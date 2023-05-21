@@ -25,3 +25,13 @@ Max Arbeitsstunden pro Tag nicht überschreiten
                     constraint_expr = solver.Sum(x[i, j, k + n] for n in range(3))
                     constraint = solver.Constraint(1, solver.infinity())  # Constraint: >= 1 with infinity hours needs to be maxed
                     constraint.SetCoefficient(constraint_expr, 1)
+
+
+ # Constraint makes sure that the user works at least 3 hours in a row - doesn't work yet
+        for i in mitarbeiter:
+            for j in range(7):
+                for k in range(len(verfügbarkeit[i][j]) - 3):
+                    # Check if the Mitarbeiter is planned at the current hour and the next 2 hours
+                    is_planned = [x[i, j, k + n] for n in range(4)]
+                    # Add a constraint to ensure at least one of the tree hours is planned
+                    solver.Add(solver.Sum(is_planned) >= 3)
