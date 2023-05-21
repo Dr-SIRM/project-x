@@ -115,7 +115,7 @@ class ORAlgorithm:
         """
 
 
-        # NB 6 - Nur einen Arbeitsblock pro Tag
+        # NB 6 - Nur einen Arbeitsblock pro Tag - funktioniert aber ohne erste Stunde!!
         for i in mitarbeiter:
             for j in range(calc_time):
                 for k in range(len(verfügbarkeit[i][j]) - min_zeit[i] - 1):  # Für jede Stunde des Tages, außer der letzten
