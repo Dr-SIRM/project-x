@@ -932,6 +932,7 @@ def get_company():
     opening_hours = OpeningHours.query.filter_by(company_name=user.company_name).first()
     weekdays = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
     company = Company.query.filter_by(company_name=user.company_name).first()
+    day_num = 7
     if company is None:
         shift = ''
         weekly_hour = ''
@@ -954,10 +955,8 @@ def get_company():
         'weekly_hours': weekly_hour,
         'start_time': opening_hours.start_time.strftime("%H:%M"),
         'end_time': opening_hours.end_time.strftime("%H:%M"),
-        'template_form': company_form.data,
         'weekdays': weekdays,
         'day_num': day_num,
-        'temp_dict': temp_dict,
     }
     print(company_list)
     #ass

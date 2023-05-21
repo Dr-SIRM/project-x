@@ -28,9 +28,11 @@ const Company = ({ company }) => {
     fetchCompany();
   }, []);
 
+  
   const handleFormSubmit = (values) => {
     // Handle form submission
   };
+
 
 
   return (
@@ -229,19 +231,21 @@ const Company = ({ company }) => {
                 }}
               ></Typography>
               {Array.from({ length: 7 }).map((_, rowIndex) => (
-                <>
-                  <Typography
-                    key={`number-${rowIndex}`}
-                    color={colors.greenAccent[500]}
-                    variant=""
-                    sx={{
-                      gridColumn: "span 1",
-                      display: "flex",
-                      alignItems: "center",
-                      height: "100%",
-                    }}
-                  >
-                    {rowIndex}
+              <>
+                <Typography
+                  key={`number-${rowIndex}`}
+                  color={colors.greenAccent[500]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 1",
+                    display: "flex",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                >
+                  {companyData && companyData.weekdays
+                    ? companyData.weekdays[rowIndex]
+                    : ""}
                   </Typography>
                   <TextField
                     key={`day_${rowIndex}_0`}
