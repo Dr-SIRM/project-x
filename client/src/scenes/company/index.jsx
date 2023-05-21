@@ -278,7 +278,7 @@ const Company = ({ company }) => {
                     type="time"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={companyData && companyData[`${rowIndex + 1}&0`] ? companyData[`${rowIndex + 1}&0`] : ""}
+                    value={companyData && companyData[`${rowIndex + 1}&1`] ? companyData[`${rowIndex + 1}&1`] : ""}
                     name={`end_time_${rowIndex}`}
                     error={
                       !!touched[`end_time_${rowIndex}`] &&
@@ -290,6 +290,7 @@ const Company = ({ company }) => {
                     }
                     sx={{ gridColumn: "span 1" }}
                   />
+
                   <Typography
                     key={`empty-1-${rowIndex}`}
                     color={colors.greenAccent[500]}
