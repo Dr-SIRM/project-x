@@ -939,6 +939,7 @@ def get_company():
     else:
         shift = company.shifts
         weekly_hour = company.weekly_hours
+
     temp_dict = {}
     for i in range(day_num):
         temp = OpeningHours.query.filter_by(weekday=weekdays[i]).first()
@@ -946,18 +947,18 @@ def get_company():
             pass
         else:
             new_i = i + 1
-            temp_dict[str(new_i) + '&0'] = temp.start_time
-            temp_dict[str(new_i) + '&1'] = temp.end_time
+            temp_dict[str(new_i) + '&0'] = temp.start_time.strftime("%H:%M") if temp.start_time else None
+            temp_dict[str(new_i) + '&1'] = temp.end_time.strftime("%H:%M") if temp.end_time else None
 
     company_list = {
         'company_name': user.company_name,
         'shifts': shift,
         'weekly_hours': weekly_hour,
-        'start_time': opening_hours.start_time.strftime("%H:%M"),
-        'end_time': opening_hours.end_time.strftime("%H:%M"),
         'weekdays': weekdays,
         'day_num': day_num,
+        'temp_dict': temp_dict, 
     }
+    
     print(company_list)
     #ass
     return jsonify(company_list)

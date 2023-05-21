@@ -254,7 +254,12 @@ const Company = ({ company }) => {
                     type="time"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values[`start_time_${rowIndex}`]}
+                    value={
+                      companyData &&
+                      companyData[`${rowIndex + 1}&0`]
+                        ? companyData[`${rowIndex + 1}&0`]
+                        : ""
+                    }
                     name={`start_time_${rowIndex}`}
                     error={
                       !!touched[`start_time_${rowIndex}`] &&
@@ -273,7 +278,7 @@ const Company = ({ company }) => {
                     type="time"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values[`end_time_${rowIndex}`]}
+                    value={companyData && companyData[`${rowIndex + 1}&0`] ? companyData[`${rowIndex + 1}&0`] : ""}
                     name={`end_time_${rowIndex}`}
                     error={
                       !!touched[`end_time_${rowIndex}`] &&
