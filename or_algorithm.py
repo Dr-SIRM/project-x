@@ -28,11 +28,7 @@ class ORAlgorithm:
 
         # Kosten für jeden MA noch gleich, ebenfalls die max Zeit bei allen gleich
         kosten = {ma: 20 for ma in mitarbeiter}  # Kosten pro Stunde
-        max_zeit = {ma: 8 for ma in mitarbeiter}  # Maximale Arbeitszeit pro Tag
-        max_working_time = 8
-        min_zeit = {ma: 3 for ma in mitarbeiter}  # Maximale Arbeitszeit pro Tag
-        salary = 1
-        calc_time = 3
+        max_zeit = {ma: 5 for ma in mitarbeiter}  # Maximale Arbeitszeit pro Tag
 
         # Diese Daten werden später noch aus der Datenbank gezogen
         # min_anwesend = [2] * 24  # Mindestanzahl an Mitarbeitern pro Stunde
@@ -61,7 +57,13 @@ class ORAlgorithm:
                 for k in range(len(verfügbarkeit[i][j])):  # Für jede Stunde des Tages, an dem das Café geöffnet ist
                     x[i, j, k] = solver.IntVar(0, 1, f'x[{i}, {j}, {k}]') # Variabeln können nur die Werte 0 oder 1 annehmen
 
-        print(x)
+        # Schichtvariable
+        y = {}
+        for i in mitarbeiter:
+            for j in range(7):  # Für jeden Tag der Woche
+                for k in range(len(verfügbarkeit[i][j]) - 1):  # Für jede Stunde des Tages, an dem das Café geöffnet ist
+                    y[i, j, k] = solver.IntVar(0, 1, f'y[{i}, {j}, {k}]') # Variabeln können nur die Werte 0 oder 1 annehmen
+
 
         # Zielfunktion ----------------------------------------------------------------------------------------------------------
         objective = solver.Objective()
@@ -84,16 +86,14 @@ class ORAlgorithm:
                     solver.Add(x[i, j, k] <= verfügbarkeit[i][j][k])
 
 
-        # NB 2 Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend 
-        for i in mitarbeiter:
-            for j in range(calc_time):
-                # for k in range(len(verfügbarkeit[mitarbeiter[i]][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
-                for k in range(len(verfügbarkeit[i][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
-                    solver.Add(solver.Sum([x[i, j, k] for i in mitarbeiter]) >= min_anwesend[j][k])
+                # Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend 
+        for j in range(7):
+            for k in range(len(verfügbarkeit[mitarbeiter[0]][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
+                solver.Add(solver.Sum([x[i, j, k] for i in mitarbeiter]) >= min_anwesend[j][k])
 
 
-        # NB 3 Constraint only allows solutions where the max planned summed hour is 25
-        total_hours = {ma: solver.Sum([x[ma, j, k] for j in range(calc_time) for k in range(len(verfügbarkeit[ma][j]))]) for ma in mitarbeiter}
+        # Constraint only allows solutions where the max planned summed hour is 25
+        total_hours = {ma: solver.Sum([x[ma, j, k] for j in range(7) for k in range(len(verfügbarkeit[ma][j]))]) for ma in mitarbeiter}
         for ma in mitarbeiter:
             solver.Add(total_hours[ma] <= 50)
 
@@ -103,25 +103,30 @@ class ORAlgorithm:
             for j in range(calc_time):
                 solver.Add(solver.Sum(x[i, j, k] for k in range(len(verfügbarkeit[i][j]))) <= max_zeit[i])
 
-        
-        # NB 5 Constraint min working hours per day is 3 hours
+
+        # Constraint makes sure that the user works at least 3 hours in a row - doesn't work yet
         for i in mitarbeiter:
-            for j in range(calc_time):
-                sum_hours = solver.Sum(x[i, j, k] for k in range(len(verfügbarkeit[i][j])))
-                if sum_hours >= min_zeit[i]:
-                    solver.Add(sum_hours >= min_zeit[i])
+            for j in range(7):
+                for k in range(len(verfügbarkeit[i][j]) - 3):
+                    # Check if the Mitarbeiter is planned at the current hour and the next 2 hours
+                    is_planned = [x[i, j, k + n] for n in range(3)]
+                    # Add a constraint to ensure at least one of the tree hours is planned
+                    solver.Add(solver.Sum(is_planned) >= 0)
 
-    
 
-       # Constraints to work consecutive
-        """for i in mitarbeiter:
-            for j in range(calc_time):
-                consecutive_hours = 0
-                for k in range(len(verfügbarkeit[i][j])):
-                    if x[i, j, k] == 1:
-                        consecutive_hours += 1
-                        solver.Add(consecutive_hours >= 3)"""
-                        
+        # Wenn ein Mitarbeiter arbeitet, darf er nicht in der nächsten Stunde eine neue Schicht beginnen, wenn er auch in dieser Stunde arbeitet
+        # funktioniert noch nicht!
+        for i in mitarbeiter:
+            for j in range(7):
+                for k in range(len(verfügbarkeit[i][j]) - 1):
+                    if k < len(verfügbarkeit[i][j]) - 2:  # Stellen Sie sicher, dass k+1 innerhalb des Bereichs liegt
+                        solver.Add(x[i, j, k] + y[i, j, k+1] - x[i, j, k+1] <= 1)
+
+        # funktioniert noch nicht!
+        for i in mitarbeiter:
+            for j in range(7):
+                for k in range(len(verfügbarkeit[i][j]) - 1):
+                    solver.Add(y[i, j, k] <= x[i, j, k])
 
         # Problem lösen ---------------------------------------------------------------------------------------------------------
         status = solver.Solve()

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useTheme, Box, Button, TextField, InputAdornment, MenuItem, Select, FormControl, InputLabel, Snackbar, Typography  } from "@mui/material";
+import { useTheme, Box, Button, TextField, Snackbar, Typography } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -7,50 +7,37 @@ import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import axios from 'axios';
 
-
 const Company = ({ company }) => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
-  const theme = useTheme();
-  const [users, setUsers] = useState([]);
-  const [message, setMessage] = useState("");
-  const colors = tokens(theme.palette.mode);
+  const [companyData, setCompanyData] = useState([]);
 
   useEffect(() => {
-    fetchData();
+    const fetchCompany = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/company');
+        setCompanyData(response.data);
+      } catch (error) {
+        console.error('Error fetching company details:', error);
+      }
+    };
+
+    fetchCompany();
   }, []);
 
-  //Datafetch for User-Display in Team.jsx
-  async function fetchData() {
-    try {
-      const response = await axios.get("http://localhost:5000/api/company");
-      const data = response.data;
-      setUsers(data);
-    } catch (error) {
-      console.error("Error fetching data:", error.response ? error.response : error);
-      setMessage("An error occurred while fetching data.");
-    }
-  }
-
-  const handleFormSubmit = (values, { resetForm }) => {
-    axios
-      .post('http://localhost:5000/api/company', values)
-      .then((response) => {
-        console.log(response.data);
-        setShowSuccessNotification(true);
-        resetForm();
-      })
-      .catch((error) => {
-        console.error(error);
-        setShowErrorNotification(true);
-      });
+  const handleFormSubmit = (values) => {
+    // Handle form submission
   };
+
 
   return (
     <Box m="20px">
-      <Header title="COMPANY" 
-      subtitle="Please update your company data whenever necessary. This are the basics for your optimized Scheduler." 
+      <Header
+        title="COMPANY"
+        subtitle="Please update your company data whenever necessary. These are the basics for your optimized Scheduler."
       />
       <h2>Company Information</h2>
 
@@ -76,94 +63,115 @@ const Company = ({ company }) => {
                 "& > div": { gridColumn: isNonMobile ? undefined : "span 6" },
               }}
             >
-            <Typography color={colors.greenAccent[500]} variant="h6" sx={{
-                gridColumn: "span 1",
-                display: "flex",
-                alignItems: "right",
-                height: "100%",
-                }}>
-             Firmennamen
-            </Typography>
+              <Typography
+                color={colors.greenAccent[500]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "right",
+                  height: "100%",
+                }}
+              >
+                Firmennamen
+              </Typography>
               <TextField
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Company Name"
+                label={companyData.company_name}
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.first_name}
+                value={values.company_name}
                 name="company_name"
-                error={!!touched.first_name && !!errors.first_name}
-                helpertext={touched.first_name && errors.first_name}
+                error={!!touched.company_name && !!errors.company_name}
+                helperText={touched.company_name && errors.company_name}
                 sx={{ gridColumn: "span 1" }}
               />
-              <Typography color={colors.greenAccent[500]} variant="" sx={{
-                gridColumn: "span 4",
-                display: "grid",
-                alignItems: "center",
-                height: "100%",
-                }}>
-            </Typography>
-              <Typography color={colors.greenAccent[500]} variant="h6" sx={{
-                gridColumn: "span 1",
-                display: "flex",
-                alignItems: "right",
-                height: "100%",
-                }}>
-             Weekly Hours
-            </Typography>
+              <Typography
+                color={colors.greenAccent[500]}
+                variant=""
+                sx={{
+                  gridColumn: "span 4",
+                  display: "grid",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              ></Typography>
+              <Typography
+                color={colors.greenAccent[500]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "right",
+                  height: "100%",
+                }}
+              >
+                Weekly Hours
+              </Typography>
               <TextField
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Hour"
+                label={companyData.weekly_hours}
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.last_name}
-                name="weekly_hour"
-                error={!!touched.last_name && !!errors.last_name}
-                helpertext={touched.last_name && errors.last_name}
+                value={values.weekly_hours}
+                name="weekly_hours"
+                error={!!touched.weekly_hours && !!errors.weekly_hours}
+                helperText={touched.weekly_hours && errors.weekly_hours}
                 sx={{ gridColumn: "span 1" }}
               />
-              <Typography color={colors.greenAccent[500]} variant="" sx={{
-                gridColumn: "span 4",
-                display: "grid",
-                alignItems: "center",
-                height: "100%",
-                }}>
-            </Typography>
-              <Typography color={colors.greenAccent[500]} variant="h6" sx={{
-                gridColumn: "span 1",
-                display: "flex",
-                alignItems: "right",
-                height: "100%",
-                }}>
-             Shifts
-            </Typography>
+              <Typography
+                color={colors.greenAccent[500]}
+                variant=""
+                sx={{
+                  gridColumn: "span 4",
+                  display: "grid",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              ></Typography>
+              <Typography
+                color={colors.greenAccent[500]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "right",
+                  height: "100%",
+                }}
+              >
+                Shifts
+              </Typography>
               <TextField
                 fullWidth
                 variant="filled"
                 type="text"
-                label="No. of Shifts"
+                label={companyData.shifts}
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.email}
-                name="shift"
-                error={!!touched.email && !!errors.email}
-                helpertext={touched.email && errors.email}
+                value={values.shifts}
+                name="shifts"
+                error={!!touched.shifts && !!errors.shifts}
+                helperText={touched.shifts && errors.shifts}
                 sx={{ gridColumn: "span 1" }}
               />
-              <Typography color={colors.greenAccent[500]} variant="" sx={{
-                gridColumn: "span 4",
-                display: "grid",
-                alignItems: "center",
-                height: "100%",
-                }}>
-            </Typography>
+              <Typography
+                color={colors.greenAccent[500]}
+                variant=""
+                sx={{
+                  gridColumn: "span 4",
+                  display: "grid",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              ></Typography>
             </Box>
             <></>
             <></>
-            <h2>Opening Hour</h2>
+            <h2>Opening Hour of your mother's legs</h2>
             <></>
             <></>
             <Box
@@ -174,51 +182,66 @@ const Company = ({ company }) => {
                 "& > div": { gridColumn: isNonMobile ? undefined : "span 6" },
               }}
             >
-              <Typography color={colors.greenAccent[500]} variant="h6" sx={{
-                gridColumn: "span 1",
-                display: "flex",
-                alignItems: "center",
-                height: "100%",
-                }}>
-             Weekday
-            </Typography>
-            <Typography color={colors.greenAccent[500]} variant="h6" sx={{
-                gridColumn: "span 1",
-                display: "flex",
-                alignItems: "center",
-                height: "100%",
-                }}>
-             Start Time
-            </Typography>
-            <Typography color={colors.greenAccent[500]} variant="h6" sx={{
-                gridColumn: "span 1",
-                display: "flex",
-                alignItems: "center",
-                height: "100%",
-                }}>
-             End Time
-            </Typography>
-            <Typography color={colors.greenAccent[500]} variant="" sx={{
-                gridColumn: "span 3",
-                display: "flex",
-                alignItems: "center",
-                height: "100%",
-                }}>
-            </Typography>
+              <Typography
+                color={colors.greenAccent[500]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              >
+                Weekday
+              </Typography>
+              <Typography
+                color={colors.greenAccent[500]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              >
+                Start Time
+              </Typography>
+              <Typography
+                color={colors.greenAccent[500]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              >
+                End Time
+              </Typography>
+              <Typography
+                color={colors.greenAccent[500]}
+                variant=""
+                sx={{
+                  gridColumn: "span 3",
+                  display: "flex",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              ></Typography>
               {Array.from({ length: 7 }).map((_, rowIndex) => (
                 <>
-                <Typography
-                  key={`number-${rowIndex}`}
-                  color={colors.greenAccent[500]}
-                  variant=""
-                  sx={{
-                    gridColumn: "span 1",
-                    display: "flex",
-                    alignItems: "center",
-                    height: "100%",
-                  }}
-                >
-                 {[rowIndex]}
+                  <Typography
+                    key={`number-${rowIndex}`}
+                    color={colors.greenAccent[500]}
+                    variant=""
+                    sx={{
+                      gridColumn: "span 1",
+                      display: "flex",
+                      alignItems: "center",
+                      height: "100%",
+                    }}
+                  >
+                    {rowIndex}
                   </Typography>
                   <TextField
                     key={`day_${rowIndex}_0`}
@@ -227,10 +250,16 @@ const Company = ({ company }) => {
                     type="time"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={`${rowIndex + 1}0`}
+                    value={values[`start_time_${rowIndex}`]}
                     name={`start_time_${rowIndex}`}
-                    error={!!touched[`start_time_${rowIndex}`] && !!errors[`start_time_${rowIndex}`]}
-                    helperText={touched[`start_time_${rowIndex}`] && errors[`start_time_${rowIndex}`]}
+                    error={
+                      !!touched[`start_time_${rowIndex}`] &&
+                      !!errors[`start_time_${rowIndex}`]
+                    }
+                    helperText={
+                      touched[`start_time_${rowIndex}`] &&
+                      errors[`start_time_${rowIndex}`]
+                    }
                     sx={{ gridColumn: "span 1" }}
                   />
                   <TextField
@@ -240,10 +269,16 @@ const Company = ({ company }) => {
                     type="time"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={`${rowIndex + 1}1`}
+                    value={values[`end_time_${rowIndex}`]}
                     name={`end_time_${rowIndex}`}
-                    error={!!touched[`end_time_${rowIndex}`] && !!errors[`end_time_${rowIndex}`]}
-                    helperText={touched[`end_time_${rowIndex}`] && errors[`end_time_${rowIndex}`]}
+                    error={
+                      !!touched[`end_time_${rowIndex}`] &&
+                      !!errors[`end_time_${rowIndex}`]
+                    }
+                    helperText={
+                      touched[`end_time_${rowIndex}`] &&
+                      errors[`end_time_${rowIndex}`]
+                    }
                     sx={{ gridColumn: "span 1" }}
                   />
                   <Typography
@@ -257,7 +292,6 @@ const Company = ({ company }) => {
                       height: "100%",
                     }}
                   ></Typography>
-                  
                 </>
               ))}
             </Box>
@@ -275,8 +309,8 @@ const Company = ({ company }) => {
         message="Registration successful"
         autoHideDuration={3000}
         sx={{
-          backgroundColor: "green !important", 
-          color: "white", 
+          backgroundColor: "green !important",
+          color: "white",
           "& .MuiSnackbarContent-root": {
             borderRadius: "4px",
             padding: "15px",
@@ -287,11 +321,11 @@ const Company = ({ company }) => {
       <Snackbar
         open={showErrorNotification}
         onClose={() => setShowErrorNotification(false)}
-        message="Error occurred - Your email might already be in use"
+        message="Error occurred - Your shifts might already be in use"
         autoHideDuration={3000}
         sx={{
-          backgroundColor: "red !important", 
-          color: "white", 
+          backgroundColor: "red !important",
+          color: "white",
           "& .MuiSnackbarContent-root": {
             borderRadius: "4px",
             padding: "15px",
@@ -299,42 +333,20 @@ const Company = ({ company }) => {
           },
         }}
       />
-
     </Box>
   );
 };
 
-
 const checkoutSchema = yup.object().shape({
-  first_name: yup.string().required("required"),
-  last_name: yup.string().required("required"),
-  email: yup.string().email("invalid email").required("required"),
-  password: yup.string().required("required"),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref("password"), null], "Passwords must match")
-    .required("required"),
-  company_name: yup.string().required("required"),
-  access_level: yup.string().required("required"),
-  employment_level: yup
-    .number()
-    .min(0, 'Company level must be greater than or equal to 0%')
-    .max(100, 'Company level must be less than or equal to 100%')
-    .required("required"),
+  company_name: yup.string(),
+  weekly_hours: yup.number(),
+  shifts: yup.number(),
 });
 
 const initialValues = {
-  first_name: "",
-  last_name: "",
-  email: "",
-  employment_level: "",
-  company_name: "company_name",
-  access_level: "",
-  department: "",
-  password: "",
-  confirmPassword: "",
-  10:"10"
-  
+  company_name: "",
+  weekly_hours: "",
+  shifts: "",
 };
 
 export default Company;

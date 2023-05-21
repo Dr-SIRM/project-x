@@ -145,6 +145,7 @@ class DataProcessing:
         self.opening_hours = [self.time_to_int(self.laden_schliesst[i]) - self.time_to_int(self.laden_oeffnet[i]) for i in range(7)]
 
 
+
     def get_time_req(self):
         """In dieser Funktion werden die benötigten Mitarbeiter für jede Stunde jedes Tages abgerufen."""
 
@@ -179,10 +180,14 @@ class DataProcessing:
             for date, start_time, worker in time_reqs:
                 # Wochentag als Index (0 = Montag, 1 = Dienstag, usw.) erhalten
                 weekday_index = date.weekday()
-                start_hour = self.time_to_int_2(start_time) - self.time_to_int_1(self.laden_oeffnet[weekday_index])
-                time_req_dict_2[date][start_hour] = worker
+
+                # Prüfen, ob die Start- und Endzeiten innerhalb der Öffnungszeiten liegen
+                if (self.laden_oeffnet[weekday_index] <= start_time < self.laden_schliesst[weekday_index]):
+                    start_hour = self.time_to_int_2(start_time) - self.time_to_int_1(self.laden_oeffnet[weekday_index])
+                    time_req_dict_2[date][start_hour] = worker
 
         self.time_req = time_req_dict_2
+
 
 
 

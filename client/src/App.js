@@ -42,7 +42,7 @@ function App() {
       setMessage("An error occurred while fetching data.");
     }
   }
-  
+
 
   return (
     <ColorModeContext.Provider value={colorMode}>
