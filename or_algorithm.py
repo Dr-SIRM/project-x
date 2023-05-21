@@ -115,20 +115,17 @@ class ORAlgorithm:
                     solver.Add(sum_hour >= min_zeit[i])
 
 
-        # NB 6 - Nur einen Arbeitsblock pro Tag - funktioniert aber ohne erste Stunde und ohne letzte!!
+        # NB 6 - Nur einen Arbeitsblock pro Tag
         for i in mitarbeiter:
             for j in range(calc_time):
-                for k in range(len(verfügbarkeit[i][j])):  # Für jede Stunde des Tages, außer der letzten
-                    if k == 0:
-                        if verfügbarkeit[i][j][0] == 1:
-                            solver.Add(y[i, j, 0] >= 1)
-                    if k >= len(verfügbarkeit[i][j]) - min_zeit[i]:
-                        solver.Add(y[i, j, k] >= 0)
-                    else:
-                        # Wenn Mitarbeiter i in der Stunde k+1 (Folgestunde) arbeitet, aber nicht in der Stunde k (aktuellen Stunde), dann ist y[i, j, k] = 1
-                        solver.Add(y[i, j, k] >= x[i, j, k+1] - x[i, j, k])
+                # Für die erste Stunde des Tages
+                solver.Add(y[i, j, 0] >= x[i, j, 0] - 0)
+                # Für die restlichen Stunden des Tages
+                for k in range(1, len(verfügbarkeit[i][j])):
+                    solver.Add(y[i, j, k] >= x[i, j, k] - x[i, j, k-1])
                 # Die Summe der y[i, j, k] für einen bestimmten Tag j sollte nicht größer als 1 sein
                 solver.Add(solver.Sum(y[i, j, k] for k in range(len(verfügbarkeit[i][j]))) <= 1)
+
 
 
 
