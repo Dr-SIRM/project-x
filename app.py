@@ -927,16 +927,41 @@ def react_update():
 
 @app.route('/api/company', methods=['GET', 'POST'])
 def get_company():
-    users = User.query.filter_by(email="robin.martin@timetab.ch").first()
-    company_name = Company.query.filter_by(company_name = users.company_name).first()
-    company_list = {
-            'company_name': users.company_name,
-            'shifts': company_name.shifts,
-            'weekly_hours': company_name.weekly_hours
-        }      
-    print(company_list)  
-    return jsonify(company_list)
+    # This has to be updated to the current user once the function is implemented.
+    user = User.query.filter_by(email="robin.martin@timetab.ch").first()
+    opening_hours = OpeningHours.query.filter_by(company_name=user.company_name).first()
+    weekdays = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
+    company = Company.query.filter_by(company_name=user.company_name).first()
+    if company is None:
+        shift = ''
+        weekly_hour = ''
+    else:
+        shift = company.shifts
+        weekly_hour = company.weekly_hours
+    temp_dict = {}
+    for i in range(day_num):
+        temp = OpeningHours.query.filter_by(weekday=weekdays[i]).first()
+        if temp is None:
+            pass
+        else:
+            new_i = i + 1
+            temp_dict[str(new_i) + '&0'] = temp.start_time
+            temp_dict[str(new_i) + '&1'] = temp.end_time
 
+    company_list = {
+        'company_name': user.company_name,
+        'shifts': shift,
+        'weekly_hours': weekly_hour,
+        'start_time': opening_hours.start_time.strftime("%H:%M"),
+        'end_time': opening_hours.end_time.strftime("%H:%M"),
+        'template_form': company_form.data,
+        'weekdays': weekdays,
+        'day_num': day_num,
+        'temp_dict': temp_dict,
+    }
+    print(company_list)
+    #ass
+    return jsonify(company_list)
 
 '''
 @app.route('/suckyourtitties', methods=['GET', 'POST'])
