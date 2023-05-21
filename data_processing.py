@@ -41,7 +41,7 @@ class DataProcessing:
 
         with app.app_context():
             start_date = "2023-05-22"
-            end_date = "2023-05-25"
+            end_date = "2023-05-26"
             
             # Hole den company_name des aktuellen Benutzers
             sql = text("""
@@ -151,7 +151,7 @@ class DataProcessing:
 
         with app.app_context():
             start_date = "2023-05-22"
-            end_date = "2023-05-25"
+            end_date = "2023-05-26"
 
             # Hole den company_name des aktuellen Benutzers
             sql = text("""

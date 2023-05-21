@@ -29,8 +29,8 @@ class ORAlgorithm:
         # Kosten für jeden MA noch gleich, ebenfalls die max Zeit bei allen gleich
         kosten = {ma: 20 for ma in mitarbeiter}  # Kosten pro Stunde
         max_zeit = {ma: 8 for ma in mitarbeiter}  # Maximale Arbeitszeit pro Tag
-        min_zeit = {ma: 2 for ma in mitarbeiter}  # Maximale Arbeitszeit pro Tag
-        calc_time = 3
+        min_zeit = {ma: 3 for ma in mitarbeiter}  # Maximale Arbeitszeit pro Tag
+        calc_time = 5
 
         # Diese Daten werden später noch aus der Datenbank gezogen
         # min_anwesend = [2] * 24  # Mindestanzahl an Mitarbeitern pro Stunde
@@ -97,7 +97,7 @@ class ORAlgorithm:
         # NB 3 - Max. Arbeitszeit pro Woche 
         total_hours = {ma: solver.Sum([x[ma, j, k] for j in range(calc_time) for k in range(len(verfügbarkeit[ma][j]))]) for ma in mitarbeiter}
         for ma in mitarbeiter:
-            solver.Add(total_hours[ma] <= 50)
+            solver.Add(total_hours[ma] <= 35)
 
 
         # NB 4 - Max. Arbeitszeit pro Tag
@@ -106,15 +106,23 @@ class ORAlgorithm:
                 solver.Add(solver.Sum(x[i, j, k] for k in range(len(verfügbarkeit[i][j]))) <= max_zeit[i])
 
 
-        # NB 5 - Wenn arbeit = min. 3h
+        """
+       # NB 5 - Min. Arbeitszeit pro Tag - funktioniert noch nicht wie gewollt!!
         for i in mitarbeiter:
             for j in range(calc_time):
-                for k in range(len(verfügbarkeit[i][j]) - 3):
-                    # Check if the Mitarbeiter is planned at the current hour and the next 2 hours
-                    is_planned = [x[i, j, k + n] for n in range(3)]
-                    # Add a constraint to ensure at least one of the tree hours is planned
-                    solver.Add(solver.Sum(is_planned) >= 0)
+                sum_hour = solver.Sum(x[i, j, k] for k in range(len(verfügbarkeit[i][j])))
+                solver.Add(sum_hour >= min_zeit[i])
+        """
 
+
+        # NB 6 - Nur einen Arbeitsblock pro Tag
+        for i in mitarbeiter:
+            for j in range(calc_time):
+                for k in range(len(verfügbarkeit[i][j]) - min_zeit[i] - 1):  # Für jede Stunde des Tages, außer der letzten
+                    # Wenn Mitarbeiter i in der Stunde k+1 (Folgestunde) arbeitet, aber nicht in der Stunde k (aktuellen Stunde), dann ist y[i, j, k] = 1
+                    solver.Add(y[i, j, k] >= x[i, j, k+1] - x[i, j, k])
+                # Die Summe der y[i, j, k] für einen bestimmten Tag j sollte nicht größer als 1 sein
+                solver.Add(solver.Sum(y[i, j, k] for k in range(len(verfügbarkeit[i][j]) - 1)) <= 1)
 
 
 
