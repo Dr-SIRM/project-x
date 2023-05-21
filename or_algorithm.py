@@ -28,7 +28,11 @@ class ORAlgorithm:
 
         # Kosten für jeden MA noch gleich, ebenfalls die max Zeit bei allen gleich
         kosten = {ma: 20 for ma in mitarbeiter}  # Kosten pro Stunde
-        max_zeit = {ma: 5 for ma in mitarbeiter}  # Maximale Arbeitszeit pro Tag
+        max_zeit = {ma: 8 for ma in mitarbeiter}  # Maximale Arbeitszeit pro Tag
+        max_working_time = 8
+        min_zeit = {ma: 3 for ma in mitarbeiter}  # Maximale Arbeitszeit pro Tag
+        salary = 1
+        calc_time = 3
 
         # Diese Daten werden später noch aus der Datenbank gezogen
         # min_anwesend = [2] * 24  # Mindestanzahl an Mitarbeitern pro Stunde
@@ -53,7 +57,7 @@ class ORAlgorithm:
         # solver.IntVar() <-- Int Variabeln
         x = {}
         for i in mitarbeiter:
-            for j in range(7):  # Für jeden Tag der Woche
+            for j in range(calc_time):  # Für jeden Tag der Woche
                 for k in range(len(verfügbarkeit[i][j])):  # Für jede Stunde des Tages, an dem das Café geöffnet ist
                     x[i, j, k] = solver.IntVar(0, 1, f'x[{i}, {j}, {k}]') # Variabeln können nur die Werte 0 oder 1 annehmen
 
@@ -62,10 +66,10 @@ class ORAlgorithm:
         # Zielfunktion ----------------------------------------------------------------------------------------------------------
         objective = solver.Objective()
         for i in mitarbeiter:
-            for j in range(7):
+            for j in range(calc_time):
                 for k in range(len(verfügbarkeit[i][j])):
                     # Die Kosten werden multipliziert
-                    objective.SetCoefficient(x[i, j, k], kosten[i])
+                    objective.SetCoefficient(x[i, j, k], salary)
         # Es wird veruscht, eine Kombination von Werten für die x[i, j, k] zu finden, die die Summe kosten[i]*x[i, j, k] minimiert            
         objective.SetMinimization()
 
@@ -73,34 +77,51 @@ class ORAlgorithm:
         # Beschränkungen --------------------------------------------------------------------------------------------------------
         # (Die solver.Add() Funktion nimmt eine Bedingung als Argument und fügt sie dem Optimierungsproblem hinzu.)
 
-        # MA darf nur eingeteilt werden, sofern er auch verfügbar ist.
+        # NB 1 MA darf nur eingeteilt werden, sofern er auch verfügbar ist.
         for i in mitarbeiter:
-            for j in range(7):
+            for j in range(calc_time):
                 for k in range(len(verfügbarkeit[i][j])):
                     solver.Add(x[i, j, k] <= verfügbarkeit[i][j][k])
 
 
-                # Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend 
-        for j in range(7):
-            for k in range(len(verfügbarkeit[mitarbeiter[0]][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
-                solver.Add(solver.Sum([x[i, j, k] for i in mitarbeiter]) >= min_anwesend[j][k])
-
-
-        # Constraint only allows solutions where the max planned summed hour is 25
-        total_hours = {ma: solver.Sum([x[ma, j, k] for j in range(7) for k in range(len(verfügbarkeit[ma][j]))]) for ma in mitarbeiter}
-        for ma in mitarbeiter:
-            solver.Add(total_hours[ma] <= 25)
-
-
-        # Constraint makes sure that the user works at least 3 hours in a row - doesn't work yet
+        # NB 2 Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend 
         for i in mitarbeiter:
-            for j in range(7):
-                for k in range(len(verfügbarkeit[i][j]) - 3):
-                    # Check if the Mitarbeiter is planned at the current hour and the next 2 hours
-                    is_planned = [x[i, j, k + n] for n in range(3)]
-                    # Add a constraint to ensure at least one of the tree hours is planned
-                    solver.Add(solver.Sum(is_planned) >= 0)
+            for j in range(calc_time):
+                # for k in range(len(verfügbarkeit[mitarbeiter[i]][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
+                for k in range(len(verfügbarkeit[i][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
+                    solver.Add(solver.Sum([x[i, j, k] for i in mitarbeiter]) >= min_anwesend[j][k])
 
+
+        # NB 3 Constraint only allows solutions where the max planned summed hour is 25
+        total_hours = {ma: solver.Sum([x[ma, j, k] for j in range(calc_time) for k in range(len(verfügbarkeit[ma][j]))]) for ma in mitarbeiter}
+        for ma in mitarbeiter:
+            solver.Add(total_hours[ma] <= 50)
+
+
+        # NB 4 Constraint min working hours per day is 5 hours
+        for i in mitarbeiter:
+            for j in range(calc_time):
+                solver.Add(solver.Sum(x[i, j, k] for k in range(len(verfügbarkeit[i][j]))) <= max_zeit[i])
+
+        
+        # NB 5 Constraint min working hours per day is 3 hours
+        for i in mitarbeiter:
+            for j in range(calc_time):
+                sum_hours = solver.Sum(x[i, j, k] for k in range(len(verfügbarkeit[i][j])))
+                if sum_hours >= min_zeit[i]:
+                    solver.Add(sum_hours >= min_zeit[i])
+
+    
+
+       # Constraints to work consecutive
+        """for i in mitarbeiter:
+            for j in range(calc_time):
+                consecutive_hours = 0
+                for k in range(len(verfügbarkeit[i][j])):
+                    if x[i, j, k] == 1:
+                        consecutive_hours += 1
+                        solver.Add(consecutive_hours >= 3)"""
+                        
 
         # Problem lösen ---------------------------------------------------------------------------------------------------------
         status = solver.Solve()
@@ -108,16 +129,27 @@ class ORAlgorithm:
 
 
         # Ergebnisse ausgeben ----------------------------------------------------------------------------------------------------
-        if status == pywraplp.Solver.OPTIMAL:
+        if status == pywraplp.Solver.OPTIMAL or status == pywraplp.Solver.FEASIBLE:
             mitarbeiter_arbeitszeiten = {}
             for i in mitarbeiter:
                 mitarbeiter_arbeitszeiten[i] = []
-                for j in range(7):
+                for j in range(calc_time):
                     arbeitszeit_pro_tag = []
                     for k in range(len(verfügbarkeit[i][j])):
                         arbeitszeit_pro_tag.append(int(x[i, j, k].solution_value()))
                     mitarbeiter_arbeitszeiten[i].append(arbeitszeit_pro_tag)
             print(mitarbeiter_arbeitszeiten)
+        if status == pywraplp.Solver.OPTIMAL:
+            print("Optimal solution found.")
+        elif status == pywraplp.Solver.FEASIBLE:
+            print("Feasible solution found.")
+        elif status == pywraplp.Solver.INFEASIBLE:
+            print("Problem is infeasible.")
+        elif status == pywraplp.Solver.UNBOUNDED:
+            print("Problem is unbounded.")
+        elif status == pywraplp.Solver.NOT_SOLVED:
+            print("Solver did not solve the problem.")
         else:
-            print('Das Problem konnte nicht optimal gelöst werden.')
+            print("Unknown status.")
+           
 
