@@ -63,7 +63,7 @@ class ORAlgorithm:
         y = {}
         for i in mitarbeiter:
             for j in range(calc_time):  # Für jeden Tag der Woche
-                for k in range(len(verfügbarkeit[i][j]) - 1):  # Für jede Stunde des Tages, an dem das Café geöffnet ist
+                for k in range(len(verfügbarkeit[i][j])):  # Für jede Stunde des Tages, an dem das Café geöffnet ist
                     y[i, j, k] = solver.IntVar(0, 1, f'y[{i}, {j}, {k}]') # Variabeln können nur die Werte 0 oder 1 annehmen
 
 
@@ -91,7 +91,7 @@ class ORAlgorithm:
         # NB 2 - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend 
         for j in range(calc_time):
             for k in range(len(verfügbarkeit[mitarbeiter[0]][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
-                solver.Add(solver.Sum([x[i, j, k] for i in mitarbeiter]) >= min_anwesend[j][k])
+                solver.Add(solver.Sum([x[i, j, k] for i in mitarbeiter]) >= min_anwesend[j][k] + 1)
 
 
         # NB 3 - Max. Arbeitszeit pro Woche 
@@ -106,24 +106,29 @@ class ORAlgorithm:
                 solver.Add(solver.Sum(x[i, j, k] for k in range(len(verfügbarkeit[i][j]))) <= max_zeit[i])
 
 
-        """
-       # NB 5 - Min. Arbeitszeit pro Tag - funktioniert noch nicht wie gewollt!!
+       # NB 5 - Min. Arbeitszeit pro Tag
         for i in mitarbeiter:
             for j in range(calc_time):
-                sum_hour = solver.Sum(x[i, j, k] for k in range(len(verfügbarkeit[i][j])))
-                solver.Add(sum_hour >= min_zeit[i])
-        """
+                # Prüfen, ob der Mitarbeiter an diesem Tag arbeiten kann (z.B. [0, 1, 1] = sum(2))
+                if sum(verfügbarkeit[i][j]) >= min_zeit[i]:
+                    sum_hour = solver.Sum(x[i, j, k] for k in range(len(verfügbarkeit[i][j])))
+                    solver.Add(sum_hour >= min_zeit[i])
 
 
-        # NB 6 - Nur einen Arbeitsblock pro Tag - funktioniert aber ohne erste Stunde!!
+        # NB 6 - Nur einen Arbeitsblock pro Tag - funktioniert aber ohne erste Stunde und ohne letzte!!
         for i in mitarbeiter:
             for j in range(calc_time):
-                for k in range(len(verfügbarkeit[i][j]) - min_zeit[i] - 1):  # Für jede Stunde des Tages, außer der letzten
-                    # Wenn Mitarbeiter i in der Stunde k+1 (Folgestunde) arbeitet, aber nicht in der Stunde k (aktuellen Stunde), dann ist y[i, j, k] = 1
-                    solver.Add(y[i, j, k] >= x[i, j, k+1] - x[i, j, k])
+                for k in range(len(verfügbarkeit[i][j])):  # Für jede Stunde des Tages, außer der letzten
+                    if k == 0:
+                        if verfügbarkeit[i][j][0] == 1:
+                            solver.Add(y[i, j, 0] >= 1)
+                    if k >= len(verfügbarkeit[i][j]) - min_zeit[i]:
+                        solver.Add(y[i, j, k] >= 0)
+                    else:
+                        # Wenn Mitarbeiter i in der Stunde k+1 (Folgestunde) arbeitet, aber nicht in der Stunde k (aktuellen Stunde), dann ist y[i, j, k] = 1
+                        solver.Add(y[i, j, k] >= x[i, j, k+1] - x[i, j, k])
                 # Die Summe der y[i, j, k] für einen bestimmten Tag j sollte nicht größer als 1 sein
-                solver.Add(solver.Sum(y[i, j, k] for k in range(len(verfügbarkeit[i][j]) - 1)) <= 1)
-
+                solver.Add(solver.Sum(y[i, j, k] for k in range(len(verfügbarkeit[i][j]))) <= 1)
 
 
 
