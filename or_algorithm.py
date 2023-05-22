@@ -5,6 +5,32 @@ from openpyxl.utils import get_column_letter
 from ortools.linear_solver import pywraplp
 from data_processing import DataProcessing
 
+"""
+To-Do Liste:
+
+Prio 1:
+
+ - (erl.) NB6: Max. einen Arbeitsblock pro Tag
+ - Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
+ - die calc_time soll automatisch errechnet werden
+ - Als Key oder i für MA soll nicht mehr MA1, MA2 usw stehen, sondern die user_id (zB. 1002)
+ - NB7: ?
+
+Prio 2:
+
+ - Die gesolvten Daten in der Datenbank speichern
+
+Prio 3:
+
+ - die max und min Zeit für die MA soll der Admin eingeben können. Diese Daten dann aus der Datenbank ziehen
+ - der Admin kann auch die Kosten der MA, wenn er will, eintragen. 
+
+
+"""
+
+
+
+
 class ORAlgorithm:
     def __init__(self, dp: DataProcessing):
         self.current_user_id = dp.current_user_id
@@ -36,13 +62,11 @@ class ORAlgorithm:
         min_zeit = {ma: 3 for ma in mitarbeiter}  # Maximale Arbeitszeit pro Tag
         calc_time = 5
 
-        # Diese Daten werden später noch aus der Datenbank gezogen
-        # min_anwesend = [2] * 24  # Mindestanzahl an Mitarbeitern pro Stunde
+        # Eine Liste mit den min. anwesendheiten der MA wird erstellt
         min_anwesend = []
         for _, values in sorted(self.time_req.items()):
             min_anwesend.append(list(values.values()))
         
-        print(min_anwesend)
 
         # Problem 
         # GLOP = Simplex Verfahren
@@ -164,7 +188,6 @@ class ORAlgorithm:
            
 
         # Ergebnisse ausgeben Excel ----------------------------------------------------------------------------------------------
-
         data = mitarbeiter_arbeitszeiten
 
         # Legen Sie die Füllungen fest
