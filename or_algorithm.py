@@ -11,10 +11,13 @@ To-Do Liste:
 Prio 1:
 
  - (erl.) NB6: Max. einen Arbeitsblock pro Tag
+ - auf Viertelstunden wechseln
  - Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
  - die calc_time soll automatisch errechnet werden
  - Als Key oder i für MA soll nicht mehr MA1, MA2 usw stehen, sondern die user_id (zB. 1002)
- - NB7: ?
+ - Shifts/Employment_level aus der Datenbank ziehen
+ - time_req stunden zusammenaddieren
+ - NB
 
 Prio 2:
 
@@ -62,6 +65,26 @@ class ORAlgorithm:
         min_zeit = {ma: 3 for ma in mitarbeiter}  # Maximale Arbeitszeit pro Tag
         calc_time = 5
 
+
+        # Diese werden später aus der Datenbank gezogen
+        shifts = 2
+
+        # Empolyment_level noch von der Datenbank ziehen
+        employment_lvl = [1, 0.8, 0.8, 0.6, 0.6]
+
+        # noch time_req stunden zusammenaddieren
+        verteilbare_stunden = 100
+
+        # max Stunden pro MA pro Woche
+        working_h = 35
+
+        # gesamtstunden Verfügbarkeit pro MA pro Woche - Noch in einer for loop berechnen!
+        gesamtstunden_verfügbarkeit = [50, 50, 50, 50, 40]
+
+
+
+
+
         # Eine Liste mit den min. anwesendheiten der MA wird erstellt
         min_anwesend = []
         for _, values in sorted(self.time_req.items()):
@@ -84,15 +107,23 @@ class ORAlgorithm:
         x = {}
         for i in mitarbeiter:
             for j in range(calc_time):  # Für jeden Tag der Woche
-                for k in range(len(verfügbarkeit[i][j])):  # Für jede Stunde des Tages, an dem das Café geöffnet ist
+                for k in range(len(verfügbarkeit[i][j])):  # Für jede Stunde des Tages, an dem die Firma geöffnet ist
                     x[i, j, k] = solver.IntVar(0, 1, f'x[{i}, {j}, {k}]') # Variabeln können nur die Werte 0 oder 1 annehmen
 
-        # Schichtvariable
+        # Arbeitsblockvariable
         y = {}
         for i in mitarbeiter:
             for j in range(calc_time):  # Für jeden Tag der Woche
-                for k in range(len(verfügbarkeit[i][j])):  # Für jede Stunde des Tages, an dem das Café geöffnet ist
+                for k in range(len(verfügbarkeit[i][j])):  # Für jede Stunde des Tages, an dem die Firma geöffnet ist
                     y[i, j, k] = solver.IntVar(0, 1, f'y[{i}, {j}, {k}]') # Variabeln können nur die Werte 0 oder 1 annehmen
+
+        # Schichtvariable - wird noch nicht genutzt!
+        s = {}
+        for i in mitarbeiter:
+            for j in range(calc_time):  # Für jeden Tag der Woche
+                for k in range(len(verfügbarkeit[i][j])):  # Für jede Stunde des Tages, an dem die Firma geöffnet ist
+                    s[i, j, k] = solver.IntVar(0, 1, f'y[{i}, {j}, {k}]') # Variabeln können nur die Werte 0 oder 1 annehmen
+
 
 
         # Zielfunktion ----------------------------------------------------------------------------------------------------------
@@ -122,10 +153,10 @@ class ORAlgorithm:
                 solver.Add(solver.Sum([x[i, j, k] for i in mitarbeiter]) >= min_anwesend[j][k] + 1)
 
 
-        # NB 3 - Max. Arbeitszeit pro Woche 
+        # NB 3 - Max. Arbeitszeit pro Woche - working_h muss noch berechnet werden!
         total_hours = {ma: solver.Sum([x[ma, j, k] for j in range(calc_time) for k in range(len(verfügbarkeit[ma][j]))]) for ma in mitarbeiter}
         for ma in mitarbeiter:
-            solver.Add(total_hours[ma] <= 35)
+            solver.Add(total_hours[ma] <= working_h)
 
 
         # NB 4 - Max. Arbeitszeit pro Tag
@@ -156,21 +187,61 @@ class ORAlgorithm:
 
 
         # NB 7 - Innerhalb einer Woche immer gleiche Schichten
+        
+
+        # NB 8 - Verteilungsgrad entsprechend employment_lvl (keine Festanstellung) - muss noch angepasst werden, sobald feste MA eingeplant werden
+        list_gesamtstunden = []
+        prozent_gesamtstunden = []
+        gerechte_verteilung = []
+        for i in range(len(mitarbeiter)):
+            if gesamtstunden_verfügbarkeit[i] > working_h:
+                arbeitsstunden_MA = employment_lvl[i] * working_h
+            else:
+                arbeitsstunden_MA = employment_lvl[i] * gesamtstunden_verfügbarkeit[i]
+            list_gesamtstunden.append(int(arbeitsstunden_MA))
+        # list_gesamtstunden = [35, 28, 28, 21, 21]
+        summe_stunden = sum(list_gesamtstunden)
+        # summe_stunden = 133
+        
+        for i in range(len(mitarbeiter)):
+            prozent_per_ma = list_gesamtstunden[i]/summe_stunden
+            prozent_gesamtstunden.append(prozent_per_ma)
+         # prozent_gesamtstunden = [0.2631578947368421, 0.21052631578947367, 0.21052631578947367, 0.15789473684210525, 0.15789473684210525]
+
+        for i in range(len(mitarbeiter)):
+            verteilende_h = prozent_gesamtstunden[i]*verteilbare_stunden
+            # +0.5, damit es immer aufgerundet
+            gerechte_verteilung.append(round(verteilende_h+0.5))
+        print(gerechte_verteilung) # [27, 22, 22, 16, 16]        
+
+        # for loop für die gerechte Verteilung gemäss LIste rechte_verteilung
+        verteilungsstunden = {ma: solver.Sum([x[ma, j, k] for j in range(calc_time) for k in range(len(verfügbarkeit[ma][j]))]) for ma in mitarbeiter}
+        tolerance = 0.3
+        for i, ma in enumerate(mitarbeiter):
+            lower_bound = gerechte_verteilung[i] * (1 - tolerance)
+            upper_bound = gerechte_verteilung[i] * (1 + tolerance)
+
+            solver.Add(verteilungsstunden[ma] <= upper_bound)
+            solver.Add(verteilungsstunden[ma] >= lower_bound)
 
 
-        # NB 8 - Verteilungsgrad ca. 50%
 
-
+            
         # NB 9 - Feste Mitarbeiter zu employement_level fest einplanen
 
 
-        # NB 10 - Max Stunden pro Woche gemäss company data (employement_level * working_hours)
+
+        # NB 10 - Wechselnde Schichten innerhalb 2 Wochen
 
 
-        # NB 11 - Planung pro Viertel Stunde
 
 
-        # NB 12 - Wechselnde Schichten innerhalb 2 Wochen
+
+
+
+
+
+
 
         # Problem lösen ---------------------------------------------------------------------------------------------------------
         status = solver.Solve()
