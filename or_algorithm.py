@@ -155,7 +155,22 @@ class ORAlgorithm:
                 solver.Add(solver.Sum(y[i, j, k] for k in range(len(verfügbarkeit[i][j]))) <= 1)
 
 
+        # NB 7 - Innerhalb einer Woche immer gleiche Schichten
 
+
+        # NB 8 - Verteilungsgrad ca. 50%
+
+
+        # NB 9 - Feste Mitarbeiter zu employement_level fest einplanen
+
+
+        # NB 10 - Max Stunden pro Woche gemäss company data (employement_level * working_hours)
+
+
+        # NB 11 - Planung pro Viertel Stunde
+
+
+        # NB 12 - Wechselnde Schichten innerhalb 2 Wochen
 
         # Problem lösen ---------------------------------------------------------------------------------------------------------
         status = solver.Solve()
