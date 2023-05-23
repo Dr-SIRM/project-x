@@ -254,12 +254,9 @@ const Company = ({ company }) => {
                     type="time"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={
-                      companyData &&
-                      companyData[`${rowIndex + 1}&0`]
-                        ? companyData[`${rowIndex + 1}&0`]
-                        : ""
-                    }
+                    value={companyData && companyData.temp_dict && companyData.temp_dict[`${rowIndex + 1}&0`]
+                    ? companyData.temp_dict[`${rowIndex + 1}&0`]
+                    : ""}
                     name={`start_time_${rowIndex}`}
                     error={
                       !!touched[`start_time_${rowIndex}`] &&
@@ -278,7 +275,9 @@ const Company = ({ company }) => {
                     type="time"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={companyData && companyData[`${rowIndex + 1}&1`] ? companyData[`${rowIndex + 1}&1`] : ""}
+                    value={companyData && companyData.temp_dict && companyData.temp_dict[`${rowIndex + 1}&1`]
+  ? companyData.temp_dict[`${rowIndex + 1}&1`]
+  : ""}
                     name={`end_time_${rowIndex}`}
                     error={
                       !!touched[`end_time_${rowIndex}`] &&
