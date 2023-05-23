@@ -245,7 +245,7 @@ class ORAlgorithm:
             gerechte_verteilung.append(round(verteilende_h+0.5))
         # gerechte_verteilung = [27, 22, 22, 16, 16]        
 
-        # for loop für die gerechte Verteilung gemäss LIste rechte_verteilung
+        # for loop für die gerechte Verteilung gemäss Liste rechte_verteilung
         verteilungsstunden = {ma: solver.Sum([x[ma, j, k] for j in range(calc_time) for k in range(len(verfügbarkeit[ma][j]))]) for ma in mitarbeiter}
         tolerance = 0.3
         for i, ma in enumerate(mitarbeiter):
