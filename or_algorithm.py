@@ -64,8 +64,10 @@ class ORAlgorithm:
 
         # Kosten für jeden MA noch gleich, ebenfalls die max Zeit bei allen gleich
         kosten = {ma: 20 for ma in mitarbeiter}  # Kosten pro Stunde
+        # kosten = {1005: 100, 1007: 50, 1008: 20, 1009: 5, 1004: 5} # nur zum testen
+
         max_zeit = {ma: 8 for ma in mitarbeiter}  # Maximale Arbeitszeit pro Tag
-        min_zeit = {ma: 3 for ma in mitarbeiter}  # Minimale Arbeitszeit pro Tag
+        min_zeit = {ma: 0 for ma in mitarbeiter}  # Minimale Arbeitszeit pro Tag
         # max Stunden pro MA pro Woche - Kann evtl. noch aus der Datenbank gezogen werden in Zukunft?
         working_h = 35
 
@@ -102,7 +104,7 @@ class ORAlgorithm:
         # Funktioniert noch nicht wenn die Stunden auf 50 gesetzt wird, algo bricht zusammen
         # Das Problem: min. Stunden pro MA pro Tag
         # !!!!!!!!!!
-        verteilbare_stunden = 100
+        # verteilbare_stunden = 100
         # !!!!!!!!!!
 
 
@@ -243,7 +245,7 @@ class ORAlgorithm:
             verteilende_h = prozent_gesamtstunden[i]*verteilbare_stunden
             # +0.5, damit es immer aufgerundet
             gerechte_verteilung.append(round(verteilende_h+0.5))
-        # gerechte_verteilung = [27, 22, 22, 16, 16]        
+        print("Gerechte Verteilung: ", gerechte_verteilung)     
 
         # for loop für die gerechte Verteilung gemäss Liste rechte_verteilung
         verteilungsstunden = {ma: solver.Sum([x[ma, j, k] for j in range(calc_time) for k in range(len(verfügbarkeit[ma][j]))]) for ma in mitarbeiter}
