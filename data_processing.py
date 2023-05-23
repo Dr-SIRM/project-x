@@ -13,8 +13,10 @@ class DataProcessing:
         self.laden_oeffnet = None
         self.laden_schliesst = None
         self.user_availability = None
-        self.binary_availability = None
         self.time_req = None
+        self.company_shifts = None
+        self.employment_lvl = None
+        self.binary_availability = None
 
 
     def run(self):
@@ -28,6 +30,9 @@ class DataProcessing:
         # print(f"Opening Hours: {self.opening_hours}")
         self.get_time_req()
         print(f"Time Req: {self.time_req}")
+        self.get_shift_emp_lvl()
+        print(f"shifts: {self.company_shifts}")
+        print(f"employment_lvl: {self.employment_lvl}")
         self.binaere_liste()
         print(f"Binary Availability: {self.binary_availability}")
 
@@ -147,7 +152,7 @@ class DataProcessing:
 
 
     def get_time_req(self):
-        """In dieser Funktion werden die benötigten Mitarbeiter für jede Stunde jedes Tages abgerufen."""
+        """ In dieser Funktion werden die benötigten Mitarbeiter für jede Stunde jedes Tages abgerufen """
 
         with app.app_context():
             start_date = "2023-05-22"
@@ -188,6 +193,39 @@ class DataProcessing:
 
         self.time_req = time_req_dict_2
 
+
+    def get_shift_emp_lvl(self):
+        """ In dieser Funktion wird als Key die user_id verwendet und die shift und employment_level aus der Datenbank gezogen """
+        with app.app_context():
+            # Hole den Firmennamen des aktuellen Benutzers
+            sql = text("""
+                SELECT company_name
+                FROM user
+                WHERE id = :current_user_id
+            """)
+            result = db.session.execute(sql, {"current_user_id": self.current_user_id})
+            company_name = result.fetchone()[0]
+
+            # Hole die Schichten für die Firma des aktuellen Benutzers
+            sql = text("""
+                SELECT shifts
+                FROM company
+                WHERE company_name = :company_name
+            """)
+            result = db.session.execute(sql, {"company_name": company_name})
+            company_shifts = result.fetchone()[0]
+
+            # Hole das employment_level für jeden Benutzer, der in der gleichen Firma arbeitet wie der aktuelle Benutzer
+            sql = text("""
+                SELECT id, employment_level
+                FROM user
+                WHERE company_name = :company_name
+            """)
+            result = db.session.execute(sql, {"company_name": company_name})
+            employment_lvl = {user_id: employment_level for user_id, employment_level in result.fetchall()}
+
+        self.company_shifts = company_shifts
+        self.employment_lvl = employment_lvl
 
 
 
