@@ -65,7 +65,7 @@ class ORAlgorithm:
         # Kosten für jeden MA noch gleich, ebenfalls die max Zeit bei allen gleich
         kosten = {ma: 20 for ma in mitarbeiter}  # Kosten pro Stunde
         max_zeit = {ma: 8 for ma in mitarbeiter}  # Maximale Arbeitszeit pro Tag
-        min_zeit = {ma: 3 for ma in mitarbeiter}  # Maximale Arbeitszeit pro Tag
+        min_zeit = {ma: 3 for ma in mitarbeiter}  # Minimale Arbeitszeit pro Tag
         # max Stunden pro MA pro Woche - Kann evtl. noch aus der Datenbank gezogen werden in Zukunft?
         working_h = 35
 
@@ -79,16 +79,15 @@ class ORAlgorithm:
 
 
         # Empolyment_level aus dem employment_lvl dict in einer Liste speichern (nur MA die berücksichtigt werden)
-        employment_lvl_2 = [] # Später kann die _2 gelöscht werden, und die employment_lvl Liste weiter unten gelöscht
-
+        employment_lvl = [] # Später die employment_lvl Liste weiter unten gelöscht
 
         # Iterieren Sie über die Schlüssel in binary_availability
         for user_id in self.binary_availability.keys():
             # Prüfen Sie, ob die user_id in employment_lvl vorhanden ist
             if user_id in self.employment_lvl:
                 # Fügen Sie den entsprechenden employment_lvl Wert zur Liste hinzu
-                employment_lvl_2.append(self.employment_lvl[user_id])
-        print("Liste Empolyment_lvl: ", employment_lvl_2)
+                employment_lvl.append(self.employment_lvl[user_id])
+        print("Liste Empolyment_lvl: ", employment_lvl)
 
         employment_lvl = [1, 0.8, 0.8, 0.6, 0.6] # Damit die Liste noch selbst manipuliert werden kann.
 
@@ -100,8 +99,11 @@ class ORAlgorithm:
                 verteilbare_stunden += self.time_req[date][hour]
         print("Verteilbare Stunden: ", verteilbare_stunden)
 
-        # Funktioniert noch nicht wenn die Stunden auf 50 gesetzt wird, algo bricht zusammen??
+        # Funktioniert noch nicht wenn die Stunden auf 50 gesetzt wird, algo bricht zusammen
+        # Das Problem: min. Stunden pro MA pro Tag
+        # !!!!!!!!!!
         verteilbare_stunden = 100
+        # !!!!!!!!!!
 
 
         # gesamtstunden Verfügbarkeit pro MA pro Woche
@@ -179,7 +181,7 @@ class ORAlgorithm:
         # NB 2 - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend 
         for j in range(calc_time):
             for k in range(len(verfügbarkeit[mitarbeiter[0]][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
-                solver.Add(solver.Sum([x[i, j, k] for i in mitarbeiter]) >= min_anwesend[j][k] + 1)
+                solver.Add(solver.Sum([x[i, j, k] for i in mitarbeiter]) >= min_anwesend[j][k])
 
 
         # NB 3 - Max. Arbeitszeit pro Woche - working_h muss noch berechnet werden!
