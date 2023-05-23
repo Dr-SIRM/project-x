@@ -29,8 +29,15 @@ const Company = ({ company }) => {
   }, []);
 
   
-  const handleFormSubmit = (values) => {
-    // Handle form submission
+  const handleFormSubmit = async (values) => {
+    try {
+      // Send the updated form values to the server for database update
+      await axios.post('http://localhost:5000/api/company', values);
+      setShowSuccessNotification(true);
+    } catch (error) {
+      console.error('Error updating company details:', error);
+      setShowErrorNotification(true);
+    }
   };
 
 

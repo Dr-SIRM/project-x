@@ -950,6 +950,76 @@ def get_company():
             temp_dict[str(new_i) + '&0'] = temp.start_time.strftime("%H:%M") if temp.start_time else None
             temp_dict[str(new_i) + '&1'] = temp.end_time.strftime("%H:%M") if temp.end_time else None
 
+        if request.method == 'POST':
+
+            # Update company name
+            updated_company_name = request.form.get('company_name')
+            if updated_company_name:
+                # Update the value in the database
+                company = Company.query.first()  # Assuming you have a Company model
+                company.company_name = updated_company_name
+                db.session.commit()
+
+            # Update weekly hours
+            updated_weekly_hours = request.form.get('weekly_hours')
+            if updated_weekly_hours:
+                # Update the value in the database
+                company = Company.query.first()  # Assuming you have a Company model
+                company.weekly_hours = int(updated_weekly_hours)
+                db.session.commit()
+
+            # Update shifts
+            updated_shifts = request.form.get('shifts')
+            if updated_shifts:
+                # Update the value in the database
+                company = Company.query.first()  # Assuming you have a Company model
+                company.shifts = int(updated_shifts)
+                db.session.commit()
+
+            # Opening Hours 
+            OpeningHours.query.filter_by(company_name=current_user.company_name).delete()
+            db.session.commit()
+            company_no = Company.query.order_by(Company.id.desc()).first()
+            if company_no is None:
+                new_company_no = 1
+            else:
+                new_company_no = company_no.id + 1
+
+            company_data = Company(
+                id=new_company_no,
+                company_name=company_form.company_name.data,
+                weekly_hours=company_form.weekly_hours.data,
+                shifts=company_form.shift.data,
+                created_by=company_id,
+                changed_by=company_id,
+                creation_timestamp=creation_date
+            )
+
+            db.session.merge(company_data)
+            db.session.commit()
+
+            for i in range(day_num):
+                entry1 = request.form.get(f'day_{i}_0')
+                entry2 = request.form.get(f'day_{i}_1')
+                if entry1:
+                    last = OpeningHours.query.order_by(OpeningHours.id.desc()).first()
+                    if last is None:
+                        new_id = 1
+                    else:
+                        new_id = last.id + 1
+                    try:
+                        new_entry1 = datetime.datetime.strptime(entry1, '%H:%M:%S').time()
+                    except:
+                        new_entry1 = datetime.datetime.strptime(entry1, '%H:%M').time()
+
+                    try:
+                        new_entry2 = datetime.datetime.strptime(entry2, '%H:%M:%S').time()
+                    except:
+                        new_entry2 = datetime.datetime.strptime(entry2, '%H:%M').time()
+
+                    new_weekday = weekdays[i]
+
+
     company_list = {
         'company_name': user.company_name,
         'shifts': shift,
@@ -959,6 +1029,8 @@ def get_company():
         'temp_dict': temp_dict, 
     }
     
+
+
     print(company_list)
     
     return jsonify(company_list)
