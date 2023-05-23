@@ -13,9 +13,9 @@ Prio 1:
  - (erl.) NB6: Max. einen Arbeitsblock pro Tag
  - (erl.) die calc_time soll automatisch errechnet werden
  - (erl.) Als Key oder i für MA soll nicht mehr MA1, MA2 usw stehen, sondern die user_id (zB. 1002)
+ - (erl.) Shifts/Employment_level aus der Datenbank ziehen
  - auf Viertelstunden wechseln
  - Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
- - Shifts/Employment_level aus der Datenbank ziehen
  - time_req stunden zusammenaddieren
 
 
@@ -52,6 +52,7 @@ class ORAlgorithm:
         # user_ids Liste, wird als Key in der Ausgabe verwendet
         mitarbeiter = [user_id for user_id in self.binary_availability]
 
+
         # Aus dem binary_availability dict. die Verfügbarkeits-Informationen ziehen
         verfügbarkeit = {}
         for i, (user_id, availabilities) in enumerate(self.binary_availability.items()):
@@ -60,31 +61,58 @@ class ORAlgorithm:
                 date, binary_list = day_availability
                 verfügbarkeit[mitarbeiter[i]].append(binary_list)
 
+
         # Kosten für jeden MA noch gleich, ebenfalls die max Zeit bei allen gleich
         kosten = {ma: 20 for ma in mitarbeiter}  # Kosten pro Stunde
         max_zeit = {ma: 8 for ma in mitarbeiter}  # Maximale Arbeitszeit pro Tag
         min_zeit = {ma: 3 for ma in mitarbeiter}  # Maximale Arbeitszeit pro Tag
+        # max Stunden pro MA pro Woche - Kann evtl. noch aus der Datenbank gezogen werden in Zukunft?
+        working_h = 35
 
         # Berechnung der calc_time (Anzahl Tage an denen die MA eingeteilt werden)
         # Es werden nur die Tage des ersten MA berechnet, da jeder MA die gleiche Wochenlänge hat
         calc_time = len(next(iter(self.binary_availability.values())))
 
+
         # Shifts aus dem Attribut der Variable shifts zuweisen
         shifts = self.company_shifts
 
-        # Empolyment_level noch von der Datenbank ziehen
-        employment_lvl = [1, 0.8, 0.8, 0.6, 0.6]
 
-        # noch time_req stunden zusammenaddieren
+        # Empolyment_level aus dem employment_lvl dict in einer Liste speichern (nur MA die berücksichtigt werden)
+        employment_lvl_2 = [] # Später kann die _2 gelöscht werden, und die employment_lvl Liste weiter unten gelöscht
+
+
+        # Iterieren Sie über die Schlüssel in binary_availability
+        for user_id in self.binary_availability.keys():
+            # Prüfen Sie, ob die user_id in employment_lvl vorhanden ist
+            if user_id in self.employment_lvl:
+                # Fügen Sie den entsprechenden employment_lvl Wert zur Liste hinzu
+                employment_lvl_2.append(self.employment_lvl[user_id])
+        print("Liste Empolyment_lvl: ", employment_lvl_2)
+
+        employment_lvl = [1, 0.8, 0.8, 0.6, 0.6] # Damit die Liste noch selbst manipuliert werden kann.
+
+
+        # verteilbare Stunden (Wieviele Mannstunden benötigt die Firma im definierten Zeitraum)
+        verteilbare_stunden = 0
+        for date in self.time_req:
+            for hour in self.time_req[date]:
+                verteilbare_stunden += self.time_req[date][hour]
+        print("Verteilbare Stunden: ", verteilbare_stunden)
+
+        # Funktioniert noch nicht wenn die Stunden auf 50 gesetzt wird, algo bricht zusammen??
         verteilbare_stunden = 100
 
-        # max Stunden pro MA pro Woche
-        working_h = 35
 
-        # gesamtstunden Verfügbarkeit pro MA pro Woche - Noch in einer for loop berechnen!
-        gesamtstunden_verfügbarkeit = [50, 50, 50, 50, 40]
+        # gesamtstunden Verfügbarkeit pro MA pro Woche
+        stunden_pro_tag = 1 # flexibler wenn einmal 1/4h eingebaut werden
 
+        gesamtstunden_verfügbarkeit = []
+        for key in self.binary_availability:
+            gesamt_stunden = sum(sum(day_data[1]) * stunden_pro_tag for day_data in self.binary_availability[key])
+            gesamtstunden_verfügbarkeit.append(gesamt_stunden)
 
+        print("Gesamtstunden Verfügbarkeit: ", gesamtstunden_verfügbarkeit)
 
         # Eine Liste mit den min. anwesendheiten der MA wird erstellt
         min_anwesend = []
