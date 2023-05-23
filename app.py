@@ -960,7 +960,7 @@ def get_company():
     }
     
     print(company_list)
-    #ass
+    
     return jsonify(company_list)
 
 '''
