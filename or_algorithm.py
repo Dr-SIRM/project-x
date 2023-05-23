@@ -11,13 +11,13 @@ To-Do Liste:
 Prio 1:
 
  - (erl.) NB6: Max. einen Arbeitsblock pro Tag
+ - (erl.) die calc_time soll automatisch errechnet werden
+ - (erl.) Als Key oder i für MA soll nicht mehr MA1, MA2 usw stehen, sondern die user_id (zB. 1002)
  - auf Viertelstunden wechseln
  - Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
- - die calc_time soll automatisch errechnet werden
- - Als Key oder i für MA soll nicht mehr MA1, MA2 usw stehen, sondern die user_id (zB. 1002)
  - Shifts/Employment_level aus der Datenbank ziehen
  - time_req stunden zusammenaddieren
- - NB
+
 
 Prio 2:
 
@@ -32,8 +32,6 @@ Prio 3:
 """
 
 
-
-
 class ORAlgorithm:
     def __init__(self, dp: DataProcessing):
         self.current_user_id = dp.current_user_id
@@ -42,14 +40,17 @@ class ORAlgorithm:
         self.laden_oeffnet = dp.laden_oeffnet
         self.laden_schliesst = dp.laden_schliesst
         self.binary_availability = dp.binary_availability
+        self.company_shifts = dp.company_shifts
+        self.employment_lvl = dp.employment_lvl
         self.time_req = dp.time_req
 
     def run(self):
         self.algorithm()
 
     def algorithm(self):
-        # List-Comprehensions
-        mitarbeiter = [f"MA{i+1}" for i in range(len(self.binary_availability))]
+        
+        # user_ids Liste, wird als Key in der Ausgabe verwendet
+        mitarbeiter = [user_id for user_id in self.binary_availability]
 
         # Aus dem binary_availability dict. die Verfügbarkeits-Informationen ziehen
         verfügbarkeit = {}
@@ -63,11 +64,13 @@ class ORAlgorithm:
         kosten = {ma: 20 for ma in mitarbeiter}  # Kosten pro Stunde
         max_zeit = {ma: 8 for ma in mitarbeiter}  # Maximale Arbeitszeit pro Tag
         min_zeit = {ma: 3 for ma in mitarbeiter}  # Maximale Arbeitszeit pro Tag
-        calc_time = 5
 
+        # Berechnung der calc_time (Anzahl Tage an denen die MA eingeteilt werden)
+        # Es werden nur die Tage des ersten MA berechnet, da jeder MA die gleiche Wochenlänge hat
+        calc_time = len(next(iter(self.binary_availability.values())))
 
-        # Diese werden später aus der Datenbank gezogen
-        shifts = 2
+        # Shifts aus dem Attribut der Variable shifts zuweisen
+        shifts = self.company_shifts
 
         # Empolyment_level noch von der Datenbank ziehen
         employment_lvl = [1, 0.8, 0.8, 0.6, 0.6]
@@ -80,8 +83,6 @@ class ORAlgorithm:
 
         # gesamtstunden Verfügbarkeit pro MA pro Woche - Noch in einer for loop berechnen!
         gesamtstunden_verfügbarkeit = [50, 50, 50, 50, 40]
-
-
 
 
 
@@ -212,7 +213,7 @@ class ORAlgorithm:
             verteilende_h = prozent_gesamtstunden[i]*verteilbare_stunden
             # +0.5, damit es immer aufgerundet
             gerechte_verteilung.append(round(verteilende_h+0.5))
-        print(gerechte_verteilung) # [27, 22, 22, 16, 16]        
+        # gerechte_verteilung = [27, 22, 22, 16, 16]        
 
         # for loop für die gerechte Verteilung gemäss LIste rechte_verteilung
         verteilungsstunden = {ma: solver.Sum([x[ma, j, k] for j in range(calc_time) for k in range(len(verfügbarkeit[ma][j]))]) for ma in mitarbeiter}
@@ -289,7 +290,7 @@ class ORAlgorithm:
         ws = wb.active
 
         # Schreiben Sie die Überschriften
-        headers = ["MA"]
+        headers = ["user_id"]
         for i in range(1, len(max(data.values(), key=len)) + 7):
             headers.extend(["T{},h{}".format(i, j+8) for j in range(10)])
         ws.append(headers)
