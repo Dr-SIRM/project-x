@@ -67,7 +67,7 @@ class ORAlgorithm:
         # kosten = {1005: 100, 1007: 50, 1008: 20, 1009: 5, 1004: 5} # nur zum testen
 
         max_zeit = {ma: 8 for ma in mitarbeiter}  # Maximale Arbeitszeit pro Tag
-        min_zeit = {ma: 0 for ma in mitarbeiter}  # Minimale Arbeitszeit pro Tag
+        min_zeit = {ma: 5 for ma in mitarbeiter}  # Minimale Arbeitszeit pro Tag
         # max Stunden pro MA pro Woche - Kann evtl. noch aus der Datenbank gezogen werden in Zukunft?
         working_h = 35
 
@@ -100,12 +100,6 @@ class ORAlgorithm:
             for hour in self.time_req[date]:
                 verteilbare_stunden += self.time_req[date][hour]
         print("Verteilbare Stunden: ", verteilbare_stunden)
-
-        # Funktioniert noch nicht wenn die Stunden auf 50 gesetzt wird, algo bricht zusammen
-        # Das Problem: min. Stunden pro MA pro Tag
-        # !!!!!!!!!!
-        # verteilbare_stunden = 100
-        # !!!!!!!!!!
 
 
         # gesamtstunden Verfügbarkeit pro MA pro Woche
@@ -157,6 +151,12 @@ class ORAlgorithm:
                 for k in range(len(verfügbarkeit[i][j])):  # Für jede Stunde des Tages, an dem die Firma geöffnet ist
                     s[i, j, k] = solver.IntVar(0, 1, f'y[{i}, {j}, {k}]') # Variabeln können nur die Werte 0 oder 1 annehmen
 
+        # Arbeitstagvariable
+        a = {}
+        for i in mitarbeiter:
+            for j in range(calc_time):  # Für jeden Tag der Woche
+                a[i, j] = solver.BoolVar(f'a[{i}, {j}]') # Variablen können nur die Werte 0 oder 1 annehmen
+
 
 
         # Zielfunktion ----------------------------------------------------------------------------------------------------------
@@ -186,26 +186,33 @@ class ORAlgorithm:
                 solver.Add(solver.Sum([x[i, j, k] for i in mitarbeiter]) >= min_anwesend[j][k])
 
 
+
         # NB 3 - Max. Arbeitszeit pro Woche - working_h muss noch berechnet werden!
         total_hours = {ma: solver.Sum([x[ma, j, k] for j in range(calc_time) for k in range(len(verfügbarkeit[ma][j]))]) for ma in mitarbeiter}
         for ma in mitarbeiter:
             solver.Add(total_hours[ma] <= working_h)
 
 
-        # NB 4 - Max. Arbeitszeit pro Tag
+        """ 
+        # NB 4 - Max. Arbeitszeit pro Tag - Diese NB ist nicht mehr nötig, da die max zeit bereits in der NB5 implementiert ist
         for i in mitarbeiter:
             for j in range(calc_time):
                 solver.Add(solver.Sum(x[i, j, k] for k in range(len(verfügbarkeit[i][j]))) <= max_zeit[i])
+        """
 
 
-       # NB 5 - Min. Arbeitszeit pro Tag
+        # NB 5 - Min. Arbeitszeit pro Tag
         for i in mitarbeiter:
             for j in range(calc_time):
                 # Prüfen, ob der Mitarbeiter an diesem Tag arbeiten kann (z.B. [0, 1, 1] = sum(2))
                 if sum(verfügbarkeit[i][j]) >= min_zeit[i]:
                     sum_hour = solver.Sum(x[i, j, k] for k in range(len(verfügbarkeit[i][j])))
-                    solver.Add(sum_hour >= min_zeit[i])
+                    # Es ist nötig, das die min und die max Zeit implementiert ist. 
+                    solver.Add(sum_hour >= min_zeit[i] * a[i, j])
+                    # NB 5.1 - Die Arbeitszeit eines Mitarbeiters an einem Tag kann nicht mehr als die maximale Arbeitszeit pro Tag betragen
+                    solver.Add(sum_hour <= max_zeit[i] * a[i, j])
 
+        
 
         # NB 6 - Nur einen Arbeitsblock pro Tag
         for i in mitarbeiter:
@@ -217,7 +224,7 @@ class ORAlgorithm:
                     solver.Add(y[i, j, k] >= x[i, j, k] - x[i, j, k-1])
                 # Die Summe der y[i, j, k] für einen bestimmten Tag j sollte nicht größer als 1 sein
                 solver.Add(solver.Sum(y[i, j, k] for k in range(len(verfügbarkeit[i][j]))) <= 1)
-
+        
 
         # NB 7 - Innerhalb einer Woche immer gleiche Schichten
         
@@ -253,12 +260,9 @@ class ORAlgorithm:
         for i, ma in enumerate(mitarbeiter):
             lower_bound = gerechte_verteilung[i] * (1 - tolerance)
             upper_bound = gerechte_verteilung[i] * (1 + tolerance)
-
             solver.Add(verteilungsstunden[ma] <= upper_bound)
             solver.Add(verteilungsstunden[ma] >= lower_bound)
-
-
-
+            
             
         # NB 9 - Feste Mitarbeiter zu employement_level fest einplanen
 
@@ -277,6 +281,7 @@ class ORAlgorithm:
 
 
         # Problem lösen ---------------------------------------------------------------------------------------------------------
+        solver.EnableOutput()
         status = solver.Solve()
 
 
