@@ -173,7 +173,7 @@ class ORAlgorithm:
         # Beschränkungen --------------------------------------------------------------------------------------------------------
         # (Die solver.Add() Funktion nimmt eine Bedingung als Argument und fügt sie dem Optimierungsproblem hinzu.)
 
-        # NB 1 - MA darf nur eingeteilt werden, sofern er auch verfügbar ist.
+        # NB 1 - MA nur einteilen, wenn er verfügbar ist.
         for i in mitarbeiter:
             for j in range(calc_time):
                 for k in range(len(verfügbarkeit[i][j])):
@@ -187,21 +187,21 @@ class ORAlgorithm:
 
 
 
-        # NB 3 - Max. Arbeitszeit pro Woche - working_h muss noch berechnet werden!
+        # NB 3 - Max. Arbeitszeit pro Woche - (working_h muss noch berechnet werden!)
         total_hours = {ma: solver.Sum([x[ma, j, k] for j in range(calc_time) for k in range(len(verfügbarkeit[ma][j]))]) for ma in mitarbeiter}
         for ma in mitarbeiter:
             solver.Add(total_hours[ma] <= working_h)
 
 
         """ 
-        # NB 4 - Max. Arbeitszeit pro Tag - Diese NB ist nicht mehr nötig, da die max zeit bereits in der NB5 implementiert ist
+        # NB X - Max. Arbeitszeit pro Tag - Diese NB ist nicht mehr nötig, da die max zeit bereits in der NB5 implementiert ist
         for i in mitarbeiter:
             for j in range(calc_time):
                 solver.Add(solver.Sum(x[i, j, k] for k in range(len(verfügbarkeit[i][j]))) <= max_zeit[i])
         """
 
 
-        # NB 5 - Min. Arbeitszeit pro Tag
+        # NB 4 - Min. und Max. Arbeitszeit pro Tag
         for i in mitarbeiter:
             for j in range(calc_time):
                 # Prüfen, ob der Mitarbeiter an diesem Tag arbeiten kann (z.B. [0, 1, 1] = sum(2))
@@ -214,7 +214,7 @@ class ORAlgorithm:
 
         
 
-        # NB 6 - Nur einen Arbeitsblock pro Tag
+        # NB 5 - Anzahl Arbeitsblöcke
         for i in mitarbeiter:
             for j in range(calc_time):
                 # Für die erste Stunde des Tages
@@ -226,10 +226,10 @@ class ORAlgorithm:
                 solver.Add(solver.Sum(y[i, j, k] for k in range(len(verfügbarkeit[i][j]))) <= 1)
         
 
-        # NB 7 - Innerhalb einer Woche immer gleiche Schichten
+        # NB X - Innerhalb einer Woche immer gleiche Schichten
         
 
-        # NB 8 - Verteilungsgrad entsprechend employment_lvl (keine Festanstellung) - muss noch angepasst werden, sobald feste MA eingeplant werden
+        # NB 6 - Verteilungsgrad MA - (entsprechend employment_lvl (keine Festanstellung) - muss noch angepasst werden, sobald feste MA eingeplant werden)
         list_gesamtstunden = []
         prozent_gesamtstunden = []
         gerechte_verteilung = []
@@ -264,11 +264,11 @@ class ORAlgorithm:
             solver.Add(verteilungsstunden[ma] >= lower_bound)
             
             
-        # NB 9 - Feste Mitarbeiter zu employement_level fest einplanen
+        # NB X - Feste Mitarbeiter zu employement_level fest einplanen
 
 
 
-        # NB 10 - Wechselnde Schichten innerhalb 2 Wochen
+        # NB X - Wechselnde Schichten innerhalb 2 Wochen
 
 
 
