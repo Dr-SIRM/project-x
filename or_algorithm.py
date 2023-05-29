@@ -43,6 +43,8 @@ class ORAlgorithm:
         self.company_shifts = dp.company_shifts
         self.employment_lvl = dp.employment_lvl
         self.time_req = dp.time_req
+        self.user_employment = dp.user_employment
+
 
     def run(self):
         self.algorithm()
@@ -67,7 +69,7 @@ class ORAlgorithm:
         # kosten = {1005: 100, 1007: 50, 1008: 20, 1009: 5, 1004: 5} # nur zum testen
 
         max_zeit = {ma: 8 for ma in mitarbeiter}  # Maximale Arbeitszeit pro Tag
-        min_zeit = {ma: 5 for ma in mitarbeiter}  # Minimale Arbeitszeit pro Tag
+        min_zeit = {ma: 2 for ma in mitarbeiter}  # Minimale Arbeitszeit pro Tag
         # max Stunden pro MA pro Woche - Kann evtl. noch aus der Datenbank gezogen werden in Zukunft?
         working_h = 35
 
@@ -228,7 +230,7 @@ class ORAlgorithm:
 
         # NB X - Innerhalb einer Woche immer gleiche Schichten
         
-
+        
         # NB 6 - Verteilungsgrad MA - (entsprechend employment_lvl (keine Festanstellung) - muss noch angepasst werden, sobald feste MA eingeplant werden)
         list_gesamtstunden = []
         prozent_gesamtstunden = []
@@ -262,7 +264,7 @@ class ORAlgorithm:
             upper_bound = gerechte_verteilung[i] * (1 + tolerance)
             solver.Add(verteilungsstunden[ma] <= upper_bound)
             solver.Add(verteilungsstunden[ma] >= lower_bound)
-            
+        
             
         # NB X - Feste Mitarbeiter zu employement_level fest einplanen
 
