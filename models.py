@@ -12,6 +12,7 @@ class User(db.Model, UserMixin):
     company_id = db.Column(db.Integer, index=True, unique=False)
     first_name = db.Column(db.String(100), index=True, unique=False)
     last_name = db.Column(db.String(100), index=True, unique=False)
+    employment = db.Column(db.String(100), index=True, unique=False)
     email = db.Column(db.String(200), index=True, unique=True)
     password = db.Column(db.String(200))
     employment_level = db.Column(db.Float, index=True, unique=False)
@@ -24,12 +25,13 @@ class User(db.Model, UserMixin):
     update_timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
 
 
-    def __init__(self, id, company_id, first_name, last_name, email, password, employment_level, company_name, department,
+    def __init__(self, id, company_id, first_name, last_name, employment, email, password, employment_level, company_name, department,
                  access_level, created_by, changed_by, creation_timestamp):
         self.id = id
         self.company_id = company_id
         self.first_name = first_name
         self.last_name = last_name
+        self.employment = employment
         self.email = email
         self.password = password
         self.employment_level = employment_level
