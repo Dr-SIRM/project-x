@@ -209,7 +209,7 @@ class ORAlgorithm:
                     sum_hour = solver.Sum(x[i, j, k] for k in range(len(verfügbarkeit[i][j])))
                     # Es ist nötig, das die min und die max Zeit implementiert ist. 
                     solver.Add(sum_hour >= min_zeit[i] * a[i, j])
-                    # NB 5.1 - Die Arbeitszeit eines Mitarbeiters an einem Tag kann nicht mehr als die maximale Arbeitszeit pro Tag betragen
+                    # NB 4.1 - Die Arbeitszeit eines Mitarbeiters an einem Tag kann nicht mehr als die maximale Arbeitszeit pro Tag betragen
                     solver.Add(sum_hour <= max_zeit[i] * a[i, j])
 
         
