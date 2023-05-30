@@ -95,17 +95,16 @@ class ORAlgorithm:
 
         employment_lvl = [1, 0.8, 0.8, 0.6, 0.6] # Damit die Liste noch selbst manipuliert werden kann.
 
-        """
+        
         # Creating a Employment List based on the user of binary_availability
         employment = []
 
         # Iteration of the key within binary_availability
         for user_id in self.binary_availability.keys():
-            if user.id in self.user_employment:
+            if user_id in self.user_employment:
                 employment.append(self.user_employment[user_id])
         print("List Employment: ", employment)
-        """
-        employment = ["Perm", "Temp", "Temp", "Temp", "Temp"]
+
 
 
         # verteilbare Stunden (Wieviele Mannstunden benötigt die Firma im definierten Zeitraum)
@@ -263,8 +262,11 @@ class ORAlgorithm:
          # prozent_gesamtstunden = [0.2631578947368421, 0.21052631578947367, 0.21052631578947367, 0.15789473684210525, 0.15789473684210525]
 
         for i in range(len(mitarbeiter)):
-            verteilende_h = prozent_gesamtstunden[i]*verteilbare_stunden
-            # +0.5, damit es immer aufgerundet
+            if employment[i] == "Perm":
+                verteilende_h = working_h
+            else:
+                verteilende_h = prozent_gesamtstunden[i]*verteilbare_stunden
+                # +0.5, damit es immer aufgerundet
             gerechte_verteilung.append(round(verteilende_h+0.5))
         print("Gerechte Verteilung: ", gerechte_verteilung)     
 
@@ -277,24 +279,19 @@ class ORAlgorithm:
             solver.Add(verteilungsstunden[ma] <= upper_bound)
             solver.Add(verteilungsstunden[ma] >= lower_bound)
         
-            
+
         # NB 7 - Feste Mitarbeiter zu employement_level fest einplanen
-        """
-        for i in range(len(mitarbeiter)):
+        total_hours = {ma: solver.Sum([x[ma, j, k] for j in range(calc_time) for k in range(len(verfügbarkeit[ma][j]))]) for ma in mitarbeiter}
+        for i, ma in enumerate(mitarbeiter):
             if employment[i] == "Perm": 
-                total_hours = {ma: solver.Sum([x[ma, j, k] for j in range(calc_time) for k in range(len(verfügbarkeit[ma][j]))]) for ma in mitarbeiter}
-                solver.Add(total_hours[ma] == working_h)   
-        """
-                       
+                solver.Add(total_hours[ma] == working_h)
+
+
 
 
         # NB X - Wechselnde Schichten innerhalb 2 Wochen
 
-
-
-
-
-
+        # NB X - Gleiche Verteilung der Stunden über eine Woche
 
 
 
