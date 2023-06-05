@@ -996,6 +996,8 @@ def get_company():
                 new_company_no = 1
             else:
                 new_company_no = company_no.id + 1
+            
+            
 
             company_data = Company(
                 id=new_company_no,

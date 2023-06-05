@@ -35,3 +35,18 @@ Max Arbeitsstunden pro Tag nicht überschreiten
                     is_planned = [x[i, j, k + n] for n in range(4)]
                     # Add a constraint to ensure at least one of the tree hours is planned
                     solver.Add(solver.Sum(is_planned) >= 3)
+
+
+# Check for Solver Execution
+
+        for i in range(len(mitarbeiter)):
+            if employment[i] == "Perm": 
+                sum_availability_perm = 0
+                for j in range(calc_time):
+                    for k in range(len(verfügbarkeit[i][j])):
+                        sum_availability_perm += verfügbarkeit[i][j][k]
+                        print(sum_availability_perm)           
+                if sum_availability_perm <= working_h:
+                    print(mitarbeiter[i], " has not planned enough hours.")
+                else:
+                    pass
