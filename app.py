@@ -945,6 +945,7 @@ def get_company():
     weekdays = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
     company = Company.query.filter_by(company_name=user.company_name).first()
     day_num = 7
+    company_data = request.data
     if company is None:
         shift = ''
         weekly_hour = ''
@@ -964,30 +965,6 @@ def get_company():
 
         if request.method == 'POST':
 
-            # Update company name
-            updated_company_name = request.form.get('company_name')
-            if updated_company_name:
-                # Update the value in the database
-                company = Company.query.first()  # Assuming you have a Company model
-                company.company_name = updated_company_name
-                db.session.commit()
-
-            # Update weekly hours
-            updated_weekly_hours = request.form.get('weekly_hours')
-            if updated_weekly_hours:
-                # Update the value in the database
-                company = Company.query.first()  # Assuming you have a Company model
-                company.weekly_hours = int(updated_weekly_hours)
-                db.session.commit()
-
-            # Update shifts
-            updated_shifts = request.form.get('shifts')
-            if updated_shifts:
-                # Update the value in the database
-                company = Company.query.first()  # Assuming you have a Company model
-                company.shifts = int(updated_shifts)
-                db.session.commit()
-
             # Opening Hours 
             OpeningHours.query.filter_by(company_name=current_user.company_name).delete()
             db.session.commit()
@@ -999,9 +976,9 @@ def get_company():
 
             company_data = Company(
                 id=new_company_no,
-                company_name=company_form.company_name.data,
-                weekly_hours=company_form.weekly_hours.data,
-                shifts=company_form.shift.data,
+                company_name=company_data['company_name'],
+                weekly_hours=company_data['weekly_hours'],
+                shifts=company_data['shifts'],
                 created_by=company_id,
                 changed_by=company_id,
                 creation_timestamp=creation_date
