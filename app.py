@@ -185,7 +185,7 @@ def admin_registration():
                 new_company_id = last_company_id + 1
 
             data = User(id = new_id, company_id = new_company_id, first_name = data_form.first_name.data,
-                        last_name = data_form.last_name.data, employment_level = data_form.employment_level.data,
+                        last_name = data_form.last_name.data, employment = data_form.employment.data, employment_level = data_form.employment_level.data,
                         company_name = data_form.company_name.data, department = data_form.department.data,
                         access_level = data_form.access_level.data, email = data_form.email.data, password = hash,
                         created_by = new_company_id, changed_by = new_company_id, creation_timestamp = creation_date)
@@ -261,6 +261,7 @@ def update():
         if existing_user:
             existing_user.first_name = user_form.first_name.data
             existing_user.last_name = user_form.last_name.data
+            existing_user.employment = user_form.employment.data
             existing_user.employment_level = user_form.employment_level.data
             existing_user.company_name = user_form.company_name.data
             existing_user.department = user_form.department.data
@@ -802,7 +803,7 @@ def invite():
         else:
             new_id = last.id + 1
 
-        data = RegistrationToken(id=new_id, email=data_form.email.data, token=random_token, company_name=data_form.company_name.data, department=data_form.department.data, employment_level=data_form.employment_level.data, access_level=data_form.access_level.data, created_by=company_id)
+        data = RegistrationToken(id=new_id, email=data_form.email.data, token=random_token, company_name=data_form.company_name.data, department=data_form.department.data, employment=data_form.employment.data, employment_level=data_form.employment_level.data, access_level=data_form.access_level.data, created_by=company_id)
 
         db.session.add(data)
         db.session.commit()
@@ -814,6 +815,17 @@ def invite():
 
 
     return render_template('invite.html', template_form=data_form, company=company)
+
+
+# Change/Update content in the database
+@app.route('/upgrade_db')
+def set_db():
+    users = User.query.all()
+    for user in users:
+        user.employment = "Temp"
+    db.session.commit()
+    return "Employment column updated successfully."
+
 
 '''
 if __name__ == '__main__':

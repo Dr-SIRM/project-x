@@ -16,6 +16,7 @@ class DataProcessing:
         self.time_req = None
         self.company_shifts = None
         self.employment_lvl = None
+        self.user_employment = None
         self.binary_availability = None
 
 
@@ -35,6 +36,8 @@ class DataProcessing:
         print(f"employment_lvl: {self.employment_lvl}")
         self.binaere_liste()
         print(f"Binary Availability: {self.binary_availability}")
+        self.get_employment()
+        print(f"Employment: {self.user_employment}")
 
 
 
@@ -258,4 +261,34 @@ class DataProcessing:
         self.binary_availability = binary_availability
 
 
+    def get_employment(self):
+            """ In following method we are fetching the employment of each user and put them into a list """
+            with app.app_context():
+                            
+                # Hole den company_name des aktuellen Benutzers
+                sql = text("""
+                    SELECT company_name
+                    FROM user
+                    WHERE id = :current_user_id
+                """)
+                result = db.session.execute(sql, {"current_user_id": self.current_user_id})
+                company_name = result.fetchone()[0]
+                
+                # Employment of all user within the same company
+                sql = text("""
+                    SELECT id, employment
+                    FROM user
+                    WHERE company_name = :company_name
+                """)
 
+                # execute = rohe Mysql Abfrage.
+                result = db.session.execute(sql, {"company_name": company_name})
+                # fetchall = alle Zeilen der Datenbank werden abgerufen und in einem Tupel gespeichert
+                employment_data = result.fetchall()
+
+                # Dictionarie erstellen mit user_id als Key:
+                user_employment = defaultdict(str)
+                for user_id, employment in employment_data:
+                    user_employment[user_id] = employment
+
+                self.user_employment = user_employment

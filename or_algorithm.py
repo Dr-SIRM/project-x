@@ -43,6 +43,8 @@ class ORAlgorithm:
         self.company_shifts = dp.company_shifts
         self.employment_lvl = dp.employment_lvl
         self.time_req = dp.time_req
+        self.user_employment = dp.user_employment
+
 
     def run(self):
         self.algorithm()
@@ -67,7 +69,7 @@ class ORAlgorithm:
         # kosten = {1005: 100, 1007: 50, 1008: 20, 1009: 5, 1004: 5} # nur zum testen
 
         max_zeit = {ma: 8 for ma in mitarbeiter}  # Maximale Arbeitszeit pro Tag
-        min_zeit = {ma: 5 for ma in mitarbeiter}  # Minimale Arbeitszeit pro Tag
+        min_zeit = {ma: 2 for ma in mitarbeiter}  # Minimale Arbeitszeit pro Tag
         # max Stunden pro MA pro Woche - Kann evtl. noch aus der Datenbank gezogen werden in Zukunft?
         working_h = 35
 
@@ -92,6 +94,17 @@ class ORAlgorithm:
         print("Liste Empolyment_lvl: ", employment_lvl)
 
         employment_lvl = [1, 0.8, 0.8, 0.6, 0.6] # Damit die Liste noch selbst manipuliert werden kann.
+
+        
+        # Creating a Employment List based on the user of binary_availability
+        employment = []
+
+        # Iteration of the key within binary_availability
+        for user_id in self.binary_availability.keys():
+            if user_id in self.user_employment:
+                employment.append(self.user_employment[user_id])
+        print("List Employment: ", employment)
+
 
 
         # verteilbare Stunden (Wieviele Mannstunden benötigt die Firma im definierten Zeitraum)
@@ -209,7 +222,7 @@ class ORAlgorithm:
                     sum_hour = solver.Sum(x[i, j, k] for k in range(len(verfügbarkeit[i][j])))
                     # Es ist nötig, das die min und die max Zeit implementiert ist. 
                     solver.Add(sum_hour >= min_zeit[i] * a[i, j])
-                    # NB 5.1 - Die Arbeitszeit eines Mitarbeiters an einem Tag kann nicht mehr als die maximale Arbeitszeit pro Tag betragen
+                    # NB 4.1 - Die Arbeitszeit eines Mitarbeiters an einem Tag kann nicht mehr als die maximale Arbeitszeit pro Tag betragen
                     solver.Add(sum_hour <= max_zeit[i] * a[i, j])
 
         
@@ -228,7 +241,7 @@ class ORAlgorithm:
 
         # NB X - Innerhalb einer Woche immer gleiche Schichten
         
-
+        
         # NB 6 - Verteilungsgrad MA - (entsprechend employment_lvl (keine Festanstellung) - muss noch angepasst werden, sobald feste MA eingeplant werden)
         list_gesamtstunden = []
         prozent_gesamtstunden = []
@@ -249,8 +262,11 @@ class ORAlgorithm:
          # prozent_gesamtstunden = [0.2631578947368421, 0.21052631578947367, 0.21052631578947367, 0.15789473684210525, 0.15789473684210525]
 
         for i in range(len(mitarbeiter)):
-            verteilende_h = prozent_gesamtstunden[i]*verteilbare_stunden
-            # +0.5, damit es immer aufgerundet
+            if employment[i] == "Perm":
+                verteilende_h = working_h
+            else:
+                verteilende_h = prozent_gesamtstunden[i]*verteilbare_stunden
+                # +0.5, damit es immer aufgerundet
             gerechte_verteilung.append(round(verteilende_h+0.5))
         print("Gerechte Verteilung: ", gerechte_verteilung)     
 
@@ -262,19 +278,20 @@ class ORAlgorithm:
             upper_bound = gerechte_verteilung[i] * (1 + tolerance)
             solver.Add(verteilungsstunden[ma] <= upper_bound)
             solver.Add(verteilungsstunden[ma] >= lower_bound)
-            
-            
-        # NB X - Feste Mitarbeiter zu employement_level fest einplanen
+        
+
+        # NB 7 - Feste Mitarbeiter zu employement_level fest einplanen
+        total_hours = {ma: solver.Sum([x[ma, j, k] for j in range(calc_time) for k in range(len(verfügbarkeit[ma][j]))]) for ma in mitarbeiter}
+        for i, ma in enumerate(mitarbeiter):
+            if employment[i] == "Perm": 
+                solver.Add(total_hours[ma] == working_h)
+
 
 
 
         # NB X - Wechselnde Schichten innerhalb 2 Wochen
 
-
-
-
-
-
+        # NB X - Gleiche Verteilung der Stunden über eine Woche
 
 
 

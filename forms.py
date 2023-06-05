@@ -10,6 +10,7 @@ class EmployeeForm(FlaskForm):
     first_name = StringField("First Name", validators=[DataRequired()])
     last_name = StringField("Last Name", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired()])
+    employment = SelectField("Access Level", choices=[('Perm', 'Festangestellt'), ('Temp', 'Teilzeit')])
     employment_level = SelectField("Employment Level", choices=[(1, '100%'), (0.9, '90%'), (0.8, '80%'), (0.7, '70%'),
                                                                 (0.6, '60%'), (0.5, '50%'), (0.4, '40%'), (0.3, '30%'),
                                                                 (0.2, '20%'), (0.1, '10%')])
@@ -55,6 +56,7 @@ class UpdateForm(FlaskForm):
     first_name = StringField("First Name")
     last_name = StringField("Last Name")
     email = StringField("Email")
+    employment = SelectField("Access Level", choices=[('Perm', 'Festangestellt'), ('Temp', 'Teilzeit')])
     employment_level = SelectField("Employment Level", choices=[(1, '100%'), (0.9, '90%'), (0.8, '80%'), (0.7, '70%'),
                                                                 (0.6, '60%'), (0.5, '50%'), (0.4, '40%'), (0.3, '30%'),
                                                                 (0.2, '20%'), (0.1, '10%')])

@@ -2,6 +2,7 @@ import mysql.connector
 
 #CREATE MYSQL
 #------------------------------------------------------------------------------
+"""
 mydb = mysql.connector.connect(
     host='database-projectx-1-0.ctsu2n36dxrk.eu-central-1.rds.amazonaws.com',
     user='admin',
@@ -9,14 +10,16 @@ mydb = mysql.connector.connect(
     port = '3306',
     database = 'projectx')
 mycursor = mydb.cursor()
+"""
 
-delete_table = 'DROP TABLE time_req'
+#delete_table = 'DROP TABLE time_req'
 #delete_db = 'DROP DATABASE projectx'
 #delete_table_entries = 'TRUNCATE TABLE opening_hours'
 #create_db = 'CREATE DATABASE IF NOT EXISTS projectx'
 #create_table = 'CREATE TABLE RegistrationToken'
 
-mycursor.execute(delete_table)
+#mycursor.execute(delete_table)
+
 
 # curl ifconfig.me
 # sudo apt-get update
