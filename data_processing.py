@@ -287,8 +287,8 @@ class DataProcessing:
                 employment_data = result.fetchall()
 
                 # Dictionarie erstellen mit user_id als Key:
-                user_employment = defaultdict(list)
+                user_employment = defaultdict(str)
                 for user_id, employment in employment_data:
-                    user_employment[user_id].append((employment))
+                    user_employment[user_id] = employment
 
                 self.user_employment = user_employment
