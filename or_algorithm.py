@@ -95,17 +95,14 @@ class ORAlgorithm:
 
         employment_lvl = [1, 0.8, 0.8, 0.6, 0.6] # Damit die Liste noch selbst manipuliert werden kann.
 
-        """
         # Creating a Employment List based on the user of binary_availability
         employment = []
 
         # Iteration of the key within binary_availability
         for user_id in self.binary_availability.keys():
-            if user.id in self.user_employment:
+            if user_id in self.user_employment:
                 employment.append(self.user_employment[user_id])
         print("List Employment: ", employment)
-        """
-        employment = ["Perm", "Temp", "Temp", "Temp", "Temp"]
 
 
         # verteilbare Stunden (Wieviele Mannstunden benötigt die Firma im definierten Zeitraum)
@@ -183,6 +180,19 @@ class ORAlgorithm:
         # Es wird veruscht, eine Kombination von Werten für die x[i, j, k] zu finden, die die Summe kosten[i]*x[i, j, k] minimiert            
         objective.SetMinimization()
 
+        # Check for Solver Execution
+
+        for i in range(len(mitarbeiter)):
+            if employment[i] == "Perm": 
+                sum_availability_perm = 0
+                for j in range(calc_time):
+                    for k in range(len(verfügbarkeit[i][j])):
+                        sum_availability_perm += verfügbarkeit[i][j][k]
+                        print(sum_availability_perm)           
+                if sum_availability_perm <= working_h:
+                    print(mitarbeiter[i], " has not planned enough hours.")
+                else:
+                    pass
 
         # Beschränkungen --------------------------------------------------------------------------------------------------------
         # (Die solver.Add() Funktion nimmt eine Bedingung als Argument und fügt sie dem Optimierungsproblem hinzu.)
