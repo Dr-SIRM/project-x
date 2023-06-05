@@ -945,7 +945,9 @@ def get_company():
     weekdays = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
     company = Company.query.filter_by(company_name=user.company_name).first()
     day_num = 7
-    company_data = request.data
+    company_id = user.company_id
+    creation_date = datetime.datetime.now()
+
     if company is None:
         shift = ''
         weekly_hour = ''
@@ -964,9 +966,10 @@ def get_company():
             temp_dict[str(new_i) + '&1'] = temp.end_time.strftime("%H:%M") if temp.end_time else None
 
         if request.method == 'POST':
+            company_data = request.get_json()
 
             # Opening Hours 
-            OpeningHours.query.filter_by(company_name=current_user.company_name).delete()
+            OpeningHours.query.filter_by(company_name=user.company_name).delete()
             db.session.commit()
             company_no = Company.query.order_by(Company.id.desc()).first()
             if company_no is None:
@@ -974,11 +977,15 @@ def get_company():
             else:
                 new_company_no = company_no.id + 1
 
+            new_company_name = company_data['company_name'] or company.name 
+            new_weekly_hours = company_data['weekly_hours'] or company.weekly_hours 
+            new_shifts = company_data['shifts'] or company.shifts 
+
             company_data = Company(
                 id=new_company_no,
-                company_name=company_data['company_name'],
-                weekly_hours=company_data['weekly_hours'],
-                shifts=company_data['shifts'],
+                company_name=company_data['new_company_name'],
+                weekly_hours=company_data['new_weekly_hours'],
+                shifts=company_data['new_shifts'],
                 created_by=company_id,
                 changed_by=company_id,
                 creation_timestamp=creation_date

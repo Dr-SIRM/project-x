@@ -40,8 +40,6 @@ const Company = ({ company }) => {
     }
   };
 
-
-
   return (
     <Box m="20px">
       <Header
@@ -91,7 +89,7 @@ const Company = ({ company }) => {
                 label={companyData.company_name}
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.company_name}
+                value={values.company_name || companyData.company_name}
                 name="company_name"
                 error={!!touched.company_name && !!errors.company_name}
                 helperText={touched.company_name && errors.company_name}
@@ -126,7 +124,7 @@ const Company = ({ company }) => {
                 label={companyData.weekly_hours}
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.weekly_hours}
+                value={values.weekly_hours || companyData.weekly_hours}
                 name="weekly_hours"
                 error={!!touched.weekly_hours && !!errors.weekly_hours}
                 helperText={touched.weekly_hours && errors.weekly_hours}
@@ -160,8 +158,8 @@ const Company = ({ company }) => {
                 type="text"
                 label={companyData.shifts}
                 onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.shifts}
+                onChange={(e) => handleChange(e, 'shifts')}
+                value={values.shifts || companyData.shifts}
                 name="shifts"
                 error={!!touched.shifts && !!errors.shifts}
                 helperText={touched.shifts && errors.shifts}
