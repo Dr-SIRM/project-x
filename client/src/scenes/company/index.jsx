@@ -51,6 +51,7 @@ const Company = ({ company }) => {
 
       <Formik
         onSubmit={handleFormSubmit}
+        enableReinitialize={true}
         initialValues={{
           company_name: companyData.company_name, // Use companyData values as defaults
           weekly_hours: companyData.weekly_hours,
