@@ -1000,8 +1000,9 @@ def get_company():
             db.session.commit()
 
             for i in range(day_num):
-                entry1 = request.form.get(f'day_{i}_0')
-                entry2 = request.form.get(f'day_{i}_1')
+                entry1 = company_data['day_0_0'] 
+                print(entry1)
+                entry1 = company_data['day_0_1']
                 if entry1:
                     last = OpeningHours.query.order_by(OpeningHours.id.desc()).first()
                     if last is None:
@@ -1020,6 +1021,20 @@ def get_company():
 
                     new_weekday = weekdays[i]
 
+                    opening = OpeningHours(
+                    id=new_id,
+                    company_name=user.company_name,
+                    weekday=new_weekday,
+                    start_time=new_entry1,
+                    end_time=new_entry2,
+                    created_by=company_id,
+                    changed_by=company_id,
+                    creation_timestamp=creation_date
+                )
+
+                db.session.add(opening)
+                db.session.commit()
+
 
     company_list = {
         'company_name': company_name,
@@ -1030,7 +1045,6 @@ def get_company():
         'temp_dict': temp_dict, 
     }
     
-
 
     print(company_list)
     
