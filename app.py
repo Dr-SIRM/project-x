@@ -949,9 +949,11 @@ def get_company():
     creation_date = datetime.datetime.now()
 
     if company is None:
+        company_name = ''
         shift = ''
         weekly_hour = ''
     else:
+        company_name = company.company_name
         shift = company.shifts
         weekly_hour = company.weekly_hours
 
@@ -978,16 +980,17 @@ def get_company():
                 new_company_no = company_no.id + 1
             
             
-
+            """
             new_company_name = company_data['company_name'] or company.name 
             new_weekly_hours = company_data['weekly_hours'] or company.weekly_hours 
             new_shifts = company_data['shifts'] or company.shifts 
+            """
 
             company_data = Company(
                 id=new_company_no,
-                company_name=company_data['new_company_name'],
-                weekly_hours=company_data['new_weekly_hours'],
-                shifts=company_data['new_shifts'],
+                company_name=company_data['company_name'],
+                weekly_hours=company_data['weekly_hours'],
+                shifts=company_data['shifts'],
                 created_by=company_id,
                 changed_by=company_id,
                 creation_timestamp=creation_date
@@ -1019,7 +1022,7 @@ def get_company():
 
 
     company_list = {
-        'company_name': user.company_name,
+        'company_name': company_name,
         'shifts': shift,
         'weekly_hours': weekly_hour,
         'weekdays': weekdays,
