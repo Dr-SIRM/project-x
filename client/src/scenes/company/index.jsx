@@ -56,7 +56,11 @@ const Company = ({ company }) => {
           company_name: companyData.company_name, // Use companyData values as defaults
           weekly_hours: companyData.weekly_hours,
           shifts: companyData.shifts,
-        }}
+          ...Array.from({ length: companyData.day_num }).reduce((acc, _, rowIndex) => {
+            acc[`day_${rowIndex}_0`] = companyData.temp_dict[`${rowIndex + 1}&0`];
+            acc[`day_${rowIndex}_1`] = companyData.temp_dict[`${rowIndex + 1}&1`];
+            return acc;
+        }}}
         validationSchema={checkoutSchema}
       >
         {({
@@ -242,7 +246,7 @@ const Company = ({ company }) => {
                   height: "100%",
                 }}
               ></Typography>
-              {Array.from({ length: 7 }).map((_, rowIndex) => (
+              {Array.from({ length: companyData.day_num }).map((_, rowIndex) => (
               <>
                 <Typography
                   key={`number-${rowIndex}`}
@@ -266,10 +270,8 @@ const Company = ({ company }) => {
                     type="time"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={companyData && companyData.temp_dict && companyData.temp_dict[`${rowIndex + 1}&0`]
-                    ? companyData.temp_dict[`${rowIndex + 1}&0`]
-                    : ""}
-                    name={`start_time_${rowIndex}`}
+                    value={values.day_${rowIndex}_0}
+                    name={`day_${rowIndex}_0`}
                     error={
                       !!touched[`start_time_${rowIndex}`] &&
                       !!errors[`start_time_${rowIndex}`]
@@ -290,7 +292,7 @@ const Company = ({ company }) => {
                     value={companyData && companyData.temp_dict && companyData.temp_dict[`${rowIndex + 1}&1`]
   ? companyData.temp_dict[`${rowIndex + 1}&1`]
   : ""}
-                    name={`end_time_${rowIndex}`}
+                    name={`day_${rowIndex}_1`}
                     error={
                       !!touched[`end_time_${rowIndex}`] &&
                       !!errors[`end_time_${rowIndex}`]
