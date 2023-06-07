@@ -26,6 +26,9 @@ mycursor = mydb.cursor()
 # sudo apt-get install mysql-client
 # mysql -h database-projectx-1-0.ctsu2n36dxrk.eu-central-1.rds.amazonaws.com -u admin -p
 
+# npm install axios
+# yarn add axios
+
 #for db in mycursor:
     #print(db)
 

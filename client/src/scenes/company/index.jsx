@@ -13,7 +13,7 @@ const Company = ({ company }) => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
-  const [companyData, setCompanyData] = useState([]);
+  const [companyData, setCompanyData] = useState({});
 
   useEffect(() => {
     const fetchCompany = async () => {
@@ -40,6 +40,7 @@ const Company = ({ company }) => {
     }
   };
 
+
   return (
     <Box m="20px">
       <Header
@@ -50,7 +51,11 @@ const Company = ({ company }) => {
 
       <Formik
         onSubmit={handleFormSubmit}
-        initialValues={initialValues}
+        initialValues={{
+          company_name: companyData.company_name, // Use companyData values as defaults
+          weekly_hours: companyData.weekly_hours,
+          shifts: companyData.shifts,
+        }}
         validationSchema={checkoutSchema}
       >
         {({
@@ -86,11 +91,12 @@ const Company = ({ company }) => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label={companyData.company_name}
+                label= "Company Name"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.company_name || companyData.company_name}
+                value={values.company_name}
                 name="company_name"
+                placeholder={companyData.company_name || ""}
                 error={!!touched.company_name && !!errors.company_name}
                 helperText={touched.company_name && errors.company_name}
                 sx={{ gridColumn: "span 1" }}
@@ -121,11 +127,12 @@ const Company = ({ company }) => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label={companyData.weekly_hours}
+                label= "Weekly Hours"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.weekly_hours || companyData.weekly_hours}
+                value={values.weekly_hours}
                 name="weekly_hours"
+                placeholder={companyData.weekly_hours || ""}
                 error={!!touched.weekly_hours && !!errors.weekly_hours}
                 helperText={touched.weekly_hours && errors.weekly_hours}
                 sx={{ gridColumn: "span 1" }}
@@ -156,10 +163,10 @@ const Company = ({ company }) => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label={companyData.shifts}
+                label= "Shifts"
                 onBlur={handleBlur}
-                onChange={(e) => handleChange(e, 'shifts')}
-                value={values.shifts || companyData.shifts}
+                onChange={handleChange}
+                value={values.shifts}
                 name="shifts"
                 error={!!touched.shifts && !!errors.shifts}
                 helperText={touched.shifts && errors.shifts}
@@ -356,11 +363,5 @@ const checkoutSchema = yup.object().shape({
   weekly_hours: yup.number(),
   shifts: yup.number(),
 });
-
-const initialValues = {
-  company_name: "",
-  weekly_hours: "",
-  shifts: "",
-};
 
 export default Company;
