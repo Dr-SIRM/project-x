@@ -94,9 +94,8 @@ const Company = ({ company }) => {
                 label= "Company Name"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.company_name}
+                value={companyData.company_name}
                 name="company_name"
-                placeholder={companyData.company_name || ""}
                 error={!!touched.company_name && !!errors.company_name}
                 helperText={touched.company_name && errors.company_name}
                 sx={{ gridColumn: "span 1" }}
