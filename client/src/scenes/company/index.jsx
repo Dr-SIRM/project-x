@@ -60,7 +60,8 @@ const Company = ({ company }) => {
             acc[`day_${rowIndex}_0`] = companyData.temp_dict[`${rowIndex + 1}&0`];
             acc[`day_${rowIndex}_1`] = companyData.temp_dict[`${rowIndex + 1}&1`];
             return acc;
-        }}}
+          }, {}),
+        }}
         validationSchema={checkoutSchema}
       >
         {({
@@ -270,7 +271,7 @@ const Company = ({ company }) => {
                     type="time"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values.day_${rowIndex}_0}
+                    value={values[`day_${rowIndex}_0`]}
                     name={`day_${rowIndex}_0`}
                     error={
                       !!touched[`start_time_${rowIndex}`] &&
@@ -289,9 +290,7 @@ const Company = ({ company }) => {
                     type="time"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={companyData && companyData.temp_dict && companyData.temp_dict[`${rowIndex + 1}&1`]
-  ? companyData.temp_dict[`${rowIndex + 1}&1`]
-  : ""}
+                    value={values[`day_${rowIndex}_1`]}
                     name={`day_${rowIndex}_1`}
                     error={
                       !!touched[`end_time_${rowIndex}`] &&

@@ -959,7 +959,7 @@ def get_company():
 
     temp_dict = {}
     for i in range(day_num):
-        temp = OpeningHours.query.filter_by(weekday=weekdays[i]).first()
+        temp = OpeningHours.query.filter_by(company_name="TimeTab", weekday=weekdays[i]).first()
         if temp is None:
             pass
         else:
@@ -970,7 +970,7 @@ def get_company():
         if request.method == 'POST':
             company_data = request.get_json()
 
-            # Opening Hours 
+            # Company Data 
             OpeningHours.query.filter_by(company_name=user.company_name).delete()
             db.session.commit()
             company_no = Company.query.order_by(Company.id.desc()).first()
