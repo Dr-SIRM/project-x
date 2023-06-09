@@ -1151,5 +1151,33 @@ def company_data():
     return jsonify(response_data)
 '''
 
+'''
+@app.route('/api/update', methods=["GET", "POST"])
+@login_required
+def react_update():
+    new_data = User.query.get(current_user.id)
+    user_form = UpdateForm(csrf_enabled=False, obj=new_data)
+    company_id = User.query.get(current_user.company_id)
+
+    if request.method == 'POST':
+        existing_user = User.query.filter_by(id=current_user.id).first()
+        if existing_user:
+            existing_user.first_name = user_form.first_name.data
+            existing_user.last_name = user_form.last_name.data
+            existing_user.employment_level = user_form.employment_level.data
+            existing_user.company_name = user_form.company_name.data
+            existing_user.department = user_form.department.data
+            existing_user.access_level = user_form.access_level.data
+            existing_user.email = user_form.email.data
+            existing_user.changed_by = company_id
+            existing_user.update_timestamp = datetime.datetime.now
+
+            db.session.commit()
+
+
+    return render_template('update.html', data_tag=User.query.all(), account=new_data, template_form=user_form)
+    '''
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

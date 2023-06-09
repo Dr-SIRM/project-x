@@ -1,16 +1,34 @@
-import { useState } from "react";
-import { useTheme, Box, Button, TextField, InputAdornment, MenuItem, Select, FormControl, InputLabel, Snackbar  } from "@mui/material";
+import { useState, useEffect } from "react";
+import { useTheme, Box, Button, TextField, InputAdornment, MenuItem, Select, FormControl, Snackbar  } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
+import { tokens } from "../../theme";
 import axios from 'axios';
 
 
 const Update = () => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
+  const [userData, setUserData] = useState({});
+
+
+  useEffect(() => {
+    const fetchCompany = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/update');
+        setUserData(response.data);
+      } catch (error) {
+        console.error('Error fetching company details:', error);
+      }
+    };
+
+    fetchCompany();
+  }, []);
 
   const handleFormSubmit = (values, { resetForm }) => {
     axios
@@ -32,7 +50,13 @@ const Update = () => {
 
       <Formik
         onSubmit={handleFormSubmit}
-        initialValues={initialValues}
+        initialValues={{
+          first_name: userData.first_name,
+          last_name: userData.last_name,
+          email: userData.email,
+          employment_level: userData.employment_level,
+          department: userData.department,
+        }}
         validationSchema={checkoutSchema}
       >
         {({
@@ -95,19 +119,6 @@ const Update = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Firmennamen"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.company_name}
-                name="company_name"
-                error={!!touched.company_name && !!errors.company_name}
-                helpertext={touched.company_name && errors.company_name}
-                sx={{ gridColumn: "span 4" }}
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
                 label="Pensum"
                 onBlur={handleBlur}
                 onChange={handleChange}
@@ -133,22 +144,6 @@ const Update = () => {
                 helpertext={touched.department && errors.department}
                 sx={{ gridColumn: "span 4" }}
               />
-              <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 4" }}>
-                <InputLabel id="access_level-label">Access Level</InputLabel>
-                <Select
-                  labelId="access_level-label"
-                  id="access_level"
-                  name="access_level"
-                  value={values.access_level}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={!!touched.access_level && !!errors.access_level}
-                  helpertext={touched.access_level && errors.access_level}
-                >
-                  <MenuItem value="admin">Admin</MenuItem>
-                  <MenuItem value="user">User</MenuItem>
-                </Select>
-              </FormControl>
              
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
@@ -199,28 +194,11 @@ const checkoutSchema = yup.object().shape({
   first_name: yup.string().required("required"),
   last_name: yup.string().required("required"),
   email: yup.string().email("invalid email").required("required"),
-  password: yup.string().required("required"),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref("password"), null], "Passwords must match")
-    .required("required"),
-  company_name: yup.string().required("required"),
-  access_level: yup.string().required("required"),
   employment_level: yup
     .number()
     .min(0, 'Company level must be greater than or equal to 0%')
     .max(100, 'Company level must be less than or equal to 100%')
     .required("required"),
 });
-
-const initialValues = {
-  first_name: "",
-  last_name: "",
-  email: "",
-  employment_level: "",
-  company_name: "",
-  access_level: "",
-  department: "",
-};
 
 export default Update;

@@ -97,7 +97,7 @@ const Company = ({ company }) => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label= "Company Name"
+                label= ""
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={companyData.company_name}
@@ -132,7 +132,7 @@ const Company = ({ company }) => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label= "Weekly Hours"
+                label= ""
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.weekly_hours}
@@ -168,7 +168,7 @@ const Company = ({ company }) => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label= "Shifts"
+                label= ""
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.shifts}
