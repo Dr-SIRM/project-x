@@ -1,4 +1,4 @@
-from flask import Flask, render_template, current_app, request, redirect, flash, url_for, abort, session, jsonify, send_from_directory
+from flask import Flask, render_template, current_app, request, redirect, flash, url_for, abort, session, jsonify, send_from_directory, make_response
 from flask_login import LoginManager, current_user, logout_user, login_required, login_user
 from flask_mail import Mail, Message
 from flask_cors import CORS
@@ -222,6 +222,7 @@ def login():
             return render_template('login.html', template_form=login_form)
     else:
         return render_template('login.html', template_form=login_form)
+
 
 
 @app.route('/logout')
@@ -834,6 +835,36 @@ if __name__ == '__main__':
 
 
 #REACT APP / API Routes
+from flask_jwt_extended import (
+    JWTManager, create_access_token, jwt_required, get_jwt_identity
+)
+from collections.abc import Mapping as ABCMapping
+
+#JWT Manager
+app.config['JWT_SECRET_KEY'] = 'your-secret-key'  
+jwt = JWTManager(app)
+
+@app.route('/api/login', methods=['POST'])
+def login_react():
+    email = request.json.get('email')
+    password = request.json.get('password')
+
+    user = User.query.filter_by(email=email).first()
+    if not user or not check_password_hash(user.password, password):
+        return jsonify({'error': 'Invalid email or password'}), 401
+
+    # Generate the JWT token
+    additional_claims = {"user_id": user.id}
+    session_token = create_access_token(identity=email, additional_claims=additional_claims)
+
+    # Log in the user
+    login_user(user)
+
+    # Return the session token
+    response = make_response(jsonify({'session_token': session_token}))
+    response.set_cookie('session_token', session_token, httponly=True)
+    return response
+
 
 @app.route('/api/users')
 def get_data():
@@ -913,7 +944,6 @@ def api_admin_registration():
 
 
 @app.route('/api/update', methods=["GET", "POST"])
-@login_required
 def react_update():
     new_data = User.query.get(current_user.id)
     user_form = UpdateForm(csrf_enabled=False, obj=new_data)

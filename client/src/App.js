@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
+import Login from "./scenes/login";
 import Dashboard from "./scenes/dashboard";
 import Team from "./scenes/team";
 import Update from "./scenes/update";
@@ -26,6 +27,8 @@ function App() {
   const [isSidebar, setIsSidebar] = useState(true);
   const [users, setUsers] = useState([]);
   const [message, setMessage] = useState("");
+  const location = useLocation();
+  const isAuthenticated = location.pathname !== "/"; // Check if the user is authenticated
 
   useEffect(() => {
     fetchData();
@@ -49,11 +52,13 @@ function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <div className="app">
-          <Sidebar isSidebar={isSidebar} />
+         {isAuthenticated && <Sidebar isSidebar={isSidebar} />}
           <main className="content">
-            <Topbar setIsSidebar={setIsSidebar} />
+            {isAuthenticated && <Topbar />}
+            
             <Routes>
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/" element={<Login />} /> 
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/team" element={<Team users={users} />} />
               <Route path="/contacts" element={<Contacts />} />
               <Route path="/invoices" element={<Invoices />} />
