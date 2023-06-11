@@ -1073,21 +1073,21 @@ def get_company():
 @app.route('/api/availability', methods = ['GET', 'POST'])
 def get_availability():
     # today's date
+    user = User.query.filter_by(email="robin.martin@timetab.ch").first()
     today = datetime.date.today()
     creation_date = datetime.datetime.now()
     monday = today - datetime.timedelta(days=today.weekday())
     weekdays = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
     day_num = 7
     week_adjustment = session.get('week_adjustment', 0)
-
-    user = User.query.get(current_user.id)
-    company_id = current_user.company_id
+    company_id = user.company_id
     planning_form = PlanningForm(csrf_enabled = False)
 
+    """
     company_dict = {}
-    for company in User.query.filter_by(email=current_user.email).all():
+    for company in User.query.filter_by(email=user.email).all():
         company_dict[company.company_name] = company
-       
+    """      
 
 
     temp_dict = {}
@@ -1097,12 +1097,12 @@ def get_availability():
             pass
         else:
             new_i = i + 1
-            temp_dict[str(new_i) + '&0'] = temp.start_time
-            temp_dict[str(new_i) + '&1'] = temp.end_time
-            temp_dict[str(new_i) + '&2'] = temp.start_time2
-            temp_dict[str(new_i) + '&3'] = temp.end_time2
-            temp_dict[str(new_i) + '&4'] = temp.start_time3
-            temp_dict[str(new_i) + '&5'] = temp.end_time3
+            temp_dict[str(new_i) + '&0'] = temp.start_time.strftime("%H:%M") if temp.start_time else None
+            temp_dict[str(new_i) + '&1'] = temp.end_time.strftime("%H:%M") if temp.end_time else None
+            temp_dict[str(new_i) + '&2'] = temp.start_time2.strftime("%H:%M") if temp.start_time else None
+            temp_dict[str(new_i) + '&3'] = temp.end_time2.strftime("%H:%M") if temp.end_time else None
+            temp_dict[str(new_i) + '&4'] = temp.start_time3.strftime("%H:%M") if temp.start_time else None
+            temp_dict[str(new_i) + '&5'] = temp.end_time3.strftime("%H:%M") if temp.end_time else None
 
 
     if planning_form.prev_week.data:
@@ -1130,15 +1130,15 @@ def get_availability():
         availability_data = request.get_json()
         for i in range(day_num):
             new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
-            Availability.query.filter_by(user_id=current_user.id, date=new_date).delete()
+            Availability.query.filter_by(user_id=user.id, date=new_date).delete()
             db.session.commit()
 
-            entry1 = request.form.get(f'day_{i}_0')
-            entry2 = request.form.get(f'day_{i}_1')
-            entry3 = request.form.get(f'day_{i}_2')
-            entry4 = request.form.get(f'day_{i}_3')
-            entry5 = request.form.get(f'day_{i}_4')
-            entry6 = request.form.get(f'day_{i}_5')
+            entry1 = request.json.get(f'day_{i}_0')
+            entry2 = request.json.get(f'day_{i}_1')
+            entry3 = request.json.get(f'day_{i}_2')
+            entry4 = request.json.get(f'day_{i}_3')
+            entry5 = request.json.get(f'day_{i}_4')
+            entry6 = request.json.get(f'day_{i}_5')
             if entry1:
                 last = Availability.query.order_by(Availability.id.desc()).first()
                 if last is None:
@@ -1180,10 +1180,22 @@ def get_availability():
                 new_weekday = weekdays[i]
 
 
-                data = Availability(id=new_id, user_id=current_user.id, date=new_date, weekday=new_weekday, email=user.email,
-                                    start_time=new_entry1, end_time=new_entry2, start_time2=new_entry3,
-                                    end_time2=new_entry4, start_time3=new_entry5, end_time3=new_entry6,
-                                    created_by=company_id, changed_by=company_id, creation_timestamp = creation_date)
+                data = Availability(
+                    id=new_id, 
+                    user_id=user.id, 
+                    date=new_date, 
+                    weekday=new_weekday, 
+                    email=user.email,
+                    start_time=new_entry1, 
+                    end_time=new_entry2, 
+                    start_time2=new_entry3,
+                    end_time2=new_entry4, 
+                    start_time3=new_entry5, 
+                    end_time3=new_entry6,
+                    created_by=company_id, 
+                    changed_by=company_id, 
+                    creation_timestamp = creation_date
+                    )
 
 
                 db.session.add(data)
@@ -1214,10 +1226,22 @@ def get_availability():
                 new_entry6 = datetime.datetime.strptime(entry6, '%H:%M').time()
                 new_weekday = weekdays[i]
 
-                data = TemplateAvailability(id=new_id, template_name=new_name, date=new_date, weekday=new_weekday, email=user.email,
-                                            start_time=new_entry1, end_time=new_entry2, start_time2=new_entry3,
-                                            end_time2=new_entry4, start_time3=new_entry5, end_time3=new_entry6,
-                                            created_by=company_id, changed_by=company_id, creation_timestamp = creation_date)
+                data = TemplateAvailability(
+                    id=new_id, 
+                    template_name=new_name, 
+                    date=new_date, 
+                    weekday=new_weekday, 
+                    email=user.email,
+                    start_time=new_entry1, 
+                    end_time=new_entry2, 
+                    start_time2=new_entry3,
+                    end_time2=new_entry4, 
+                    start_time3=new_entry5, 
+                    end_time3=new_entry6,
+                    created_by=company_id, 
+                    changed_by=company_id, 
+                    creation_timestamp = creation_date
+                    )
 
 
                 db.session.add(data)
@@ -1227,10 +1251,9 @@ def get_availability():
         'weekdays': weekdays,
         'day_num': day_num,
         'temp_dict': temp_dict,
-        'company_dict': company_dict,
     }
 
-    return jsonify(company_list)
+    return jsonify(availability_list)
 
 
 if __name__ == "__main__":

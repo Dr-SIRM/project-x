@@ -52,8 +52,17 @@ const Availability = ({ availability }) => {
       <Formik
         onSubmit={handleFormSubmit}
         enableReinitialize={true}
-        initialValues={true}
-        validationSchema={checkoutSchema}
+        initialValues={{
+          ...Array.from({ length: availabilityData.day_num }).reduce((acc, _, rowIndex) => {
+            acc[`day_${rowIndex}_0`] = availabilityData.temp_dict[`${rowIndex + 1}&0`];
+            acc[`day_${rowIndex}_1`] = availabilityData.temp_dict[`${rowIndex + 1}&1`];
+            acc[`day_${rowIndex}_2`] = availabilityData.temp_dict[`${rowIndex + 1}&2`];
+            acc[`day_${rowIndex}_3`] = availabilityData.temp_dict[`${rowIndex + 1}&3`];
+            acc[`day_${rowIndex}_4`] = availabilityData.temp_dict[`${rowIndex + 1}&4`];
+            acc[`day_${rowIndex}_5`] = availabilityData.temp_dict[`${rowIndex + 1}&5`];
+            return acc;
+          }, {}),
+        }}
       >
         {({
           values,
@@ -70,7 +79,7 @@ const Availability = ({ availability }) => {
             <Box
               display="grid"
               gap="30px"
-              gridTemplateColumns="repeat(8, minmax(0, 1fr))"
+              gridTemplateColumns="repeat(7, minmax(0, 1fr))"
               sx={{
                 "& > div": { gridColumn: isNonMobile ? undefined : "span 6" },
               }}
@@ -176,58 +185,29 @@ const Availability = ({ availability }) => {
                     ? availabilityData.weekdays[rowIndex]
                     : ""}
                   </Typography>
-                  <TextField
-                    key={`day_${rowIndex}_0`}
-                    fullWidth
-                    variant="filled"
-                    type="time"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values[`day_${rowIndex}_0`]}
-                    name={`day_${rowIndex}_0`}
-                    error={
-                      !!touched[`day_${rowIndex}_0`] &&
-                      !!errors[`day_${rowIndex}_0`]
-                    }
-                    helperText={
-                      touched[`day_${rowIndex}_0`] &&
-                      errors[`day_${rowIndex}_0`]
-                    }
-                    sx={{ gridColumn: "span 1" }}
-                  />
-                  <TextField
-                    key={`day_${rowIndex}_1`}
-                    fullWidth
-                    variant="filled"
-                    type="time"
-                    onBlur={handleBlur}
-                    onChange={handleChange}
-                    value={values[`day_${rowIndex}_1`]}
-                    name={`day_${rowIndex}_1`}
-                    error={
-                      !!touched[`day_${rowIndex}_1`] &&
-                      !!errors[`day_${rowIndex}_1`]
-                    }
-                    helperText={
-                      touched[`day_${rowIndex}_1`] &&
-                      errors[`day_${rowIndex}_1`]
-                    }
-                    sx={{ gridColumn: "span 1" }}
-                  />
-
-                  <Typography
-                    key={`empty-1-${rowIndex}`}
-                    color={colors.greenAccent[500]}
-                    variant=""
-                    sx={{
-                      gridColumn: "span 3",
-                      display: "flex",
-                      alignItems: "center",
-                      height: "100%",
-                    }}
-                  ></Typography>
-                </>
-              ))}
+                  {Array.from({ length: 6 }).map((_, columnIndex) => (
+                    <TextField
+                      key={`day_${rowIndex}_${columnIndex}`}
+                      fullWidth
+                      variant="filled"
+                      type="time"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      value={values[`day_${rowIndex}_${columnIndex}`] || 0}
+                      name={`day_${rowIndex}_${columnIndex}`}
+                      error={
+                        !!touched[`day_${rowIndex}_${columnIndex}`] &&
+                        !!errors[`day_${rowIndex}_${columnIndex}`]
+                      }
+                      helperText={
+                        touched[`day_${rowIndex}_${columnIndex}`] &&
+                        errors[`day_${rowIndex}_${columnIndex}`]
+                      }
+                      sx={{ gridColumn: "span 1" }}
+                    />
+                  ))}
+                  </>
+                ))}
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
               <Button type="submit" color="secondary" variant="contained">
@@ -271,7 +251,6 @@ const Availability = ({ availability }) => {
   );
 };
 
-const checkoutSchema = yup.object().shape({
-});
+
 
 export default Availability;
