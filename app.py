@@ -1065,8 +1065,6 @@ def get_company():
         'temp_dict': temp_dict, 
     }
     
-
-    print(company_list)
     
     return jsonify(company_list)
 
@@ -1232,8 +1230,7 @@ def get_availability():
         'company_dict': company_dict,
     }
 
-    return render_template('planning.html', template_form=planning_form, monday=monday, weekdays=weekdays,
-                           day_num=day_num, temp_dict=temp_dict, company_dict=company_dict)
+    return jsonify(company_list)
 
 
 if __name__ == "__main__":

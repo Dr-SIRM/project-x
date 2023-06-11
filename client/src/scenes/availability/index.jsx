@@ -70,7 +70,7 @@ const Availability = ({ availability }) => {
             <Box
               display="grid"
               gap="30px"
-              gridTemplateColumns="repeat(6, minmax(0, 1fr))"
+              gridTemplateColumns="repeat(8, minmax(0, 1fr))"
               sx={{
                 "& > div": { gridColumn: isNonMobile ? undefined : "span 6" },
               }}
@@ -111,20 +111,18 @@ const Availability = ({ availability }) => {
               >
                 End Time 1
               </Typography>
-              
               <Typography
                 color={colors.greenAccent[500]}
-                variant=""
+                variant="h6"
                 sx={{
-                  gridColumn: "span 3",
+                  gridColumn: "span 1",
                   display: "flex",
                   alignItems: "center",
                   height: "100%",
                 }}
-              ></Typography>
-              Start Time 2
+              >
+                Start Time 2
               </Typography>
-
               <Typography
                 color={colors.greenAccent[500]}
                 variant="h6"
@@ -137,20 +135,18 @@ const Availability = ({ availability }) => {
               >
                 End Time 2
               </Typography>
-
               <Typography
                 color={colors.greenAccent[500]}
-                variant=""
+                variant="h6"
                 sx={{
-                  gridColumn: "span 3",
+                  gridColumn: "span 1",
                   display: "flex",
                   alignItems: "center",
                   height: "100%",
                 }}
-              ></Typography>
-              Start Time 3
+              >
+                Start Time 3
               </Typography>
-              
               <Typography
                 color={colors.greenAccent[500]}
                 variant="h6"
@@ -163,16 +159,6 @@ const Availability = ({ availability }) => {
               >
                 End Time 3
               </Typography>
-              <Typography
-                color={colors.greenAccent[500]}
-                variant=""
-                sx={{
-                  gridColumn: "span 3",
-                  display: "flex",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              ></Typography>
               {Array.from({ length: availabilityData.day_num }).map((_, rowIndex) => (
               <>
                 <Typography
