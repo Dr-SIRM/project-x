@@ -7,35 +7,35 @@ import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import axios from 'axios';
 
-const Company = ({ company }) => {
+const Availability = ({ availability }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
-  const [companyData, setcompanyData] = useState({});
+  const [availabilityData, setavailabilityData] = useState({});
 
   useEffect(() => {
-    const fetchCompany = async () => {
+    const fetchavailabilityData = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/company');
-        setcompanyData(response.data);
+        const response = await axios.get('http://localhost:5000/api/availability');
+        setavailabilityData(response.data);
       } catch (error) {
-        console.error('Error fetching company details:', error);
+        console.error('Error fetching Availability details:', error);
       }
     };
 
-    fetchCompany();
+    fetchavailabilityData();
   }, []);
 
   
   const handleFormSubmit = async (values) => {
     try {
       // Send the updated form values to the server for database update
-      await axios.post('http://localhost:5000/api/company', values);
+      await axios.post('http://localhost:5000/api/availability', values);
       setShowSuccessNotification(true);
     } catch (error) {
-      console.error('Error updating company details:', error);
+      console.error('Error updating availability details:', error);
       setShowErrorNotification(true);
     }
   };
@@ -44,24 +44,15 @@ const Company = ({ company }) => {
   return (
     <Box m="20px">
       <Header
-        title="COMPANY"
-        subtitle="Please update your company data whenever necessary. These are the basics for your optimized Scheduler."
+        title="Availability"
+        subtitle="Please update your availability data whenever necessary. These are the basics for your optimized Scheduler."
       />
-      <h2>Company Information</h2>
+      <h2>Availability Sheet</h2>
 
       <Formik
         onSubmit={handleFormSubmit}
         enableReinitialize={true}
-        initialValues={{
-          company_name: companyData.company_name, // Use companyData values as defaults
-          weekly_hours: companyData.weekly_hours,
-          shifts: companyData.shifts,
-          ...Array.from({ length: companyData.day_num }).reduce((acc, _, rowIndex) => {
-            acc[`day_${rowIndex}_0`] = companyData.temp_dict[`${rowIndex + 1}&0`];
-            acc[`day_${rowIndex}_1`] = companyData.temp_dict[`${rowIndex + 1}&1`];
-            return acc;
-          }, {}),
-        }}
+        initialValues={true}
         validationSchema={checkoutSchema}
       >
         {({
@@ -73,126 +64,9 @@ const Company = ({ company }) => {
           handleSubmit,
         }) => (
           <form onSubmit={handleSubmit}>
-            <Box
-              display="grid"
-              gap="30px"
-              gridTemplateColumns="repeat(6, minmax(0, 1fr))"
-              sx={{
-                "& > div": { gridColumn: isNonMobile ? undefined : "span 6" },
-              }}
-            >
-              <Typography
-                color={colors.greenAccent[500]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "right",
-                  height: "100%",
-                }}
-              >
-                Firmennamen
-              </Typography>
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={companyData.company_name}
-                name="company_name"
-                error={!!touched.company_name && !!errors.company_name}
-                helperText={touched.company_name && errors.company_name}
-                sx={{ gridColumn: "span 1" }}
-              />
-              <Typography
-                color={colors.greenAccent[500]}
-                variant=""
-                sx={{
-                  gridColumn: "span 4",
-                  display: "grid",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              ></Typography>
-              <Typography
-                color={colors.greenAccent[500]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "right",
-                  height: "100%",
-                }}
-              >
-                Weekly Hours
-              </Typography>
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.weekly_hours}
-                name="weekly_hours"
-                placeholder={companyData.weekly_hours || ""}
-                error={!!touched.weekly_hours && !!errors.weekly_hours}
-                helperText={touched.weekly_hours && errors.weekly_hours}
-                sx={{ gridColumn: "span 1" }}
-              />
-              <Typography
-                color={colors.greenAccent[500]}
-                variant=""
-                sx={{
-                  gridColumn: "span 4",
-                  display: "grid",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              ></Typography>
-              <Typography
-                color={colors.greenAccent[500]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "right",
-                  height: "100%",
-                }}
-              >
-                Shifts
-              </Typography>
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.shifts}
-                name="shifts"
-                error={!!touched.shifts && !!errors.shifts}
-                helperText={touched.shifts && errors.shifts}
-                sx={{ gridColumn: "span 1" }}
-              />
-              <Typography
-                color={colors.greenAccent[500]}
-                variant=""
-                sx={{
-                  gridColumn: "span 4",
-                  display: "grid",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              ></Typography>
-            </Box>
+            
             <></>
-            <></>
-            <h2>Opening Hour of your mother's legs</h2>
-            <></>
-            <></>
+           
             <Box
               display="grid"
               gap="30px"
@@ -223,7 +97,7 @@ const Company = ({ company }) => {
                   height: "100%",
                 }}
               >
-                Start Time
+                Start Time 1
               </Typography>
               <Typography
                 color={colors.greenAccent[500]}
@@ -235,7 +109,59 @@ const Company = ({ company }) => {
                   height: "100%",
                 }}
               >
-                End Time
+                End Time 1
+              </Typography>
+              
+              <Typography
+                color={colors.greenAccent[500]}
+                variant=""
+                sx={{
+                  gridColumn: "span 3",
+                  display: "flex",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              ></Typography>
+              Start Time 2
+              </Typography>
+
+              <Typography
+                color={colors.greenAccent[500]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              >
+                End Time 2
+              </Typography>
+
+              <Typography
+                color={colors.greenAccent[500]}
+                variant=""
+                sx={{
+                  gridColumn: "span 3",
+                  display: "flex",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              ></Typography>
+              Start Time 3
+              </Typography>
+              
+              <Typography
+                color={colors.greenAccent[500]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              >
+                End Time 3
               </Typography>
               <Typography
                 color={colors.greenAccent[500]}
@@ -247,7 +173,7 @@ const Company = ({ company }) => {
                   height: "100%",
                 }}
               ></Typography>
-              {Array.from({ length: companyData.day_num }).map((_, rowIndex) => (
+              {Array.from({ length: availabilityData.day_num }).map((_, rowIndex) => (
               <>
                 <Typography
                   key={`number-${rowIndex}`}
@@ -260,8 +186,8 @@ const Company = ({ company }) => {
                     height: "100%",
                   }}
                 >
-                  {companyData && companyData.weekdays
-                    ? companyData.weekdays[rowIndex]
+                  {availabilityData && availabilityData.weekdays
+                    ? availabilityData.weekdays[rowIndex]
                     : ""}
                   </Typography>
                   <TextField
@@ -360,9 +286,6 @@ const Company = ({ company }) => {
 };
 
 const checkoutSchema = yup.object().shape({
-  company_name: yup.string(),
-  weekly_hours: yup.number(),
-  shifts: yup.number(),
 });
 
-export default Company;
+export default Availability;

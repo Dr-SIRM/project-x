@@ -6,6 +6,7 @@ import Login from "./scenes/login";
 import Dashboard from "./scenes/dashboard";
 import Team from "./scenes/team";
 import Update from "./scenes/update";
+import Availability from "./scenes/availability";
 import Invite from "./scenes/invite";
 import Invoices from "./scenes/invoices";
 import Contacts from "./scenes/contacts";
@@ -68,6 +69,7 @@ function App() {
               <Route path="/line" element={<Line />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/calendar" element={<Calendar />} />
+              <Route path="/availability" element={<Availability />} />
               <Route path="/geography" element={<Geography />} />
               <Route path="/plan" element={<Plan />} />
               <Route path="/company" element={<Company />} />

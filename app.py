@@ -9,7 +9,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import random
 from models import db
-
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from collections.abc import Mapping as ABCMapping
 
 #Config
 #----------------------------------------------------------------------------------
@@ -34,6 +35,10 @@ migrate = Migrate(app, db)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+#SET JWT Manager
+app.config['JWT_SECRET_KEY'] = 'your-secret-key'  
+jwt = JWTManager(app)
 
 
 @login_manager.user_loader
@@ -732,7 +737,7 @@ def company_data():
 
     temp_dict = {}
     for i in range(day_num):
-        temp = OpeningHours.query.filter_by(weekday=weekdays[i]).first()
+        temp = OpeningHours.query.filter_by(company_name=company_name, weekday=weekdays[i]).first()
         if temp is None:
             pass
         else:
@@ -833,16 +838,6 @@ if __name__ == '__main__':
     app.run(debug=True)
 '''
 
-
-#REACT APP / API Routes
-from flask_jwt_extended import (
-    JWTManager, create_access_token, jwt_required, get_jwt_identity
-)
-from collections.abc import Mapping as ABCMapping
-
-#JWT Manager
-app.config['JWT_SECRET_KEY'] = 'your-secret-key'  
-jwt = JWTManager(app)
 
 @app.route('/api/login', methods=['POST'])
 def login_react():
@@ -1009,12 +1004,7 @@ def get_company():
             else:
                 new_company_no = company_no.id + 1
             
-            
-            """
-            new_company_name = company_data['company_name'] or company.name 
-            new_weekly_hours = company_data['weekly_hours'] or company.weekly_hours 
-            new_shifts = company_data['shifts'] or company.shifts 
-            """
+
 
             company_data = Company(
                 id=new_company_no,
@@ -1030,9 +1020,9 @@ def get_company():
             db.session.commit()
 
             for i in range(day_num):
-                entry1 = company_data['day_0_0'] 
+                entry1 = request.json.get(f'day_{i}_0')
                 print(entry1)
-                entry1 = company_data['day_0_1']
+                entry2 = request.json.get(f'day_{i}_1')
                 if entry1:
                     last = OpeningHours.query.order_by(OpeningHours.id.desc()).first()
                     if last is None:
@@ -1080,133 +1070,170 @@ def get_company():
     
     return jsonify(company_list)
 
-'''
-@app.route('/suckyourtitties', methods=['GET', 'POST'])
 
-def company_data():
-    opening_hour = OpeningHours.query.all()
+
+@app.route('/api/availability', methods = ['GET', 'POST'])
+def get_availability():
+    # today's date
+    today = datetime.date.today()
     creation_date = datetime.datetime.now()
+    monday = today - datetime.timedelta(days=today.weekday())
     weekdays = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
     day_num = 7
-    company_form = CompanyForm(csrf_enabled=False, obj=opening_hour)
-    company_id = current_user.company_id
-    company_name = current_user.company_name
-    company = Company.query.filter_by(company_name=company_name).first()
+    week_adjustment = session.get('week_adjustment', 0)
 
-    if company is None:
-        shift = ''
-        weekly_hour = ''
-    else:
-        shift = company.shifts
-        weekly_hour = company.weekly_hours
+    user = User.query.get(current_user.id)
+    company_id = current_user.company_id
+    planning_form = PlanningForm(csrf_enabled = False)
+
+    company_dict = {}
+    for company in User.query.filter_by(email=current_user.email).all():
+        company_dict[company.company_name] = company
+       
+
 
     temp_dict = {}
     for i in range(day_num):
-        temp = OpeningHours.query.filter_by(weekday=weekdays[i]).first()
+        temp = Availability.query.filter_by(email=user.email, weekday=weekdays[i]).first()
         if temp is None:
             pass
         else:
             new_i = i + 1
             temp_dict[str(new_i) + '&0'] = temp.start_time
             temp_dict[str(new_i) + '&1'] = temp.end_time
+            temp_dict[str(new_i) + '&2'] = temp.start_time2
+            temp_dict[str(new_i) + '&3'] = temp.end_time2
+            temp_dict[str(new_i) + '&4'] = temp.start_time3
+            temp_dict[str(new_i) + '&5'] = temp.end_time3
 
+
+    if planning_form.prev_week.data:
+        week_adjustment -=7
+        session['week_adjustment'] = week_adjustment
+
+        monday = monday + datetime.timedelta(days=week_adjustment)
+
+        return render_template('planning.html', template_form=planning_form, monday=monday, weekdays=weekdays,
+                               day_num=day_num)
+
+    if planning_form.next_week.data:
+        week_adjustment +=7
+        session['week_adjustment'] = week_adjustment
+
+        monday = monday + datetime.timedelta(days=week_adjustment)
+
+        return render_template('planning.html', template_form=planning_form, monday=monday, weekdays=weekdays,
+                               day_num=day_num, temp_dict=temp_dict)
+
+
+
+    #Save Availability
     if request.method == 'POST':
-        OpeningHours.query.filter_by(company_name=current_user.company_name).delete()
-        db.session.commit()
-        company_no = Company.query.order_by(Company.id.desc()).first()
-        if company_no is None:
-            new_company_no = 1
-        else:
-            new_company_no = company_no.id + 1
-
-        company_data = Company(
-            id=new_company_no,
-            company_name=company_form.company_name.data,
-            weekly_hours=company_form.weekly_hours.data,
-            shifts=company_form.shift.data,
-            created_by=company_id,
-            changed_by=company_id,
-            creation_timestamp=creation_date
-        )
-
-        db.session.merge(company_data)
-        db.session.commit()
-
+        availability_data = request.get_json()
         for i in range(day_num):
+            new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+            Availability.query.filter_by(user_id=current_user.id, date=new_date).delete()
+            db.session.commit()
+
             entry1 = request.form.get(f'day_{i}_0')
             entry2 = request.form.get(f'day_{i}_1')
+            entry3 = request.form.get(f'day_{i}_2')
+            entry4 = request.form.get(f'day_{i}_3')
+            entry5 = request.form.get(f'day_{i}_4')
+            entry6 = request.form.get(f'day_{i}_5')
             if entry1:
-                last = OpeningHours.query.order_by(OpeningHours.id.desc()).first()
+                last = Availability.query.order_by(Availability.id.desc()).first()
                 if last is None:
                     new_id = 1
                 else:
                     new_id = last.id + 1
+    
                 try:
                     new_entry1 = datetime.datetime.strptime(entry1, '%H:%M:%S').time()
                 except:
                     new_entry1 = datetime.datetime.strptime(entry1, '%H:%M').time()
-
+                
                 try:
                     new_entry2 = datetime.datetime.strptime(entry2, '%H:%M:%S').time()
                 except:
                     new_entry2 = datetime.datetime.strptime(entry2, '%H:%M').time()
+                
+                try:
+                    new_entry3 = datetime.datetime.strptime(entry3, '%H:%M:%S').time()
+                except:
+                    new_entry3 = datetime.datetime.strptime(entry3, '%H:%M').time()
+                
+                try:
+                    new_entry4 = datetime.datetime.strptime(entry4, '%H:%M:%S').time()
+                except:
+                    new_entry4 = datetime.datetime.strptime(entry4, '%H:%M').time()
+               
+                try:
+                    new_entry5 = datetime.datetime.strptime(entry5, '%H:%M:%S').time()
+                except:
+                    new_entry5 = datetime.datetime.strptime(entry5, '%H:%M').time()
+                
+                try:
+                    new_entry6 = datetime.datetime.strptime(entry6, '%H:%M:%S').time()
+                except:
+                    new_entry6 = datetime.datetime.strptime(entry6, '%H:%M').time()
 
+                
                 new_weekday = weekdays[i]
 
-                opening = OpeningHours(
-                    id=new_id,
-                    company_name=current_user.company_name,
-                    weekday=new_weekday,
-                    start_time=new_entry1,
-                    end_time=new_entry2,
-                    created_by=company_id,
-                    changed_by=company_id,
-                    creation_timestamp=creation_date
-                )
 
-                db.session.add(opening)
+                data = Availability(id=new_id, user_id=current_user.id, date=new_date, weekday=new_weekday, email=user.email,
+                                    start_time=new_entry1, end_time=new_entry2, start_time2=new_entry3,
+                                    end_time2=new_entry4, start_time3=new_entry5, end_time3=new_entry6,
+                                    created_by=company_id, changed_by=company_id, creation_timestamp = creation_date)
+
+
+                db.session.add(data)
                 db.session.commit()
 
-    # Prepare the data to be sent as a JSON response
-    response_data = {
-        'template_form': company_form.data,
+    #Save templates
+    if request.method == 'POST' and 'template' in request.form:
+        for i in range(day_num):
+            entry1 = request.form.get(f'day_{i}_0')
+            entry2 = request.form.get(f'day_{i}_1')
+            entry3 = request.form.get(f'day_{i}_2')
+            entry4 = request.form.get(f'day_{i}_3')
+            entry5 = request.form.get(f'day_{i}_4')
+            entry6 = request.form.get(f'day_{i}_5')
+            if entry1:
+                last = TemplateAvailability.query.order_by(TemplateAvailability.id.desc()).first()
+                if last is None:
+                    new_id = 1
+                else:
+                    new_id = last.id + 1
+                new_name = planning_form.template_name.data
+                new_date = monday + datetime.timedelta(days=i)
+                new_entry1 = datetime.datetime.strptime(entry1, '%H:%M').time()
+                new_entry2 = datetime.datetime.strptime(entry2, '%H:%M').time()
+                new_entry3 = datetime.datetime.strptime(entry3, '%H:%M').time()
+                new_entry4 = datetime.datetime.strptime(entry4, '%H:%M').time()
+                new_entry5 = datetime.datetime.strptime(entry5, '%H:%M').time()
+                new_entry6 = datetime.datetime.strptime(entry6, '%H:%M').time()
+                new_weekday = weekdays[i]
+
+                data = TemplateAvailability(id=new_id, template_name=new_name, date=new_date, weekday=new_weekday, email=user.email,
+                                            start_time=new_entry1, end_time=new_entry2, start_time2=new_entry3,
+                                            end_time2=new_entry4, start_time3=new_entry5, end_time3=new_entry6,
+                                            created_by=company_id, changed_by=company_id, creation_timestamp = creation_date)
+
+
+                db.session.add(data)
+                db.session.commit()
+
+    availability_list = {
         'weekdays': weekdays,
         'day_num': day_num,
         'temp_dict': temp_dict,
-        'company_name': company_name,
-        'shift': shift,
-        'weekly_hours': weekly_hour
+        'company_dict': company_dict,
     }
 
-    return jsonify(response_data)
-'''
-
-'''
-@app.route('/api/update', methods=["GET", "POST"])
-@login_required
-def react_update():
-    new_data = User.query.get(current_user.id)
-    user_form = UpdateForm(csrf_enabled=False, obj=new_data)
-    company_id = User.query.get(current_user.company_id)
-
-    if request.method == 'POST':
-        existing_user = User.query.filter_by(id=current_user.id).first()
-        if existing_user:
-            existing_user.first_name = user_form.first_name.data
-            existing_user.last_name = user_form.last_name.data
-            existing_user.employment_level = user_form.employment_level.data
-            existing_user.company_name = user_form.company_name.data
-            existing_user.department = user_form.department.data
-            existing_user.access_level = user_form.access_level.data
-            existing_user.email = user_form.email.data
-            existing_user.changed_by = company_id
-            existing_user.update_timestamp = datetime.datetime.now
-
-            db.session.commit()
-
-
-    return render_template('update.html', data_tag=User.query.all(), account=new_data, template_form=user_form)
-    '''
+    return render_template('planning.html', template_form=planning_form, monday=monday, weekdays=weekdays,
+                           day_num=day_num, temp_dict=temp_dict, company_dict=company_dict)
 
 
 if __name__ == "__main__":

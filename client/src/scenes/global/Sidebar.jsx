@@ -184,6 +184,13 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
             <Item
+              title="Verfügbarkeit"
+              to="/availability"
+              icon={<BusinessIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
               title="Company"
               to="/company"
               icon={<BusinessIcon />}
