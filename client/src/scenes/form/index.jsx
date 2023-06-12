@@ -104,6 +104,22 @@ const Form = () => {
                 helpertext={touched.company_name && errors.company_name}
                 sx={{ gridColumn: "span 4" }}
               />
+              <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 4" }}>
+                <InputLabel id="employment-label">Anstellung</InputLabel>
+                <Select
+                  labelId="employment-label"
+                  id="employment"
+                  name="employment"
+                  value={values.employment}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.employment && !!errors.employment}
+                  helpertext={touched.employment && errors.employment}
+                >
+                  <MenuItem value="perm">Vollzeit</MenuItem>
+                  <MenuItem value="temp">Teilzeit</MenuItem>
+                </Select>
+              </FormControl>
               <TextField
                 fullWidth
                 variant="filled"
@@ -232,6 +248,7 @@ const checkoutSchema = yup.object().shape({
     .required("required"),
   company_name: yup.string().required("required"),
   access_level: yup.string().required("required"),
+  employment: yup.string().required("required"),
   employment_level: yup
     .number()
     .min(0, 'Company level must be greater than or equal to 0%')
@@ -249,6 +266,7 @@ const initialValues = {
   department: "",
   password: "",
   confirmPassword: "",
+  employment: "",
 };
 
 export default Form;

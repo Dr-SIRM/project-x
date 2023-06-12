@@ -25,7 +25,7 @@ def serve_static_files(path):
 
 #SET SQLALCHEMY
 app.config["SECRET_KEY"] = "mysecret"
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:ProjectX2023.@database-projectx-1-0.ctsu2n36dxrk.eu-central-1.rds.amazonaws.com/projectx'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:ProjectX2023.@projectx2.crbavgy9fqyf.eu-central-1.rds.amazonaws.com/projectx2'
 app.config['SQLALCHEMY_TRACK_MODIFICATION'] = False
 db.init_app(app)
 migrate = Migrate(app, db)
@@ -917,6 +917,7 @@ def api_admin_registration():
         first_name=data['first_name'],
         last_name=data['last_name'],
         employment_level=data['employment_level'],
+        employment=data['employment'],
         company_name=data['company_name'],
         department=data['department'],
         access_level=data['access_level'],
