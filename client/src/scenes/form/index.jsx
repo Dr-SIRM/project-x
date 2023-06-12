@@ -116,8 +116,8 @@ const Form = () => {
                   error={!!touched.employment && !!errors.employment}
                   helpertext={touched.employment && errors.employment}
                 >
-                  <MenuItem value="perm">Vollzeit</MenuItem>
-                  <MenuItem value="temp">Teilzeit</MenuItem>
+                  <MenuItem value="Perm">Vollzeit</MenuItem>
+                  <MenuItem value="Temp">Teilzeit</MenuItem>
                 </Select>
               </FormControl>
               <TextField
