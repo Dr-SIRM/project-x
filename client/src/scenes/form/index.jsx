@@ -161,8 +161,8 @@ const Form = () => {
                   error={!!touched.access_level && !!errors.access_level}
                   helpertext={touched.access_level && errors.access_level}
                 >
-                  <MenuItem value="admin">Admin</MenuItem>
-                  <MenuItem value="user">User</MenuItem>
+                  <MenuItem value="Admin">Admin</MenuItem>
+                  <MenuItem value="User">User</MenuItem>
                 </Select>
               </FormControl>
               <TextField

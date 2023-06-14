@@ -135,13 +135,13 @@ def registration():
                 last = User.query.order_by(User.id.desc()).first()
                 hash = generate_password_hash(data_form.password.data)
                 if last is None:
-                    new_id = 10000
+                    new_id = 1
                 else:
                     new_id = last.id + 1
 
                 last_company_id = User.query.filter_by(company_name=token.company_name).order_by(User.company_id.desc()).first()
                 if last_company_id is None:
-                    new_company_id = 1000
+                    new_company_id = 10000
                 else:
                     new_company_id = last_company_id + 1
 
@@ -179,13 +179,13 @@ def admin_registration():
             last = User.query.order_by(User.id.desc()).first()
             hash = generate_password_hash(data_form.password.data)
             if last is None:
-                new_id = 10000
+                new_id = 1
             else:
                 new_id = last.id + 1
 
             last_company_id = User.query.filter_by(company_name=data_form.company_name.data).order_by(User.company_id.desc()).first()
             if last_company_id is None:
-                new_company_id = 1000
+                new_company_id = 10000
             else:
                 new_company_id = last_company_id + 1
 
@@ -900,14 +900,14 @@ def api_admin_registration():
     last = User.query.order_by(User.id.desc()).first()
 
     if last is None:
-        new_id = 10000
+        new_id = 1
     else:
         new_id = last.id + 1
 
     last_company_id = User.query.filter_by(company_name=data['company_name']).order_by(User.company_id.desc()).first()
 
     if last_company_id is None:
-        new_company_id = 1000
+        new_company_id = 10000
     else:
         new_company_id = last_company_id.company_id + 1
 
