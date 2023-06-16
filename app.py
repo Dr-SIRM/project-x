@@ -852,9 +852,6 @@ def login_react():
     additional_claims = {"user_id": user.id}
     session_token = create_access_token(identity=email, additional_claims=additional_claims)
 
-    # Log in the user
-    login_user(user)
-
     # Return the session token
     response = make_response(jsonify({'session_token': session_token}))
     response.set_cookie('session_token', session_token, httponly=True)

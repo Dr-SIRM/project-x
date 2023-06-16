@@ -25,7 +25,8 @@ const Login = () => {
       });
 
       // Save the session token or user information in local storage or state management
-      localStorage.setItem('token', response.data.token);
+      sessionStorage.setItem('token', response.data.session_token);
+      console.log(response.data.session_token);
 
       // Redirect to the dashboard
       navigate('/dashboard');
