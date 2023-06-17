@@ -874,6 +874,22 @@ def get_data():
         user_list.append(user_dict)
     return jsonify(user_list)
 
+@app.route('/api/current_user')
+def react_current_user():
+    token = request.headers.get('Authorization').split(' ')[1]
+
+    # Perform any necessary validation and decoding of the token
+
+    # Search for the email address associated with the token
+    email = search_user_by_token(token)
+
+    if email:
+        # Return the email address as a response
+        return {'email': email}
+    else:
+        # Handle the case where the email address is not found
+        return {'error': 'Email address not found'}, 404
+
 
 @app.route('/api/new_user', methods=['POST'])
 def new_user():
@@ -963,7 +979,10 @@ def react_update():
 @app.route('/api/company', methods=['GET', 'POST'])
 def get_company():
     # This has to be updated to the current user once the function is implemented.
-    user = User.query.filter_by(email="robin.martin@timetab.ch").first()
+    email = react_current_user()
+    session['react_mail'] = email
+    user = User.query.filter_by(email=email).first()
+    print(email)
     opening_hours = OpeningHours.query.filter_by(company_name=user.company_name).first()
     weekdays = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
     company = Company.query.filter_by(company_name=user.company_name).first()
@@ -982,7 +1001,7 @@ def get_company():
 
     temp_dict = {}
     for i in range(day_num):
-        temp = OpeningHours.query.filter_by(company_name="TimeTab", weekday=weekdays[i]).first()
+        temp = OpeningHours.query.filter_by(company_name=user.company_name, weekday=weekdays[i]).first()
         if temp is None:
             pass
         else:
