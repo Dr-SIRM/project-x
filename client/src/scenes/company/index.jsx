@@ -14,8 +14,11 @@ const Company = ({ company }) => {
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [companyData, setcompanyData] = useState({});
+  const [currentUser, setCurrentUser] = useState(null); 
 
   useEffect(() => {
+    const baseURL = 'http://localhost:5000/api'; // Update with your Flask app's base URL
+    
     const fetchCompany = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/company');
@@ -25,7 +28,17 @@ const Company = ({ company }) => {
       }
     };
 
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/current_user');
+        setCurrentUser(response.data);
+      } catch (error) {
+        console.error('Error fetching current user:', error);
+      }
+    };
+
     fetchCompany();
+    fetchCurrentUser();
   }, []);
 
   
