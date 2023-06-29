@@ -53,7 +53,7 @@ class ORAlgorithm:
         self.working_h = None
         self.calc_time = None
         self.employment_lvl_list = None
-        self.employment = None
+        self.employment = []
         self.verteilbare_stunden = None
         self.stunden_pro_tag = None
         self.gesamtstunden_verfügbarkeit = None
@@ -133,17 +133,14 @@ class ORAlgorithm:
 
         self.employment_lvl = [1, 0.8, 0.8, 0.6, 0.6] # Damit die Liste noch selbst manipuliert werden kann.
 
-        """
-        # Creating a Employment List based on the user of binary_availability
-        self.employment = []
 
         # Iteration of the key within binary_availability
         for user_id in self.binary_availability.keys():
-            if user.id in self.user_employment:
-                employment.append(self.user_employment[user_id])
-        print("List Employment: ", employment)
-        """
-        self.employment = ["Perm", "Temp", "Temp", "Temp", "Temp"]
+            if user_id in self.user_employment:
+                self.employment.append(self.user_employment[user_id])
+        print("List Employment: ", self.employment)
+        # self.employment = ["Perm", "Temp", "Temp", "Temp", "Temp"] # selbst manipulierbar
+
 
         # verteilbare Stunden (Wieviele Mannstunden benötigt die Firma im definierten Zeitraum)
         self.verteilbare_stunden = 0
