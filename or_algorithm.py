@@ -183,8 +183,10 @@ class ORAlgorithm:
         # Es wird veruscht, eine Kombination von Werten für die x[i, j, k] zu finden, die die Summe kosten[i]*x[i, j, k] minimiert            
         objective.SetMinimization()
 
-        # Check for Solver Execution
 
+        # Vorüberprüfungen ------------------------------------------------------------------------------------------------------
+
+        # Hat Phu noch hinzugefügt, haben die festen MA genug Stunden eingeplant?
         for i in range(len(mitarbeiter)):
             if employment[i] == "Perm": 
                 sum_availability_perm = 0
@@ -196,6 +198,8 @@ class ORAlgorithm:
                     print(mitarbeiter[i], " has not planned enough hours.")
                 else:
                     pass
+ 
+ 
 
         # Beschränkungen --------------------------------------------------------------------------------------------------------
         # (Die solver.Add() Funktion nimmt eine Bedingung als Argument und fügt sie dem Optimierungsproblem hinzu.)
@@ -284,7 +288,7 @@ class ORAlgorithm:
             gerechte_verteilung.append(round(verteilende_h+0.5))
         print("Gerechte Verteilung: ", gerechte_verteilung)     
 
-        # for loop für die gerechte Verteilung gemäss Liste rechte_verteilung
+        # for loop für die gerechte Verteilung gemäss Liste gerechte_verteilung
         verteilungsstunden = {ma: solver.Sum([x[ma, j, k] for j in range(calc_time) for k in range(len(verfügbarkeit[ma][j]))]) for ma in mitarbeiter}
         tolerance = 0.3
         for i, ma in enumerate(mitarbeiter):
