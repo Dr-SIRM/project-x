@@ -12,32 +12,36 @@ import GeographyChart from "../../components/GeographyChart";
 import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
 import ProgressCircle from "../../components/ProgressCircle";
+import React, { useContext } from 'react';
+import { AuthContext } from "../../AuthContext";
 
-const token = sessionStorage.getItem('token');
+
+//const token = sessionStorage.getItem('token');
 
 // Include the token in your request to the Flask server, e.g., using the fetch API
-fetch('/api/current_user', {
-  method: 'GET',
-  headers: {
-    Authorization: `Bearer ${token}`,
-  },
-})
-  .then((response) => response.json())
-  .then((data) => {
+//fetch('/api/current_user', {
+  //method: 'GET',
+  //headers: {
+    //Authorization: `Bearer ${token}`,
+  //},
+//})
+  //.then((response) => response.json())
+  //.then((data) => {
     // Handle the response data from the Flask server
     // ...
-  });
+  //});
 
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const { user } = useContext(AuthContext);
 
 
   return (
     <Box m="20px">
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="DASHBOARD" subtitle="Willkomen auf dem Dashboard" />
+        <Header title="DASHBOARD" subtitle="Willkomen auf dem Dashboard " />
 
         <Box>
           <Button
