@@ -31,7 +31,6 @@ Prio 3:
 
 """
 
-
 class ORAlgorithm:
     def __init__(self, dp: DataProcessing):
         self.current_user_id = dp.current_user_id
@@ -58,7 +57,7 @@ class ORAlgorithm:
         self.verteilbare_stunden = None
         self.stunden_pro_tag = None
         self.gesamtstunden_verfügbarkeit = None
-        self.min_anwesend = None
+        self.min_anwesend = []
 
         # Attribute der Methode "solver_selection"
         self.solver = None
@@ -72,14 +71,22 @@ class ORAlgorithm:
         # Attribute der Methode "objective_function"
         self.objective = None
 
-        # Attribute der Methode "objective_function"
+        # Attribute der Methode "solve_problem"
         self.status = None
+
+        # Attribute der Methode "output_result_excel"
+        self.mitarbeiter_arbeitszeiten = None
 
 
     def run(self):
         self.create_variables()
-        self.algorithm()
-        # Hier alle Methoden runnen lassen
+        self.pre_check()
+        self.solver_selection()
+        self.decision_variables()
+        self.objective_function()
+        self.constraints()
+        self.solve_problem()
+        self.output_result_excel()
 
 
     def create_variables(self):
@@ -128,7 +135,7 @@ class ORAlgorithm:
 
         """
         # Creating a Employment List based on the user of binary_availability
-        employment = []
+        self.employment = []
 
         # Iteration of the key within binary_availability
         for user_id in self.binary_availability.keys():
@@ -160,6 +167,46 @@ class ORAlgorithm:
             self.min_anwesend.append(list(values.values()))
 
        
+    def pre_check(self):
+        """ 
+        Vorüberprüfungen
+
+        Hier als nächstes ausbauen, alles überprüfen (evtl. für Programmierer auch mit assert)
+
+        """
+        assert isinstance(self.mitarbeiter, list), "self.mitarbeiter sollte eine Liste sein"
+        assert all(isinstance(ma, int) for ma in self.mitarbeiter), "Alle Elemente in self.mitarbeiter sollten Ganzzahlen sein"
+
+        assert isinstance(self.verfügbarkeit, dict), "self.verfügbarkeit sollte ein Wörterbuch sein"
+        assert all(isinstance(val, list) for val in self.verfügbarkeit.values()), "Alle Werte in self.verfügbarkeit sollten Listen sein"
+        assert len(self.verfügbarkeit) == len(self.mitarbeiter), "self.verfügbarkeit und self.mitarbeiter sollten die gleiche Länge haben"
+
+        assert isinstance(self.kosten, dict), "self.kosten sollte ein Wörterbuch sein"
+        assert all(isinstance(kost, (int, float)) for kost in self.kosten.values()), "Alle Werte in self.kosten sollten Ganzzahlen oder Gleitkommazahlen sein"
+    
+        assert isinstance(self.max_zeit, dict), "self.max_zeit sollte ein Wörterbuch sein"
+        assert all(isinstance(zeit, (int, float)) for zeit in self.max_zeit.values()), "Alle Werte in self.max_zeit sollten Ganzzahlen oder Gleitkommazahlen sein"
+
+        assert isinstance(self.min_zeit, dict), "self.min_zeit sollte ein Wörterbuch sein"
+        assert all(isinstance(zeit, (int, float)) for zeit in self.min_zeit.values()), "Alle Werte in self.min_zeit sollten Ganzzahlen oder Gleitkommazahlen sein"
+
+
+
+        # Hat Phu noch hinzugefügt, haben die festen MA genug Stunden eingeplant?
+        for i in range(len(self.mitarbeiter)):
+            if self.employment[i] == "Perm": 
+                sum_availability_perm = 0
+                for j in range(self.calc_time):
+                    for k in range(len(self.verfügbarkeit[i][j])):
+                        sum_availability_perm += self.verfügbarkeit[i][j][k]
+                        print(sum_availability_perm)           
+                if sum_availability_perm <= self.working_h:
+                    print(self.mitarbeiter[i], " has not planned enough hours.")
+                else:
+                    pass
+
+
+
     def solver_selection(self):
         """
         Anwahl des geeigneten Solvers
@@ -211,32 +258,17 @@ class ORAlgorithm:
         """
         Zielfunktion
         """
-        self.objective = solver.Objective()
+        self.objective = self.solver.Objective()
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
                     # Die Kosten werden multipliziert
-                    self.objective.SetCoefficient(x[i, j, k], self.kosten[i])
+                    self.objective.SetCoefficient(self.x[i, j, k], self.kosten[i])
         # Es wird veruscht, eine Kombination von Werten für die x[i, j, k] zu finden, die die Summe kosten[i]*x[i, j, k] minimiert            
         self.objective.SetMinimization()
 
 
-    def pre_check(self):
-        """ 
-        Vorüberprüfungen
-        """
-        # Hat Phu noch hinzugefügt, haben die festen MA genug Stunden eingeplant?
-        for i in range(len(self.mitarbeiter)):
-            if self.employment[i] == "Perm": 
-                sum_availability_perm = 0
-                for j in range(self.calc_time):
-                    for k in range(len(self.verfügbarkeit[i][j])):
-                        sum_availability_perm += self.verfügbarkeit[i][j][k]
-                        print(sum_availability_perm)           
-                if sum_availability_perm <= self.working_h:
-                    print(self.mitarbeiter[i], " has not planned enough hours.")
-                else:
-                    pass
+
 
     def constraints(self):
         """
@@ -248,7 +280,7 @@ class ORAlgorithm:
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
-                    self.solver.Add(x[i, j, k] <= self.verfügbarkeit[i][j][k])
+                    self.solver.Add(self.x[i, j, k] <= self.verfügbarkeit[i][j][k])
 
 
         # NB 2 - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend 
@@ -261,7 +293,7 @@ class ORAlgorithm:
         # NB 3 - Max. Arbeitszeit pro Woche - (working_h muss noch berechnet werden!)
         total_hours = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
         for ma in self.mitarbeiter:
-            self.solver.Add(self.total_hours[ma] <= self.working_h)
+            self.solver.Add(total_hours[ma] <= self.working_h)
 
 
         """ 
@@ -352,14 +384,105 @@ class ORAlgorithm:
         # NB X - Gleiche Verteilung der Stunden über eine Woche
 
 
-def solve_problem(self):
-    """
-    Problem lösen
-    """
+    def solve_problem(self):
+        """
+        Problem lösen
+        """
 
-    self.solver.EnableOutput()
-    self.status = self.solver.Solve()
+        self.solver.EnableOutput()
+        self.status = self.solver.Solve()
 
+
+    def output_result_excel(self):
+        """
+        Excelausgabe
+        """
+
+        if self.status == pywraplp.Solver.OPTIMAL or self.status == pywraplp.Solver.FEASIBLE:
+            self.mitarbeiter_arbeitszeiten = {}
+            for i in self.mitarbeiter:
+                self.mitarbeiter_arbeitszeiten[i] = []
+                for j in range(self.calc_time):
+                    arbeitszeit_pro_tag = []
+                    for k in range(len(self.verfügbarkeit[i][j])):
+                        arbeitszeit_pro_tag.append(int(self.x[i, j, k].solution_value()))
+                    self.mitarbeiter_arbeitszeiten[i].append(arbeitszeit_pro_tag)
+            print(self.mitarbeiter_arbeitszeiten)
+        if self.status == pywraplp.Solver.OPTIMAL:
+            print("Optimal solution found.")
+        elif self.status == pywraplp.Solver.FEASIBLE:
+            print("Feasible solution found.")
+        elif self.status == pywraplp.Solver.INFEASIBLE:
+            print("Problem is infeasible.")
+        elif self.status == pywraplp.Solver.UNBOUNDED:
+            print("Problem is unbounded.")
+        elif self.status == pywraplp.Solver.NOT_SOLVED:
+            print("Solver did not solve the problem.")
+        else:
+            print("Unknown status.")
+
+
+        # Ergebnisse ausgeben Excel ----------------------------------------------------------------------------------------------
+        data = self.mitarbeiter_arbeitszeiten
+
+        # Legen Sie die Füllungen fest
+        green_fill = PatternFill(start_color="00FF00", end_color="00FF00", fill_type="solid")
+        red_fill = PatternFill(start_color="FF0000", end_color="FF0000", fill_type="solid")
+
+        # Festlegen der Schriftgröße
+        font = Font(size=10)
+        header_font = Font(size=5)  # Schriftgröße für die Spaltentitel
+
+        # Erstellen Sie ein Workbook
+        wb = Workbook()
+        ws = wb.active
+
+        # Schreiben Sie die Überschriften
+        headers = ["user_id"]
+        for i in range(1, len(max(data.values(), key=len)) + 7):
+            headers.extend(["T{},h{}".format(i, j+8) for j in range(10)])
+        ws.append(headers)
+
+        # Ändern der Schriftgröße der Spaltentitel
+        for cell in ws[1]:
+            cell.font = header_font
+
+        # Schreiben Sie die Daten
+        for ma, days in data.items():
+            row = [ma]
+            for day in days:
+                if day:
+                    row.extend(day)
+                else:
+                    row.extend([None]*9)  # Für Tage ohne Stunden
+            ws.append(row)
+
+        # Farben auf Basis der Zellenwerte festlegen und Schriftgröße für den Rest des Dokuments
+        for row in ws.iter_rows(min_row=2, values_only=False):
+            for cell in row[1:]:
+                if cell.value == 1:
+                    cell.fill = green_fill
+                elif cell.value == 0:
+                    cell.fill = red_fill
+                cell.font = font
+
+        # Ändern der Spaltenbreite
+        for column in ws.columns:
+            max_length = 0
+            column = [cell for cell in column]
+            for cell in column:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(cell.value)
+                except:
+                    pass
+            adjusted_width = (max_length + 2)
+            if adjusted_width > 3:
+                adjusted_width = 3
+            ws.column_dimensions[get_column_letter(column[0].column)].width = adjusted_width
+
+        # Speichern Sie das Workbook
+        wb.save("Einsatzplan.xlsx")
 
 
 
