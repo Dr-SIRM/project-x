@@ -19,6 +19,10 @@ class DataProcessing:
         self.user_employment = None
         self.binary_availability = None
 
+        # Zeitraum in dem gesolvet wird, wird noch angepasst!
+        self.start_date = "2023-06-26"
+        self.end_date = "2023-06-30"
+        
 
     def run(self):
         """ Die einzelnen Methoden werden in der Reihe nach ausgeführt """
@@ -48,8 +52,6 @@ class DataProcessing:
         print(f"Admin mit der User_id: {self.current_user_id} hat den Solve Button gedrückt.")
 
         with app.app_context():
-            start_date = "2023-06-26"
-            end_date = "2023-06-30"
             
             # Hole den company_name des aktuellen Benutzers
             sql = text("""
@@ -69,7 +71,7 @@ class DataProcessing:
                 AND a.date BETWEEN :start_date AND :end_date
             """)
             # execute = rohe Mysql Abfrage.
-            result = db.session.execute(sql, {"company_name": company_name, "start_date": start_date, "end_date": end_date})
+            result = db.session.execute(sql, {"company_name": company_name, "start_date": self.start_date, "end_date": self.end_date})
             # fetchall = alle Zeilen der Datenbank werden abgerufen und in einem Tupel gespeichert
             times = result.fetchall()
 
@@ -158,8 +160,6 @@ class DataProcessing:
         """ In dieser Funktion werden die benötigten Mitarbeiter für jede Stunde jedes Tages abgerufen """
 
         with app.app_context():
-            start_date = "2023-06-26"
-            end_date = "2023-06-30"
 
             # Hole den company_name des aktuellen Benutzers
             sql = text("""
@@ -178,7 +178,7 @@ class DataProcessing:
                 AND t.date BETWEEN :start_date AND :end_date
             """)
             # execute = rohe Mysql Abfrage.
-            result = db.session.execute(sql, {"company_name": company_name, "start_date": start_date, "end_date": end_date})
+            result = db.session.execute(sql, {"company_name": company_name, "start_date": self.start_date, "end_date": self.end_date})
 
             # fetchall = alle Zeilen der Datenbank werden abgerufen und in einem Tupel gespeichert
             time_reqs = result.fetchall()
