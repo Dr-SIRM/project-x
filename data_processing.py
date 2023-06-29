@@ -48,8 +48,8 @@ class DataProcessing:
         print(f"Admin mit der User_id: {self.current_user_id} hat den Solve Button gedrückt.")
 
         with app.app_context():
-            start_date = "2023-05-22"
-            end_date = "2023-05-26"
+            start_date = "2023-06-26"
+            end_date = "2023-06-30"
             
             # Hole den company_name des aktuellen Benutzers
             sql = text("""
@@ -158,8 +158,8 @@ class DataProcessing:
         """ In dieser Funktion werden die benötigten Mitarbeiter für jede Stunde jedes Tages abgerufen """
 
         with app.app_context():
-            start_date = "2023-05-22"
-            end_date = "2023-05-26"
+            start_date = "2023-06-26"
+            end_date = "2023-06-30"
 
             # Hole den company_name des aktuellen Benutzers
             sql = text("""
