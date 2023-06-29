@@ -25,7 +25,7 @@ def serve_static_files(path):
 
 #SET SQLALCHEMY
 app.config["SECRET_KEY"] = "mysecret"
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:ProjectX2023.@projectx2.crbavgy9fqyf.eu-central-1.rds.amazonaws.com/projectx2'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:ProjectX2023.@projectx4.cnoaam4bktuu.eu-central-1.rds.amazonaws.com/projectx'
 app.config['SQLALCHEMY_TRACK_MODIFICATION'] = False
 db.init_app(app)
 migrate = Migrate(app, db)
