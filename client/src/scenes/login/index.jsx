@@ -1,14 +1,13 @@
-import React, { useContext, useState } from 'react';
+import { useState } from 'react';
 import { Box, Typography, TextField, Button, Alert, useTheme } from '@mui/material';
 import axios from 'axios';
-import Header from "../../components/Header";
 import { useNavigate } from 'react-router-dom';
 import { tokens } from "../../theme";
-import { AuthContext } from "../../AuthContext";
+import Header from "../../components/Header";
+
 
 
 const Login = () => {
-  const { login } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -26,8 +25,8 @@ const Login = () => {
       });
 
       // Save the session token or user information in local storage or state management
-      // sessionStorage.setItem('token', response.data.session_token);
-      // console.log(response.data.session_token);
+      sessionStorage.setItem('token', response.data.session_token);
+      console.log(response.data.session_token);
 
       // Redirect to the dashboard
       navigate('/dashboard');

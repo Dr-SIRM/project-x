@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
-import AuthProvider from "./AuthContext";
-import PrivateRoute from "./PrivateRoute";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
 import Login from "./scenes/login";
@@ -24,7 +22,6 @@ import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import Calendar from "./scenes/calendar";
 import axios from "axios";
-
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -60,31 +57,26 @@ function App() {
           <main className="content">
             {isAuthenticated && <Topbar />}
             
-            <BrowserRouter>
-              <AuthProvider>
-                <Routes>
-                  <Route path="/" element={<Login />} /> 
-                  <PrivateRoute path="/dashboard" element={<Dashboard />} />
-                  <PrivateRoute path="/team" element={<Team users={users} />} />
-                  <PrivateRoute path="/contacts" element={<Contacts />} />
-                  <PrivateRoute path="/invoices" element={<Invoices />} />
-                  <PrivateRoute path="/form" element={<Form />} />
-                  <PrivateRoute path="/bar" element={<Bar />} />
-                  <PrivateRoute path="/pie" element={<Pie />} />
-                  <PrivateRoute path="/line" element={<Line />} />
-                  <PrivateRoute path="/faq" element={<FAQ />} />
-                  <PrivateRoute path="/calendar" element={<Calendar />} />
-                  <PrivateRoute path="/availability" element={<Availability />} />
-                  <PrivateRoute path="/geography" element={<Geography />} />
-                  <PrivateRoute path="/plan" element={<Plan />} />
-                  <PrivateRoute path="/company" element={<Company />} />
-                  <PrivateRoute path="/invite" element={<Invite />} />
-                  <PrivateRoute path="/update" element={<Update />} />
-                </Routes>
-              </AuthProvider>
-            <p>{message}</p> 
-            </BrowserRouter>
-            
+            <Routes>
+              <Route path="/" element={<Login />} /> 
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/team" element={<Team users={users} />} />
+              <Route path="/contacts" element={<Contacts />} />
+              <Route path="/invoices" element={<Invoices />} />
+              <Route path="/form" element={<Form />} />
+              <Route path="/bar" element={<Bar />} />
+              <Route path="/pie" element={<Pie />} />
+              <Route path="/line" element={<Line />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/calendar" element={<Calendar />} />
+              <Route path="/availability" element={<Availability />} />
+              <Route path="/geography" element={<Geography />} />
+              <Route path="/plan" element={<Plan />} />
+              <Route path="/company" element={<Company />} />
+              <Route path="/invite" element={<Invite />} />
+              <Route path="/update" element={<Update />} />
+            </Routes>
+            <p>{message}</p>
           </main>
         </div>
       </ThemeProvider>

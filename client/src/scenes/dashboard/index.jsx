@@ -34,7 +34,7 @@ import { AuthContext } from "../../AuthContext";
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const { user } = useContext(AuthContext);
+  
 
 
   return (
@@ -221,7 +221,7 @@ const Dashboard = () => {
                   {transaction.txId}
                 </Typography>
                 <Typography color={colors.grey[100]}>
-                  {transaction.user}
+                  
                 </Typography>
               </Box>
               <Box color={colors.grey[100]}>{transaction.date}</Box>
