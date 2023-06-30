@@ -286,13 +286,30 @@ class DataProcessing:
 
 
 
-    # Bis jetzt noch nicht einen ganzen tag möglich.
     def pre_check_admin(self):
+        """
+        ---------------------------------------------------------------------------------------------------------------
+        1. Überprüfen, ob der Admin zu jeder Stunde time_req eingegeben hat
+        ---------------------------------------------------------------------------------------------------------------
+        """
         fehlende_stunden = []
-        for date, time_req_dict in self.time_req.items():
-            for hour in range(len(self.opening_hours)):
-                if hour not in time_req_dict:
-                    fehlende_stunden.append((date, hour))
+
+        # Erzeugt alle möglichen Daten innerhalb des Bereichs
+        start_date = datetime.strptime(self.start_date, "%Y-%m-%d").date()
+        end_date = datetime.strptime(self.end_date, "%Y-%m-%d").date()
+        date_range = [start_date + timedelta(days=x) for x in range((end_date-start_date).days + 1)]
+
+        for current_date in date_range:
+            # Wochentag als Index (0 = Montag, 1 = Dienstag, usw.) erhalten
+            weekday_index = current_date.weekday()
+
+            # Prüft, ob der Tag ein Arbeitstag ist (Basierend auf den Öffnungszeiten)
+            if self.laden_oeffnet[weekday_index] is not None and self.laden_schliesst[weekday_index] is not None:
+                time_req_dict = self.time_req.get(current_date, {})
+
+                for hour in range(self.time_to_int(self.laden_schliesst[weekday_index]) - self.time_to_int(self.laden_oeffnet[weekday_index])):
+                    if hour not in time_req_dict:
+                        fehlende_stunden.append((current_date, hour))
         if fehlende_stunden:
             print("Für folgende Zeitfenster fehlen time_req-Werte:")
             for date, hour in fehlende_stunden:
@@ -300,3 +317,10 @@ class DataProcessing:
             raise ValueError("Es fehlen time_req-Werte.")
         else:
             print("Alle Zeitfenster haben time_req-Werte.")
+
+        """
+        ---------------------------------------------------------------------------------------------------------------
+        2. XXXXXXXXXXXXXX
+        ---------------------------------------------------------------------------------------------------------------
+        """
+        
