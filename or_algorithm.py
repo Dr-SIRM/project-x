@@ -183,6 +183,7 @@ class ORAlgorithm:
         print("108. self.time_req: ", self.time_req) 
         print("109. user_employment: ", self.user_employment) 
         print()
+        
 
         print("Attribute der Methode create_variables:")
         # Attribute der Methode "create_variables"

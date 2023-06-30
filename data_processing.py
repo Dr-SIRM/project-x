@@ -27,21 +27,12 @@ class DataProcessing:
     def run(self):
         """ Die einzelnen Methoden werden in der Reihe nach ausgeführt """
         self.get_availability()
-        # Ausgabe user_availability
-        # print(f"User Availability: {self.user_availability}")
         self.get_opening_hours()
-        # print(f"Laden öffnet: {self.laden_oeffnet}")
-        # print(f"Laden schliesst: {self.laden_schliesst}")
-        # print(f"Opening Hours: {self.opening_hours}")
         self.get_time_req()
-        # print(f"Time Req: {self.time_req}")
         self.get_shift_emp_lvl()
-        # print(f"shifts: {self.company_shifts}")
-        # print(f"employment_lvl: {self.employment_lvl}")
         self.binaere_liste()
-        # print(f"Binary Availability: {self.binary_availability}")
         self.get_employment()
-        # print(f"Employment: {self.user_employment}")
+        self.pre_check_admin()
 
 
 
@@ -292,3 +283,20 @@ class DataProcessing:
                     user_employment[user_id] = employment
 
                 self.user_employment = user_employment
+
+
+
+    # Bis jetzt noch nicht einen ganzen tag möglich.
+    def pre_check_admin(self):
+        fehlende_stunden = []
+        for date, time_req_dict in self.time_req.items():
+            for hour in range(len(self.opening_hours)):
+                if hour not in time_req_dict:
+                    fehlende_stunden.append((date, hour))
+        if fehlende_stunden:
+            print("Für folgende Zeitfenster fehlen time_req-Werte:")
+            for date, hour in fehlende_stunden:
+                print(f"Datum: {date}, Stunde: {hour}")
+            raise ValueError("Es fehlen time_req-Werte.")
+        else:
+            print("Alle Zeitfenster haben time_req-Werte.")
