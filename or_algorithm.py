@@ -81,7 +81,8 @@ class ORAlgorithm:
     def run(self):
         self.create_variables()
         self.show_variables()
-        self.pre_check()
+        self.pre_check_programmer()
+        self.pre_check_admin()
         self.solver_selection()
         self.decision_variables()
         self.objective_function()
@@ -197,17 +198,17 @@ class ORAlgorithm:
         print("5. self.min_zeit: ", self.min_zeit)
         print("6. self.working_h: ", self.working_h)
         print("7. self.calc_time: ", self.calc_time)
-        print("8. empolyment_lvl_exact: ", self.employment_lvl_exact)
-        print("9. employment: ", self.employment)
-        print("10. verteilbare_stunden: ", self.verteilbare_stunden)
-        print("11. stunden_pro_tag: ", self.stunden_pro_tag)
-        print("12. gesamtstunden_verfügbarkeit: ", self.gesamtstunden_verfügbarkeit)
-        print("13. min_anwesend: ", self.min_anwesend)
+        print("8. self.empolyment_lvl_exact: ", self.employment_lvl_exact)
+        print("9. self.employment: ", self.employment)
+        print("10. self.verteilbare_stunden: ", self.verteilbare_stunden)
+        print("11. self.stunden_pro_tag: ", self.stunden_pro_tag)
+        print("12. self.gesamtstunden_verfügbarkeit: ", self.gesamtstunden_verfügbarkeit)
+        print("13. self.min_anwesend: ", self.min_anwesend)
 
 
-    def pre_check(self):
+    def pre_check_programmer(self):
         """ 
-        Vorüberprüfungen
+        Vorüberprüfungen für den Programmierer
         """
 
         # Attribute der Methode "create_variables"
@@ -262,20 +263,25 @@ class ORAlgorithm:
 
         
   
+
+    def pre_check_admin(self):
+        """ 
+        Vorüberprüfungen für den Programmierer
         """
-        # Hat Phu noch hinzugefügt, haben die festen MA genug Stunden eingeplant?
+
+        # Haben die festen MA genug Stunden eingeplant?
         for i in range(len(self.mitarbeiter)):
             if self.employment[i] == "Perm": 
                 sum_availability_perm = 0
                 for j in range(self.calc_time):
                     for k in range(len(self.verfügbarkeit[i][j])):
                         sum_availability_perm += self.verfügbarkeit[i][j][k]
-                        print(sum_availability_perm)           
                 if sum_availability_perm <= self.working_h:
-                    print(self.mitarbeiter[i], " has not planned enough hours.")
-                else:
-                    pass
-        """
+                    raise ValueError(f"Fester Mitarbeiter mit ID {self.mitarbeiter[i]} hat nicht genügend Stunden geplant.")
+
+
+
+
 
     def solver_selection(self):
         """
