@@ -14,7 +14,11 @@ Prio 1:
  - (erl.) die calc_time soll automatisch errechnet werden
  - (erl.) Als Key oder i für MA soll nicht mehr MA1, MA2 usw stehen, sondern die user_id (zB. 1002)
  - (erl.) Shifts/Employment_level aus der Datenbank ziehen
+
  - working_h noch diskutieren, ist das max. arbeitszeit oder norm Arbeiszeit?
+ - Jeder MA muss vor dem Solven eingegeben haben, wann er arbeiten kann. Auch wenn es alles 0 sind.
+ - Sollte die time_req die grösste Gewichtung haben? Macht keinen Sinn wenn ich 2 MA brauche und 4 eingeteilt werden
+
  - auf Viertelstunden wechseln
  - Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
  - time_req stunden zusammenaddieren
@@ -117,11 +121,11 @@ class ORAlgorithm:
         self.max_zeit = {ma: 8 for ma in self.mitarbeiter}  # Maximale Arbeitszeit pro Tag
 
         # -- 5 --
-        self.min_zeit = {ma: 2 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
+        self.min_zeit = {ma: 5 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
 
         # -- 6 --
         # Maximale Arbeitszeit pro woche, wird später noch aus der Datenbank gezogen
-        self.working_h = 35   
+        self.working_h = 40   
 
         # -- 7 --
         # Berechnung der calc_time (Anzahl Tage an denen die MA eingeteilt werden)
@@ -136,7 +140,7 @@ class ORAlgorithm:
             if user_id in self.employment_lvl:
                 # Fügen Sie den entsprechenden employment_lvl Wert zur Liste hinzu
                 self.employment_lvl_exact.append(self.employment_lvl[user_id])
-        self.employment_lvl_exact = [1, 0.8, 0.8, 0.6, 0.6] # Damit die Liste noch selbst manipuliert werden kann.
+        # self.employment_lvl_exact = [1, 0.8, 0.8, 0.6, 0.6] # Damit die Liste noch selbst manipuliert werden kann.
 
         # -- 9 --
         # Iteration of the key within binary_availability
@@ -445,7 +449,9 @@ class ORAlgorithm:
         for i in range(len(self.mitarbeiter)):
             prozent_per_ma = list_gesamtstunden[i] / summe_stunden
             prozent_gesamtstunden.append(prozent_per_ma)
-         # prozent_gesamtstunden = [0.2631578947368421, 0.21052631578947367, 0.21052631578947367, 0.15789473684210525, 0.15789473684210525]
+        # prozent_gesamtstunden = [0.2631578947368421, 0.21052631578947367, 0.21052631578947367, 0.15789473684210525, 0.15789473684210525]
+        # Ein MA wird protenzual soviel eingeteilt, wie er Stunden eingetragen hat.
+        # Dabei wird ebenfalls der Anstellungsbeschäftigungsgrad berücksichtigt.
 
         for i in range(len(self.mitarbeiter)):
             if self.employment[i] == "Perm":
