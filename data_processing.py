@@ -20,8 +20,8 @@ class DataProcessing:
         self.binary_availability = None
 
         # Zeitraum in dem gesolvet wird, wird noch angepasst!
-        self.start_date = "2023-06-26"
-        self.end_date = "2023-06-30"
+        self.start_date = "2023-07-03"
+        self.end_date = "2023-07-07"
         
 
     def run(self):

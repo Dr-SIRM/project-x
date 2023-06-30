@@ -266,6 +266,9 @@ class ORAlgorithm:
   
 
     def pre_check_admin(self):
+        # Wenn die einzelnen Überprüfungen nicht standhalten, wird ein ValueError ausgelöst und jeweils geprintet, woran das Problem liegt. 
+        # Später soll der Admin genau eine solche Meldung angezeigt bekommen.
+        
         """
         ---------------------------------------------------------------------------------------------------------------
         1. Überprüfen ob die "Perm" Mitarbeiter mind. working_h Stunden einplant haben
@@ -286,7 +289,7 @@ class ORAlgorithm:
         ---------------------------------------------------------------------------------------------------------------
         """
         total_hours_available = sum(self.gesamtstunden_verfügbarkeit)
-        toleranz = 1.2  # Definieren Sie Ihre Toleranz hier als Dezimalzahl
+        toleranz = 1.3 # Wenn man möchte, das die eingegebenen Stunden der MA höher sein müssen als die verteilbaren_stunden
 
         if total_hours_available < self.verteilbare_stunden * toleranz:
             raise ValueError(f"Die Mitarbeiter haben insgesamt nicht genug Stunden eingegeben, um die verteilbaren Stunden zu erreichen. Benötigte Stunden: {self.verteilbare_stunden}, eingegebene Stunden: {total_hours_available}, Toleranz: {toleranz}")
