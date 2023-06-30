@@ -289,7 +289,7 @@ class DataProcessing:
     def pre_check_admin(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        1. Überprüfen, ob der Admin zu jeder Stunde time_req eingegeben hat
+        1. Überprüfen, ob der Admin zu jeder Öffnungszeitstunde time_req eingegeben hat
         ---------------------------------------------------------------------------------------------------------------
         """
         fehlende_stunden = []
