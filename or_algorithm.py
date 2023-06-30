@@ -14,6 +14,7 @@ Prio 1:
  - (erl.) die calc_time soll automatisch errechnet werden
  - (erl.) Als Key oder i für MA soll nicht mehr MA1, MA2 usw stehen, sondern die user_id (zB. 1002)
  - (erl.) Shifts/Employment_level aus der Datenbank ziehen
+ - working_h noch diskutieren, ist das max. arbeitszeit oder norm Arbeiszeit?
  - auf Viertelstunden wechseln
  - Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
  - time_req stunden zusammenaddieren
@@ -265,22 +266,40 @@ class ORAlgorithm:
   
 
     def pre_check_admin(self):
-        """ 
-        Vorüberprüfungen für den Programmierer
         """
-
-        # Haben die festen MA genug Stunden eingeplant?
+        ---------------------------------------------------------------------------------------------------------------
+        1. Überprüfen ob die "Perm" Mitarbeiter mind. working_h Stunden einplant haben
+        ---------------------------------------------------------------------------------------------------------------
+        """
         for i in range(len(self.mitarbeiter)):
             if self.employment[i] == "Perm": 
                 sum_availability_perm = 0
                 for j in range(self.calc_time):
-                    for k in range(len(self.verfügbarkeit[i][j])):
-                        sum_availability_perm += self.verfügbarkeit[i][j][k]
-                if sum_availability_perm <= self.working_h:
+                    for k in range(len(self.verfügbarkeit[self.mitarbeiter[i]][j])):
+                        sum_availability_perm += self.verfügbarkeit[self.mitarbeiter[i]][j][k]
+                if sum_availability_perm < self.working_h:
                     raise ValueError(f"Fester Mitarbeiter mit ID {self.mitarbeiter[i]} hat nicht genügend Stunden geplant.")
 
+        """
+        ---------------------------------------------------------------------------------------------------------------
+        2. Haben alle MA zusammen genug Stunden eingegeben, um die verteilbaren Stunden zu erreichen?
+        ---------------------------------------------------------------------------------------------------------------
+        """
+        total_hours_available = sum(self.gesamtstunden_verfügbarkeit)
+        toleranz = 1.2  # Definieren Sie Ihre Toleranz hier als Dezimalzahl
 
+        if total_hours_available < self.verteilbare_stunden * toleranz:
+            raise ValueError(f"Die Mitarbeiter haben insgesamt nicht genug Stunden eingegeben, um die verteilbaren Stunden zu erreichen. Benötigte Stunden: {self.verteilbare_stunden}, eingegebene Stunden: {total_hours_available}, Toleranz: {toleranz}")
 
+        """
+        ---------------------------------------------------------------------------------------------------------------
+        3. Ist zu jeder notwendigen Zeit (self.min_anwesend) die mindestanzahl Mitarbeiter verfügbar?
+        ---------------------------------------------------------------------------------------------------------------
+        """
+        for i in range(len(self.min_anwesend)):  # Für jeden Tag in der Woche
+            for j in range(len(self.min_anwesend[i])):  # Für jede Stunde am Tag
+                if sum([self.verfügbarkeit[ma][i][j] for ma in self.mitarbeiter]) < self.min_anwesend[i][j]:
+                    raise ValueError(f"Es sind nicht genügend Mitarbeiter verfügbar zur notwendigen Zeit (Tag {i+1}, Stunde {j+1}).")
 
 
     def solver_selection(self):
