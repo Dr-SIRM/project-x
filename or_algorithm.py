@@ -33,38 +33,34 @@ Prio 3:
 
 class ORAlgorithm:
     def __init__(self, dp: DataProcessing):
-        self.current_user_id = dp.current_user_id
-        self.user_availability = dp.user_availability
-        self.opening_hours = dp.opening_hours
-        self.laden_oeffnet = dp.laden_oeffnet
-        self.laden_schliesst = dp.laden_schliesst
-        self.binary_availability = dp.binary_availability
-        self.company_shifts = dp.company_shifts
-        self.employment_lvl = dp.employment_lvl
-        self.time_req = dp.time_req
-        self.user_employment = dp.user_employment
+        self.current_user_id = dp.current_user_id           # 100     
+        self.user_availability = dp.user_availability       # 101
+        self.opening_hours = dp.opening_hours               # 102
+        self.laden_oeffnet = dp.laden_oeffnet               # 103
+        self.laden_schliesst = dp.laden_schliesst           # 104
+        self.binary_availability = dp.binary_availability   # 105
+        self.company_shifts = dp.company_shifts             # 106
+        self.employment_lvl = dp.employment_lvl             # 107
+        self.time_req = dp.time_req                         # 108    
+        self.user_employment = dp.user_employment           # 109
 
         # Attribute der Methode "create_variables"
-        self.mitarbeiter = None
-        self.verfügbarkeit = None
-        self.kosten = None
-        self.max_zeit = None
-        self.min_zeit = None
-        self.working_h = None
-        self.calc_time = None
-        self.employment_lvl_list = None
-        self.employment = []
-
-        # Variablen noch richtig umbenennen!
-        
-        self.employment_lvl_2 = []
-        self.verteilbare_stunden = None
-        self.stunden_pro_tag = None
-        self.gesamtstunden_verfügbarkeit = None
-        self.min_anwesend = []
+        self.mitarbeiter = None                             # 1
+        self.verfügbarkeit = {}                             # 2
+        self.kosten = None                                  # 3
+        self.max_zeit = None                                # 4
+        self.min_zeit = None                                # 5
+        self.working_h = None                               # 6   
+        self.calc_time = None                               # 7
+        self.employment_lvl_exact = []                      # 8
+        self.employment = []                                # 9
+        self.verteilbare_stunden = None                     # 10
+        self.stunden_pro_tag = None                         # 11
+        self.gesamtstunden_verfügbarkeit = []               # 12
+        self.min_anwesend = []                              # 13
 
         # Attribute der Methode "solver_selection"
-        self.solver = None
+        self.solver = None                                 
 
         # Attribute der Methode "decision_variables"
         self.x = None
@@ -84,6 +80,7 @@ class ORAlgorithm:
 
     def run(self):
         self.create_variables()
+        self.show_variables()
         self.pre_check()
         self.solver_selection()
         self.decision_variables()
@@ -98,100 +95,172 @@ class ORAlgorithm:
         Allgemeine Variabeln
         """
 
+        # -- 1 -- 
         # user_ids Liste, wird als Key in der Ausgabe verwendet
         self.mitarbeiter = [user_id for user_id in self.binary_availability]
 
+        # -- 2 --
         # Aus dem binary_availability dict. die Verfügbarkeits-Informationen ziehen
-        self.verfügbarkeit = {}
         for i, (user_id, availabilities) in enumerate(self.binary_availability.items()):
             self.verfügbarkeit[self.mitarbeiter[i]] = []
             for day_availability in availabilities:
                 date, binary_list = day_availability
                 self.verfügbarkeit[self.mitarbeiter[i]].append(binary_list)
 
+        # -- 3 --
         # Kosten für jeden MA noch gleich, ebenfalls die max Zeit bei allen gleich
         self.kosten = {ma: 20 for ma in self.mitarbeiter}  # Kosten pro Stunde
 
+        # -- 4 --
         self.max_zeit = {ma: 8 for ma in self.mitarbeiter}  # Maximale Arbeitszeit pro Tag
-        self.min_zeit = {ma: 2 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
-        # max Stunden pro MA pro Woche - Kann evtl. noch aus der Datenbank gezogen werden in Zukunft?
-        self.working_h = 35
 
+        # -- 5 --
+        self.min_zeit = {ma: 2 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
+
+        # -- 6 --
+        # Maximale Arbeitszeit pro woche, wird später noch aus der Datenbank gezogen
+        self.working_h = 35   
+
+        # -- 7 --
         # Berechnung der calc_time (Anzahl Tage an denen die MA eingeteilt werden)
         # Es werden nur die Tage des ersten MA berechnet, da jeder MA die gleiche Wochenlänge hat
         self.calc_time = len(next(iter(self.binary_availability.values())))
 
-        # Shifts aus dem Attribut der Variable shifts zuweisen
-        self.shifts = self.company_shifts
-
+        # -- 8 --
         # Empolyment_level aus dem employment_lvl dict in einer Liste speichern (nur MA die berücksichtigt werden)
         # Iterieren Sie über die Schlüssel in binary_availability
         for user_id in self.binary_availability.keys():
             # Prüfen Sie, ob die user_id in employment_lvl vorhanden ist
             if user_id in self.employment_lvl:
                 # Fügen Sie den entsprechenden employment_lvl Wert zur Liste hinzu
-                self.employment_lvl_2.append(self.employment_lvl[user_id])
-        print("Liste Empolyment_lvl_2: ", self.employment_lvl_2)
+                self.employment_lvl_exact.append(self.employment_lvl[user_id])
+        self.employment_lvl_exact = [1, 0.8, 0.8, 0.6, 0.6] # Damit die Liste noch selbst manipuliert werden kann.
 
-        self.employment_lvl = [1, 0.8, 0.8, 0.6, 0.6] # Damit die Liste noch selbst manipuliert werden kann.
-
-
+        # -- 9 --
         # Iteration of the key within binary_availability
         for user_id in self.binary_availability.keys():
             if user_id in self.user_employment:
                 self.employment.append(self.user_employment[user_id])
-        print("List Employment: ", self.employment)
-
         # self.employment = ["Perm", "Temp", "Temp", "Temp", "Temp"] # selbst manipuliert
 
+        # -- 10 --
         # verteilbare Stunden (Wieviele Mannstunden benötigt die Firma im definierten Zeitraum)
         self.verteilbare_stunden = 0
         for date in self.time_req:
             for hour in self.time_req[date]:
                 self.verteilbare_stunden += self.time_req[date][hour]
-        print("Verteilbare Stunden: ", self.verteilbare_stunden)
 
+        # -- 11 --
         # gesamtstunden Verfügbarkeit pro MA pro Woche
-        self.stunden_pro_tag = 1 # flexibler wenn einmal 1/4h eingebaut werden
+        self.stunden_pro_tag = 1 # flexibler wenn einmal 1/4h eingebaut werden 
 
-        self.gesamtstunden_verfügbarkeit = []
+        # -- 12 --
         for key in self.binary_availability:
             gesamt_stunden = sum(sum(day_data[1]) * self.stunden_pro_tag for day_data in self.binary_availability[key])
             self.gesamtstunden_verfügbarkeit.append(gesamt_stunden)
 
-        print("Gesamtstunden Verfügbarkeit: ", self.gesamtstunden_verfügbarkeit)
-
+        # -- 13 --
         # Eine Liste mit den min. anwesendheiten der MA wird erstellt
         for _, values in sorted(self.time_req.items()):
             self.min_anwesend.append(list(values.values()))
 
-       
+
+
+    def show_variables(self):
+        """
+        Wenn die Methode aktiviert wird, werden alle Attribute geprintet
+        """
+
+        # Attribute aus DataProcessing
+        print("100. self.current_user_id: ", self.current_user_id) 
+        print("101. self.user_availability: ", self.user_availability) 
+        print("102. self.opening_hours: ", self.opening_hours) 
+        print("103. self.laden_oeffnet: ", self.laden_oeffnet) 
+        print("104. self.laden_schliesst: ", self.laden_schliesst) 
+        print("105. self.binary_availability: ", self.binary_availability) 
+        print("106. self.company_shifts: ", self.company_shifts) 
+        print("107. self.employment_lvl: ", self.employment_lvl) 
+        print("108. self.time_req: ", self.time_req) 
+        print("109. user_employment: ", self.user_employment) 
+        print()
+
+        print("Attribute der Methode create_variables:")
+        # Attribute der Methode "create_variables"
+        print("1. self.mitarbeiter: ", self.mitarbeiter)
+        print("2. self.verfügbarkeit: ")
+        for key, value in self.verfügbarkeit.items():
+            print("MA_id: ", key)
+            print("Wert: ", value)
+        print("3. self.kosten: ", self.kosten)
+        print("4. self.max_zeit: ", self.max_zeit)
+        print("5. self.min_zeit: ", self.min_zeit)
+        print("6. self.working_h: ", self.working_h)
+        print("7. self.calc_time: ", self.calc_time)
+        print("8. empolyment_lvl_exact: ", self.employment_lvl_exact)
+        print("9. employment: ", self.employment)
+        print("10. verteilbare_stunden: ", self.verteilbare_stunden)
+        print("11. stunden_pro_tag: ", self.stunden_pro_tag)
+        print("12. gesamtstunden_verfügbarkeit: ", self.gesamtstunden_verfügbarkeit)
+        print("13. min_anwesend: ", self.min_anwesend)
+
+
     def pre_check(self):
         """ 
         Vorüberprüfungen
-
-        Hier als nächstes ausbauen, alles überprüfen (evtl. für Programmierer auch mit assert)
-
         """
 
-        """
+        # Attribute der Methode "create_variables"
+        # -- 1 -- 
         assert isinstance(self.mitarbeiter, list), "self.mitarbeiter sollte eine Liste sein"
         assert all(isinstance(ma, int) for ma in self.mitarbeiter), "Alle Elemente in self.mitarbeiter sollten Ganzzahlen sein"
 
+        # -- 2 -- 
         assert isinstance(self.verfügbarkeit, dict), "self.verfügbarkeit sollte ein Wörterbuch sein"
         assert all(isinstance(val, list) for val in self.verfügbarkeit.values()), "Alle Werte in self.verfügbarkeit sollten Listen sein"
         assert len(self.verfügbarkeit) == len(self.mitarbeiter), "self.verfügbarkeit und self.mitarbeiter sollten die gleiche Länge haben"
 
+        # -- 3 -- 
         assert isinstance(self.kosten, dict), "self.kosten sollte ein Wörterbuch sein"
         assert all(isinstance(kost, (int, float)) for kost in self.kosten.values()), "Alle Werte in self.kosten sollten Ganzzahlen oder Gleitkommazahlen sein"
-    
+
+        # -- 4 -- 
         assert isinstance(self.max_zeit, dict), "self.max_zeit sollte ein Wörterbuch sein"
         assert all(isinstance(zeit, (int, float)) for zeit in self.max_zeit.values()), "Alle Werte in self.max_zeit sollten Ganzzahlen oder Gleitkommazahlen sein"
 
+        # -- 5 -- 
         assert isinstance(self.min_zeit, dict), "self.min_zeit sollte ein Wörterbuch sein"
         assert all(isinstance(zeit, (int, float)) for zeit in self.min_zeit.values()), "Alle Werte in self.min_zeit sollten Ganzzahlen oder Gleitkommazahlen sein"
-        """
 
+        # -- 6 -- 
+        assert isinstance(self.working_h, (int, float)), "self.working_h sollte eine Ganzzahl oder eine Gleitkommazahl sein"
+
+        # -- 7 -- 
+        assert isinstance(self.calc_time, int), "self.calc_time sollte eine Ganzzahl sein"
+
+        # -- 8 -- 
+        assert isinstance(self.employment_lvl_exact, list), "self.employment_lvl_exact sollte eine Liste sein"
+        assert all(isinstance(level, (int, float)) for level in self.employment_lvl_exact), "Alle Elemente in self.employment_lvl_exact sollten Ganzzahlen oder Gleitkommazahlen sein"
+
+        # -- 9 -- 
+        assert isinstance(self.employment, list), "self.employment sollte eine Liste sein"
+        assert all(isinstance(emp, str) for emp in self.employment), "Alle Elemente in self.employment sollten Zeichenketten sein"
+
+        # -- 10 -- 
+        assert isinstance(self.verteilbare_stunden, (int, float)), "self.verteilbare_stunden sollte eine Ganzzahl oder eine Gleitkommazahl sein"
+
+        # -- 11 -- 
+        assert isinstance(self.stunden_pro_tag, (int, float)), "self.stunden_pro_tag sollte eine Ganzzahl oder eine Gleitkommazahl sein"
+
+        # -- 12 -- 
+        assert isinstance(self.gesamtstunden_verfügbarkeit, list), "self.gesamtstunden_verfügbarkeit sollte eine Liste sein"
+        assert all(isinstance(stunde, (int, float)) for stunde in self.gesamtstunden_verfügbarkeit), "Alle Elemente in self.gesamtstunden_verfügbarkeit sollten Ganzzahlen oder Gleitkommazahlen sein"
+
+        # -- 13 -- 
+        assert isinstance(self.min_anwesend, list), "self.min_anwesend sollte eine Liste sein"
+        assert all(isinstance(val, list) for val in self.min_anwesend), "Alle Elemente in self.min_anwesend sollten Listen sein"
+
+        
+  
         """
         # Hat Phu noch hinzugefügt, haben die festen MA genug Stunden eingeplant?
         for i in range(len(self.mitarbeiter)):
@@ -268,8 +337,6 @@ class ORAlgorithm:
         self.objective.SetMinimization()
 
 
-
-
     def constraints(self):
         """
         Beschränkungen / Nebenbedingungen
@@ -338,9 +405,9 @@ class ORAlgorithm:
         gerechte_verteilung = []
         for i in range(len(self.mitarbeiter)):
             if self.gesamtstunden_verfügbarkeit[i] > self.working_h:
-                arbeitsstunden_MA = self.employment_lvl[i] * self.working_h
+                arbeitsstunden_MA = self.employment_lvl_exact[i] * self.working_h
             else:
-                arbeitsstunden_MA = self.employment_lvl[i] * self.gesamtstunden_verfügbarkeit[i]
+                arbeitsstunden_MA = self.employment_lvl_exact[i] * self.gesamtstunden_verfügbarkeit[i]
             list_gesamtstunden.append(int(arbeitsstunden_MA))
         # list_gesamtstunden = [35, 28, 28, 21, 21]
         summe_stunden = sum(list_gesamtstunden)

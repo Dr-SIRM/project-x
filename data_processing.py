@@ -34,14 +34,14 @@ class DataProcessing:
         # print(f"Laden schliesst: {self.laden_schliesst}")
         # print(f"Opening Hours: {self.opening_hours}")
         self.get_time_req()
-        print(f"Time Req: {self.time_req}")
+        # print(f"Time Req: {self.time_req}")
         self.get_shift_emp_lvl()
-        print(f"shifts: {self.company_shifts}")
-        print(f"employment_lvl: {self.employment_lvl}")
+        # print(f"shifts: {self.company_shifts}")
+        # print(f"employment_lvl: {self.employment_lvl}")
         self.binaere_liste()
-        print(f"Binary Availability: {self.binary_availability}")
+        # print(f"Binary Availability: {self.binary_availability}")
         self.get_employment()
-        print(f"Employment: {self.user_employment}")
+        # print(f"Employment: {self.user_employment}")
 
 
 
