@@ -73,6 +73,7 @@ class ORAlgorithm:
         self.y = None
         self.s = None
         self.a = None
+        self.c = None # -- IN BEARBEITUNG 01.07.2023 --
 
         # Attribute der Methode "objective_function"
         self.objective = None
@@ -122,7 +123,7 @@ class ORAlgorithm:
         self.max_zeit = {ma: 8 for ma in self.mitarbeiter}  # Maximale Arbeitszeit pro Tag
 
         # -- 5 --
-        self.min_zeit = {ma: 2 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
+        self.min_zeit = {ma: 3 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
 
         # -- 6 --
         # Maximale Arbeitszeit pro woche, wird später noch aus der Datenbank gezogen
@@ -344,7 +345,7 @@ class ORAlgorithm:
                 for k in range(len(self.verfügbarkeit[i][j])):  # Für jede Stunde des Tages, an dem die Firma geöffnet ist
                     self.y[i, j, k] = self.solver.IntVar(0, 1, f'y[{i}, {j}, {k}]') # Variabeln können nur die Werte 0 oder 1 annehmen
 
-        # Schichtvariable - wird noch nicht genutzt!
+        # Schichtvariable - WIRD NOCH NICHT GENUTZT!
         self.s = {}
         for i in self.mitarbeiter:
             for j in range(self.calc_time):  # Für jeden Tag der Woche
@@ -356,6 +357,13 @@ class ORAlgorithm:
         for i in self.mitarbeiter:
             for j in range(self.calc_time):  # Für jeden Tag der Woche
                 self.a[i, j] = self.solver.BoolVar(f'a[{i}, {j}]') # Variablen können nur die Werte 0 oder 1 annehmen
+
+        # Gleiche Schichten -- IN BEARBEITUNG 01.07.23 --
+        self.c = {}
+        for i in self.mitarbeiter:
+            for j in range(1, self.calc_time):  # Von Tag 1 an, da es keinen Vortag für Tag 0 gibt
+                self.c[i, j] = self.solver.BoolVar(f'c[{i}, {j}]')
+
 
 
     def objective_function(self):
@@ -399,7 +407,7 @@ class ORAlgorithm:
 
 
         """ 
-        # NB X - Max. Arbeitszeit pro Tag - Diese NB ist nicht mehr nötig, da die max zeit bereits in der NB5 implementiert ist
+        # NB X - Max. Arbeitszeit pro Tag - Diese NB ist nicht mehr nötig, da die max zeit bereits in der NB4 implementiert ist
         for i in mitarbeiter:
             for j in range(calc_time):
                 solver.Add(solver.Sum(x[i, j, k] for k in range(len(verfügbarkeit[i][j]))) <= max_zeit[i])
@@ -476,16 +484,24 @@ class ORAlgorithm:
             self.solver.Add(verteilungsstunden[ma] >= lower_bound)
         
 
+        # PHU NOCHMAL FRAGEN, WIESO DIESE NB NOTWENDIG IST??
         # NB 7 - Feste Mitarbeiter zu employement_level fest einplanen
         total_hours = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
         for i, ma in enumerate(self.mitarbeiter):
             if self.employment[i] == "Perm": 
                 self.solver.Add(total_hours[ma] == self.working_h)
 
-
         # NB X - Wechselnde Schichten innerhalb 2 Wochen
 
-        # NB X - Gleiche Verteilung der Stunden über eine Woche
+        """
+        # NB X - Gleiche Verteilung der Stunden über eine Woche # -- IN BEARBEITUNG 01.07.2023 --
+        for i in self.mitarbeiter:
+            for j in range(1, self.calc_time):  # Starten bei Tag 1, da es keinen Vortag für Tag 0 gibt
+                for k in range(len(self.verfügbarkeit[i][j])):
+                    self.solver.Add(self.c[i, j] >= (self.x[i, j-1, k] + self.x[i, j, k] - 1))  # Schicht am gleichen Zeitpunkt wie am Vortag
+                    self.solver.Add(self.c[i, j] <= self.x[i, j-1, k])  # Muss am Vortag gearbeitet haben
+                    self.solver.Add(self.c[i, j] <= self.x[i, j, k])  # Muss an diesem Tag arbeiten
+        """
 
 
     def solve_problem(self):
