@@ -15,6 +15,7 @@ Prio 1:
  - (erl.) Als Key oder i für MA soll nicht mehr MA1, MA2 usw stehen, sondern die user_id (zB. 1002)
  - (erl.) Shifts/Employment_level aus der Datenbank ziehen
 
+ - Den Übergang auf harte und weiche NBs machen? 
  - working_h noch diskutieren, ist das max. arbeitszeit oder norm Arbeiszeit?
  - Jeder MA muss vor dem Solven eingegeben haben, wann er arbeiten kann. Auch wenn es alles 0 sind.
  - Sollte die time_req die grösste Gewichtung haben? Macht keinen Sinn wenn ich 2 MA brauche und 4 eingeteilt werden
@@ -121,7 +122,7 @@ class ORAlgorithm:
         self.max_zeit = {ma: 8 for ma in self.mitarbeiter}  # Maximale Arbeitszeit pro Tag
 
         # -- 5 --
-        self.min_zeit = {ma: 5 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
+        self.min_zeit = {ma: 2 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
 
         # -- 6 --
         # Maximale Arbeitszeit pro woche, wird später noch aus der Datenbank gezogen
@@ -307,6 +308,7 @@ class ORAlgorithm:
             for j in range(len(self.min_anwesend[i])):  # Für jede Stunde am Tag
                 if sum([self.verfügbarkeit[ma][i][j] for ma in self.mitarbeiter]) < self.min_anwesend[i][j]:
                     raise ValueError(f"Es sind nicht genügend Mitarbeiter verfügbar zur notwendigen Zeit (Tag {i+1}, Stunde {j+1}).")
+
 
 
     def solver_selection(self):
@@ -510,6 +512,8 @@ class ORAlgorithm:
                         arbeitszeit_pro_tag.append(int(self.x[i, j, k].solution_value()))
                     self.mitarbeiter_arbeitszeiten[i].append(arbeitszeit_pro_tag)
             print(self.mitarbeiter_arbeitszeiten)
+
+
         if self.status == pywraplp.Solver.OPTIMAL:
             print("Optimal solution found.")
         elif self.status == pywraplp.Solver.FEASIBLE:
@@ -522,7 +526,6 @@ class ORAlgorithm:
             print("Solver did not solve the problem.")
         else:
             print("Unknown status.")
-
 
         # Ergebnisse ausgeben Excel ----------------------------------------------------------------------------------------------
         data = self.mitarbeiter_arbeitszeiten
@@ -541,8 +544,9 @@ class ORAlgorithm:
 
         # Schreiben Sie die Überschriften
         headers = ["user_id"]
-        for i in range(1, len(max(data.values(), key=len)) + 7):
+        for i in range(1, len(max(data.values(), key=len)) + 1):
             headers.extend(["T{},h{}".format(i, j+8) for j in range(10)])
+            headers.append(None)
         ws.append(headers)
 
         # Ändern der Schriftgröße der Spaltentitel
@@ -555,9 +559,14 @@ class ORAlgorithm:
             for day in days:
                 if day:
                     row.extend(day)
+                    row.append(None)  # Fügt eine leere Spalte nach jedem Tag hinzu
                 else:
-                    row.extend([None]*9)  # Für Tage ohne Stunden
+                    row.extend([None]*10)  # Für Tage ohne Stunden
             ws.append(row)
+
+        # Fügen Sie die Summenformel zur letzten Spalte jeder Zeile hinzu
+        for i, row in enumerate(ws.iter_rows(min_row=2, values_only=False), start=2):
+            ws.cell(row=i, column=ws.max_column, value=f'=SUM(B{i}:{get_column_letter(ws.max_column - 1)}{i})')
 
         # Farben auf Basis der Zellenwerte festlegen und Schriftgröße für den Rest des Dokuments
         for row in ws.iter_rows(min_row=2, values_only=False):
