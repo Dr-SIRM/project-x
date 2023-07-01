@@ -18,7 +18,6 @@ Prio 1:
  - Den Übergang auf harte und weiche NBs machen? 
  - working_h noch diskutieren, ist das max. arbeitszeit oder norm Arbeiszeit?
  - Jeder MA muss vor dem Solven eingegeben haben, wann er arbeiten kann. Auch wenn es alles 0 sind.
- - Sollte die time_req die grösste Gewichtung haben? Macht keinen Sinn wenn ich 2 MA brauche und 4 eingeteilt werden
 
  - auf Viertelstunden wechseln
  - Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
@@ -386,20 +385,21 @@ class ORAlgorithm:
         # (Die solver.Add() Funktion nimmt eine Bedingung als Argument und fügt sie dem Optimierungsproblem hinzu.)
         """
 
-        # NB 1 - MA nur einteilen, wenn er verfügbar ist.
+        # HARTE NB
+        # NB 1 - MA nur einteilen, wenn er verfügbar ist. 
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
                     self.solver.Add(self.x[i, j, k] <= self.verfügbarkeit[i][j][k])
 
-
+        # WEICHE NB
         # NB 2 - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend 
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
                 self.solver.Add(self.solver.Sum([self.x[i, j, k] for i in self.mitarbeiter]) >= self.min_anwesend[j][k])
 
 
-
+        # WEICHE NB
         # NB 3 - Max. Arbeitszeit pro Woche - (working_h muss noch berechnet werden!)
         total_hours = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
         for ma in self.mitarbeiter:
@@ -413,7 +413,7 @@ class ORAlgorithm:
                 solver.Add(solver.Sum(x[i, j, k] for k in range(len(verfügbarkeit[i][j]))) <= max_zeit[i])
         """
 
-
+        # WEICHE NB
         # NB 4 - Min. und Max. Arbeitszeit pro Tag
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
@@ -426,7 +426,7 @@ class ORAlgorithm:
                     self.solver.Add(sum_hour <= self.max_zeit[i] * self.a[i, j])
 
         
-
+        # WEICHE NB (HOHE KOSTEN)
         # NB 5 - Anzahl Arbeitsblöcke
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
@@ -441,7 +441,7 @@ class ORAlgorithm:
 
         # NB X - Innerhalb einer Woche immer gleiche Schichten
         
-        
+        # WEICHE NB
         # NB 6 - Verteilungsgrad MA - (entsprechend employment_lvl (keine Festanstellung) - muss noch angepasst werden, sobald feste MA eingeplant werden)
         list_gesamtstunden = []
         prozent_gesamtstunden = []
