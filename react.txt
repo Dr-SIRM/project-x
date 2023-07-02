@@ -1,104 +1,3 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useNavigate  } from 'react-router-dom';
-
-export const AuthContext = createContext();
-
-const AuthProvider = ({ children }) => {
-  const navigate = useNavigate();
-  const [user, setUser] = useState(null);
-  const [error, setError] = useState('');
-
-  const login = async (email, password) => {
-    try {
-      console.log('Email:', email, 'Password:', password);
-      const response = await fetch("http://localhost:5000/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-      if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      console.log('Server response:', data);
-      setUser( data.user );
-      localStorage.setItem('session_token', data.session_token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-  } catch (error) {
-    setError('Invalid email or password');
-  }
-};
-
-  useEffect(() => {
-    if (user) {
-      console.log('User after login:', user);
-      console.log('Session token after login:', localStorage.getItem('session_token'));
-      navigate('/dashboard');
-    } else {
-      console.log('Back to Login');
-    }  
-  }, [user]); // This useEffect hook logs the value of 'user' whenever it changes
-
-  const logout = () => {
-    // Clear user data and access token from localStorage
-    setUser(null);
-    localStorage.removeItem('session_token');
-    localStorage.removeItem('user');
-    navigate('/login');
-  };
-
-  return (
-    <AuthContext.Provider value={{ user, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
-
-export default AuthProvider;
-
-
-
-
-
-
-
-
-
-import React, { useContext } from 'react';
-import { Route, Navigate } from 'react-router-dom';
-import { AuthContext } from './AuthContext';
-
-const PrivateRoute = ({ component: Component, accessLevel, ...rest }) => {
-  const { user } = useContext(AuthContext);
-
-  console.log('User in PrivateRoute:', user); // Print the user state
-  console.log('Session token in PrivateRoute:', localStorage.getItem('session_token'));
-
-  if (!user) {
-    console.log('User not authenticated in PrivateRoute');
-    return <Navigate to="/login" />; // Redirect to login if user is not authenticated
-  }
-
-  if (user.access_level !== accessLevel) {
-    return <Navigate to="/login" />; // Redirect to unauthorized page if user's access level is not sufficient
-  }
-
-  return <Component {...rest} />;
-};
-
-export default PrivateRoute;
-
-
-
-
-
-
-
-
-
-
 import { useState, useEffect, useContext } from "react";
 import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Outlet } from "react-router-dom";
@@ -191,6 +90,103 @@ export default App;
 
 
 
+import React, { useContext } from 'react';
+import { Route, Navigate } from 'react-router-dom';
+import { AuthContext } from './AuthContext';
+
+const PrivateRoute = ({ component: Component, accessLevel, ...rest }) => {
+  const { user } = useContext(AuthContext);
+
+  console.log('User in PrivateRoute:', user); // Print the user state
+  console.log('Session token in PrivateRoute:', localStorage.getItem('session_token'));
+
+  if (!user) {
+    console.log('User not authenticated in PrivateRoute');
+    return <Navigate to="/login" />; // Redirect to login if user is not authenticated
+  }
+
+  if (user.access_level !== accessLevel) {
+    return <Navigate to="/login" />; // Redirect to unauthorized page if user's access level is not sufficient
+  }
+
+  return <Component {...rest} />;
+};
+
+export default PrivateRoute;
+
+
+
+
+
+
+
+
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useNavigate  } from 'react-router-dom';
+
+export const AuthContext = createContext();
+
+const AuthProvider = ({ children }) => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState('');
+
+  const login = async (email, password) => {
+    try {
+      console.log('Email:', email, 'Password:', password);
+      const response = await fetch("http://localhost:5000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      console.log('Server response:', data);
+      setUser( data.user );
+      localStorage.setItem('session_token', data.session_token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+  } catch (error) {
+    setError('Invalid email or password');
+  }
+};
+
+  useEffect(() => {
+    if (user) {
+      console.log('User after login:', user);
+      console.log('Session token after login:', localStorage.getItem('session_token'));
+      navigate('/dashboard');
+    } else {
+      console.log('Back to Login');
+    }  
+  }, [user]); // This useEffect hook logs the value of 'user' whenever it changes
+
+  const logout = () => {
+    // Clear user data and access token from localStorage
+    setUser(null);
+    localStorage.removeItem('session_token');
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export default AuthProvider;
+
+
+
+
+
+
+
 import React, { useContext, useState } from 'react';
 import { Box, Typography, TextField, Button, Alert, useTheme } from '@mui/material';
 import Header from "../../components/Header";
@@ -267,7 +263,8 @@ export default Login;
 
 
 
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, useContext } from "react";
 import { useTheme, Box, Button, TextField, Snackbar, Typography } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -275,6 +272,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import axios from 'axios';
+import { AuthContext } from "../../AuthContext";
 
 const Company = ({ company }) => {
   const theme = useTheme();
@@ -286,15 +284,19 @@ const Company = ({ company }) => {
   const [currentUser, setCurrentUser] = useState(null); 
 
   useEffect(() => {
-    const baseURL = 'http://localhost:5000/api'; // Update with your Flask app's base URL
-    
     const fetchCompany = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/company');
-        setcompanyData(response.data);
-      } catch (error) {
-        console.error('Error fetching company details:', error);
-      }
+        try {
+          const token = localStorage.getItem('session_token'); // Get the session token from local storage
+          console.log('Token', token);
+          const response = await axios.get('http://localhost:5000/api/company', {
+              headers: {
+                  'Authorization': `Bearer ${token}`
+              }
+          });
+          setcompanyData(response.data);
+        } catch (error) {
+          console.error('Error fetching company details:', error);
+        }
     };
 
     fetchCompany();
@@ -809,12 +811,11 @@ def react_update():
     return render_template('update.html', data_tag=User.query.all(), account=new_data, template_form=user_form)
 
 @app.route('/api/company', methods=['GET', 'POST'])
+@jwt_required()
 def get_company():
-    # This has to be updated to the current user once the function is implemented.
-    react_user = get_current_user()
-    email = react_user['email']
-    print(email)
-    user = User.query.filter_by(email=email).first()
+    print(request.headers)
+    react_user = get_jwt_identity()
+    user = User.query.filter_by(email=react_user).first()
     opening_hours = OpeningHours.query.filter_by(company_name=user.company_name).first()
     weekdays = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
     company = Company.query.filter_by(company_name=user.company_name).first()
@@ -1103,4 +1104,20 @@ def get_availability():
     }
 
     return jsonify(availability_list)
+
+
+
+
+
+
+# SET LOAD USER REACT
+@jwt.user_lookup_loader
+def load_user(jwt_header, jwt_data):
+    user_email = jwt_data["sub"]
+    user = User.query.filter_by(email=user_email).first()
+    return user
+
+
+
+
 
