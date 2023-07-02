@@ -65,7 +65,14 @@ class ORAlgorithm:
         self.min_anwesend = []                              # 13
 
         # Attribute der Methode "solver_selection"
-        self.solver = None                                 
+        self.solver = None               
+
+        # Attribute der Methode "define_penalty_costs"
+        self.penalty_cost_nb2 = None
+        self.penalty_cost_nb3 = None
+        self.penalty_cost_nb4 = None
+        self.penalty_cost_nb5 = None
+        self.penalty_cost_nb6 = None
 
         # Attribute der Methode "decision_variables"
         self.x = None
@@ -73,6 +80,13 @@ class ORAlgorithm:
         self.s = None
         self.a = None
         self.c = None # -- IN BEARBEITUNG 01.07.2023 --
+
+        # Attribute der Methode "violation_variables"
+        self.nb2_violation = {}
+        self.nb3_violation = {}
+        self.nb4_violation = {}
+        self.nb5_violation = {}
+        self.nb6_violation = {}
 
         # Attribute der Methode "objective_function"
         self.objective = None
@@ -90,7 +104,10 @@ class ORAlgorithm:
         self.pre_check_programmer()
         self.pre_check_admin()
         self.solver_selection()
+        self.define_penalty_costs()
         self.decision_variables()
+        self.violation_variables()
+
         self.objective_function()
         self.constraints()
         self.solve_problem()
@@ -294,7 +311,7 @@ class ORAlgorithm:
         ---------------------------------------------------------------------------------------------------------------
         """
         total_hours_available = sum(self.gesamtstunden_verfügbarkeit)
-        toleranz = 1.3 # Wenn man möchte, das die eingegebenen Stunden der MA höher sein müssen als die verteilbaren_stunden
+        toleranz = 1 # Wenn man möchte, das die eingegebenen Stunden der MA höher sein müssen als die verteilbaren_stunden
 
         if total_hours_available < self.verteilbare_stunden * toleranz:
             raise ValueError(f"Die Mitarbeiter haben insgesamt nicht genug Stunden eingegeben, um die verteilbaren Stunden zu erreichen. Benötigte Stunden: {self.verteilbare_stunden}, eingegebene Stunden: {total_hours_available}, Toleranz: {toleranz}")
@@ -320,6 +337,17 @@ class ORAlgorithm:
         # GLPK = Vielzahl von Algorithmen, einschließlich des Simplex-Verfahrens und des branch-and-bound-Verfahrens
         """
         self.solver = pywraplp.Solver.CreateSolver('SCIP')
+
+
+    def define_penalty_costs(self):
+        """
+        Definiere Strafkosten für weiche Nebenbedingungen
+        """
+        self.penalty_cost_nb2 = 100
+        self.penalty_cost_nb3 = 100
+        self.penalty_cost_nb4 = 100
+        self.penalty_cost_nb5 = 100
+        self.penalty_cost_nb6 = 100
 
 
     def decision_variables(self):
@@ -363,6 +391,18 @@ class ORAlgorithm:
             for j in range(1, self.calc_time):  # Von Tag 1 an, da es keinen Vortag für Tag 0 gibt
                 self.c[i, j] = self.solver.BoolVar(f'c[{i}, {j}]')
 
+
+    def violation_variables(self):
+        """
+        Definiere Variablen für Nebenbedingungsverletzungen
+        """
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                self.nb2_violation[i, j] = self.solver.BoolVar(f'nb2_violation[{i}, {j}]')
+                self.nb3_violation[i, j] = self.solver.BoolVar(f'nb3_violation[{i}, {j}]')
+                self.nb4_violation[i, j] = self.solver.BoolVar(f'nb4_violation[{i}, {j}]')
+                self.nb5_violation[i, j] = self.solver.BoolVar(f'nb5_violation[{i}, {j}]')
+                self.nb6_violation[i, j] = self.solver.BoolVar(f'nb6_violation[{i}, {j}]')
 
 
     def objective_function(self):
@@ -484,7 +524,6 @@ class ORAlgorithm:
             self.solver.Add(verteilungsstunden[ma] >= lower_bound)
         
 
-        # PHU NOCHMAL FRAGEN, WIESO DIESE NB NOTWENDIG IST??
         # NB 7 - Feste Mitarbeiter zu employement_level fest einplanen
         total_hours = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
         for i, ma in enumerate(self.mitarbeiter):
