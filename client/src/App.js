@@ -21,11 +21,10 @@ import Line from "./scenes/line";
 import Pie from "./scenes/pie";
 import FAQ from "./scenes/faq";
 import Plan from "./scenes/plan";
-
 import Geography from "./scenes/geography";
+import Calendar from "./scenes/calendar";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
-import Calendar from "./scenes/calendar";
 import axios from "axios";
 import { AuthContext } from "./AuthContext";
 
@@ -66,7 +65,6 @@ function App() {
             {isAuthenticated && isSidebar && <Sidebar />}
             <main className="content">
               {isAuthenticated && <Topbar />}
-
               <Routes>
                 <Route path="/" element={<Login />} />
                 <Route path="/login" element={<Login />} />
@@ -78,8 +76,15 @@ function App() {
                 <Route path="/Invoices" element={<PrivateRoute component={Invoices} accessLevel="Admin" />} />
                 <Route path="/company" element={<PrivateRoute component={Company} accessLevel="Admin" />} />
                 <Route path="/Contacts" element={<PrivateRoute component={Contacts} accessLevel="Admin" />} />
+                <Route path="/Bar" element={<PrivateRoute component={Bar} accessLevel="Admin" />} />
+                <Route path="/Form" element={<PrivateRoute component={Form} accessLevel="Admin" />} />
+                <Route path="/Line" element={<PrivateRoute component={Line} accessLevel="Admin" />} />
+                <Route path="/Pie" element={<PrivateRoute component={Pie} accessLevel="Admin" />} />
+                <Route path="/FAQ" element={<PrivateRoute component={FAQ} accessLevel="Admin" />} />
+                <Route path="/Plan" element={<PrivateRoute component={Plan} accessLevel="Admin" />} />
+                <Route path="/Geography" element={<PrivateRoute component={Geography} accessLevel="Admin" />} />
+                <Route path="/Calendar" element={<PrivateRoute component={Calendar} accessLevel="Admin" />} />
               </Routes>
-
             </main>
           </div>
         </ThemeProvider>
