@@ -72,7 +72,12 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/dashboard" element={<PrivateRoute component={Dashboard} accessLevel="Admin" />} />
                 <Route path="/availability" element={<PrivateRoute component={Availability} accessLevel="Admin" />} />
+                <Route path="/Team" element={<PrivateRoute component={Team} accessLevel="Admin" />} />
+                <Route path="/Update" element={<PrivateRoute component={Update} accessLevel="Admin" />} />
+                <Route path="/Invite" element={<PrivateRoute component={Invite} accessLevel="Admin" />} />
+                <Route path="/Invoices" element={<PrivateRoute component={Invoices} accessLevel="Admin" />} />
                 <Route path="/company" element={<PrivateRoute component={Company} accessLevel="Admin" />} />
+                <Route path="/Contacts" element={<PrivateRoute component={Contacts} accessLevel="Admin" />} />
               </Routes>
 
             </main>
