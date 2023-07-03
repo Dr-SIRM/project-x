@@ -1,4 +1,4 @@
-import { Box, IconButton, useTheme } from "@mui/material";
+import { Box, IconButton, useTheme, Popover, Typography } from "@mui/material";
 import { useContext, useState } from "react";
 import { ColorModeContext, tokens } from "../../theme";
 import InputBase from "@mui/material/InputBase";
@@ -6,8 +6,8 @@ import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchIcon from "@mui/icons-material/Search";
+import LogoutIcon from "@mui/icons-material/Logout";
 import { AuthContext } from "../../AuthContext";
 
 const Topbar = () => {
@@ -19,14 +19,25 @@ const Topbar = () => {
   const authContext = useContext(AuthContext);
   const { logout } = authContext;
 
-  const [isHovered, setIsHovered] = useState(false);
+  const [isLogoutHovered, setIsLogoutHovered] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [notificationsAnchor, setNotificationsAnchor] = useState(null);
 
-  const handleMouseEnter = () => {
-    setIsHovered(true);
+  const handleLogoutMouseEnter = () => {
+    setIsLogoutHovered(true);
   };
 
-  const handleMouseLeave = () => {
-    setIsHovered(false);
+  const handleLogoutMouseLeave = () => {
+    setIsLogoutHovered(false);
+  };
+
+  const handleNotificationsClick = (event) => {
+    setIsNotificationsOpen(true);
+    setNotificationsAnchor(event.currentTarget);
+  };
+
+  const handlePopoverClose = () => {
+    setIsNotificationsOpen(false);
   };
 
   return (
@@ -50,7 +61,6 @@ const Topbar = () => {
 
       {/* ICONS */}
       <Box justifyContent="flex-end" sx={{ width: "960px", display: "flex" }}>
-        {/* sx={{  display: "flex" }} doesn't solve the problem */}
         <IconButton onClick={colorMode.toggleColorMode}>
           {theme.palette.mode === "dark" ? (
             <DarkModeOutlinedIcon />
@@ -58,41 +68,72 @@ const Topbar = () => {
             <LightModeOutlinedIcon />
           )}
         </IconButton>
-        <IconButton>
+        <IconButton onClick={handleNotificationsClick}>
           <NotificationsOutlinedIcon />
         </IconButton>
-        <IconButton>
-          <SettingsOutlinedIcon />
-        </IconButton>
+        <Popover
+          open={isNotificationsOpen}
+          anchorEl={notificationsAnchor}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "center",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "center",
+          }}
+          onClose={handlePopoverClose}
+          disableRestoreFocus
+          sx={{
+            "& .MuiPaper-root": {
+              minHeight: "400px",
+              maxWidth: "300px",
+              borderRadius: "8px",
+            },
+          }}
+        >
+          <Box sx={{ padding: "10px" }}>
+            <Typography variant="body2">
+              Recent changes and notifications will be displayed here.
+              <br />
+              A
+              <br /><br />
+              N
+              <br /><br />
+              A
+              <br /><br />
+              L
+            </Typography>
+          </Box>
+        </Popover>
         <IconButton
           onClick={logout}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
+          onMouseEnter={handleLogoutMouseEnter}
+          onMouseLeave={handleLogoutMouseLeave}
           sx={{
             position: "relative",
           }}
         >
-          <PersonOutlinedIcon />
-          {isHovered && (
-            <span
-              style={{
-                position: "absolute",
-                top: "100%",
-                left: "50%",
-                transform: "translateX(-50%)",
-                marginTop: "4px",
-                backgroundColor: theme.palette.background.default,
-                color: theme.palette.text.primary,
-                fontSize: "12px",
-                opacity: 0.8,
-                borderRadius: "3px",
-                padding: "4px 8px",
-                zIndex: 1,
-              }}
-            >
-              Logout
-            </span>
-          )}
+          <LogoutIcon />
+          <span
+            style={{
+              position: "absolute",
+              top: "100%",
+              left: "50%",
+              transform: "translateX(-50%)",
+              marginTop: "4px",
+              backgroundColor: theme.palette.background.default,
+              color: theme.palette.text.primary,
+              fontSize: "12px",
+              opacity: isLogoutHovered ? 0.8 : 0,
+              borderRadius: "3px",
+              padding: "4px 8px",
+              zIndex: 1,
+              transition: "opacity 0.3s ease-in-out",
+            }}
+          >
+            Logout
+          </span>
         </IconButton>
       </Box>
     </Box>
