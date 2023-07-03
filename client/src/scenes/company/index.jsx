@@ -17,12 +17,11 @@ const Company = ({ company }) => {
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [companyData, setcompanyData] = useState({});
   const [currentUser, setCurrentUser] = useState(null); 
+  const token = localStorage.getItem('session_token'); // Get the session token from local storage
 
   useEffect(() => {
     const fetchCompany = async () => {
         try {
-          const token = localStorage.getItem('session_token'); // Get the session token from local storage
-          console.log('Token', token);
           const response = await axios.get('http://localhost:5000/api/company', {
               headers: {
                   'Authorization': `Bearer ${token}`
@@ -41,7 +40,11 @@ const Company = ({ company }) => {
   const handleFormSubmit = async (values) => {
     try {
       // Send the updated form values to the server for database update
-      await axios.post('http://localhost:5000/api/company', values);
+      await axios.post('http://localhost:5000/api/company', values, {
+    headers: {
+        'Authorization': `Bearer ${token}`
+        }
+    });
       setShowSuccessNotification(true);
     } catch (error) {
       console.error('Error updating company details:', error);
