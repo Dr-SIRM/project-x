@@ -854,8 +854,27 @@ def login_react():
 
     # Return the session token
     response = make_response(jsonify({'session_token': session_token}))
-    response.set_cookie('session_token', session_token, httponly=True)
-    return response
+    response.set_cookie('session_token', session_token, httponly=True, secure=True)
+
+    # Save User Data and token
+    response = {
+        'session_token': session_token,
+        'user': {
+            'id': user.id,
+            'email': user.email,
+            'company_id': user.company_id,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'employment': user.employment,
+            'email': user.email,
+            'employment_level': user.employment_level,
+            'company_name': user.company_name,
+            'department': user.department,
+            'access_level': user.access_level
+        }
+    }
+    print(response)
+    return jsonify(response)
 
 
 @app.route('/api/users')
@@ -875,7 +894,6 @@ def get_data():
     return jsonify(user_list)
 
 @app.route('/api/current_user', methods=['GET'])
-@jwt_required()
 def get_current_user():
     current_user = get_jwt_identity()
     user = User.query.filter_by(email=current_user['email']).first()
@@ -894,9 +912,9 @@ def get_current_user():
             'access_level': user.access_level
         }
         print(user_data)
-        return jsonify(user_data)
+        return user_data
     
-    return jsonify({'message': 'User not found'})
+    return None
 
 
 @app.route('/api/new_user', methods=['POST'])
@@ -987,10 +1005,9 @@ def react_update():
 @app.route('/api/company', methods=['GET', 'POST'])
 @jwt_required()
 def get_company():
-    # This has to be updated to the current user once the function is implemented.
-    react_user = get_current_user()
-    email = react_user['email']
-    user = User.query.filter_by(email=email).first()
+    print(request.headers)
+    react_user = get_jwt_identity()
+    user = User.query.filter_by(email=react_user).first()
     opening_hours = OpeningHours.query.filter_by(company_name=user.company_name).first()
     weekdays = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
     company = Company.query.filter_by(company_name=user.company_name).first()
@@ -1279,6 +1296,19 @@ def get_availability():
     }
 
     return jsonify(availability_list)
+
+
+
+
+
+
+# SET LOAD USER REACT
+@jwt.user_lookup_loader
+def load_user(jwt_header, jwt_data):
+    user_email = jwt_data["sub"]
+    user = User.query.filter_by(email=user_email).first()
+    return user
+
 
 
 if __name__ == "__main__":

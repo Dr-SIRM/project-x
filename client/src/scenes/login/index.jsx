@@ -1,13 +1,13 @@
-import { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Box, Typography, TextField, Button, Alert, useTheme } from '@mui/material';
-import axios from 'axios';
+import Header from "../../components/Header";
 import { useNavigate } from 'react-router-dom';
 import { tokens } from "../../theme";
-import Header from "../../components/Header";
-
+import { AuthContext } from "../../AuthContext";
 
 
 const Login = () => {
+  const { login } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,19 +19,9 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:5000/api/login', {
-        email,
-        password,
-      });
-
-      // Save the session token or user information in local storage or state management
-      sessionStorage.setItem('token', response.data.session_token);
-      console.log(response.data.session_token);
-
-      // Redirect to the dashboard
-      navigate('/dashboard');
+      await login(email, password);
     } catch (error) {
-      setError('Invalid email or password');
+      setError('error.message');
     }
   };
 

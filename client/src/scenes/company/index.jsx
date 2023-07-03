@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useTheme, Box, Button, TextField, Snackbar, Typography } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -6,6 +6,8 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import axios from 'axios';
+
+
 
 const Company = ({ company }) => {
   const theme = useTheme();
@@ -17,28 +19,22 @@ const Company = ({ company }) => {
   const [currentUser, setCurrentUser] = useState(null); 
 
   useEffect(() => {
-    const baseURL = 'http://localhost:5000/api'; // Update with your Flask app's base URL
-    
     const fetchCompany = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/company');
-        setcompanyData(response.data);
-      } catch (error) {
-        console.error('Error fetching company details:', error);
-      }
-    };
-
-    const fetchCurrentUser = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/current_user');
-        setCurrentUser(response.data);
-      } catch (error) {
-        console.error('Error fetching current user:', error);
-      }
+        try {
+          const token = localStorage.getItem('session_token'); // Get the session token from local storage
+          console.log('Token', token);
+          const response = await axios.get('http://localhost:5000/api/company', {
+              headers: {
+                  'Authorization': `Bearer ${token}`
+              }
+          });
+          setcompanyData(response.data);
+        } catch (error) {
+          console.error('Error fetching company details:', error);
+        }
     };
 
     fetchCompany();
-    fetchCurrentUser();
   }, []);
 
   

@@ -1,12 +1,16 @@
-import { useState, useEffect } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { useState, useEffect, useContext } from "react";
+import { lazy, Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route, Outlet } from "react-router-dom";
+import { useLocation, Navigate } from "react-router-dom";
+import AuthProvider from "./AuthContext";
+import PrivateRoute from "./PrivateRoute";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
 import Login from "./scenes/login";
 import Dashboard from "./scenes/dashboard";
 import Team from "./scenes/team";
-import Update from "./scenes/update";
 import Availability from "./scenes/availability";
+import Update from "./scenes/update";
 import Invite from "./scenes/invite";
 import Invoices from "./scenes/invoices";
 import Contacts from "./scenes/contacts";
@@ -17,11 +21,14 @@ import Line from "./scenes/line";
 import Pie from "./scenes/pie";
 import FAQ from "./scenes/faq";
 import Plan from "./scenes/plan";
+
 import Geography from "./scenes/geography";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 import Calendar from "./scenes/calendar";
 import axios from "axios";
+import { AuthContext } from "./AuthContext";
+
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -30,57 +37,49 @@ function App() {
   const [message, setMessage] = useState("");
   const location = useLocation();
   const isAuthenticated = location.pathname !== "/"; // Check if the user is authenticated
+  // const { user } = useContext(AuthContext);
+  // const isAuthenticated = !!user;
 
-  useEffect(() => {
-    fetchData();
-  }, []);
 
-  //Datafetch for User-Display in Team.jsx
-  async function fetchData() {
-    try {
-      const response = await axios.get("http://localhost:5000/api/users");
-      const data = response.data;
-      setUsers(data);
-    } catch (error) {
-      console.error("Error fetching data:", error.response ? error.response : error);
-      setMessage("An error occurred while fetching data.");
-    }
-  }
+  // useEffect(() => {
+    // fetchData();
+  // }, []);
 
+  // Data fetch for User-Display in Team.jsx
+  // async function fetchData() {
+    // try {
+      // const response = await axios.get("http://localhost:5000/api/login");
+      // const data = response.data;
+      // setUsers(data);
+    // } catch (error) {
+      // console.error("Error fetching data:", error.response ? error.response : error);
+      // setMessage("An error occurred while fetching data.");
+    // }
+  // }
 
   return (
-    <ColorModeContext.Provider value={colorMode}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <div className="app">
-         {isAuthenticated && <Sidebar isSidebar={isSidebar} />}
-          <main className="content">
-            {isAuthenticated && <Topbar />}
-            
-            <Routes>
-              <Route path="/" element={<Login />} /> 
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/team" element={<Team users={users} />} />
-              <Route path="/contacts" element={<Contacts />} />
-              <Route path="/invoices" element={<Invoices />} />
-              <Route path="/form" element={<Form />} />
-              <Route path="/bar" element={<Bar />} />
-              <Route path="/pie" element={<Pie />} />
-              <Route path="/line" element={<Line />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/calendar" element={<Calendar />} />
-              <Route path="/availability" element={<Availability />} />
-              <Route path="/geography" element={<Geography />} />
-              <Route path="/plan" element={<Plan />} />
-              <Route path="/company" element={<Company />} />
-              <Route path="/invite" element={<Invite />} />
-              <Route path="/update" element={<Update />} />
-            </Routes>
-            <p>{message}</p>
-          </main>
-        </div>
-      </ThemeProvider>
-    </ColorModeContext.Provider>
+    <AuthProvider>
+      <ColorModeContext.Provider value={colorMode}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <div className="app">
+            {isAuthenticated && isSidebar && <Sidebar />}
+            <main className="content">
+              {isAuthenticated && <Topbar />}
+
+              <Routes>
+                <Route path="/" element={<Login />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/dashboard" element={<PrivateRoute component={Dashboard} accessLevel="Admin" />} />
+                <Route path="/availability" element={<PrivateRoute component={Availability} accessLevel="Admin" />} />
+                <Route path="/company" element={<PrivateRoute component={Company} accessLevel="Admin" />} />
+              </Routes>
+
+            </main>
+          </div>
+        </ThemeProvider>
+      </ColorModeContext.Provider>
+    </AuthProvider>
   );
 }
 
