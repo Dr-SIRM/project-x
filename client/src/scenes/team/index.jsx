@@ -6,7 +6,6 @@ import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettin
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import Header from "../../components/Header";
-
 import axios from "axios";
 
 
@@ -18,20 +17,19 @@ const Team = () => {
   const [setMessage] = useState("");
 
   useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await axios.get("http://localhost:5000/api/users");
+        const data = response.data;
+        setUsers(data);
+      } catch (error) {
+        console.error("Error fetching data:", error.response ? error.response : error);
+        setMessage("An error occurred while fetching data.");
+      }
+    }
     fetchData();
   }, []);
-
-  //Datafetch for User-Display in Team.jsx
-  async function fetchData() {
-    try {
-      const response = await axios.get("http://localhost:5000/api/users");
-      const data = response.data;
-      setUsers(data);
-    } catch (error) {
-      console.error("Error fetching data:", error.response ? error.response : error);
-      setMessage("An error occurred while fetching data.");
-    }
-  }
+  
 
 
   const columns = [

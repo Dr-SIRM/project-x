@@ -39,23 +39,6 @@ function App() {
   // const { user } = useContext(AuthContext);
   // const isAuthenticated = !!user;
 
-
-  // useEffect(() => {
-    // fetchData();
-  // }, []);
-
-  // Data fetch for User-Display in Team.jsx
-  // async function fetchData() {
-    // try {
-      // const response = await axios.get("http://localhost:5000/api/login");
-      // const data = response.data;
-      // setUsers(data);
-    // } catch (error) {
-      // console.error("Error fetching data:", error.response ? error.response : error);
-      // setMessage("An error occurred while fetching data.");
-    // }
-  // }
-
   return (
     <AuthProvider>
       <ColorModeContext.Provider value={colorMode}>
