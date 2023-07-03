@@ -15,7 +15,7 @@ const Team = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [users, setUsers] = useState([]);
-  const [message, setMessage] = useState("");
+  const [setMessage] = useState("");
 
   useEffect(() => {
     fetchData();
