@@ -57,22 +57,22 @@ function AppContent({ isSidebar, setIsSidebar }) {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<PrivateRoute component={Dashboard} accessLevel="Admin" />} />
-          <Route path="/availability" element={<PrivateRoute component={Availability} accessLevel="Admin" />} />
-          <Route path="/Team" element={<PrivateRoute component={Team} accessLevel="Admin" />} />
-          <Route path="/Update" element={<PrivateRoute component={Update} accessLevel="Admin" />} />
-          <Route path="/Invite" element={<PrivateRoute component={Invite} accessLevel="Admin" />} />
-          <Route path="/Invoices" element={<PrivateRoute component={Invoices} accessLevel="Admin" />} />
-          <Route path="/company" element={<PrivateRoute component={Company} accessLevel="Admin" />} />
-          <Route path="/Contacts" element={<PrivateRoute component={Contacts} accessLevel="Admin" />} />
-          <Route path="/Bar" element={<PrivateRoute component={Bar} accessLevel="Admin" />} />
-          <Route path="/Form" element={<PrivateRoute component={Form} accessLevel="Admin" />} />
-          <Route path="/Line" element={<PrivateRoute component={Line} accessLevel="Admin" />} />
-          <Route path="/Pie" element={<PrivateRoute component={Pie} accessLevel="Admin" />} />
-          <Route path="/FAQ" element={<PrivateRoute component={FAQ} accessLevel="Admin" />} />
-          <Route path="/Plan" element={<PrivateRoute component={Plan} accessLevel="Admin" />} />
-          <Route path="/Geography" element={<PrivateRoute component={Geography} accessLevel="Admin" />} />
-          <Route path="/Calendar" element={<PrivateRoute component={Calendar} accessLevel="Admin" />} />
+          <Route path="/dashboard" element={<PrivateRoute component={Dashboard} accessLevels={["Admin", "User"]} />} />
+          <Route path="/availability" element={<PrivateRoute component={Availability} accessLevels="Admin" />} />
+          <Route path="/Team" element={<PrivateRoute component={Team} accessLevels="Admin" />} />
+          <Route path="/Update" element={<PrivateRoute component={Update} accessLevels="Admin" />} />
+          <Route path="/Invite" element={<PrivateRoute component={Invite} accessLevels="Admin" />} />
+          <Route path="/Invoices" element={<PrivateRoute component={Invoices} accessLevels="Admin" />} />
+          <Route path="/company" element={<PrivateRoute component={Company} accessLevels="Admin" />} />
+          <Route path="/Contacts" element={<PrivateRoute component={Contacts} accessLevels="Admin" />} />
+          <Route path="/Bar" element={<PrivateRoute component={Bar} accessLevels="Admin" />} />
+          <Route path="/Form" element={<PrivateRoute component={Form} accessLevels="Admin" />} />
+          <Route path="/Line" element={<PrivateRoute component={Line} accessLevels="Admin" />} />
+          <Route path="/Pie" element={<PrivateRoute component={Pie} accessLevels="Admin" />} />
+          <Route path="/FAQ" element={<PrivateRoute component={FAQ} accessLevels="Admin" />} />
+          <Route path="/Plan" element={<PrivateRoute component={Plan} accessLevels="Admin" />} />
+          <Route path="/Geography" element={<PrivateRoute component={Geography} accessLevels="Admin" />} />
+          <Route path="/Calendar" element={<PrivateRoute component={Calendar} accessLevels="Admin" />} />
         </Routes>
       </main>
     </>
