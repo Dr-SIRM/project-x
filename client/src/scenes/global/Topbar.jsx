@@ -14,6 +14,10 @@ const Topbar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
+  
+  // Consume the AuthContext
+  const authContext = useContext(AuthContext);
+  const { logout } = authContext;
 
   return (
     <Box
@@ -50,7 +54,7 @@ const Topbar = () => {
         <IconButton>
           <SettingsOutlinedIcon />
         </IconButton>
-        <IconButton>
+        <IconButton onClick={logout}>
           <PersonOutlinedIcon />
         </IconButton>
       </Box>

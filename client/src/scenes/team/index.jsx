@@ -11,11 +11,27 @@ import axios from "axios";
 
 
 
-const Team = ({ users }) => {
+const Team = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [setUsers] = useState([]);
+  const [users, setUsers] = useState([]);
   const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  //Datafetch for User-Display in Team.jsx
+  async function fetchData() {
+    try {
+      const response = await axios.get("http://localhost:5000/api/users");
+      const data = response.data;
+      setUsers(data);
+    } catch (error) {
+      console.error("Error fetching data:", error.response ? error.response : error);
+      setMessage("An error occurred while fetching data.");
+    }
+  }
 
 
   const columns = [
@@ -74,22 +90,6 @@ const Team = ({ users }) => {
       },
     },
   ];
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  //Datafetch for User-Display in Team.jsx
-  async function fetchData() {
-    try {
-      const response = await axios.get("http://localhost:5000/api/users");
-      const data = response.data;
-      setUsers(data);
-    } catch (error) {
-      console.error("Error fetching data:", error.response ? error.response : error);
-      setMessage("An error occurred while fetching data.");
-    }
-  }
 
   return (
     <Box m="20px">
