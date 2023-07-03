@@ -1,5 +1,5 @@
 import { Box, IconButton, useTheme } from "@mui/material";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { ColorModeContext, tokens } from "../../theme";
 import InputBase from "@mui/material/InputBase";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
@@ -14,10 +14,20 @@ const Topbar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
-  
+
   // Consume the AuthContext
   const authContext = useContext(AuthContext);
   const { logout } = authContext;
+
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+  };
 
   return (
     <Box
@@ -26,7 +36,7 @@ const Topbar = () => {
       alignItems="center"
       p={2}
     >
-      {/*SEARCH BAR*/}
+      {/* SEARCH BAR */}
       <Box
         display="flex"
         backgroundColor={colors.primary[400]}
@@ -54,8 +64,35 @@ const Topbar = () => {
         <IconButton>
           <SettingsOutlinedIcon />
         </IconButton>
-        <IconButton onClick={logout}>
+        <IconButton
+          onClick={logout}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          sx={{
+            position: "relative",
+          }}
+        >
           <PersonOutlinedIcon />
+          {isHovered && (
+            <span
+              style={{
+                position: "absolute",
+                top: "100%",
+                left: "50%",
+                transform: "translateX(-50%)",
+                marginTop: "4px",
+                backgroundColor: theme.palette.background.default,
+                color: theme.palette.text.primary,
+                fontSize: "12px",
+                opacity: 0.8,
+                borderRadius: "3px",
+                padding: "4px 8px",
+                zIndex: 1,
+              }}
+            >
+              Logout
+            </span>
+          )}
         </IconButton>
       </Box>
     </Box>
