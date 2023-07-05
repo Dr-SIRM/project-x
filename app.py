@@ -876,6 +876,28 @@ def login_react():
     print(response)
     return jsonify(response)
 
+@app.route('/api/current_user')
+@jwt_required()
+def current_user():
+    jwt_data = get_jwt()
+    user_id = jwt_data['user_id']
+    user = User.query.get(user_id)
+    
+    if user is None:
+        print("No user found with this ID.")
+        return jsonify({"msg": "User not found"}), 404
+
+    user_dict = {
+        'id': user.id,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'company_name': user.company_name,
+        'email': user.email,
+        'access_level': user.access_level
+    }
+
+    return jsonify(user_dict)
+    
 
 @app.route('/api/users')
 def get_data():
@@ -906,30 +928,6 @@ def new_user():
     db.session.add(user)
     db.session.commit()
     return {'success': True}
-
-
-@app.route('/api/current_user')
-@jwt_required()
-def current_user():
-    jwt_data = get_jwt()
-    user_id = jwt_data['user_id']
-    user = User.query.get(user_id)
-    
-    if user is None:
-        print("No user found with this ID.")
-        return jsonify({"msg": "User not found"}), 404
-
-    user_dict = {
-        'id': user.id,
-        'first_name': user.first_name,
-        'last_name': user.last_name,
-        'company_name': user.company_name,
-        'email': user.email,
-        'access_level': user.access_level
-    }
-
-    return jsonify(user_dict)
-
 
 
 @app.route('/api/registration/admin', methods=['POST'])
