@@ -5,7 +5,6 @@ import InputBase from "@mui/material/InputBase";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
-import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { AuthContext } from "../../AuthContext";
@@ -95,14 +94,6 @@ const Topbar = () => {
           <Box sx={{ padding: "10px" }}>
             <Typography variant="body2">
               Recent changes and notifications will be displayed here.
-              <br />
-              A
-              <br /><br />
-              N
-              <br /><br />
-              A
-              <br /><br />
-              L
             </Typography>
           </Box>
         </Popover>

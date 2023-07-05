@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { Link } from "react-router-dom";
@@ -17,6 +17,8 @@ import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 import BusinessIcon from '@mui/icons-material/Business';
+import axios from 'axios';
+
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -41,6 +43,38 @@ const Sidebar = () => {
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
+  const token = localStorage.getItem('session_token'); 
+  const [user, setUser] = useState({
+    firstName: '',
+    lastName: '',
+    companyName: '',
+    email: '',
+    accessLevel: ''
+  });
+
+  useEffect(() => {
+    axios.get('http://localhost:5000/api/current_user', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then((response) => {
+        if (response.data) {
+          const currentUser = response.data;
+          setUser({
+            firstName: currentUser.first_name,
+            lastName: currentUser.last_name,
+            companyName: currentUser.company_name,
+            email: currentUser.email,
+            accessLevel: currentUser.access_level
+          });
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching data: ', error);
+      });
+  }, []);
+
 
   return (
     <Box
@@ -81,7 +115,7 @@ const Sidebar = () => {
                 ml="15px"
               >
                 <Typography variant="h3" color={colors.grey[100]}>
-                  ADMINIS
+                  TimeTab
                 </Typography>
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon />
@@ -103,15 +137,15 @@ const Sidebar = () => {
               </Box>
               <Box textAlign="center">
                 <Typography
-                  variant="h2"
+                  variant="h3"
                   color={colors.grey[100]}
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                  Gery
+                  {user.firstName}
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
-                  Admin
+                  {user.accessLevel}
                 </Typography>
               </Box>
             </Box>

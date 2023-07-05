@@ -9,7 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import random
 from models import db
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, get_jwt
 from collections.abc import Mapping as ABCMapping
 
 #Config
@@ -893,30 +893,6 @@ def get_data():
         user_list.append(user_dict)
     return jsonify(user_list)
 
-@app.route('/api/current_user', methods=['GET'])
-def get_current_user():
-    current_user = get_jwt_identity()
-    user = User.query.filter_by(email=current_user['email']).first()
-    
-    if user:
-        user_data = {
-            'id': user.id, 
-            'company_id': user.company_id,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'employment': user.employment,
-            'email': user.email,
-            'employment_level': user.employment_level,
-            'company_name': user.company_name,
-            'department': user.department,
-            'access_level': user.access_level
-        }
-        print(user_data)
-        return user_data
-    
-    return None
-
-
 @app.route('/api/new_user', methods=['POST'])
 def new_user():
     data = request.json
@@ -930,6 +906,30 @@ def new_user():
     db.session.add(user)
     db.session.commit()
     return {'success': True}
+
+
+@app.route('/api/current_user')
+@jwt_required()
+def current_user():
+    jwt_data = get_jwt()
+    user_id = jwt_data['user_id']
+    user = User.query.get(user_id)
+    
+    if user is None:
+        print("No user found with this ID.")
+        return jsonify({"msg": "User not found"}), 404
+
+    user_dict = {
+        'id': user.id,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'company_name': user.company_name,
+        'email': user.email,
+        'access_level': user.access_level
+    }
+
+    return jsonify(user_dict)
+
 
 
 @app.route('/api/registration/admin', methods=['POST'])

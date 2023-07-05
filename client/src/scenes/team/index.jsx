@@ -26,7 +26,7 @@ const Team = () => {
         console.error("Error fetching data:", error.response ? error.response : error);
         setMessage("An error occurred while fetching data.");
       }
-    }
+    } 
     fetchData();
   }, []);
   
