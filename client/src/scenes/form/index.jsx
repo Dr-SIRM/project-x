@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Button, TextField, InputAdornment, MenuItem, Select, FormControl, InputLabel, Snackbar  } from "@mui/material";
+import { Box, Button, TextField, MenuItem, Select, FormControl, InputLabel, Snackbar  } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -120,22 +120,37 @@ const Form = () => {
                   <MenuItem value="Temp">Teilzeit</MenuItem>
                 </Select>
               </FormControl>
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Pensum"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.employment_level}
-                name="employment_level"
-                error={!!touched.employment_level && !!errors.employment_level}
-                helpertext={touched.employment_level && errors.employment_level}
-                InputProps={{
-                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                }}
-                sx={{ gridColumn: "span 4" }}
-              />
+              <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 4" }}>
+                <InputLabel id="employment-level-label">Pensum</InputLabel>
+                <Select
+                  labelId="employment-level-label"
+                  id="employment-level-select"
+                  onBlur={handleBlur}
+                  onChange={(event) => {
+                    const selectedValue = event.target.value;
+                    const decimalValue = selectedValue / 100;
+                    handleChange({
+                      target: {
+                        name: 'employment_level',
+                        value: decimalValue,
+                      },
+                    });
+                  }}
+                  value={values.employment_level ? values.employment_level * 100 : ''}
+                  name="employment_level"
+                  error={!!touched.employment_level && !!errors.employment_level}
+                  renderValue={(selected) => `${selected}%`}
+                >
+                  {Array.from(Array(10).keys()).map((percentage) => {
+                    const value = (percentage + 1) * 10;
+                    return (
+                      <MenuItem key={percentage + 1} value={value}>
+                        {value}%
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
               <TextField
                 fullWidth
                 variant="filled"
