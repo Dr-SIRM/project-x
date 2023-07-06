@@ -56,7 +56,7 @@ function AppContent({ isSidebar, setIsSidebar }) {
           <Route path="/dashboard" element={<PrivateRoute component={Dashboard} accessLevels={["Admin", "User"]} />} />
           <Route path="/availability" element={<PrivateRoute component={Availability} accessLevels="Admin" />} />
           <Route path="/Team" element={<PrivateRoute component={Team} accessLevels="Admin" />} />
-          <Route path="/Update" element={<PrivateRoute component={Update} accessLevels="Admin" />} />
+          <Route path="/Update" element={<PrivateRoute component={Update} accessLevels={["Admin", "User"]} />} />
           <Route path="/Invite" element={<PrivateRoute component={Invite} accessLevels="Admin" />} />
           <Route path="/company" element={<PrivateRoute component={Company} accessLevels="Admin" />} />
           <Route path="/Contacts" element={<PrivateRoute component={Contacts} accessLevels="Admin" />} />
