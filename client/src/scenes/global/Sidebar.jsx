@@ -20,9 +20,14 @@ import BusinessIcon from '@mui/icons-material/Business';
 import axios from 'axios';
 
 
-const Item = ({ title, to, icon, selected, setSelected }) => {
+const Item = ({ title, to, icon, selected, setSelected, requiredAccessLevel, accessLevel }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  // Don't render the item if the user is not an Admin and the item requires Admin access
+  if (requiredAccessLevel === 'Admin' && accessLevel !== 'Admin') {
+    return null;
+  }
   return (
     <MenuItem
       active={selected === title}
@@ -114,7 +119,7 @@ const Sidebar = () => {
                 alignItems="center"
                 ml="15px"
               >
-                <Typography variant="h3" color={colors.grey[100]}>
+                <Typography variant="h4" color={colors.grey[100]}>
                   TimeTab
                 </Typography>
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
@@ -128,9 +133,9 @@ const Sidebar = () => {
             <Box mb="25px">
               <Box display="flex" justifyContent="center" alignItems="center">
                 <img
-                  alt="profile-user"
-                  width="100px"
-                  height="100px"
+                  alt="TimeTab-Logo"
+                  width="80px"
+                  height="80px"
                   src={`../../assets/TimeTab.png`}
                   style={{ cursor: "pointer", borderRadius: "20%" }}
                 />
@@ -165,7 +170,7 @@ const Sidebar = () => {
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              Daten
+              Team
             </Typography>
             <Item
               title="Manage Team"
@@ -173,16 +178,20 @@ const Sidebar = () => {
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              requiredAccessLevel="Admin"
+              accessLevel={user.accessLevel}
             />
             <Item
-              title="Invite"
+              title="Einladen"
               to="/invite"
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              requiredAccessLevel="Admin"
+              accessLevel={user.accessLevel}
             />
             <Item
-              title="Update"
+              title="Updaten"
               to="/update"
               icon={<PeopleOutlinedIcon />}
               selected={selected}
@@ -195,14 +204,6 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-            <Item
-              title="Zahlung"
-              to="/invoices"
-              icon={<ReceiptOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-
             <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -216,6 +217,8 @@ const Sidebar = () => {
               icon={<PersonOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              requiredAccessLevel="Admin"
+              accessLevel={user.accessLevel}
             />
             <Item
               title="Verfügbarkeit"
@@ -223,6 +226,8 @@ const Sidebar = () => {
               icon={<BusinessIcon />}
               selected={selected}
               setSelected={setSelected}
+              requiredAccessLevel="Admin"
+              accessLevel={user.accessLevel}
             />
             <Item
               title="Company"

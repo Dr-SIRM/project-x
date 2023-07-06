@@ -10,7 +10,6 @@ import Team from "./scenes/team";
 import Availability from "./scenes/availability";
 import Update from "./scenes/update";
 import Invite from "./scenes/invite";
-import Invoices from "./scenes/invoices";
 import Contacts from "./scenes/contacts";
 import Company from "./scenes/company";
 import Bar from "./scenes/bar";
@@ -23,13 +22,10 @@ import Geography from "./scenes/geography";
 import Calendar from "./scenes/calendar";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
-import axios from "axios";
 
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
-  const [users, setUsers] = useState([]);
-  const [message, setMessage] = useState("");
 
   return (
     <AuthProvider>
@@ -62,7 +58,6 @@ function AppContent({ isSidebar, setIsSidebar }) {
           <Route path="/Team" element={<PrivateRoute component={Team} accessLevels="Admin" />} />
           <Route path="/Update" element={<PrivateRoute component={Update} accessLevels="Admin" />} />
           <Route path="/Invite" element={<PrivateRoute component={Invite} accessLevels="Admin" />} />
-          <Route path="/Invoices" element={<PrivateRoute component={Invoices} accessLevels="Admin" />} />
           <Route path="/company" element={<PrivateRoute component={Company} accessLevels="Admin" />} />
           <Route path="/Contacts" element={<PrivateRoute component={Contacts} accessLevels="Admin" />} />
           <Route path="/Bar" element={<PrivateRoute component={Bar} accessLevels="Admin" />} />
