@@ -5,6 +5,7 @@ import PrivateRoute from "./PrivateRoute";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
 import Login from "./scenes/login";
+import ForgetPassword from "./scenes/forget_password";
 import Dashboard from "./scenes/dashboard";
 import Team from "./scenes/team";
 import Availability from "./scenes/availability";
@@ -53,6 +54,7 @@ function AppContent({ isSidebar, setIsSidebar }) {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/forget_password" element={<ForgetPassword />} />
           <Route path="/dashboard" element={<PrivateRoute component={Dashboard} accessLevels={["Admin", "User"]} />} />
           <Route path="/availability" element={<PrivateRoute component={Availability} accessLevels="Admin" />} />
           <Route path="/Team" element={<PrivateRoute component={Team} accessLevels="Admin" />} />

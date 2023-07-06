@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Box, Typography, TextField, Button, Alert, useTheme } from '@mui/material';
+import { Box, Typography, TextField, Button, Alert, useTheme, Link } from '@mui/material';
 import Header from "../../components/Header";
 import { useNavigate } from 'react-router-dom';
 import { tokens } from "../../theme";
@@ -55,6 +55,14 @@ const Login = () => {
           <Button type="submit" variant="contained" fullWidth>
             Login
           </Button>
+          <Box></Box>
+          <Box mb={2}>
+            <Typography>
+              <Link href="/forget_password" style={{ textDecoration: 'none', color: 'inherit' }}>
+                Forgot Password
+              </Link>
+            </Typography>
+          </Box>
           {error && (
             <Box mt={2}>
               <Alert severity="error">{error}</Alert>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTheme, Box, Button, TextField, InputAdornment, MenuItem, Select, FormControl, InputLabel, Snackbar  } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -11,10 +11,29 @@ const Invite = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
+  const [companies, setCompanies] = useState([]);
+  const [selectedCompany, setSelectedCompany] = useState('');
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/invite');
+        setCompanies(response.data);
+      } catch (error) {
+        console.error('Failed to fetch companies', error);
+      }
+    };
+
+    fetchCompanies();
+  }, []);
+
+  const handleChange = (event) => {
+    setSelectedCompany(event.target.value);
+  };
 
   const handleFormSubmit = (values, { resetForm }) => {
     axios
-      .post('http://localhost:5000/api/update', values)
+      .post('http://localhost:5000/api/invite', values)
       .then((response) => {
         console.log(response.data);
         setShowSuccessNotification(true);
@@ -66,35 +85,64 @@ const Invite = () => {
                 helpertext={touched.email && errors.email}
                 sx={{ gridColumn: "span 4" }}
               />
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Firmennamen"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.company_name}
-                name="company_name"
-                error={!!touched.company_name && !!errors.company_name}
-                helpertext={touched.company_name && errors.company_name}
-                sx={{ gridColumn: "span 4" }}
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Pensum"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.employment_level}
-                name="employment_level"
-                error={!!touched.employment_level && !!errors.employment_level}
-                helpertext={touched.employment_level && errors.employment_level}
-                InputProps={{
-                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                }}
-                sx={{ gridColumn: "span 4" }}
-              />
+              <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 4" }}>
+                <InputLabel id="company-label">Company Name</InputLabel>
+                <Select
+                  labelId="company-label"
+                  id="company_name"
+                  name="company_name"
+                  value={selectedCompany}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.company_name && !!errors.company_name}
+                  helpertext={touched.company_name && errors.company_name}
+                >
+                  {companies.map((company) => (
+                    <MenuItem key={company.company_name} value={company.company_name}>
+                      {company.company_name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 4" }}>
+                <InputLabel id="employment-label">Anstellung</InputLabel>
+                <Select
+                  labelId="employment-label"
+                  id="employment"
+                  name="employment"
+                  value={values.employment}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.employment && !!errors.employment}
+                  helpertext={touched.employment && errors.employment}
+                >
+                  <MenuItem value="Perm">Vollzeit</MenuItem>
+                  <MenuItem value="Temp">Teilzeit</MenuItem>
+                </Select>
+              </FormControl>
+              <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 4" }}>
+                <InputLabel id="employment-level-label">Pensum</InputLabel>
+                <Select
+                  labelId="employment-level-label"
+                  id="employment-level-select"
+                  onBlur={handleBlur}
+                  onChange={(event) => {
+                    const selectedValue = event.target.value;
+                    const decimalValue = selectedValue / 100;
+                    handleChange({
+                      target: {
+                        name: 'employment_level',
+                        value: decimalValue,
+                      },
+                    });
+                  }}
+                  value={values.employment_level ? values.employment_level * 100 : ''}
+                  name="employment_level"
+                  error={!!touched.employment_level && !!errors.employment_level}
+                  renderValue={(selected) => `${selected}%`}
+                >
+                </Select>
+              </FormControl>
               <TextField
                 fullWidth
                 variant="filled"
@@ -174,11 +222,6 @@ const checkoutSchema = yup.object().shape({
   first_name: yup.string().required("required"),
   last_name: yup.string().required("required"),
   email: yup.string().email("invalid email").required("required"),
-  password: yup.string().required("required"),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref("password"), null], "Passwords must match")
-    .required("required"),
   company_name: yup.string().required("required"),
   access_level: yup.string().required("required"),
   employment_level: yup

@@ -1297,6 +1297,80 @@ def get_availability():
 
 
 
+@app.route('/api/forget_password', methods=["GET", "POST"])
+def get_forget_password():
+    if request.method == 'POST':
+        forget_password_data = request.get_json()
+        
+        existing_user = User.query.filter_by(email=forget_password_data['email']).first()
+        if existing_user is None:
+            return jsonify({"message": "No User exists under your email"}), 400
+        else:
+            random_token = random.randint(100000,999999)
+            reset_url = url_for('reset_password', token=random_token, _external=True)
+            last = PasswordReset.query.order_by(PasswordReset.id.desc()).first()
+            if last is None:
+                new_id = 1
+            else:
+                new_id = last.id + 1
+
+            data = PasswordReset(id=new_id, email=forget_password_data['email'], token=random_token)
+
+            db.session.add(data)
+            db.session.commit()
+
+            msg = Message('Reset Password', recipients=['timetab@gmx.ch'])
+            msg.body = f"Hey there,\n \n Below you will find your reset Link. \n \n {reset_url}"
+            mail.send(msg)
+
+            return jsonify({"message": "Password reset email sent"}), 200
+    return jsonify({"message": "Method not allowed"}), 405
+
+
+
+@app.route('/api/invite', methods = ['GET', 'POST'])
+@jwt_required
+def get_invite():
+    react_user = get_jwt_identity()
+    user = User.query.filter_by(email=react_user).first()
+    invite_data = request.get_json()
+
+    company_dict = []
+    for comp in user:
+        company_dict = {
+            'company_name': comp.company_name,
+        }
+        user_list.append(company_dict)
+
+    if request.method == 'POST':
+        random_token = random.randint(100000,999999)
+        last = RegistrationToken.query.order_by(RegistrationToken.id.desc()).first()
+        if last is None:
+            new_id = 1
+        else:
+            new_id = last.id + 1
+
+        data = RegistrationToken(id=new_id, 
+                                 email=invite_data['email'].data, 
+                                 token=random_token, 
+                                 company_name=invite_data['company_name'].data, 
+                                 department=invite_data['department'].data, 
+                                 employment=invite_data['employment'].data, 
+                                 employment_level=invite_data['employment_level'].data, 
+                                 access_level=invite_data['access_level'].data, 
+                                 created_by=company_id)
+
+        db.session.add(data)
+        db.session.commit()
+
+        msg = Message('Registration Token', recipients=['timetab@gmx.ch'])
+        msg.body = f"Hey there SHOW BOOBS, SEND NUDES,\n \n Below you will find your registration token \n \n {random_token}"
+        mail.send(msg)
+        
+        return jsonify({"message": "Registration successful"}), 200
+
+
+    return jsonify(company_dict)
 
 
 
