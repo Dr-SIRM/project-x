@@ -112,7 +112,7 @@ const Company = ({ company }) => {
                 label= ""
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={companyData.company_name}
+                value={values.company_name}
                 name="company_name"
                 error={!!touched.company_name && !!errors.company_name}
                 helperText={touched.company_name && errors.company_name}
