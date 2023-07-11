@@ -1003,7 +1003,6 @@ def react_update():
 @app.route('/api/company', methods=['GET', 'POST'])
 @jwt_required()
 def get_company():
-    print(request.headers)
     react_user = get_jwt_identity()
     user = User.query.filter_by(email=react_user).first()
     opening_hours = OpeningHours.query.filter_by(company_name=user.company_name).first()
@@ -1122,13 +1121,6 @@ def get_availability():
     week_adjustment = session.get('week_adjustment', 0)
     company_id = user.company_id
     planning_form = PlanningForm(csrf_enabled = False)
-
-    """
-    company_dict = {}
-    for company in User.query.filter_by(email=user.email).all():
-        company_dict[company.company_name] = company
-    """      
-
 
     temp_dict = {}
     for i in range(day_num):
@@ -1329,7 +1321,7 @@ def get_forget_password():
 
 
 @app.route('/api/invite', methods = ['GET', 'POST'])
-@jwt_required
+@jwt_required()
 def get_invite():
     react_user = get_jwt_identity()
     user = User.query.filter_by(email=react_user).first()
@@ -1341,6 +1333,7 @@ def get_invite():
             'company_name': comp.company_name,
         }
         user_list.append(company_dict)
+    print(company_dict)
 
     if request.method == 'POST':
         random_token = random.randint(100000,999999)

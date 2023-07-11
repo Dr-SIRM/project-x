@@ -13,36 +13,44 @@ const Invite = () => {
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [companies, setCompanies] = useState([]);
   const [selectedCompany, setSelectedCompany] = useState('');
+  const [inviteData, setinviteData] = useState({});
+  const token = localStorage.getItem('session_token'); // Get the session token from local storage
 
   useEffect(() => {
-    const fetchCompanies = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/invite');
-        setCompanies(response.data);
-      } catch (error) {
-        console.error('Failed to fetch companies', error);
-      }
+    const fetchInvite = async () => {
+        try {
+          const response = await axios.get('http://localhost:5000/api/invite', {
+              headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json',
+              }
+          });
+          setinviteData(response.data);
+        } catch (error) {
+          console.error('Error fetching invite details:', error);
+        }
     };
 
-    fetchCompanies();
+    fetchInvite();
   }, []);
 
   const handleChange = (event) => {
     setSelectedCompany(event.target.value);
   };
 
-  const handleFormSubmit = (values, { resetForm }) => {
-    axios
-      .post('http://localhost:5000/api/invite', values)
-      .then((response) => {
-        console.log(response.data);
-        setShowSuccessNotification(true);
-        resetForm();
-      })
-      .catch((error) => {
-        console.error(error);
-        setShowErrorNotification(true);
-      });
+  const handleFormSubmit = async (values) => {
+    try {
+      // Send the updated form values to the server for database update
+      await axios.post('http://localhost:5000/api/invite', values, {
+    headers: {
+        'Authorization': `Bearer ${token}`
+        }
+    });
+      setShowSuccessNotification(true);
+    } catch (error) {
+      console.error('Error updating invite details:', error);
+      setShowErrorNotification(true);
+    }
   };
 
   return (
@@ -51,7 +59,9 @@ const Invite = () => {
 
       <Formik
         onSubmit={handleFormSubmit}
-        initialValues={initialValues}
+        initialValues={{
+          company_name: inviteData.company_name, // Use companyData values as defaults
+        }}
         validationSchema={checkoutSchema}
       >
         {({
@@ -91,7 +101,7 @@ const Invite = () => {
                   labelId="company-label"
                   id="company_name"
                   name="company_name"
-                  value={selectedCompany}
+                  value={inviteData.company_name}
                   onChange={handleChange}
                   onBlur={handleBlur}
                   error={!!touched.company_name && !!errors.company_name}
