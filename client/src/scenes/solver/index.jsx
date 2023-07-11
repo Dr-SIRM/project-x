@@ -65,7 +65,6 @@ const Solver = ({ solver }) => {
         onSubmit={handleFormSubmit}
         enableReinitialize={true}
         initialValues={{}}
-        validationSchema={checkoutSchema}
       >
         {({
           handleSubmit,
@@ -113,7 +112,7 @@ const Solver = ({ solver }) => {
   );
 };
 
-const checkoutSchema = ({});
+
 
 
 export default Solver;

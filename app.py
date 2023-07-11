@@ -1387,6 +1387,8 @@ def run_solver():
             or_algo.run()
             
             return jsonify({'message': 'Solver successfully started'}), 200
+        else:
+            return jsonify({'message': 'Solver button was not clicked'}), 200
 
 
 
