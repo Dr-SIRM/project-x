@@ -1367,6 +1367,28 @@ def get_invite():
     return jsonify(invite_dict)
 
 
+@app.route('/api/solver', methods = ['GET', 'POST'])
+@jwt_required()
+def run_solver():
+
+    react_user = get_jwt_identity()
+    user = User.query.filter_by(email=react_user).first()
+
+    if request.method == 'POST':
+        from data_processing import DataProcessing
+        from or_algorithm import ORAlgorithm
+
+        solver_data = request.get_json()
+        if 'solverButtonClicked' in solver_data and solver_data['solverButtonClicked']:
+            # Damit der Code threadsafe ist, wird jedesmal eine neue Instanz erstellt pro Anfrage!
+            dp = DataProcessing(user.id)
+            dp.run()
+            or_algo = ORAlgorithm(dp)
+            or_algo.run()
+            
+            return jsonify({'message': 'Solver successfully started'}), 200
+
+
 
 # SET LOAD USER REACT
 @jwt.user_lookup_loader
