@@ -1392,6 +1392,108 @@ def run_solver():
 
 
 
+@app.route('/api/token_registration', methods = ['POST'])
+def get_registration():   
+    if request.method =='POST':
+        registration_data = request.get_json()
+        if registration_data['password'] != registration_data['password2']:
+            return jsonify({'message': 'Password are not matching'}), 200
+        else:
+            token = RegistrationToken.query.filter_by(token=registration_data['token'], email=registration_data['email']).first()
+            if token is None:
+                return jsonify({'message': 'Token does not exist'}), 200
+            else:
+                creation_date = datetime.datetime.now()
+                last = User.query.order_by(User.id.desc()).first()
+                hash = generate_password_hash(registration_data['password'])
+                if last is None:
+                    new_id = 1
+                else:
+                    new_id = last.id + 1
+
+                last_company_id = User.query.filter_by(company_name=token.company_name).order_by(User.company_id.desc()).first()
+                if last_company_id is None:
+                    new_company_id = 10000
+                else:
+                    new_company_id = last_company_id.company_id + 1
+
+                data = User(id = new_id, 
+                            company_id = new_company_id, 
+                            first_name = registration_data['first_name'],
+                            last_name = registration_data['last_name'],
+                            employment = token.employment,
+                            employment_level = token.employment_level,
+                            company_name = token.company_name, 
+                            department = token.department,
+                            access_level = token.access_level, 
+                            email = token.email, 
+                            password = hash,
+                            created_by = new_company_id, 
+                            changed_by = new_company_id, 
+                            creation_timestamp = creation_date
+                            )
+
+                try:
+                    db.session.add(data)
+                    db.session.commit()
+                    return jsonify({'message': 'Succesful Registration'}), 200
+                except:
+                    db.session.rollback()
+                    return jsonify({'message': 'Registration went wrong!'}), 200
+
+    return jsonify({'message': 'Get Ready!'}), 200
+
+
+
+@app.route('/api/registration/admin', methods = ['GET', 'POST'])
+def get_admin_registration():   
+    if request.method =='POST':
+        admin_registration_data = request.get_json()
+        if admin_registration_data['password'] != admin_registration_data['password2']:
+            return jsonify({'message': 'Password are not matching'}), 200
+        else:
+            creation_date = datetime.datetime.now()
+            last = User.query.order_by(User.id.desc()).first()
+            hash = generate_password_hash(admin_registration_data['password'])
+            if last is None:
+                new_id = 1
+            else:
+                new_id = last.id + 1
+
+            last_company_id = User.query.filter_by(company_name=admin_registration_data['company_name']).order_by(User.company_id.desc()).first()
+            if last_company_id is None:
+                new_company_id = 10000
+            else:
+                new_company_id = last_company_id + 1
+
+            data = User(id = new_id, 
+                        company_id = new_company_id, 
+                        first_name = admin_registration_data['first_name'],
+                        last_name = admin_registration_data['last_name'], 
+                        employment = admin_registration_data['employment'], 
+                        employment_level = admin_registration_data['employment_level'],
+                        company_name = admin_registration_data['company_name'], 
+                        department = admin_registration_data['department'],
+                        access_level = admin_registration_data['access_level'], 
+                        email = admin_registration_data['email'], 
+                        password = hash,
+                        created_by = new_company_id, 
+                        changed_by = new_company_id, 
+                        creation_timestamp = creation_date
+                        )
+
+            try:
+                db.session.add(data)
+                db.session.commit()
+                return jsonify({'message': 'Successful Registration'}), 200
+            except:
+                db.session.rollback()
+                return jsonify({'message': 'Registration went wrong!'}), 200
+    
+    return jsonify({'message': 'Get Ready!'}), 200
+                
+
+
 # SET LOAD USER REACT
 @jwt.user_lookup_loader
 def load_user(jwt_header, jwt_data):

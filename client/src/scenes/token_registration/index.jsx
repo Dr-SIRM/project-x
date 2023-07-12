@@ -10,37 +10,22 @@ import axios from 'axios';
 
 
 
-const Invite = ({ invite }) => {
+const Token_Registration = ({ token_registration }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
-  const [inviteData, setinviteData] = useState({});
+  const [tokenRegData, settokenRegData] = useState({});
   const token = localStorage.getItem('session_token'); // Get the session token from local storage
 
-  useEffect(() => {
-    const fetchInvite = async () => {
-        try {
-          const response = await axios.get('http://localhost:5000/api/invite', {
-              headers: {
-                  'Authorization': `Bearer ${token}`
-              }
-          });
-          setinviteData(response.data);
-        } catch (error) {
-          console.error('Error fetching invite details:', error);
-        }
-    };
-
-    fetchInvite();
-  }, []);
+  
 
   
   const handleFormSubmit = async (values) => {
     try {
       // Send the updated form values to the server for database update
-      await axios.post('http://localhost:5000/api/invite', values, {
+      await axios.post('http://localhost:5000/api/token_registration', values, {
     headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -48,7 +33,7 @@ const Invite = ({ invite }) => {
     });
       setShowSuccessNotification(true);
     } catch (error) {
-      console.error('Error updating invite details:', error);
+      console.error('Error updating registration details:', error);
       setShowErrorNotification(true);
     }
   };
@@ -57,22 +42,15 @@ const Invite = ({ invite }) => {
   return (
     <Box m="20px">
       <Header
-        title="INVITE"
-        subtitle="Add your new team member into your business."
+        title="Registration"
+        subtitle=""
       />
-      <h2>Invite your Teammember</h2>
+      <h2>Register Now</h2>
 
       <Formik
         onSubmit={handleFormSubmit}
         enableReinitialize={true}
-        initialValues={{
-          email: inviteData.email,
-          company_name: inviteData.company_name,
-          department: inviteData.department,
-          employment: inviteData.employment,
-          employment_level: inviteData.employment_level,
-          access_level: inviteData.access_level,
-        }}
+        initialValues={{}}
         validationSchema={checkoutSchema}
       >
         {({
@@ -92,6 +70,31 @@ const Invite = ({ invite }) => {
                 "& > div": { gridColumn: isNonMobile ? undefined : "span 6" },
               }}
             >
+              <Typography
+                color={colors.greenAccent[500]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "right",
+                  height: "100%",
+                }}
+              >
+                Token
+              </Typography>
+              <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label= ""
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.token}
+                name="token"
+                error={!!touched.token && !!errors.token}
+                helperText={touched.token && errors.token}
+                sx={{ gridColumn: "span 2" }}
+              />
               <Typography
                 color={colors.greenAccent[500]}
                 variant="h6"
@@ -127,7 +130,7 @@ const Invite = ({ invite }) => {
                   height: "100%",
                 }}
               >
-                Company
+                First Name
               </Typography>
               <TextField
                 fullWidth
@@ -136,10 +139,10 @@ const Invite = ({ invite }) => {
                 label= ""
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.company_name}
-                name="company_name"
-                error={!!touched.company_name && !!errors.company_name}
-                helperText={touched.company_name && errors.company_name}
+                value={values.first_name}
+                name="first_name"
+                error={!!touched.first_name && !!errors.first_name}
+                helperText={touched.first_name && errors.first_name}
                 sx={{ gridColumn: "span 2" }}
               />
               <Typography
@@ -152,7 +155,7 @@ const Invite = ({ invite }) => {
                   height: "100%",
                 }}
               >
-                Department
+                Last Name
               </Typography>
               <TextField
                 fullWidth
@@ -161,10 +164,10 @@ const Invite = ({ invite }) => {
                 label= ""
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.department}
-                name="department"
-                error={!!touched.department && !!errors.department}
-                helperText={touched.department && errors.department}
+                value={values.last_name}
+                name="last_name"
+                error={!!touched.last_name && !!errors.last_name}
+                helperText={touched.last_name && errors.last_name}
                 sx={{ gridColumn: "span 2" }}
               />
               <Typography
@@ -177,24 +180,21 @@ const Invite = ({ invite }) => {
                   height: "100%",
                 }}
               >
-                Employment
+                Password
               </Typography>
-              <Select
+              <TextField
                 fullWidth
                 variant="filled"
                 type="text"
                 label= ""
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.employment}
-                name="employment"
-                error={!!touched.employment && !!errors.employment}
-                helperText={touched.employment && errors.employment}
+                value={values.password}
+                name="password"
+                error={!!touched.password && !!errors.password}
+                helperText={touched.password && errors.password}
                 sx={{ gridColumn: "span 2" }}
-              >
-                <MenuItem value={'Perm'}>Festangestellt</MenuItem>
-                <MenuItem value={'Temp'}>Teilzeit</MenuItem>
-              </Select>
+              />
               <Typography
                 color={colors.greenAccent[500]}
                 variant="h6"
@@ -205,60 +205,21 @@ const Invite = ({ invite }) => {
                   height: "100%",
                 }}
               >
-                Employment Level
+                Repeat Password
               </Typography>
-              <Select
+              <TextField
                 fullWidth
                 variant="filled"
                 type="text"
                 label= ""
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.employment_level}
-                name="employment_level"
-                error={!!touched.employment_level && !!errors.employment_level}
-                helperText={touched.employment_level && errors.employment_level}
+                value={values.password2}
+                name="password2"
+                error={!!touched.password2 && !!errors.password2}
+                helperText={touched.password2 && errors.password2}
                 sx={{ gridColumn: "span 2" }}
-              >
-                <MenuItem value={'1'}>100%</MenuItem>
-                <MenuItem value={'0.9'}>90%</MenuItem>
-                <MenuItem value={'0.8'}>80%</MenuItem>
-                <MenuItem value={'0.7'}>70%</MenuItem>
-                <MenuItem value={'0.6'}>60%</MenuItem>
-                <MenuItem value={'0.5'}>50%</MenuItem>
-                <MenuItem value={'0.4'}>40%</MenuItem>
-                <MenuItem value={'0.3'}>30%</MenuItem>
-                <MenuItem value={'0.2'}>20%</MenuItem>
-                <MenuItem value={'0.1'}>10%</MenuItem>
-              </Select>
-              <Typography
-                color={colors.greenAccent[500]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "right",
-                  height: "100%",
-                }}
-              >
-                Access Level
-              </Typography>
-              <Select
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.access_level}
-                name="access_level"
-                error={!!touched.access_level && !!errors.access_level}
-                helperText={touched.access_level && errors.access_level}
-                sx={{ gridColumn: "span 2" }}
-              >
-                <MenuItem value={'User'}>User</MenuItem>
-                <MenuItem value={'Admin'}>Admin</MenuItem>
-              </Select>
+              />
             </Box>
             <></>
             
@@ -273,7 +234,7 @@ const Invite = ({ invite }) => {
       <Snackbar
         open={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
-        message="Invititation E-Mail is send!"
+        message="Successful Registered!"
         autoHideDuration={3000}
         sx={{
           backgroundColor: "green !important",
@@ -288,7 +249,7 @@ const Invite = ({ invite }) => {
       <Snackbar
         open={showErrorNotification}
         onClose={() => setShowErrorNotification(false)}
-        message="Error occurred - E-Mail is already in use!"
+        message="Error occurred - Token and E-Mail does not match!"
         autoHideDuration={3000}
         sx={{
           backgroundColor: "red !important",
@@ -306,16 +267,14 @@ const Invite = ({ invite }) => {
 
 const checkoutSchema = yup.object().shape({
   email: yup.string().email("invalid email").required("required"),
-  company_name: yup.string().required("required"),
-  department: yup.string().required("required"),
-  employment: yup.string().required("required"),
-  employment_level: yup
-    .number()
-    .min(0, 'Company level must be greater than or equal to 0%')
-    .max(100, 'Company level must be less than or equal to 100%')
-    .required("required"),
-  access_level: yup.string().required("required"),
+  first_name: yup.string().required("required"),
+  last_name: yup.string().required("required"),
+  password: yup.string().required("required"),
+  password2: yup
+  .string()
+  .oneOf([yup.ref("password"), null], "Passwords must match")
+  .required("required"),
 });
 
 
-export default Invite;
+export default Token_Registration;
