@@ -1325,17 +1325,9 @@ def get_forget_password():
 def get_invite():
     react_user = get_jwt_identity()
     user = User.query.filter_by(email=react_user).first()
-    invite_data = request.get_json()
-
-    company_dict = []
-    for comp in user:
-        company_dict = {
-            'company_name': comp.company_name,
-        }
-        user_list.append(company_dict)
-    print(company_dict)
 
     if request.method == 'POST':
+        invite_data = request.get_json()
         random_token = random.randint(100000,999999)
         last = RegistrationToken.query.order_by(RegistrationToken.id.desc()).first()
         if last is None:
@@ -1344,14 +1336,14 @@ def get_invite():
             new_id = last.id + 1
 
         data = RegistrationToken(id=new_id, 
-                                 email=invite_data['email'].data, 
+                                 email=invite_data['email'], 
                                  token=random_token, 
-                                 company_name=invite_data['company_name'].data, 
-                                 department=invite_data['department'].data, 
-                                 employment=invite_data['employment'].data, 
-                                 employment_level=invite_data['employment_level'].data, 
-                                 access_level=invite_data['access_level'].data, 
-                                 created_by=company_id)
+                                 company_name=invite_data['company_name'], 
+                                 department=invite_data['department'], 
+                                 employment=invite_data['employment'], 
+                                 employment_level=invite_data['employment_level'], 
+                                 access_level=invite_data['access_level'], 
+                                 created_by=user.company_id)
 
         db.session.add(data)
         db.session.commit()
@@ -1360,10 +1352,43 @@ def get_invite():
         msg.body = f"Hey there SHOW BOOBS, SEND NUDES,\n \n Below you will find your registration token \n \n {random_token}"
         mail.send(msg)
         
-        return jsonify({"message": "Registration successful"}), 200
 
 
-    return jsonify(company_dict)
+    invite_dict = {
+        'email': "",
+        'company_name': user.company_name,
+        'department': "",
+        'employment': "",
+        'employment_level': "",
+        'access_level': "",
+    }
+
+    
+    return jsonify(invite_dict)
+
+
+@app.route('/api/solver', methods = ['GET', 'POST'])
+@jwt_required()
+def run_solver():
+
+    react_user = get_jwt_identity()
+    user = User.query.filter_by(email=react_user).first()
+
+    if request.method == 'POST':
+        from data_processing import DataProcessing
+        from or_algorithm import ORAlgorithm
+
+        solver_data = request.get_json()
+        if 'solverButtonClicked' in solver_data and solver_data['solverButtonClicked']:
+            # Damit der Code threadsafe ist, wird jedesmal eine neue Instanz erstellt pro Anfrage!
+            dp = DataProcessing(user.id)
+            dp.run()
+            or_algo = ORAlgorithm(dp)
+            or_algo.run()
+            
+            return jsonify({'message': 'Solver successfully started'}), 200
+        else:
+            return jsonify({'message': 'Solver button was not clicked'}), 200
 
 
 
