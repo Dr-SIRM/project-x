@@ -17,10 +17,6 @@ export const navLinks = [
     id: "clients",
     title: "Clients",
   },
-  {
-    id: "login",
-    title: "Login",
-  },
 ];
 
 export const features = [

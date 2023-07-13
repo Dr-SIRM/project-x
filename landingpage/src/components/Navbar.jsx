@@ -1,5 +1,4 @@
 import { useState } from "react";
-
 import { close, logo, menu } from "../assets";
 import { navLinks } from "../constants";
 
@@ -23,6 +22,15 @@ const Navbar = () => {
             <a href={`#${nav.id}`}>{nav.title}</a>
           </li>
         ))}
+        {window.innerWidth >= 640 && (
+          <li
+            key="login"
+            className="font-poppins font-normal cursor-pointer text-[16px] text-dimWhite"
+            onClick={() => window.location.href = 'http://localhost:3000'}
+          >
+            <a>Login</a>
+          </li>
+        )}
       </ul>
 
       <div className="sm:hidden flex flex-1 justify-end items-center">
@@ -36,7 +44,7 @@ const Navbar = () => {
         <div
           className={`${
             !toggle ? "hidden" : "flex"
-          } p-6 bg-black-gradient absolute top-20 right-0 mx-4 my-2 min-w-[140px] rounded-xl sidebar`}
+          } p-6 bg-black-gradient absolute top-20 right-20 mx-4 my-2 min-w-[140px] rounded-xl sidebar`}
         >
           <ul className="list-none flex justify-end items-start flex-1 flex-col">
             {navLinks.map((nav, index) => (
@@ -50,6 +58,13 @@ const Navbar = () => {
                 <a href={`#${nav.id}`}>{nav.title}</a>
               </li>
             ))}
+            <li
+              key="login"
+              className="font-poppins font-medium cursor-pointer text-[16px] text-dimWhite"
+              onClick={() => window.location.href = 'http://localhost:3000'}
+            >
+              <a>Login</a>
+            </li>
           </ul>
         </div>
       </div>
