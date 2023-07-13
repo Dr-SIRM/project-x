@@ -14,7 +14,6 @@ import Team from "./scenes/team";
 import Availability from "./scenes/availability";
 import Update from "./scenes/update";
 import Invite from "./scenes/invite";
-import Contacts from "./scenes/contacts";
 import Company from "./scenes/company";
 import Bar from "./scenes/bar";
 import Form from "./scenes/form";
@@ -60,22 +59,21 @@ function AppContent({ isSidebar, setIsSidebar }) {
           <Route path="/forget_password" element={<ForgetPassword />} />
           <Route path="/token_registration" element={<Token_Registration />} />
           <Route path="/registration/admin" element={<Registration />} />
-          <Route path="/dashboard" element={<PrivateRoute component={Dashboard} accessLevels={["Admin", "User"]} />} />
-          <Route path="/solver" element={<PrivateRoute component={Solver} accessLevels={["Admin", "User"]} />} />
-          <Route path="/availability" element={<PrivateRoute component={Availability} accessLevels="Admin" />} />
-          <Route path="/Team" element={<PrivateRoute component={Team} accessLevels="Admin" />} />
-          <Route path="/Update" element={<PrivateRoute component={Update} accessLevels={["Admin", "User"]} />} />
-          <Route path="/Invite" element={<PrivateRoute component={Invite} accessLevels="Admin" />} />
-          <Route path="/company" element={<PrivateRoute component={Company} accessLevels="Admin" />} />
-          <Route path="/Contacts" element={<PrivateRoute component={Contacts} accessLevels="Admin" />} />
-          <Route path="/Bar" element={<PrivateRoute component={Bar} accessLevels="Admin" />} />
-          <Route path="/Form" element={<PrivateRoute component={Form} accessLevels="Admin" />} />
-          <Route path="/Line" element={<PrivateRoute component={Line} accessLevels="Admin" />} />
-          <Route path="/Pie" element={<PrivateRoute component={Pie} accessLevels="Admin" />} />
-          <Route path="/FAQ" element={<PrivateRoute component={FAQ} accessLevels="Admin" />} />
-          <Route path="/Plan" element={<PrivateRoute component={Plan} accessLevels="Admin" />} />
-          <Route path="/Geography" element={<PrivateRoute component={Geography} accessLevels="Admin" />} />
-          <Route path="/Calendar" element={<PrivateRoute component={Calendar} accessLevels="Admin" />} />
+          <Route path="/dashboard" element={<PrivateRoute component={Dashboard} accessLevels={["Super_Admin", "Admin", "User"]} />} />
+          <Route path="/solver" element={<PrivateRoute component={Solver} accessLevels={["Super_Admin", "Admin"]} />} />
+          <Route path="/availability" element={<PrivateRoute component={Availability} accessLevels={["Super_Admin", "Admin", "User"]} />} />
+          <Route path="/Team" element={<PrivateRoute component={Team} accessLevels={["Super_Admin", "Admin", "User"]} />} />
+          <Route path="/Update" element={<PrivateRoute component={Update} accessLevels={["Super_Admin", "Admin", "User"]} />} />
+          <Route path="/Invite" element={<PrivateRoute component={Invite} accessLevels={["Super_Admin", "Admin", "User"]} />} />
+          <Route path="/company" element={<PrivateRoute component={Company} accessLevels={["Super_Admin", "Admin"]} />} />
+          <Route path="/Bar" element={<PrivateRoute component={Bar} accessLevels={["Super_Admin", "Admin", "User"]} />} />
+          <Route path="/Form" element={<PrivateRoute component={Form} accessLevels={["Super_Admin", "Admin"]} />} />
+          <Route path="/Line" element={<PrivateRoute component={Line} accessLevels={["Super_Admin", "Admin"]} />} />
+          <Route path="/Pie" element={<PrivateRoute component={Pie} accessLevels={["Super_Admin", "Admin"]} />} />
+          <Route path="/FAQ" element={<PrivateRoute component={FAQ} accessLevels={["Super_Admin", "Admin", "User"]} />} />
+          <Route path="/Plan" element={<PrivateRoute component={Plan} accessLevels={["Super_Admin", "Admin"]} />} />
+          <Route path="/Geography" element={<PrivateRoute component={Geography} accessLevels={["Super_Admin", "Admin"]} />} />
+          <Route path="/Calendar" element={<PrivateRoute component={Calendar} accessLevels={["Super_Admin", "Admin"]} />} />
         </Routes>
       </main>
     </>

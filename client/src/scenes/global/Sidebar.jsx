@@ -169,6 +169,8 @@ const Sidebar = () => {
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
+              requiredAccessLevel={["Super_Admin", "Admin"]}
+              accessLevel={user.accessLevel}
             />
 
             <Typography
@@ -184,7 +186,7 @@ const Sidebar = () => {
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-              requiredAccessLevel="Admin"
+              requiredAccessLevel={["Super_Admin", "Admin"]}
               accessLevel={user.accessLevel}
             />
             <Item
@@ -193,20 +195,13 @@ const Sidebar = () => {
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-              requiredAccessLevel="Admin"
+              requiredAccessLevel={["Super_Admin", "Admin"]}
               accessLevel={user.accessLevel}
             />
             <Item
               title="Updaten"
               to="/update"
               icon={<PeopleOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Kontakt Informationen"
-              to="/contacts"
-              icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
@@ -223,7 +218,7 @@ const Sidebar = () => {
               icon={<PersonOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-              requiredAccessLevel="Admin"
+              requiredAccessLevel={["Super_Admin"]}
               accessLevel={user.accessLevel}
             />
             <Item
@@ -232,7 +227,7 @@ const Sidebar = () => {
               icon={<BusinessIcon />}
               selected={selected}
               setSelected={setSelected}
-              requiredAccessLevel="Admin"
+              requiredAccessLevel={["Super_Admin", "Admin"]}
               accessLevel={user.accessLevel}
             />
             <Item
@@ -241,6 +236,8 @@ const Sidebar = () => {
               icon={<BusinessIcon />}
               selected={selected}
               setSelected={setSelected}
+              requiredAccessLevel={["Super_Admin", "Admin"]}
+              accessLevel={user.accessLevel}
             />
             <Item
               title="Kalender"

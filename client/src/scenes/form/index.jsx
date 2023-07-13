@@ -178,6 +178,7 @@ const Form = () => {
                 >
                   <MenuItem value="Admin">Admin</MenuItem>
                   <MenuItem value="User">User</MenuItem>
+                  <MenuItem value="Super_Admin">Super Admin</MenuItem>
                 </Select>
               </FormControl>
               <TextField

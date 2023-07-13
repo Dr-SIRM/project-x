@@ -59,7 +59,7 @@ const Company = ({ company }) => {
         title="COMPANY"
         subtitle="Please update your company data whenever necessary. These are the basics for your optimized Scheduler."
       />
-      <h2>Company Information</h2>
+      <h2>Firmen Information</h2>
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -138,7 +138,7 @@ const Company = ({ company }) => {
                   height: "100%",
                 }}
               >
-                Weekly Hours
+                Wochenstunden
               </Typography>
               <TextField
                 fullWidth
@@ -174,7 +174,7 @@ const Company = ({ company }) => {
                   height: "100%",
                 }}
               >
-                Shifts
+                Schichten
               </Typography>
               <TextField
                 fullWidth
@@ -202,7 +202,7 @@ const Company = ({ company }) => {
             </Box>
             <></>
             <></>
-            <h2>Opening Hour of your mother's legs</h2>
+            <h2>Öffnungszeiten</h2>
             <></>
             <></>
             <Box
@@ -223,7 +223,7 @@ const Company = ({ company }) => {
                   height: "100%",
                 }}
               >
-                Weekday
+                Wochentag
               </Typography>
               <Typography
                 color={colors.greenAccent[500]}
@@ -235,7 +235,7 @@ const Company = ({ company }) => {
                   height: "100%",
                 }}
               >
-                Start Time
+                Startzeit
               </Typography>
               <Typography
                 color={colors.greenAccent[500]}
@@ -247,7 +247,7 @@ const Company = ({ company }) => {
                   height: "100%",
                 }}
               >
-                End Time
+                Endezeit
               </Typography>
               <Typography
                 color={colors.greenAccent[500]}
