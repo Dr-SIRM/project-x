@@ -1444,7 +1444,7 @@ def get_registration():
     return jsonify({'message': 'Get Ready!'}), 200
 
 
-
+#api should maybe be named differently? as aleardy used
 @app.route('/api/registration/admin', methods = ['GET', 'POST'])
 def get_admin_registration():   
     if request.method =='POST':
@@ -1500,6 +1500,114 @@ def load_user(jwt_header, jwt_data):
     user_email = jwt_data["sub"]
     user = User.query.filter_by(email=user_email).first()
     return user
+
+
+@app.route('/api/admin', methods=['GET', 'POST'])
+@admin_required
+def admin():
+    HOURS_PER_DAY = 24
+    DAYS_PER_WEEK = 7
+
+    if request.method == 'GET':
+        Time = TimeReq.query.all()
+        creation_date = datetime.datetime.now()
+        weekdays = {0: 'Monday', 1: 'Tuesday', 2: 'Wednesday', 3: 'Thursday', 4: 'Friday', 5: 'Saturday', 6: 'Sunday'}
+        today = datetime.date.today()
+        monday = today - datetime.timedelta(days=today.weekday())
+        week_adjustment = session.get('week_adjustment', 0)
+
+        timereq_dict = {}
+        for i in range(DAYS_PER_WEEK):
+            for hour in range(HOURS_PER_DAY):
+                new_date = monday + datetime.timedelta(days=i)
+                new_time = datetime.time(hour=hour)
+                temp = TimeReq.query.filter_by(company_name=current_user.company_name, date=new_date, start_time=new_time).first()
+                if temp is not None:
+                    timereq_dict[f'{i + 1}{hour}'] = temp.worker
+
+        return jsonify({
+            'timereq_dict': timereq_dict,
+            'week_adjustment': week_adjustment,
+            'weekdays': weekdays,
+            'Time': Time,
+            'monday': monday.isoformat(),
+            'creation_date': creation_date.isoformat()
+        })
+
+    if request.method == 'POST':
+        data = request.get_json()
+        action = data.get('action')
+
+        if action == 'adjust_week':
+            adjustment = data.get('adjustment')
+            week_adjustment = session.get('week_adjustment', 0) + adjustment
+            session['week_adjustment'] = week_adjustment
+            monday = monday + datetime.timedelta(days=week_adjustment)
+            return jsonify({'week_adjustment': week_adjustment, 'monday': monday.isoformat()})
+
+        elif action == 'template1':
+            # implement template1 logic here
+            temp_dict = {}
+            for i in range(DAYS_PER_WEEK):
+                for hour in range(HOURS_PER_DAY):
+                    new_time = datetime.time(hour=hour)
+                    temp = TemplateTimeRequirement.query.filter_by(weekday=weekdays[i], start_time=new_time).first()
+                    if temp is not None:
+                        temp_dict[f'{i + 1}&{hour}'] = temp.worker
+
+            return jsonify({'temp_dict': temp_dict})
+
+        elif action == 'submit':
+            # implement submit logic here
+            capacities = data.get('capacities')
+            for i in range(DAYS_PER_WEEK):
+                for hour in range(HOURS_PER_DAY):
+                    capacity = capacities.get(f'worker_{i}_{hour}')
+                    if capacity:
+                        new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+                        new_time = datetime.time(hour=hour)
+
+                        TimeReq.query.filter_by(company_name=current_user.company_name, date=new_date, start_time=new_time).delete()
+                        db.session.commit()
+
+                        req = TimeReq(id=new_id, company_name=current_user.company_name, date=new_date, start_time=new_time, worker=capacity, created_by=company_id, changed_by=company_id, creation_timestamp=creation_date)
+                        db.session.add(req)
+                        db.session.commit()
+
+            return jsonify({'message': 'Data submitted successfully'})
+
+        elif action == 'template':
+            # implement template logic here
+            capacities = data.get('capacities')
+            for i in range(DAYS_PER_WEEK):
+                for hour in range(HOURS_PER_DAY):
+                    capacity = capacities.get(f'worker_{i}_{hour}')
+                    if capacity:
+                        new_date = monday + datetime.timedelta(days=i)
+                        new_time = datetime.time(hour=hour)
+                        new_weekday = weekdays[i]
+
+                        data = TemplateTimeRequirement(id=new_id, template_name=new_name, date=new_date, weekday=new_weekday, start_time=new_time, worker=capacity, created_by=company_id, changed_by=company_id, creation_timestamp=creation_date)
+                        db.session.add(data)
+                        db.session.commit()
+
+            return jsonify({'message': 'Template created successfully'})
+
+        elif action == 'remove':
+            # implement remove logic here
+            remove_date = data.get('remove_date')
+            remove_date_formatted = remove_date.strftime('%Y-%m-%d')
+            remove = TimeReq.query.filter_by(date=remove_date_formatted).all()
+
+            for entry in remove:
+                db.session.delete(entry)
+
+            db.session.commit()
+
+            return jsonify({'message': 'Data removed successfully'})
+
+        else:
+            return jsonify({'error': 'Invalid action'}), 400
 
 
 
