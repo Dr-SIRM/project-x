@@ -315,6 +315,7 @@ const Registration = ({ registration }) => {
               >
                 <MenuItem value={'User'}>User</MenuItem>
                 <MenuItem value={'Admin'}>Admin</MenuItem>
+                <MenuItem value={'Super_Admin'}>Super Admin</MenuItem>
               </Select>
               <Typography
                 color={colors.greenAccent[500]}
