@@ -201,13 +201,13 @@ const Form = () => {
                 label="Confirm Password"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.confirmPassword}
-                name="confirmPassword"
-                error={!!touched.confirmPassword && !!errors.confirmPassword}
-                helperText={touched.confirmPassword && errors.confirmPassword}
+                value={values.password2}
+                name="password2"
+                error={!!touched.password2 && !!errors.password2}
+                helperText={touched.password2 && errors.password2}
                 sx={{ gridColumn: "span 2" }}
               />
-              {values.password !== values.confirmPassword && touched.confirmPassword }
+              {values.password !== values.password2 && touched.password2 }
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
               <Button type="submit" color="secondary" variant="contained">
@@ -258,7 +258,7 @@ const checkoutSchema = yup.object().shape({
   last_name: yup.string().required("required"),
   email: yup.string().email("invalid email").required("required"),
   password: yup.string().required("required"),
-  confirmPassword: yup
+  password2: yup
     .string()
     .oneOf([yup.ref("password"), null], "Passwords must match")
     .required("required"),
@@ -281,7 +281,7 @@ const initialValues = {
   access_level: "",
   department: "",
   password: "",
-  confirmPassword: "",
+  password2: "",
   employment: "",
 };
 

@@ -929,7 +929,7 @@ def new_user():
     db.session.commit()
     return {'success': True}
 
-
+"""
 @app.route('/api/registration/admin', methods=['POST'])
 def api_admin_registration():
     data = request.json
@@ -973,7 +973,7 @@ def api_admin_registration():
     except:
         db.session.rollback()
         return jsonify({'error': 'Error occurred - Your email might already be in use'})
-
+"""
 
 
 @app.route('/api/update', methods=["GET", "POST"])
