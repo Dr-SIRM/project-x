@@ -24,6 +24,7 @@ import Plan from "./scenes/plan";
 import Geography from "./scenes/geography";
 import Calendar from "./scenes/calendar";
 import Calendar2 from "./scenes/calendar2.0";
+import Calendar3 from "./scenes/calendar3.0"
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 
@@ -76,6 +77,7 @@ function AppContent({ isSidebar, setIsSidebar }) {
           <Route path="/Geography" element={<PrivateRoute component={Geography} accessLevels={["Super_Admin", "Admin"]} />} />
           <Route path="/Calendar" element={<PrivateRoute component={Calendar} accessLevels={["Super_Admin", "Admin"]} />} />
           <Route path="/Calendar2" element={<PrivateRoute component={Calendar2} accessLevels={["Super_Admin", "Admin"]} />} />
+          <Route path="/Calendar3" element={<PrivateRoute component={Calendar3} accessLevels={["Super_Admin", "Admin"]} />} />
         </Routes>
       </main>
     </>
