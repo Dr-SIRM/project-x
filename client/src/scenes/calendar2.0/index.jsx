@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Box, Typography, TextField, ButtonGroup, Button } from '@mui/material';
 
 // 24 hours * 4 slots/hour = 96 slots
 const slots = Array.from({ length: 96 }, (_, i) => ({
@@ -21,27 +22,39 @@ const Day = ({ day }) => {
   };
 
   return (
-    <div style={{ margin: '1em' }}>
-      <h2>{day}</h2>
-      <input type="number" value={employeeCount} onChange={setEmployees} placeholder="Enter employee count..." />
-      {slots.map(slot => 
-        <div 
-          style={{ padding: '0.5em', backgroundColor: selectedSlots.includes(slot.id) ? 'green' : 'white' }}
-          onClick={() => selectSlot(slot.id)}
-          key={slot.id}
-        >
-          {slot.time}
-        </div>
-      )}
-    </div>
+    <Box sx={{ m: 2, p: 1, border: 1, borderColor: 'divider' }}>
+      <Typography variant="h4" gutterBottom component="div">
+        {day}
+      </Typography>
+      <TextField 
+        type="number" 
+        value={employeeCount} 
+        onChange={setEmployees} 
+        label="Enter employee count" 
+        variant="outlined"
+        fullWidth
+      />
+      <ButtonGroup orientation="vertical" fullWidth>
+        {slots.map(slot => 
+          <Button 
+            variant={selectedSlots.includes(slot.id) ? 'contained' : 'outlined'}
+            color={selectedSlots.includes(slot.id) ? 'success' : 'inherit'}
+            onClick={() => selectSlot(slot.id)}
+            key={slot.id}
+          >
+            {slot.time}
+          </Button>
+        )}
+      </ButtonGroup>
+    </Box>
   );
 };
 
 const Week = () => {
   return (
-    <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', overflowX: 'auto' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', overflowX: 'auto' }}>
       {weekDays.map(day => <Day day={day} key={day} />)}
-    </div>
+    </Box>
   );
 };
 
