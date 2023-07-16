@@ -4,15 +4,16 @@ html,
 body, 
 #root,
 .app, 
-content{
+.content { 
   height: 100%;
   width: 100%;
   font-family: 'Source Sans Pro', sans-serif;
 }
 
-.app{
+.app {
   display: flex;
   position: relative;
+  justify-content: center; /* This will center children on the horizontal axis */
 }
 
 ::-webkit-scrollbar{

@@ -27,9 +27,11 @@ const Login = () => {
 
   return (
     <Box
-    m="20px"
+    display="flex"
+    flexDirection="column"
     justifyContent="center"
-    alignItems="center"    
+    alignItems="center" 
+    minHeight="100vh"
     >
     <Header title="Login" subtitle="" />
       <Box width="300px" p={2}>

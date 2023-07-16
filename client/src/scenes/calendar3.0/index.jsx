@@ -13,38 +13,30 @@ const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Satur
 const Day = ({ day, slotCounts, setSlotCounts }) => {
   const [selectedSlots, setSelectedSlots] = useState([]);
   const [employeeCount, setEmployeeCount] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
 
-  const selectSlot = (slot, e) => {
-    if (e.type === 'mousedown') {
-      setIsDragging(true);
-    }
-    
-    if (isDragging || e.type === 'mouseup') {
-      setSelectedSlots(prevSlots => {
-        // Check if slot is already selected
-        if (prevSlots.includes(slot)) {
-          // If it is, remove it from the array
-          return prevSlots.filter(s => s !== slot);
-        } else {
-          // If it isn't, add it to the array
-          return [...prevSlots, slot];
-        }
-      });
-    }
-
-    if (e.type === 'mouseup') {
-      setIsDragging(false);
-    }
+  const selectSlot = (slot) => {
+    setSelectedSlots(prevSlots => {
+      if (prevSlots.includes(slot)) {
+        return prevSlots.filter(s => s !== slot);
+      } else {
+        return [...prevSlots, slot];
+      }
+    });
   };
 
   const setEmployees = (event) => {
-    setEmployeeCount(event.target.value);
+    setEmployeeCount(Math.max(0, event.target.value));
   };
 
   const enter = () => {
     selectedSlots.forEach(slot => {
-      setSlotCounts(prevCounts => ({ ...prevCounts, [day]: { ...prevCounts[day], [slot]: employeeCount } }));
+      setSlotCounts(prevCounts => ({
+        ...prevCounts,
+        [day]: {
+          ...prevCounts[day],
+          [slot]: { startTime: slots[slot].time, worker: employeeCount }
+        }
+      }));
     });
     setSelectedSlots([]);
     setEmployeeCount(0);
@@ -62,21 +54,22 @@ const Day = ({ day, slotCounts, setSlotCounts }) => {
         label="Enter employee count" 
         variant="outlined"
         fullWidth
+        inputProps={{ min: 0 }}
       />
       <Button 
         variant="contained" 
         color="primary" 
         onClick={enter} 
         sx={{ 
-          p: 0.2, // Add padding
+          p: 0.2,
           m: 1,
-          borderColor: 'white', // Border color
-          borderWidth: 0.05, // Border width
-          borderStyle: 'solid', // Border style
-          backgroundColor: '#2e7c67', // Background color
-          color: 'white', // Text color
+          borderColor: 'white',
+          borderWidth: 0.05,
+          borderStyle: 'solid',
+          backgroundColor: '#2e7c67',
+          color: 'white',
           '&:hover': { 
-            backgroundColor: 'darkpurple', // Hover background color
+            backgroundColor: 'darkpurple',
           },
         }}
       >
@@ -89,11 +82,9 @@ const Day = ({ day, slotCounts, setSlotCounts }) => {
           const isEntered = slotCounts[day] && slotCounts[day][slot.id];
           return (
             <Button 
-              onMouseDown={(e) => selectSlot(slot.id, e)}
-              onMouseUp={(e) => selectSlot(slot.id, e)}
-              onMouseOver={(e) => selectSlot(slot.id, e)}
               variant={isEntered ? 'text' : (isSelected ? 'contained' : 'outlined')}
               color={isEntered ? 'error' : (isSelected ? 'success' : 'inherit')}
+              onClick={() => selectSlot(slot.id)}
               key={slot.id}
               sx={{
                 borderColor: 'white', 
@@ -104,18 +95,19 @@ const Day = ({ day, slotCounts, setSlotCounts }) => {
                   borderColor: 'white',
                 },
                 '&.MuiButton-text': {
-                  borderColor: 'white', // add border color to text buttons
-                  color: 'white', // change text color
-                  backgroundColor: '#2e7c67', // change background color
+                  borderColor: 'white',
+                  color: 'white',
+                  backgroundColor: '#2e7c67',
                 }
               }}
             >
               {slot.time}
-              {isEntered && <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{slotCounts[day][slot.id]}</span>}
+              {isEntered && <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{slotCounts[day][slot.id].worker}</span>}
             </Button>
           );
         })}
       </ButtonGroup>
+
       </Box>
     </Box>
   );
@@ -126,7 +118,21 @@ const Week = () => {
 
   const submit = async () => {
     try {
-      await axios.post('http://localhost:5000/api/requirement/workforce', slotCounts);
+      const token = localStorage.getItem('session_token');
+      const currentDate = new Date();
+      for (const [day, slots] of Object.entries(slotCounts)) {
+        for (const [_, slotData] of Object.entries(slots)) {
+          const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + weekDays.indexOf(day));
+          await axios.post('http://localhost:5000/api/requirement/workforce', {
+            date: date.toISOString().split('T')[0],
+            ...slotData
+          }, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+        }
+      }
       console.log('Data submitted successfully');
     } catch (error) {
       console.error('Failed to submit data:', error);
@@ -145,9 +151,28 @@ const Week = () => {
           />
         )}
       </Box>
-      <Button onClick={submit} variant="contained" color="primary" sx={{ m: 1 }}>
+      <Button
+        variant="outlined"
+        color="inherit"
+        onClick={submit}
+        sx={{
+          borderColor: 'white',
+          '&.MuiButton-outlined': {
+            borderColor: 'white',
+          },
+          '&:hover': {
+            borderColor: 'white',
+          },
+          '&.MuiButton-text': {
+            borderColor: 'white',
+            color: 'white',
+            backgroundColor: '#2e7c67',
+          }
+        }}
+      >
         Submit
       </Button>
+
     </Box>
   );
 };
