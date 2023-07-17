@@ -323,6 +323,20 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
           </Box>
+          {!isCollapsed && (
+  <Box
+    style={{
+      paddingLeft: "50px", 
+      paddingTop: "20px",
+    }}
+  >
+    <Typography>
+      <h5>© 2023 TimeTab GmbH</h5>
+    </Typography>
+  </Box>
+)}
+
+
         </Menu>
       </ProSidebar>
     </Box>
