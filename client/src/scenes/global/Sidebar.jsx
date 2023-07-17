@@ -23,10 +23,13 @@ const Item = ({ title, to, icon, selected, setSelected, requiredAccessLevel, acc
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  // Don't render the item if the user is not an Admin and the item requires Admin access
-  if (requiredAccessLevel === 'Admin' && accessLevel !== 'Admin') {
+  // Don't render the item if the user's access level is not included in the required access levels for the item
+  if (Array.isArray(requiredAccessLevel) && !requiredAccessLevel.includes(accessLevel)) {
+    return null;
+  } else if (typeof requiredAccessLevel === 'string' && requiredAccessLevel !== accessLevel) {
     return null;
   }
+  
   return (
     <MenuItem
       active={selected === title}
@@ -41,6 +44,7 @@ const Item = ({ title, to, icon, selected, setSelected, requiredAccessLevel, acc
     </MenuItem>
   );
 };
+
 
 const Sidebar = () => {
   const theme = useTheme();
@@ -99,6 +103,7 @@ const Sidebar = () => {
           color: "#6870fa !important",
         },
       }}
+      className="sidebar"
     >
       <ProSidebar collapsed={isCollapsed}>
         <Menu iconShape="square">

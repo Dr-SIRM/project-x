@@ -25,6 +25,11 @@ body,
   background: #e0e0e0;
 }
 
+.sidebar {
+  position: relative;
+  height: 160vh;  /* Make sidebar take up the full viewport height */
+}
+
 /*Handle*/
 ::-webkit-scrollbar-thumb{
   background: #888;
