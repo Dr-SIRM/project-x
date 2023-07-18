@@ -11,3 +11,8 @@
 
     # pip install Flask Flask-Login Flask-Mail Flask-Cors Flask-Migrate Flask-JWT-Extended pandas openpyxl ortools WTForms Flask-WTF Flask-SQLAlchemy pymysql mysql
     # npm install react react-router-dom axios react-dom formik yup @mui/material
+
+# RUN REACT
+
+    # cd client --> npm start (npm install if required)
+    # cd landingpage --> npm run dev (npm install if required)
