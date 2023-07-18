@@ -1494,6 +1494,124 @@ def get_admin_registration():
                 
 
 
+@app.route('/api/requirement/workforce', methods = ['GET', 'POST'])
+@jwt_required()
+def get_required_workforce():
+    react_user = get_jwt_identity()
+    user = User.query.filter_by(email=react_user).first()
+    Time = TimeReq.query.all()
+    creation_date = datetime.datetime.now()
+    weekdays = {0: 'Monday', 1: 'Tuesday', 2: 'Wednesday', 3: 'Thursday', 4: 'Friday', 5: 'Saturday', 6: 'Sunday'}
+    today = datetime.date.today()
+    monday = today - datetime.timedelta(days=today.weekday())
+    day_num = 7
+    week_adjustment = session.get('week_adjustment', 0)
+    user = User.query.get(user.id)
+    company_id = user.company_id
+
+
+    timereq_dict = {}
+    for i in range(day_num):
+        for hour in range(24):
+            new_date = monday + datetime.timedelta(days=i)
+            time_num = hour * 100
+            time = f'{time_num:04d}'
+            new_time = datetime.datetime.strptime(time, '%H%M').time()
+            temp = TimeReq.query.filter_by(company_name=user.company_name, date=new_date, start_time=new_time).first()
+            if temp is None:
+                pass
+            else:
+                new_i = i + 1
+                timereq_dict[str(new_i) + str(hour)] = temp.worker
+    
+    opening_dict = {}
+    for i in range(day_num):
+        opening = OpeningHours.query.filter_by(company_name=user.company_name, weekday=weekdays[i]).first()
+        if opening is None:
+            pass
+        else:
+            new_i = i + 1
+            opening_dict[str(new_i) + '&0'] = opening.start_time.strftime("%H:%M") if opening.start_time else None
+            opening_dict[str(new_i) + '&1'] = opening.end_time.strftime("%H:%M") if opening.end_time else None
+
+    """
+    #Prev Week
+    if time_form.prev_week.data:
+        week_adjustment -=7
+        session['week_adjustment'] = week_adjustment
+
+        monday = monday + datetime.timedelta(days=week_adjustment)
+
+
+    #Next Week
+    if time_form.next_week.data:
+        week_adjustment +=7
+        session['week_adjustment'] = week_adjustment
+
+        monday = monday + datetime.timedelta(days=week_adjustment)
+    
+    
+
+    # Set Template
+    if time_form.template1.data:
+        temp_dict = {}
+        for i in range(day_num):
+            for hour in range(24):
+                time_num = hour * 100
+                time = f'{time_num:04d}'
+                new_time = datetime.datetime.strptime(time, '%H%M').time()
+                temp = TemplateTimeRequirement.query.filter_by(weekday=weekdays[i], start_time=new_time).first()
+                if temp is None:
+                    pass
+                else:
+                    new_i = i + 1
+                    temp_dict[str(new_i) + '&' + str(hour)] = temp.worker
+
+   """     
+
+    #Submit the required FTE per hour
+    if request.method =='POST':
+        workforce_data = request.get_json()
+        for i in range(day_num):
+            for quarter in range(96): # There are 96 quarters in a day
+                quarter_hour = quarter / 4  # Each quarter represents 15 minutes, so divided by 4 gives hour
+                quarter_minute = (quarter % 4) * 15  # Remainder gives the quarter in the hour
+                formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+                capacity = workforce_data.get(f'worker_{i}_{formatted_time}')
+                if capacity:
+                    last = TimeReq.query.order_by(TimeReq.id.desc()).first()
+                    if last is None:
+                        new_id = 1
+                    else:
+                        new_id = last.id + 1
+                    new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+                    """
+                    time_num = hour * 100"
+                    """
+                    time = f'{formatted_time}:00'
+                    new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+
+                    TimeReq.query.filter_by(company_name=user.company_name, date=new_date, start_time=new_time).delete()
+                    db.session.commit()
+
+                    req = TimeReq(id=new_id, company_name=user.company_name, date=new_date, start_time=new_time, worker=capacity, created_by=company_id,
+                                  changed_by=company_id, creation_timestamp = creation_date)
+
+                    db.session.add(req)
+                    db.session.commit()
+        
+    calendar_dict={
+        'weekdays': weekdays,
+        'opening_dict': opening_dict,
+        'day_num': day_num
+    }
+
+    return jsonify(calendar_dict)
+    
+
+
+
+
 # SET LOAD USER REACT
 @jwt.user_lookup_loader
 def load_user(jwt_header, jwt_data):
