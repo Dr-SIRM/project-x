@@ -686,10 +686,12 @@ class ORAlgorithm:
         wb.save("Einsatzplan.xlsx")
 
 
+
     def save_data_in_database(self):
         """
         Gesolvte Daten in der Datenbank speichern  -- IN BEARBEITUNG 20.07.2023 --
         """
+        pass
 
         
 
