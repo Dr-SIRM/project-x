@@ -232,8 +232,6 @@ const Sidebar = () => {
               icon={<BusinessIcon />}
               selected={selected}
               setSelected={setSelected}
-              requiredAccessLevel={["Super_Admin", "Admin"]}
-              accessLevel={user.accessLevel}
             />
             <Item
               title="Company"
