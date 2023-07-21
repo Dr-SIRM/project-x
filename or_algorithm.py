@@ -347,7 +347,7 @@ class ORAlgorithm:
         """
         self.penalty_cost_nb2 = 100
         self.penalty_cost_nb3 = 100
-        self.penalty_cost_nb4 = 1
+        self.penalty_cost_nb4 = 100
         self.penalty_cost_nb5 = 100
         self.penalty_cost_nb6 = 100
 

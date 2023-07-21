@@ -74,6 +74,9 @@ class DataProcessing:
             self.user_availability = user_availability
 
 
+    """
+    Die nächsten drei Methoden müssen auf 1/4h abgeändert werden!
+    """
     def time_to_int(self, t):
         if isinstance(t, timedelta):
             total_seconds = t.total_seconds()
@@ -83,22 +86,21 @@ class DataProcessing:
             raise ValueError("Invalid input type, must be datetime.timedelta or datetime.time")
         return int(total_seconds / 3600)
 
-
-
     def time_to_int_1(self, t):
         if isinstance(t, timedelta):
             return int((t.seconds) / 3600)
         else:
             return int((t.hour * 3600 + t.minute * 60 + t.second) / 3600)
 
-
-
     def time_to_int_2(self, t):
         """ Die eingegebene Uhrzeit (second) wird in Stunden umgerechnet """
         return int(t.seconds / 3600)
 
 
-
+    """
+    Bis anhin sieht die Liste etwa so aus [10, 10, 10, 10, 10, 0, 0]. Neu sollen die Zahlen 1/4h darstellen. Also neu --> [40, 40, 40, 40, 40, 0, 0]
+    Achtung! Die laden_oeffnet und die laden_schliesst Listen können so bestehen bleiben!!
+    """
     def get_opening_hours(self):
         """ In dieser Funktion werden die Öffnungszeiten (7 Tage) der jeweiligen Company aus der Datenbank gezogen. """
         with app.app_context():
@@ -147,6 +149,9 @@ class DataProcessing:
 
 
 
+    """
+    Bisher sah es so aus: [Datum: {0:1, 1:1, 2:1, ...}] Stunde 0, Stunde 1 usw. neu ist 1-4 Stunde 1, 5-8 Stunde 2 usw..
+    """
     def get_time_req(self):
         """ In dieser Funktion werden die benötigten Mitarbeiter für jede Stunde jedes Tages abgerufen """
 
@@ -188,6 +193,9 @@ class DataProcessing:
         self.time_req = time_req_dict_2
 
 
+    """
+    Hier muss nichts verändert werden!
+    """
     def get_shift_emp_lvl(self):
         """ In dieser Funktion wird als Key die user_id verwendet und die shift und employment_level aus der Datenbank gezogen """
         with app.app_context():
@@ -222,7 +230,9 @@ class DataProcessing:
         self.employment_lvl = employment_lvl
 
 
-
+    """
+    Hier müssen Änderungen vorgenommen werden. Zuerst user_availabilities abändern!
+    """
     def binaere_liste(self):
         """ In dieser Funktion werden die zuvor erstellten user_availabilities in binäre Listen umgewandelt. """
 
@@ -251,9 +261,11 @@ class DataProcessing:
 
         self.binary_availability = binary_availability
 
-
+    """
+    Hier muss nichts geändert werden!
+    """
     def get_employment(self):
-            """ In following method we are fetching the employment of each user and put them into a list """
+            """ In der folgenden Methode holen wir die Beschäftigung jedes Benutzers und fügen sie in eine Liste ein """
             with app.app_context():
                             
                 # Hole den company_name des aktuellen Benutzers
@@ -265,7 +277,7 @@ class DataProcessing:
                 result = db.session.execute(sql, {"current_user_id": self.current_user_id})
                 company_name = result.fetchone()[0]
                 
-                # Employment of all user within the same company
+                # Hole das employment_level für jeden Benutzer, der in der gleichen Firma arbeitet wie der aktuelle Benutzer
                 sql = text("""
                     SELECT id, employment
                     FROM user
