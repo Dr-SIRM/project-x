@@ -78,9 +78,6 @@ class DataProcessing:
             print("user_availability:", self.user_availability)
 
 
-    """
-    Die nächsten drei Methoden müssen auf 1/4h abgeändert werden!
-    """
     
     def time_to_int(self, t):
         if isinstance(t, timedelta):
@@ -91,22 +88,19 @@ class DataProcessing:
             raise ValueError("Invalid input type, must be datetime.timedelta or datetime.time")
         return int(total_seconds / 900)
 
+
     def time_to_int_1(self, t):
         if isinstance(t, timedelta):
             return int((t.seconds) / 900)
         else:
             return int((t.hour * 3600 + t.minute * 60 + t.second) / 900)
 
+
     def time_to_int_2(self, t):
         """ Die eingegebene Uhrzeit (second) wird in Viertelstunden umgerechnet """
         return int(t.seconds / 900)
 
 
-
-    """
-    Bis anhin sieht die Liste etwa so aus [10, 10, 10, 10, 10, 0, 0]. Neu sollen die Zahlen 1/4h darstellen. Also neu --> [40, 40, 40, 40, 40, 0, 0]
-    Achtung! Die laden_oeffnet und die laden_schliesst Listen können so bestehen bleiben!!
-    """
     def get_opening_hours(self):
         """ In dieser Funktion werden die Öffnungszeiten (7 Tage) der jeweiligen Company aus der Datenbank gezogen. """
         with app.app_context():
@@ -150,21 +144,12 @@ class DataProcessing:
             self.laden_oeffnet[index] = start_time
             self.laden_schliesst[index] = end_time
 
-        # NEU 21.07.23
         # Berechne die Öffnungszeiten für jeden Wochentag und speichere sie in einer Liste
         # Die Öffnungszeiten werden in Viertelstunden umgerechnet, indem sie mit 4 multipliziert werden.
         self.opening_hours = [(self.time_to_int(self.laden_schliesst[i]) - self.time_to_int(self.laden_oeffnet[i])) for i in range(7)]
-        print("opening_hours:", self.opening_hours)
-        """
-        # Berechne die Öffnungszeiten für jeden Wochentag und speichere sie in einer Liste
-        self.opening_hours = [self.time_to_int(self.laden_schliesst[i]) - self.time_to_int(self.laden_oeffnet[i]) for i in range(7)]
-        """
+
 
         
-
-    """
-    Bisher sah es so aus: [Datum: {0:1, 1:1, 2:1, ...}] Stunde 0, Stunde 1 usw. neu ist 1-4 Stunde 1, 5-8 Stunde 2 usw..
-    """
     def get_time_req(self):
         """ In dieser Funktion werden die benötigten Mitarbeiter für jede Stunde jedes Tages abgerufen """
         with app.app_context():
@@ -206,15 +191,8 @@ class DataProcessing:
                     time_req_dict_2[date][start_hour] = worker
 
         self.time_req = time_req_dict_2
-        print("time_req:", self.time_req)
 
     
-
-
-
-    """
-    Hier muss nichts verändert werden!
-    """
     def get_shift_emp_lvl(self):
         """ In dieser Funktion wird als Key die user_id verwendet und die shift und employment_level aus der Datenbank gezogen """
         with app.app_context():
@@ -249,9 +227,6 @@ class DataProcessing:
         self.employment_lvl = employment_lvl
 
 
-    """
-    Hier müssen Änderungen vorgenommen werden. Zuerst user_availabilities abändern!
-    """
     def binaere_liste(self):
         """ In dieser Funktion werden die zuvor erstellten user_availabilities in binäre Listen umgewandelt. """
 
@@ -280,12 +255,8 @@ class DataProcessing:
                 binary_availability[user_id].append((date, binary_list))
 
         self.binary_availability = binary_availability
-        print("binary_availability:", self.binary_availability)
 
 
-    """
-    Hier muss nichts geändert werden!
-    """
     def get_employment(self):
             """ In der folgenden Methode holen wir die Beschäftigung jedes Benutzers und fügen sie in eine Liste ein """
             with app.app_context():

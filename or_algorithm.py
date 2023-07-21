@@ -1,4 +1,5 @@
 import pandas as pd
+import datetime
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font
 from openpyxl.utils import get_column_letter
@@ -114,6 +115,8 @@ class ORAlgorithm:
         self.constraints()
         self.solve_problem()
         self.output_result_excel()
+
+        # self.save_data_in_database()
 
 
     def create_variables(self):
@@ -683,11 +686,57 @@ class ORAlgorithm:
 
 
 
+
+
     def save_data_in_database(self):
         """
-        Gesolvte Daten in der Datenbank speichern  -- IN BEARBEITUNG 20.07.2023 --
+        Gespeicherte Daten in die Datenbank einfügen
         """
-        pass
+        # Durchlaufen Sie jeden Mitarbeiter in self.binary_availability
+        for mitarbeiter_id, verfuegbarkeiten in self.binary_availability.items():
+            # Durchlaufen Sie jeden Tag für den aktuellen Mitarbeiter
+            for datum, stunden in verfuegbarkeiten:
+                # Erstellen Sie eine Liste, um die Start- und Endzeiten der Arbeitszeiten zu speichern
+                perioden = []
+                start_zeit = None
+                for stunden_index, stunde in enumerate(stunden):
+                    if stunde == 1 and start_zeit is None:
+                        # Wenn der Mitarbeiter während der aktuellen Stunde arbeitet und es der Beginn einer neuen Arbeitsperiode ist
+                        start_zeit = datetime.time(hour=stunden_index)
+                    elif stunde == 0 and start_zeit is not None:
+                        # Wenn der Mitarbeiter während der aktuellen Stunde nicht arbeitet und eine Arbeitsperiode beendet wurde
+                        end_zeit = datetime.time(hour=stunden_index)
+                        perioden.append((start_zeit, end_zeit))
+                        start_zeit = None
 
-        
+                # Wenn der Mitarbeiter am Ende des Tages noch arbeitet, fügen Sie die letzte Arbeitsperiode hinzu
+                if start_zeit is not None:
+                    end_zeit = datetime.time(hour=len(stunden)//4)
+                    perioden.append((start_zeit, end_zeit))
 
+                # Erstellen Sie ein neues Timetable-Objekt für jede Arbeitsperiode
+                for periode_index, (start_zeit, end_zeit) in enumerate(perioden):
+                    # Fetch employee information from database or other source
+                    mitarbeiter_info = db.session.query(Mitarbeiter).filter(Mitarbeiter.id==mitarbeiter_id).first()
+
+                    # Hier muss die employee Klasse angepasst werden
+                    zeitplan = Timetable(
+                        id=None,  # Füllen Sie dies mit der tatsächlichen ID ein
+                        email=mitarbeiter_info.email,  # Holen Sie die E-Mail aus der Datenbank oder einer anderen Quelle
+                        first_name=mitarbeiter_info.first_name,  # Holen Sie den Vornamen aus der Datenbank oder einer anderen Quelle
+                        last_name=mitarbeiter_info.last_name,  # Holen Sie den Nachnamen aus der Datenbank oder einer anderen Quelle
+                        date=datum,
+                        start_time=start_zeit if periode_index == 0 else None,
+                        end_time=end_zeit if periode_index == 0 else None,
+                        start_time2=start_zeit if periode_index == 1 else None,
+                        end_time2=end_zeit if periode_index == 1 else None,
+                        start_time3=start_zeit if periode_index == 2 else None,
+                        end_time3=end_zeit if periode_index == 2 else None,
+                        created_by=self.current_user_id,  # Nutzen Sie die self.current_user_id
+                        changed_by=self.current_user_id,  # Nutzen Sie die self.current_user_id
+                        creation_timestamp=datetime.datetime.now(),
+                        update_timestamp=datetime.datetime.now()
+                    )
+                    # Fügen Sie das neue Timetable-Objekt zur Datenbank hinzu und commiten Sie es
+                    db.session.add(zeitplan)
+                    db.session.commit()
