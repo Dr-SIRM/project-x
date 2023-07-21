@@ -23,6 +23,7 @@ class DataProcessing:
         self.start_date = "2023-06-26"
         self.end_date = "2023-06-30"
         
+        
 
     def run(self):
         """ Die einzelnen Methoden werden in der Reihe nach ausgeführt """
@@ -33,7 +34,6 @@ class DataProcessing:
         self.binaere_liste()
         self.get_employment()
         self.pre_check_admin()
-
 
 
     def get_availability(self):
