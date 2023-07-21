@@ -16,3 +16,8 @@
 
     # cd client --> npm start (npm install if required)
     # cd landingpage --> npm run dev (npm install if required)
+
+# RUN DATABASE
+
+    # curl ifconfig.me
+    # mysql -h projectx4.cnoaam4bktuu.eu-central-1.rds.amazonaws.com -u admin -p
