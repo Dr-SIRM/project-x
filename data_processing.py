@@ -20,11 +20,14 @@ class DataProcessing:
         self.binary_availability = None
 
         # Zeitraum in dem gesolvet wird, wird noch angepasst!
-        self.start_date = "2023-06-26"
-        self.end_date = "2023-06-30"
-        
-        
+        self.start_date = "2023-07-17"
+        self.end_date = "2023-07-21"
 
+        # Gute Daten zum testsolven
+        #self.start_date = "2023-06-26"
+        #self.end_date = "2023-06-30"
+        
+        
     def run(self):
         """ Die einzelnen Methoden werden in der Reihe nach ausgeführt """
         self.get_availability()
@@ -72,11 +75,13 @@ class DataProcessing:
                 user_availability[user_id].append((date, start_time, end_time))
 
             self.user_availability = user_availability
+            print("user_availability:", self.user_availability)
 
 
     """
     Die nächsten drei Methoden müssen auf 1/4h abgeändert werden!
     """
+    
     def time_to_int(self, t):
         if isinstance(t, timedelta):
             total_seconds = t.total_seconds()
@@ -84,17 +89,18 @@ class DataProcessing:
             total_seconds = t.hour * 3600 + t.minute * 60 + t.second
         else:
             raise ValueError("Invalid input type, must be datetime.timedelta or datetime.time")
-        return int(total_seconds / 3600)
+        return int(total_seconds / 900)
 
     def time_to_int_1(self, t):
         if isinstance(t, timedelta):
-            return int((t.seconds) / 3600)
+            return int((t.seconds) / 900)
         else:
-            return int((t.hour * 3600 + t.minute * 60 + t.second) / 3600)
+            return int((t.hour * 3600 + t.minute * 60 + t.second) / 900)
 
     def time_to_int_2(self, t):
-        """ Die eingegebene Uhrzeit (second) wird in Stunden umgerechnet """
-        return int(t.seconds / 3600)
+        """ Die eingegebene Uhrzeit (second) wird in Viertelstunden umgerechnet """
+        return int(t.seconds / 900)
+
 
 
     """
@@ -144,19 +150,24 @@ class DataProcessing:
             self.laden_oeffnet[index] = start_time
             self.laden_schliesst[index] = end_time
 
+        # NEU 21.07.23
+        # Berechne die Öffnungszeiten für jeden Wochentag und speichere sie in einer Liste
+        # Die Öffnungszeiten werden in Viertelstunden umgerechnet, indem sie mit 4 multipliziert werden.
+        self.opening_hours = [(self.time_to_int(self.laden_schliesst[i]) - self.time_to_int(self.laden_oeffnet[i])) for i in range(7)]
+        print("opening_hours:", self.opening_hours)
+        """
         # Berechne die Öffnungszeiten für jeden Wochentag und speichere sie in einer Liste
         self.opening_hours = [self.time_to_int(self.laden_schliesst[i]) - self.time_to_int(self.laden_oeffnet[i]) for i in range(7)]
+        """
 
-
+        
 
     """
     Bisher sah es so aus: [Datum: {0:1, 1:1, 2:1, ...}] Stunde 0, Stunde 1 usw. neu ist 1-4 Stunde 1, 5-8 Stunde 2 usw..
     """
     def get_time_req(self):
         """ In dieser Funktion werden die benötigten Mitarbeiter für jede Stunde jedes Tages abgerufen """
-
         with app.app_context():
-
             # Hole den company_name des aktuellen Benutzers
             sql = text("""
                 SELECT company_name
@@ -187,10 +198,18 @@ class DataProcessing:
 
                 # Prüfen, ob die Start- und Endzeiten innerhalb der Öffnungszeiten liegen
                 if (self.laden_oeffnet[weekday_index] <= start_time < self.laden_schliesst[weekday_index]):
-                    start_hour = self.time_to_int_2(start_time) - self.time_to_int_1(self.laden_oeffnet[weekday_index])
+                    # Umwandlung der Startzeit in Viertelstunden
+                    start_hour = int(start_time.total_seconds() // 900) - int(self.laden_oeffnet[weekday_index].total_seconds() // 900)
+                    # Ensure start_hour is not negative
+                    if start_hour < 0:
+                        start_hour = 0
                     time_req_dict_2[date][start_hour] = worker
 
         self.time_req = time_req_dict_2
+        print("time_req:", self.time_req)
+
+    
+
 
 
     """
@@ -251,8 +270,9 @@ class DataProcessing:
                 binary_list = [0] * num_hours
 
                 # Werte werden auf 1 gesetzt, wenn der Mitarbeiter arbeiten kann.
-                start_hour = self.time_to_int_2(start_time) - self.time_to_int_1(self.laden_oeffnet[weekday_index])
-                end_hour = self.time_to_int_2(end_time) - self.time_to_int_1(self.laden_oeffnet[weekday_index])
+                # Die Start- und Endzeiten werden in Viertelstunden umgerechnet.
+                start_hour = (self.time_to_int_2(start_time) - self.time_to_int_1(self.laden_oeffnet[weekday_index])) * 4
+                end_hour = (self.time_to_int_2(end_time) - self.time_to_int_1(self.laden_oeffnet[weekday_index])) * 4
                 for i in range(start_hour, end_hour):
                     if 0 <= i < len(binary_list):
                         binary_list[i] = 1
@@ -260,6 +280,8 @@ class DataProcessing:
                 binary_availability[user_id].append((date, binary_list))
 
         self.binary_availability = binary_availability
+        print("binary_availability:", self.binary_availability)
+
 
     """
     Hier muss nichts geändert werden!

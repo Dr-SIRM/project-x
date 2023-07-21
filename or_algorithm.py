@@ -138,14 +138,14 @@ class ORAlgorithm:
         self.kosten = {ma: 20 for ma in self.mitarbeiter}  # Kosten pro Stunde
 
         # -- 4 --
-        self.max_zeit = {ma: 8 for ma in self.mitarbeiter}  # Maximale Arbeitszeit pro Tag
+        self.max_zeit = {ma: 8*4 for ma in self.mitarbeiter}  # Maximale Arbeitszeit pro Tag
 
         # -- 5 --
-        self.min_zeit = {ma: 5 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
+        self.min_zeit = {ma: 5*4 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
 
         # -- 6 --
         # Maximale Arbeitszeit pro woche, wird später noch aus der Datenbank gezogen
-        self.working_h = 40   
+        self.working_h = 40*4   
 
         # -- 7 --
         # Berechnung der calc_time (Anzahl Tage an denen die MA eingeteilt werden)
@@ -175,6 +175,7 @@ class ORAlgorithm:
         for date in self.time_req:
             for hour in self.time_req[date]:
                 self.verteilbare_stunden += self.time_req[date][hour]
+                self.verteilbare_stunden = self.verteilbare_stunden
 
         # -- 11 --
         # gesamtstunden Verfügbarkeit pro MA pro Woche
@@ -591,7 +592,6 @@ class ORAlgorithm:
         """
         Excelausgabe
         """
-
         if self.status == pywraplp.Solver.OPTIMAL or self.status == pywraplp.Solver.FEASIBLE:
             self.mitarbeiter_arbeitszeiten = {}
             for i in self.mitarbeiter:
@@ -602,7 +602,6 @@ class ORAlgorithm:
                         arbeitszeit_pro_tag.append(int(self.x[i, j, k].solution_value()))
                     self.mitarbeiter_arbeitszeiten[i].append(arbeitszeit_pro_tag)
             print(self.mitarbeiter_arbeitszeiten)
-
 
         if self.status == pywraplp.Solver.OPTIMAL:
             print("Optimal solution found.")
@@ -634,9 +633,10 @@ class ORAlgorithm:
 
         # Schreiben Sie die Überschriften
         headers = ["user_id"]
-        for i in range(1, len(max(data.values(), key=len)) + 1):
-            headers.extend(["T{},h{}".format(i, j+8) for j in range(10)])
-            headers.append(None)
+        for i in range(1, len(data[list(data.keys())[0]]) + 1):
+            headers.extend(["T{}, {}:{}".format(i, j+8, k*15) for j in range(10) for k in range(4)])
+            headers.append(' ')
+        headers.append("Total Hours")  # Add a column for total hours
         ws.append(headers)
 
         # Ändern der Schriftgröße der Spaltentitel
@@ -644,19 +644,15 @@ class ORAlgorithm:
             cell.font = header_font
 
         # Schreiben Sie die Daten
-        for ma, days in data.items():
+        for idx, (ma, days) in enumerate(data.items(), start=2):
             row = [ma]
             for day in days:
-                if day:
-                    row.extend(day)
-                    row.append(None)  # Fügt eine leere Spalte nach jedem Tag hinzu
-                else:
-                    row.extend([None]*10)  # Für Tage ohne Stunden
+                quarter_hours = [h for h in day]
+                row.extend(quarter_hours)
+                row.append(' ')  # Fügt eine leere Spalte nach jedem Tag hinzu
             ws.append(row)
+            ws.cell(row=idx, column=len(row) + 1, value=f"=SUM(B{idx}:{get_column_letter(len(row))}{idx})/4")
 
-        # Fügen Sie die Summenformel zur letzten Spalte jeder Zeile hinzu
-        for i, row in enumerate(ws.iter_rows(min_row=2, values_only=False), start=2):
-            ws.cell(row=i, column=ws.max_column, value=f'=SUM(B{i}:{get_column_letter(ws.max_column - 1)}{i})')
 
         # Farben auf Basis der Zellenwerte festlegen und Schriftgröße für den Rest des Dokuments
         for row in ws.iter_rows(min_row=2, values_only=False):
