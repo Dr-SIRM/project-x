@@ -1,12 +1,11 @@
 import pandas as pd
 import datetime
+import pymysql
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font
 from openpyxl.utils import get_column_letter
 from ortools.linear_solver import pywraplp
 from data_processing import DataProcessing
-
-import pymysql
 from app import app, db
 from sqlalchemy import text
 from models import Timetable
@@ -21,22 +20,20 @@ Prio 1:
  - (erl.) die calc_time soll automatisch errechnet werden
  - (erl.) Als Key oder i für MA soll nicht mehr MA1, MA2 usw stehen, sondern die user_id (zB. 1002)
  - (erl.) Shifts/Employment_level aus der Datenbank ziehen
+ - (erl.) auf Viertelstunden wechseln
 
- - Den Übergang auf harte und weiche NBs machen? 
+    !! In der Entität Timetable noch user_id einbauen?? !!
+
+ - (***) Die gesolvten Daten in der Datenbank speichern
+ - (***) Den Übergang auf harte und weiche NBs machen? 
+
  - working_h noch diskutieren, ist das max. arbeitszeit oder norm Arbeiszeit?
  - Jeder MA muss vor dem Solven eingegeben haben, wann er arbeiten kann. Auch wenn es alles 0 sind.
-
- - auf Viertelstunden wechseln
  - Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
- - time_req stunden zusammenaddieren
 
 
 Prio 2:
-
- - Die gesolvten Daten in der Datenbank speichern
-
-Prio 3:
-
+ - start_time und end_time zwei und drei noch implementieren
  - die max und min Zeit für die MA soll der Admin eingeben können. Diese Daten dann aus der Datenbank ziehen
  - der Admin kann auch die Kosten der MA, wenn er will, eintragen. 
 
@@ -188,7 +185,7 @@ class ORAlgorithm:
 
         # -- 11 --
         # gesamtstunden Verfügbarkeit pro MA pro Woche
-        self.stunden_pro_tag = 1 # flexibler wenn einmal 1/4h eingebaut werden 
+        self.stunden_pro_tag = 1 # flexibler wenn einmal 1/4h eingebaut werden          !!!  -- EVTL KANN DAS GANZ RAUSGELÖSCHT WERDEN --  !!!
 
         # -- 12 --
         for key in self.binary_availability:

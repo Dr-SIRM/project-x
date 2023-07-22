@@ -145,7 +145,6 @@ class DataProcessing:
             self.laden_schliesst[index] = end_time
 
         # Berechne die Öffnungszeiten für jeden Wochentag und speichere sie in einer Liste
-        # Die Öffnungszeiten werden in Viertelstunden umgerechnet, indem sie mit 4 multipliziert werden.
         self.opening_hours = [(self.time_to_int(self.laden_schliesst[i]) - self.time_to_int(self.laden_oeffnet[i])) for i in range(7)]
 
 
