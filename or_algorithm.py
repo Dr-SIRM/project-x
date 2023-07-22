@@ -6,6 +6,12 @@ from openpyxl.utils import get_column_letter
 from ortools.linear_solver import pywraplp
 from data_processing import DataProcessing
 
+import pymysql
+from app import app, db
+from sqlalchemy import text
+from models import Timetable
+
+
 """
 To-Do Liste:
 
@@ -116,7 +122,7 @@ class ORAlgorithm:
         self.solve_problem()
         self.output_result_excel()
 
-        # self.save_data_in_database()
+        self.save_data_in_database()
 
 
     def create_variables(self):
@@ -686,57 +692,54 @@ class ORAlgorithm:
 
 
 
-
-
     def save_data_in_database(self):
-        """
-        Gespeicherte Daten in die Datenbank einfügen
-        """
-        # Durchlaufen Sie jeden Mitarbeiter in self.binary_availability
-        for mitarbeiter_id, verfuegbarkeiten in self.binary_availability.items():
-            # Durchlaufen Sie jeden Tag für den aktuellen Mitarbeiter
-            for datum, stunden in verfuegbarkeiten:
-                # Erstellen Sie eine Liste, um die Start- und Endzeiten der Arbeitszeiten zu speichern
-                perioden = []
-                start_zeit = None
-                for stunden_index, stunde in enumerate(stunden):
-                    if stunde == 1 and start_zeit is None:
-                        # Wenn der Mitarbeiter während der aktuellen Stunde arbeitet und es der Beginn einer neuen Arbeitsperiode ist
-                        start_zeit = datetime.time(hour=stunden_index)
-                    elif stunde == 0 and start_zeit is not None:
-                        # Wenn der Mitarbeiter während der aktuellen Stunde nicht arbeitet und eine Arbeitsperiode beendet wurde
-                        end_zeit = datetime.time(hour=stunden_index)
-                        perioden.append((start_zeit, end_zeit))
-                        start_zeit = None
+        """ Diese Methode speichert die berechneten Arbeitszeiten in der Datenbank """
+        with app.app_context():
+            for user_id, days in self.mitarbeiter_arbeitszeiten.items():
+                print(f"Verarbeite Benutzer-ID: {user_id}")
+                for day_index, day in enumerate(days):
+                    # Wir gehen davon aus, dass der erste Tag im 'self.user_availability' das Startdatum ist
+                    date = self.user_availability[user_id][0][0] + datetime.timedelta(days=day_index)
 
-                # Wenn der Mitarbeiter am Ende des Tages noch arbeitet, fügen Sie die letzte Arbeitsperiode hinzu
-                if start_zeit is not None:
-                    end_zeit = datetime.time(hour=len(stunden)//4)
-                    perioden.append((start_zeit, end_zeit))
+                    # Hier unterteilen wir den Tag in Schichten, basierend auf den Zeiten, zu denen der Mitarbeiter arbeitet
+                    shifts = []
+                    start_time_index = None
+                    for time_index in range(len(day)):  # change here
+                        if day[time_index] == 1 and start_time_index is None:
+                            start_time_index = time_index
+                        elif day[time_index] == 0 and start_time_index is not None:
+                            shifts.append((start_time_index, time_index))
+                            start_time_index = None
+                    
+                    if start_time_index is not None:
+                        shifts.append((start_time_index, len(day)))
 
-                # Erstellen Sie ein neues Timetable-Objekt für jede Arbeitsperiode
-                for periode_index, (start_zeit, end_zeit) in enumerate(perioden):
-                    # Fetch employee information from database or other source
-                    mitarbeiter_info = db.session.query(Mitarbeiter).filter(Mitarbeiter.id==mitarbeiter_id).first()
+                    print(f"Berechnete Schichten für Benutzer-ID {user_id}, Tag-Index {day_index}: {shifts}")
 
-                    # Hier muss die employee Klasse angepasst werden
-                    zeitplan = Timetable(
-                        id=None,  # Füllen Sie dies mit der tatsächlichen ID ein
-                        email=mitarbeiter_info.email,  # Holen Sie die E-Mail aus der Datenbank oder einer anderen Quelle
-                        first_name=mitarbeiter_info.first_name,  # Holen Sie den Vornamen aus der Datenbank oder einer anderen Quelle
-                        last_name=mitarbeiter_info.last_name,  # Holen Sie den Nachnamen aus der Datenbank oder einer anderen Quelle
-                        date=datum,
-                        start_time=start_zeit if periode_index == 0 else None,
-                        end_time=end_zeit if periode_index == 0 else None,
-                        start_time2=start_zeit if periode_index == 1 else None,
-                        end_time2=end_zeit if periode_index == 1 else None,
-                        start_time3=start_zeit if periode_index == 2 else None,
-                        end_time3=end_zeit if periode_index == 2 else None,
-                        created_by=self.current_user_id,  # Nutzen Sie die self.current_user_id
-                        changed_by=self.current_user_id,  # Nutzen Sie die self.current_user_id
-                        creation_timestamp=datetime.datetime.now(),
-                        update_timestamp=datetime.datetime.now()
-                    )
-                    # Fügen Sie das neue Timetable-Objekt zur Datenbank hinzu und commiten Sie es
-                    db.session.add(zeitplan)
-                    db.session.commit()
+                    # Nun erstellen wir Einträge für jede Schicht des Mitarbeiters an diesem Tag
+                    for shift_index, (start_time, end_time) in enumerate(shifts):
+                        # Erstelle ein neues Timetable-Objekt mit den gesammelten Daten
+                        new_entry = Timetable(
+                            id=None,  # Die ID sollte automatisch generiert werden
+                            email=None,  # Sie haben keine E-Mail-Informationen bereitgestellt
+                            first_name=None,  # Sie haben keinen Vornamen bereitgestellt
+                            last_name=None,  # Sie haben keinen Nachnamen bereitgestellt
+                            date=date,
+                            start_time=datetime.datetime.combine(date, datetime.time(hour=start_time // 4, minute=(start_time % 4) * 15)),
+                            end_time=datetime.datetime.combine(date, datetime.time(hour=end_time // 4, minute=(end_time % 4) * 15)),
+                            start_time2=datetime.datetime.combine(date, datetime.time(hour=shifts[1][0] // 4, minute=(shifts[1][0] % 4) * 15)) if len(shifts) > 1 else None,
+                            end_time2=datetime.datetime.combine(date, datetime.time(hour=shifts[1][1] // 4, minute=(shifts[1][1] % 4) * 15)) if len(shifts) > 1 else None,
+                            start_time3=datetime.datetime.combine(date, datetime.time(hour=shifts[2][0] // 4, minute=(shifts[2][0] % 4) * 15)) if len(shifts) > 2 else None,
+                            end_time3=datetime.datetime.combine(date, datetime.time(hour=shifts[2][1] // 4, minute=(shifts[2][1] % 4) * 15)) if len(shifts) > 2 else None,
+                            created_by=self.current_user_id,
+                            changed_by=self.current_user_id,
+                            creation_timestamp=datetime.datetime.now()
+                        )
+
+                        print(f"Füge neues Zeitplandatum zur Sitzung hinzu: {new_entry}")
+                        db.session.add(new_entry)
+
+            # Speichern Sie alle Änderungen in der Datenbank
+            print("Änderungen in der Datenbank werden gespeichert")
+            db.session.commit()
+
