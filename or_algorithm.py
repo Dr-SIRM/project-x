@@ -8,7 +8,7 @@ from ortools.linear_solver import pywraplp
 from data_processing import DataProcessing
 from app import app, db
 from sqlalchemy import text
-from models import Timetable
+from models import Timetable, User
 
 
 """
@@ -692,8 +692,15 @@ class ORAlgorithm:
     def save_data_in_database(self):
         """ Diese Methode speichert die berechneten Arbeitszeiten in der Datenbank """
         with app.app_context():
-            for user_id, days in self.mitarbeiter_arbeitszeiten.items():
+            for user_id, days in self.mitarbeiter_arbeitszeiten.items(): # Durch mitarbeiter_arbeitszeiten durchitterieren
                 print(f"Verarbeite Benutzer-ID: {user_id}")
+
+                # Benutzer aus der Datenbank abrufen
+                user = User.query.get(user_id)
+                if not user:
+                    print(f"Kein Benutzer gefunden mit ID: {user_id}")
+                    continue
+
                 for day_index, day in enumerate(days):
                     # Wir gehen davon aus, dass der erste Tag im 'self.user_availability' das Startdatum ist
                     date = self.user_availability[user_id][0][0] + datetime.timedelta(days=day_index)
@@ -701,7 +708,7 @@ class ORAlgorithm:
                     # Hier unterteilen wir den Tag in Schichten, basierend auf den Zeiten, zu denen der Mitarbeiter arbeitet
                     shifts = []
                     start_time_index = None
-                    for time_index in range(len(day)):  # change here
+                    for time_index in range(len(day)):
                         if day[time_index] == 1 and start_time_index is None:
                             start_time_index = time_index
                         elif day[time_index] == 0 and start_time_index is not None:
@@ -713,30 +720,33 @@ class ORAlgorithm:
 
                     print(f"Berechnete Schichten für Benutzer-ID {user_id}, Tag-Index {day_index}: {shifts}")
 
-                    # Nun erstellen wir Einträge für jede Schicht des Mitarbeiters an diesem Tag
                     for shift_index, (start_time, end_time) in enumerate(shifts):
-                        # Erstelle ein neues Timetable-Objekt mit den gesammelten Daten
+                        # Ladenöffnungszeit am aktuellen Tag hinzufügen
+                        opening_time_in_quarters = int(self.laden_oeffnet[day_index].total_seconds() / 900)
+                        start_time += opening_time_in_quarters
+                        end_time += opening_time_in_quarters
+
+                        # Neues Timetable-Objekt
                         new_entry = Timetable(
-                            id=None,  # Die ID sollte automatisch generiert werden
-                            email=None,  # Sie haben keine E-Mail-Informationen bereitgestellt
-                            first_name=None,  # Sie haben keinen Vornamen bereitgestellt
-                            last_name=None,  # Sie haben keinen Nachnamen bereitgestellt
+                            id=None,  # ID wird automatisch generiert
+                            email=user.email,
+                            first_name=user.first_name,
+                            last_name=user.last_name,
                             date=date,
                             start_time=datetime.datetime.combine(date, datetime.time(hour=start_time // 4, minute=(start_time % 4) * 15)),
                             end_time=datetime.datetime.combine(date, datetime.time(hour=end_time // 4, minute=(end_time % 4) * 15)),
-                            start_time2=datetime.datetime.combine(date, datetime.time(hour=shifts[1][0] // 4, minute=(shifts[1][0] % 4) * 15)) if len(shifts) > 1 else None,
-                            end_time2=datetime.datetime.combine(date, datetime.time(hour=shifts[1][1] // 4, minute=(shifts[1][1] % 4) * 15)) if len(shifts) > 1 else None,
-                            start_time3=datetime.datetime.combine(date, datetime.time(hour=shifts[2][0] // 4, minute=(shifts[2][0] % 4) * 15)) if len(shifts) > 2 else None,
-                            end_time3=datetime.datetime.combine(date, datetime.time(hour=shifts[2][1] // 4, minute=(shifts[2][1] % 4) * 15)) if len(shifts) > 2 else None,
+                            start_time2=None,
+                            end_time2=None,
+                            start_time3=None,
+                            end_time3=None,
                             created_by=self.current_user_id,
                             changed_by=self.current_user_id,
                             creation_timestamp=datetime.datetime.now()
                         )
 
-                        print(f"Füge neues Zeitplandatum zur Sitzung hinzu: {new_entry}")
+                        # new_entry der Datenbank hinzufügen
                         db.session.add(new_entry)
 
-            # Speichern Sie alle Änderungen in der Datenbank
-            print("Änderungen in der Datenbank werden gespeichert")
+            # Änderungen in der Datenbank speichern
             db.session.commit()
 
