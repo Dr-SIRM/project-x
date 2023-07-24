@@ -596,7 +596,7 @@ class ORAlgorithm:
 
     def output_result_excel(self):
         """
-        Excelausgabe
+        mitarbeiter_arbeitszeiten erstellen und Excel ausgeben
         """
         if self.status == pywraplp.Solver.OPTIMAL or self.status == pywraplp.Solver.FEASIBLE:
             self.mitarbeiter_arbeitszeiten = {}
