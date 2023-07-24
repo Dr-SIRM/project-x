@@ -448,11 +448,8 @@ class ORAlgorithm:
                     self.objective.SetCoefficient(self.nb2_violation[i, j], self.penalty_cost_nb2)
         """
 
-
-
         # Es wird veruscht, eine Kombination von Werten für die x[i, j, k] zu finden, die die Summe kosten[i]*x[i, j, k] minimiert            
         self.objective.SetMinimization()
-
 
 
 
@@ -613,7 +610,6 @@ class ORAlgorithm:
         """
         Problem lösen
         """
-
         self.solver.EnableOutput()
         self.status = self.solver.Solve()
 
@@ -635,23 +631,23 @@ class ORAlgorithm:
             print(self.mitarbeiter_arbeitszeiten)
 
         if self.status == pywraplp.Solver.OPTIMAL:
-            print("Optimal solution found.")
+            print("Optimale Lösung gefunden.")
         elif self.status == pywraplp.Solver.FEASIBLE:
-            print("Feasible solution found.")
+            print("Mögliche Lösung gefunden.")
         elif self.status == pywraplp.Solver.INFEASIBLE:
-            print("Problem is infeasible.")
+            print("Problem ist unlösbar.")
         elif self.status == pywraplp.Solver.UNBOUNDED:
-            print("Problem is unbounded.")
+            print("Problem ist unbeschränkt.")
         elif self.status == pywraplp.Solver.NOT_SOLVED:
-            print("Solver did not solve the problem.")
+            print("Solver hat das Problem nicht gelöst.")
         else:
-            print("Unknown status.")
+            print("Unbekannter Status.")
 
 
 
     def output_result_excel(self):
         """
-        Excel
+        Excel ausgabe
         """
         data = self.mitarbeiter_arbeitszeiten
 
@@ -672,7 +668,7 @@ class ORAlgorithm:
         for i in range(1, len(data[list(data.keys())[0]]) + 1):
             headers.extend(["T{}, {}:{}".format(i, j+8, k*15) for j in range(10) for k in range(4)])
             headers.append(' ')
-        headers.append("Total Hours")  # Add a column for total hours
+        headers.append("Total Hours") 
         ws.append(headers)
 
         # Ändern der Schriftgröße der Spaltentitel
@@ -722,7 +718,9 @@ class ORAlgorithm:
 
 
     def save_data_in_database(self):
-        """ Diese Methode speichert die berechneten Arbeitszeiten in der Datenbank """
+        """ 
+        Diese Methode speichert die berechneten Arbeitszeiten in der Datenbank 
+        """
         with app.app_context():
             for user_id, days in self.mitarbeiter_arbeitszeiten.items(): # Durch mitarbeiter_arbeitszeiten durchitterieren
                 print(f"Verarbeite Benutzer-ID: {user_id}")
