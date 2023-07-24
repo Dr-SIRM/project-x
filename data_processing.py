@@ -20,10 +20,14 @@ class DataProcessing:
         self.binary_availability = None
 
         # Zeitraum in dem gesolvet wird, wird noch angepasst!
-        self.start_date = "2023-06-26"
-        self.end_date = "2023-06-30"
-        
+        self.start_date = "2023-07-17"
+        self.end_date = "2023-07-21"
 
+        # Gute Daten zum testsolven
+        #self.start_date = "2023-06-26"
+        #self.end_date = "2023-06-30"
+        
+        
     def run(self):
         """ Die einzelnen Methoden werden in der Reihe nach ausgeführt """
         self.get_availability()
@@ -33,7 +37,6 @@ class DataProcessing:
         self.binaere_liste()
         self.get_employment()
         self.pre_check_admin()
-
 
 
     def get_availability(self):
@@ -72,8 +75,10 @@ class DataProcessing:
                 user_availability[user_id].append((date, start_time, end_time))
 
             self.user_availability = user_availability
+            print("user_availability:", self.user_availability)
 
 
+    
     def time_to_int(self, t):
         if isinstance(t, timedelta):
             total_seconds = t.total_seconds()
@@ -81,22 +86,19 @@ class DataProcessing:
             total_seconds = t.hour * 3600 + t.minute * 60 + t.second
         else:
             raise ValueError("Invalid input type, must be datetime.timedelta or datetime.time")
-        return int(total_seconds / 3600)
-
+        return int(total_seconds / 900)
 
 
     def time_to_int_1(self, t):
         if isinstance(t, timedelta):
-            return int((t.seconds) / 3600)
+            return int((t.seconds) / 900)
         else:
-            return int((t.hour * 3600 + t.minute * 60 + t.second) / 3600)
-
+            return int((t.hour * 3600 + t.minute * 60 + t.second) / 900)
 
 
     def time_to_int_2(self, t):
-        """ Die eingegebene Uhrzeit (second) wird in Stunden umgerechnet """
-        return int(t.seconds / 3600)
-
+        """ Die eingegebene Uhrzeit (second) wird in Viertelstunden umgerechnet """
+        return int(t.seconds / 900)
 
 
     def get_opening_hours(self):
@@ -143,15 +145,13 @@ class DataProcessing:
             self.laden_schliesst[index] = end_time
 
         # Berechne die Öffnungszeiten für jeden Wochentag und speichere sie in einer Liste
-        self.opening_hours = [self.time_to_int(self.laden_schliesst[i]) - self.time_to_int(self.laden_oeffnet[i]) for i in range(7)]
+        self.opening_hours = [(self.time_to_int(self.laden_schliesst[i]) - self.time_to_int(self.laden_oeffnet[i])) for i in range(7)]
 
 
-
+        
     def get_time_req(self):
         """ In dieser Funktion werden die benötigten Mitarbeiter für jede Stunde jedes Tages abgerufen """
-
         with app.app_context():
-
             # Hole den company_name des aktuellen Benutzers
             sql = text("""
                 SELECT company_name
@@ -182,12 +182,16 @@ class DataProcessing:
 
                 # Prüfen, ob die Start- und Endzeiten innerhalb der Öffnungszeiten liegen
                 if (self.laden_oeffnet[weekday_index] <= start_time < self.laden_schliesst[weekday_index]):
-                    start_hour = self.time_to_int_2(start_time) - self.time_to_int_1(self.laden_oeffnet[weekday_index])
+                    # Umwandlung der Startzeit in Viertelstunden
+                    start_hour = int(start_time.total_seconds() // 900) - int(self.laden_oeffnet[weekday_index].total_seconds() // 900)
+                    # Ensure start_hour is not negative
+                    if start_hour < 0:
+                        start_hour = 0
                     time_req_dict_2[date][start_hour] = worker
 
         self.time_req = time_req_dict_2
 
-
+    
     def get_shift_emp_lvl(self):
         """ In dieser Funktion wird als Key die user_id verwendet und die shift und employment_level aus der Datenbank gezogen """
         with app.app_context():
@@ -222,7 +226,6 @@ class DataProcessing:
         self.employment_lvl = employment_lvl
 
 
-
     def binaere_liste(self):
         """ In dieser Funktion werden die zuvor erstellten user_availabilities in binäre Listen umgewandelt. """
 
@@ -241,8 +244,9 @@ class DataProcessing:
                 binary_list = [0] * num_hours
 
                 # Werte werden auf 1 gesetzt, wenn der Mitarbeiter arbeiten kann.
-                start_hour = self.time_to_int_2(start_time) - self.time_to_int_1(self.laden_oeffnet[weekday_index])
-                end_hour = self.time_to_int_2(end_time) - self.time_to_int_1(self.laden_oeffnet[weekday_index])
+                # Die Start- und Endzeiten werden in Viertelstunden umgerechnet.
+                start_hour = (self.time_to_int_2(start_time) - self.time_to_int_1(self.laden_oeffnet[weekday_index])) * 4
+                end_hour = (self.time_to_int_2(end_time) - self.time_to_int_1(self.laden_oeffnet[weekday_index])) * 4
                 for i in range(start_hour, end_hour):
                     if 0 <= i < len(binary_list):
                         binary_list[i] = 1
@@ -253,7 +257,7 @@ class DataProcessing:
 
 
     def get_employment(self):
-            """ In following method we are fetching the employment of each user and put them into a list """
+            """ In der folgenden Methode holen wir die Beschäftigung jedes Benutzers und fügen sie in eine Liste ein """
             with app.app_context():
                             
                 # Hole den company_name des aktuellen Benutzers
@@ -265,7 +269,7 @@ class DataProcessing:
                 result = db.session.execute(sql, {"current_user_id": self.current_user_id})
                 company_name = result.fetchone()[0]
                 
-                # Employment of all user within the same company
+                # Hole das employment_level für jeden Benutzer, der in der gleichen Firma arbeitet wie der aktuelle Benutzer
                 sql = text("""
                     SELECT id, employment
                     FROM user

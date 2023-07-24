@@ -1,9 +1,15 @@
 import pandas as pd
+import datetime
+import pymysql
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font
 from openpyxl.utils import get_column_letter
 from ortools.linear_solver import pywraplp
 from data_processing import DataProcessing
+from app import app, db
+from sqlalchemy import text
+from models import Timetable, User
+
 
 """
 To-Do Liste:
@@ -14,22 +20,26 @@ Prio 1:
  - (erl.) die calc_time soll automatisch errechnet werden
  - (erl.) Als Key oder i für MA soll nicht mehr MA1, MA2 usw stehen, sondern die user_id (zB. 1002)
  - (erl.) Shifts/Employment_level aus der Datenbank ziehen
+ - (erl.) auf Viertelstunden wechseln
 
- - Den Übergang auf harte und weiche NBs machen? 
+    Fragen:
+    ----------------------------------------------------------
+    - In der Entität Timetable noch user_id einbauen?
+    - Öffnungszeiten Geschäft "2"?
+    - Öffnungszeiten über den Tag hinaus? (z.B. 07:00 - 00:30)
+    ----------------------------------------------------------
+
+ - (90%) Die gesolvten Daten in der Datenbank speichern
+ - (30%) Den Übergang auf harte und weiche NBs machen? 
+ - (10%) Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
+
  - working_h noch diskutieren, ist das max. arbeitszeit oder norm Arbeiszeit?
  - Jeder MA muss vor dem Solven eingegeben haben, wann er arbeiten kann. Auch wenn es alles 0 sind.
 
- - auf Viertelstunden wechseln
- - Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
- - time_req stunden zusammenaddieren
 
 
 Prio 2:
-
- - Die gesolvten Daten in der Datenbank speichern
-
-Prio 3:
-
+ - start_time und end_time zwei und drei noch implementieren
  - die max und min Zeit für die MA soll der Admin eingeben können. Diese Daten dann aus der Datenbank ziehen
  - der Admin kann auch die Kosten der MA, wenn er will, eintragen. 
 
@@ -96,7 +106,7 @@ class ORAlgorithm:
         # Attribute der Methode "solve_problem"
         self.status = None
 
-        # Attribute der Methode "output_result_excel"
+        # Attribute der Methode "store_solved_data"
         self.mitarbeiter_arbeitszeiten = None
 
 
@@ -113,7 +123,10 @@ class ORAlgorithm:
         self.objective_function()
         self.constraints()
         self.solve_problem()
+        self.store_solved_data()
         self.output_result_excel()
+
+        self.save_data_in_database()
 
 
     def create_variables(self):
@@ -138,14 +151,14 @@ class ORAlgorithm:
         self.kosten = {ma: 20 for ma in self.mitarbeiter}  # Kosten pro Stunde
 
         # -- 4 --
-        self.max_zeit = {ma: 8 for ma in self.mitarbeiter}  # Maximale Arbeitszeit pro Tag
+        self.max_zeit = {ma: 8*4 for ma in self.mitarbeiter}  # Maximale Arbeitszeit pro Tag
 
         # -- 5 --
-        self.min_zeit = {ma: 5 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
+        self.min_zeit = {ma: 5*4 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
 
         # -- 6 --
         # Maximale Arbeitszeit pro woche, wird später noch aus der Datenbank gezogen
-        self.working_h = 40   
+        self.working_h = 40*4   
 
         # -- 7 --
         # Berechnung der calc_time (Anzahl Tage an denen die MA eingeteilt werden)
@@ -175,10 +188,11 @@ class ORAlgorithm:
         for date in self.time_req:
             for hour in self.time_req[date]:
                 self.verteilbare_stunden += self.time_req[date][hour]
+                self.verteilbare_stunden = self.verteilbare_stunden
 
         # -- 11 --
         # gesamtstunden Verfügbarkeit pro MA pro Woche
-        self.stunden_pro_tag = 1 # flexibler wenn einmal 1/4h eingebaut werden 
+        self.stunden_pro_tag = 1 # flexibler wenn einmal 1/4h eingebaut werden          !!!  -- EVTL KANN DAS GANZ RAUSGELÖSCHT WERDEN --  !!!
 
         # -- 12 --
         for key in self.binary_availability:
@@ -347,7 +361,7 @@ class ORAlgorithm:
         """
         self.penalty_cost_nb2 = 100
         self.penalty_cost_nb3 = 100
-        self.penalty_cost_nb4 = 1
+        self.penalty_cost_nb4 = 100
         self.penalty_cost_nb5 = 100
         self.penalty_cost_nb6 = 100
 
@@ -422,9 +436,24 @@ class ORAlgorithm:
                     self.objective.SetCoefficient(self.x[i, j, k], self.kosten[i])
 
 
+        """
+        # -- TEST 23.07.2023 - WEICHE NEBENBEDINGUNGEN EINBAUEN --
+        # Zielfunktion
+        self.objective = self.solver.Objective()
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                for k in range(len(self.verfügbarkeit[i][j])):
+                    # Die Kosten werden multipliziert
+                    self.objective.SetCoefficient(self.x[i, j, k], self.kosten[i])
+                    self.objective.SetCoefficient(self.nb2_violation[i, j], self.penalty_cost_nb2)
+        """
+
+
 
         # Es wird veruscht, eine Kombination von Werten für die x[i, j, k] zu finden, die die Summe kosten[i]*x[i, j, k] minimiert            
         self.objective.SetMinimization()
+
+
 
 
     def constraints(self):
@@ -445,7 +474,7 @@ class ORAlgorithm:
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
                 self.solver.Add(self.solver.Sum([self.x[i, j, k] for i in self.mitarbeiter]) >= self.min_anwesend[j][k])
-
+        
         """
         # WEICHE NB -- TEST 02.07.2023 --
         # NB 2 - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend 
@@ -453,6 +482,7 @@ class ORAlgorithm:
             for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
                 self.solver.Add(self.solver.Sum([self.x[i, j, k] for i in self.mitarbeiter]) + self.nb2_violation[i, j] * self.penalty_cost_nb2 >= self.min_anwesend[j][k])
         """
+
 
         # WEICHE NB
         # NB 3 - Max. Arbeitszeit pro Woche - (working_h muss noch berechnet werden!)
@@ -578,6 +608,7 @@ class ORAlgorithm:
         """
 
 
+
     def solve_problem(self):
         """
         Problem lösen
@@ -587,11 +618,11 @@ class ORAlgorithm:
         self.status = self.solver.Solve()
 
 
-    def output_result_excel(self):
-        """
-        Excelausgabe
-        """
 
+    def store_solved_data(self):
+        """
+        mitarbeiter_arbeitszeiten Attribut befüllen
+        """
         if self.status == pywraplp.Solver.OPTIMAL or self.status == pywraplp.Solver.FEASIBLE:
             self.mitarbeiter_arbeitszeiten = {}
             for i in self.mitarbeiter:
@@ -602,7 +633,6 @@ class ORAlgorithm:
                         arbeitszeit_pro_tag.append(int(self.x[i, j, k].solution_value()))
                     self.mitarbeiter_arbeitszeiten[i].append(arbeitszeit_pro_tag)
             print(self.mitarbeiter_arbeitszeiten)
-
 
         if self.status == pywraplp.Solver.OPTIMAL:
             print("Optimal solution found.")
@@ -617,7 +647,12 @@ class ORAlgorithm:
         else:
             print("Unknown status.")
 
-        # Ergebnisse ausgeben Excel ----------------------------------------------------------------------------------------------
+
+
+    def output_result_excel(self):
+        """
+        Excel
+        """
         data = self.mitarbeiter_arbeitszeiten
 
         # Legen Sie die Füllungen fest
@@ -634,9 +669,10 @@ class ORAlgorithm:
 
         # Schreiben Sie die Überschriften
         headers = ["user_id"]
-        for i in range(1, len(max(data.values(), key=len)) + 1):
-            headers.extend(["T{},h{}".format(i, j+8) for j in range(10)])
-            headers.append(None)
+        for i in range(1, len(data[list(data.keys())[0]]) + 1):
+            headers.extend(["T{}, {}:{}".format(i, j+8, k*15) for j in range(10) for k in range(4)])
+            headers.append(' ')
+        headers.append("Total Hours")  # Add a column for total hours
         ws.append(headers)
 
         # Ändern der Schriftgröße der Spaltentitel
@@ -644,19 +680,15 @@ class ORAlgorithm:
             cell.font = header_font
 
         # Schreiben Sie die Daten
-        for ma, days in data.items():
+        for idx, (ma, days) in enumerate(data.items(), start=2):
             row = [ma]
             for day in days:
-                if day:
-                    row.extend(day)
-                    row.append(None)  # Fügt eine leere Spalte nach jedem Tag hinzu
-                else:
-                    row.extend([None]*10)  # Für Tage ohne Stunden
+                quarter_hours = [h for h in day]
+                row.extend(quarter_hours)
+                row.append(' ')  # Fügt eine leere Spalte nach jedem Tag hinzu
             ws.append(row)
+            ws.cell(row=idx, column=len(row) + 1, value=f"=SUM(B{idx}:{get_column_letter(len(row))}{idx})/4")
 
-        # Fügen Sie die Summenformel zur letzten Spalte jeder Zeile hinzu
-        for i, row in enumerate(ws.iter_rows(min_row=2, values_only=False), start=2):
-            ws.cell(row=i, column=ws.max_column, value=f'=SUM(B{i}:{get_column_letter(ws.max_column - 1)}{i})')
 
         # Farben auf Basis der Zellenwerte festlegen und Schriftgröße für den Rest des Dokuments
         for row in ws.iter_rows(min_row=2, values_only=False):
@@ -684,3 +716,70 @@ class ORAlgorithm:
 
         # Speichern Sie das Workbook
         wb.save("Einsatzplan.xlsx")
+<<<<<<< HEAD
+=======
+
+
+
+    def save_data_in_database(self):
+        """ Diese Methode speichert die berechneten Arbeitszeiten in der Datenbank """
+        with app.app_context():
+            for user_id, days in self.mitarbeiter_arbeitszeiten.items(): # Durch mitarbeiter_arbeitszeiten durchitterieren
+                print(f"Verarbeite Benutzer-ID: {user_id}")
+
+                # Benutzer aus der Datenbank abrufen
+                user = User.query.get(user_id)
+                if not user:
+                    print(f"Kein Benutzer gefunden mit ID: {user_id}")
+                    continue
+
+                for day_index, day in enumerate(days):
+                    # Wir gehen davon aus, dass der erste Tag im 'self.user_availability' das Startdatum ist
+                    date = self.user_availability[user_id][0][0] + datetime.timedelta(days=day_index)
+
+                    # Hier unterteilen wir den Tag in Schichten, basierend auf den Zeiten, zu denen der Mitarbeiter arbeitet
+                    shifts = []
+                    start_time_index = None
+                    for time_index in range(len(day)):
+                        if day[time_index] == 1 and start_time_index is None:
+                            start_time_index = time_index
+                        elif day[time_index] == 0 and start_time_index is not None:
+                            shifts.append((start_time_index, time_index))
+                            start_time_index = None
+                    
+                    if start_time_index is not None:
+                        shifts.append((start_time_index, len(day)))
+
+                    print(f"Berechnete Schichten für Benutzer-ID {user_id}, Tag-Index {day_index}: {shifts}")
+
+                    for shift_index, (start_time, end_time) in enumerate(shifts):
+                        # Ladenöffnungszeit am aktuellen Tag hinzufügen
+                        opening_time_in_quarters = int(self.laden_oeffnet[day_index].total_seconds() / 900)
+                        start_time += opening_time_in_quarters
+                        end_time += opening_time_in_quarters
+
+                        # Neues Timetable-Objekt
+                        new_entry = Timetable(
+                            id=None,  # ID wird automatisch generiert
+                            email=user.email,
+                            first_name=user.first_name,
+                            last_name=user.last_name,
+                            date=date,
+                            start_time=datetime.datetime.combine(date, datetime.time(hour=start_time // 4, minute=(start_time % 4) * 15)),
+                            end_time=datetime.datetime.combine(date, datetime.time(hour=end_time // 4, minute=(end_time % 4) * 15)),
+                            start_time2=None,
+                            end_time2=None,
+                            start_time3=None,
+                            end_time3=None,
+                            created_by=self.current_user_id,
+                            changed_by=self.current_user_id,
+                            creation_timestamp=datetime.datetime.now()
+                        )
+
+                        # new_entry der Datenbank hinzufügen
+                        db.session.add(new_entry)
+
+            # Änderungen in der Datenbank speichern
+            db.session.commit()
+
+>>>>>>> fc05a3da2defe06d66e832667135b371eacfe4f9
