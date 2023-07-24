@@ -247,6 +247,8 @@ def about():
 @app.route('/user', methods=["GET", "POST"])
 @login_required
 def user():
+    print(current_user)
+    print(type(current_user))
     account = User.query.get(current_user.id)
     user_form = UpdateForm(csrf_enabled=False, obj=account)
 
@@ -876,9 +878,9 @@ def login_react():
     print(response)
     return jsonify(response)
 
-@app.route('/api/current_user')
+@app.route('/api/current_react_user')
 @jwt_required()
-def current_user():
+def current_react_user():
     jwt_data = get_jwt()
     user_id = jwt_data['user_id']
     user = User.query.get(user_id)
@@ -1111,8 +1113,10 @@ def get_company():
 from flask import jsonify
 
 @app.route('/api/availability', methods = ['GET', 'POST'])
+@jwt_required()
 def get_availability():
-    user = User.query.filter_by(email="robin.martin@timetab.ch").first()
+    react_user = get_jwt_identity()
+    user = User.query.filter_by(email=react_user).first()
     today = datetime.date.today()
     creation_date = datetime.datetime.now()
     monday = today - datetime.timedelta(days=today.weekday())
@@ -1134,12 +1138,15 @@ def get_availability():
             temp_dict[str(new_i) + '&5'] = temp.end_time3.strftime("%H:%M") if temp.end_time else None
 
     if request.method == 'POST':
-        availability_data = request.get_json()
         for i in range(day_num):
             new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
             Availability.query.filter_by(user_id=user.id, date=new_date).delete()
             db.session.commit()
-
+            last = Availability.query.order_by(Availability.id.desc()).first()
+            if last is None:
+                new_id = 1
+            else:
+                new_id = last.id + 1
             entries = []
             for j in range(6):
                 entry = request.json.get(f'day_{i}_{j}')
@@ -1154,6 +1161,7 @@ def get_availability():
             new_weekday = weekdays[i]
 
             data = Availability(
+                id=new_id,
                 user_id=user.id, 
                 date=new_date, 
                 weekday=new_weekday, 
@@ -1166,8 +1174,7 @@ def get_availability():
                 end_time3=entries[5],
                 created_by=company_id, 
                 changed_by=company_id, 
-                creation_timestamp = creation_date
-            )
+                creation_timestamp = creation_date)
 
             db.session.add(data)
             db.session.commit()
