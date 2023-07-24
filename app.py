@@ -1112,83 +1112,13 @@ def get_company():
 
 from flask import jsonify
 
+
 @app.route('/api/availability', methods = ['GET', 'POST'])
 @jwt_required()
 def get_availability():
+    # today's date
     react_user = get_jwt_identity()
     user = User.query.filter_by(email=react_user).first()
-    today = datetime.date.today()
-    creation_date = datetime.datetime.now()
-    monday = today - datetime.timedelta(days=today.weekday())
-    weekdays = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
-    day_num = 7
-    week_adjustment = session.get('week_adjustment', 0)
-    company_id = user.company_id
-
-    temp_dict = {}
-    for i in range(day_num):
-        temp = Availability.query.filter_by(email=user.email, weekday=weekdays[i]).first()
-        if temp is not None:
-            new_i = i + 1
-            temp_dict[str(new_i) + '&0'] = temp.start_time.strftime("%H:%M") if temp.start_time else None
-            temp_dict[str(new_i) + '&1'] = temp.end_time.strftime("%H:%M") if temp.end_time else None
-            temp_dict[str(new_i) + '&2'] = temp.start_time2.strftime("%H:%M") if temp.start_time else None
-            temp_dict[str(new_i) + '&3'] = temp.end_time2.strftime("%H:%M") if temp.end_time else None
-            temp_dict[str(new_i) + '&4'] = temp.start_time3.strftime("%H:%M") if temp.start_time else None
-            temp_dict[str(new_i) + '&5'] = temp.end_time3.strftime("%H:%M") if temp.end_time else None
-
-    if request.method == 'POST':
-        for i in range(day_num):
-            new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
-            Availability.query.filter_by(user_id=user.id, date=new_date).delete()
-            db.session.commit()
-            last = Availability.query.order_by(Availability.id.desc()).first()
-            if last is None:
-                new_id = 1
-            else:
-                new_id = last.id + 1
-            entries = []
-            for j in range(6):
-                entry = request.json.get(f'day_{i}_{j}')
-                if entry:
-                    try:
-                        entries.append(datetime.datetime.strptime(entry, '%H:%M:%S').time())
-                    except ValueError:
-                        entries.append(datetime.datetime.strptime(entry, '%H:%M').time())
-                else:
-                    entries.append(None)
-                
-            new_weekday = weekdays[i]
-
-            data = Availability(
-                id=new_id,
-                user_id=user.id, 
-                date=new_date, 
-                weekday=new_weekday, 
-                email=user.email,
-                start_time=entries[0], 
-                end_time=entries[1], 
-                start_time2=entries[2],
-                end_time2=entries[3], 
-                start_time3=entries[4], 
-                end_time3=entries[5],
-                created_by=company_id, 
-                changed_by=company_id, 
-                creation_timestamp = creation_date)
-
-            db.session.add(data)
-            db.session.commit()
-
-        return jsonify({'message': 'Availability updated successfully'}), 200
-
-    return jsonify(temp_dict), 200
-
-
-'''
-@app.route('/api/availability', methods = ['GET', 'POST'])
-def get_availability():
-    # today's date
-    user = User.query.filter_by(email="robin.martin@timetab.ch").first()
     today = datetime.date.today()
     creation_date = datetime.datetime.now()
     monday = today - datetime.timedelta(days=today.weekday())
@@ -1363,7 +1293,6 @@ def get_availability():
 
     return jsonify(availability_list)
 
-'''
 
 @app.route('/api/forget_password', methods=["GET", "POST"])
 def get_forget_password():
