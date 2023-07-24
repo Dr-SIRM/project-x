@@ -24,8 +24,8 @@ Prio 1:
 
     !! In der Entität Timetable noch user_id einbauen?? !!
 
- - (***) Die gesolvten Daten in der Datenbank speichern
- - (***) Den Übergang auf harte und weiche NBs machen? 
+ - (90%) Die gesolvten Daten in der Datenbank speichern
+ - (20%) Den Übergang auf harte und weiche NBs machen? 
 
  - working_h noch diskutieren, ist das max. arbeitszeit oder norm Arbeiszeit?
  - Jeder MA muss vor dem Solven eingegeben haben, wann er arbeiten kann. Auch wenn es alles 0 sind.
