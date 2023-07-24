@@ -22,14 +22,20 @@ Prio 1:
  - (erl.) Shifts/Employment_level aus der Datenbank ziehen
  - (erl.) auf Viertelstunden wechseln
 
-    !! In der Entität Timetable noch user_id einbauen?? !!
+    Fragen:
+    ----------------------------------------------------------
+    - In der Entität Timetable noch user_id einbauen?
+    - Öffnungszeiten Geschäft "2"?
+    - Öffnungszeiten über den Tag hinaus? (z.B. 07:00 - 00:30)
+    ----------------------------------------------------------
 
  - (90%) Die gesolvten Daten in der Datenbank speichern
- - (20%) Den Übergang auf harte und weiche NBs machen? 
+ - (30%) Den Übergang auf harte und weiche NBs machen? 
+ - (10%) Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
 
  - working_h noch diskutieren, ist das max. arbeitszeit oder norm Arbeiszeit?
  - Jeder MA muss vor dem Solven eingegeben haben, wann er arbeiten kann. Auch wenn es alles 0 sind.
- - Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
+
 
 
 Prio 2:
@@ -100,7 +106,7 @@ class ORAlgorithm:
         # Attribute der Methode "solve_problem"
         self.status = None
 
-        # Attribute der Methode "output_result_excel"
+        # Attribute der Methode "store_solved_data"
         self.mitarbeiter_arbeitszeiten = None
 
 
@@ -117,6 +123,7 @@ class ORAlgorithm:
         self.objective_function()
         self.constraints()
         self.solve_problem()
+        self.store_solved_data()
         self.output_result_excel()
 
         self.save_data_in_database()
@@ -429,9 +436,24 @@ class ORAlgorithm:
                     self.objective.SetCoefficient(self.x[i, j, k], self.kosten[i])
 
 
+        """
+        # -- TEST 23.07.2023 - WEICHE NEBENBEDINGUNGEN EINBAUEN --
+        # Zielfunktion
+        self.objective = self.solver.Objective()
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                for k in range(len(self.verfügbarkeit[i][j])):
+                    # Die Kosten werden multipliziert
+                    self.objective.SetCoefficient(self.x[i, j, k], self.kosten[i])
+                    self.objective.SetCoefficient(self.nb2_violation[i, j], self.penalty_cost_nb2)
+        """
+
+
 
         # Es wird veruscht, eine Kombination von Werten für die x[i, j, k] zu finden, die die Summe kosten[i]*x[i, j, k] minimiert            
         self.objective.SetMinimization()
+
+
 
 
     def constraints(self):
@@ -452,7 +474,7 @@ class ORAlgorithm:
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
                 self.solver.Add(self.solver.Sum([self.x[i, j, k] for i in self.mitarbeiter]) >= self.min_anwesend[j][k])
-
+        
         """
         # WEICHE NB -- TEST 02.07.2023 --
         # NB 2 - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend 
@@ -460,6 +482,7 @@ class ORAlgorithm:
             for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
                 self.solver.Add(self.solver.Sum([self.x[i, j, k] for i in self.mitarbeiter]) + self.nb2_violation[i, j] * self.penalty_cost_nb2 >= self.min_anwesend[j][k])
         """
+
 
         # WEICHE NB
         # NB 3 - Max. Arbeitszeit pro Woche - (working_h muss noch berechnet werden!)
@@ -585,6 +608,7 @@ class ORAlgorithm:
         """
 
 
+
     def solve_problem(self):
         """
         Problem lösen
@@ -594,9 +618,10 @@ class ORAlgorithm:
         self.status = self.solver.Solve()
 
 
-    def output_result_excel(self):
+
+    def store_solved_data(self):
         """
-        mitarbeiter_arbeitszeiten erstellen und Excel ausgeben
+        mitarbeiter_arbeitszeiten Attribut befüllen
         """
         if self.status == pywraplp.Solver.OPTIMAL or self.status == pywraplp.Solver.FEASIBLE:
             self.mitarbeiter_arbeitszeiten = {}
@@ -622,7 +647,12 @@ class ORAlgorithm:
         else:
             print("Unknown status.")
 
-        # Ergebnisse ausgeben Excel ----------------------------------------------------------------------------------------------
+
+
+    def output_result_excel(self):
+        """
+        Excel
+        """
         data = self.mitarbeiter_arbeitszeiten
 
         # Legen Sie die Füllungen fest
