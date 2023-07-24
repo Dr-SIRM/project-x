@@ -70,6 +70,7 @@ const Day = ({ day, slotCounts = {}, setSlotCounts, openingHour, closingHour }) 
         label="Enter employee count" 
         variant="outlined"
         fullWidth
+        inputProps={{ min: 0 }}
       />
       <Button 
         variant="contained" 
