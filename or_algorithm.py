@@ -22,13 +22,6 @@ Prio 1:
  - (erl.) Shifts/Employment_level aus der Datenbank ziehen
  - (erl.) auf Viertelstunden wechseln
 
-    Fragen:
-    ----------------------------------------------------------
-    - In der Entität Timetable noch user_id einbauen?
-    - Öffnungszeiten Geschäft "2"?
-    - Öffnungszeiten über den Tag hinaus? (z.B. 07:00 - 00:30)
-    ----------------------------------------------------------
-
  - (90%) Die gesolvten Daten in der Datenbank speichern
  - (30%) Den Übergang auf harte und weiche NBs machen? 
  - (10%) Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
@@ -151,14 +144,14 @@ class ORAlgorithm:
         self.kosten = {ma: 20 for ma in self.mitarbeiter}  # Kosten pro Stunde
 
         # -- 4 --
-        self.max_zeit = {ma: 8*4 for ma in self.mitarbeiter}  # Maximale Arbeitszeit pro Tag
+        self.max_zeit = {ma: 9*4 for ma in self.mitarbeiter}  # Maximale Arbeitszeit pro Tag
 
         # -- 5 --
         self.min_zeit = {ma: 5*4 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
 
         # -- 6 --
         # Maximale Arbeitszeit pro woche, wird später noch aus der Datenbank gezogen
-        self.working_h = 40*4   
+        self.working_h = 42*4   
 
         # -- 7 --
         # Berechnung der calc_time (Anzahl Tage an denen die MA eingeteilt werden)
@@ -448,11 +441,8 @@ class ORAlgorithm:
                     self.objective.SetCoefficient(self.nb2_violation[i, j], self.penalty_cost_nb2)
         """
 
-
-
         # Es wird veruscht, eine Kombination von Werten für die x[i, j, k] zu finden, die die Summe kosten[i]*x[i, j, k] minimiert            
         self.objective.SetMinimization()
-
 
 
 
@@ -613,7 +603,6 @@ class ORAlgorithm:
         """
         Problem lösen
         """
-
         self.solver.EnableOutput()
         self.status = self.solver.Solve()
 
@@ -635,23 +624,23 @@ class ORAlgorithm:
             print(self.mitarbeiter_arbeitszeiten)
 
         if self.status == pywraplp.Solver.OPTIMAL:
-            print("Optimal solution found.")
+            print("Optimale Lösung gefunden.")
         elif self.status == pywraplp.Solver.FEASIBLE:
-            print("Feasible solution found.")
+            print("Mögliche Lösung gefunden.")
         elif self.status == pywraplp.Solver.INFEASIBLE:
-            print("Problem is infeasible.")
+            print("Problem ist unlösbar.")
         elif self.status == pywraplp.Solver.UNBOUNDED:
-            print("Problem is unbounded.")
+            print("Problem ist unbeschränkt.")
         elif self.status == pywraplp.Solver.NOT_SOLVED:
-            print("Solver did not solve the problem.")
+            print("Solver hat das Problem nicht gelöst.")
         else:
-            print("Unknown status.")
+            print("Unbekannter Status.")
 
 
 
     def output_result_excel(self):
         """
-        Excel
+        Excel ausgabe
         """
         data = self.mitarbeiter_arbeitszeiten
 
@@ -672,7 +661,7 @@ class ORAlgorithm:
         for i in range(1, len(data[list(data.keys())[0]]) + 1):
             headers.extend(["T{}, {}:{}".format(i, j+8, k*15) for j in range(10) for k in range(4)])
             headers.append(' ')
-        headers.append("Total Hours")  # Add a column for total hours
+        headers.append("Total Hours") 
         ws.append(headers)
 
         # Ändern der Schriftgröße der Spaltentitel
@@ -716,13 +705,13 @@ class ORAlgorithm:
 
         # Speichern Sie das Workbook
         wb.save("Einsatzplan.xlsx")
-<<<<<<< HEAD
-=======
 
 
 
     def save_data_in_database(self):
-        """ Diese Methode speichert die berechneten Arbeitszeiten in der Datenbank """
+        """ 
+        Diese Methode speichert die berechneten Arbeitszeiten in der Datenbank 
+        """
         with app.app_context():
             for user_id, days in self.mitarbeiter_arbeitszeiten.items(): # Durch mitarbeiter_arbeitszeiten durchitterieren
                 print(f"Verarbeite Benutzer-ID: {user_id}")
@@ -782,4 +771,3 @@ class ORAlgorithm:
             # Änderungen in der Datenbank speichern
             db.session.commit()
 
->>>>>>> fc05a3da2defe06d66e832667135b371eacfe4f9

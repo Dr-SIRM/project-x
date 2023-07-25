@@ -61,7 +61,7 @@ const Sidebar = () => {
   });
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/current_user', {
+    axios.get('http://localhost:5000/api/current_react_user', {
         headers: {
           'Authorization': `Bearer ${token}`
         }

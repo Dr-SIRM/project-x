@@ -13,26 +13,35 @@ const Availability = ({ availability }) => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
-  const [availabilityData, setavailabilityData] = useState({});
+  const [availabilityData, setAvailabilityData] = useState({});
+  const token = localStorage.getItem('session_token'); // Get the session token from local storage
 
-  useEffect(() => {
-    const fetchavailabilityData = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/availability');
-        setavailabilityData(response.data);
-      } catch (error) {
-        console.error('Error fetching Availability details:', error);
-      }
+    useEffect(() => {
+    const fetchAvailabilityData = async () => {
+        try {
+          const response = await axios.get('http://localhost:5000/api/availability', {
+              headers: {
+                  'Authorization': `Bearer ${token}`
+              }
+          });
+          setAvailabilityData(response.data);
+        } catch (error) {
+          console.error('Error fetching availability details:', error);
+        }
     };
 
-    fetchavailabilityData();
+    fetchAvailabilityData();
   }, []);
 
-  
+
   const handleFormSubmit = async (values) => {
     try {
       // Send the updated form values to the server for database update
-      await axios.post('http://localhost:5000/api/availability', values);
+      await axios.post('http://localhost:5000/api/availability', values, {
+    headers: {
+        'Authorization': `Bearer ${token}`
+        }
+    });
       setShowSuccessNotification(true);
     } catch (error) {
       console.error('Error updating availability details:', error);
@@ -54,12 +63,12 @@ const Availability = ({ availability }) => {
         enableReinitialize={true}
         initialValues={{
           ...Array.from({ length: availabilityData.day_num }).reduce((acc, _, rowIndex) => {
-            acc[`day_${rowIndex}_0`] = availabilityData.temp_dict[`${rowIndex + 1}&0`] || 0;
-            acc[`day_${rowIndex}_1`] = availabilityData.temp_dict[`${rowIndex + 1}&1`] || 0;
-            acc[`day_${rowIndex}_2`] = availabilityData.temp_dict[`${rowIndex + 1}&2`] || 0;
-            acc[`day_${rowIndex}_3`] = availabilityData.temp_dict[`${rowIndex + 1}&3`] || 0;
-            acc[`day_${rowIndex}_4`] = availabilityData.temp_dict[`${rowIndex + 1}&4`] || 0;
-            acc[`day_${rowIndex}_5`] = availabilityData.temp_dict[`${rowIndex + 1}&5`] || 0;
+            acc[`day_${rowIndex}_0`] = availabilityData.temp_dict[`${rowIndex + 1}&0`] || '00:00';
+            acc[`day_${rowIndex}_1`] = availabilityData.temp_dict[`${rowIndex + 1}&1`] || '00:00';
+            acc[`day_${rowIndex}_2`] = availabilityData.temp_dict[`${rowIndex + 1}&2`] || '00:00';
+            acc[`day_${rowIndex}_3`] = availabilityData.temp_dict[`${rowIndex + 1}&3`] || '00:00';
+            acc[`day_${rowIndex}_4`] = availabilityData.temp_dict[`${rowIndex + 1}&4`] || '00:00';
+            acc[`day_${rowIndex}_5`] = availabilityData.temp_dict[`${rowIndex + 1}&5`] || '00:00';
             return acc;
           }, {}),
         }}

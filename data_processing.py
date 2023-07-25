@@ -20,8 +20,8 @@ class DataProcessing:
         self.binary_availability = None
 
         # Zeitraum in dem gesolvet wird, wird noch angepasst!
-        self.start_date = "2023-07-17"
-        self.end_date = "2023-07-21"
+        self.start_date = "2023-07-24"
+        self.end_date = "2023-07-28"
 
         # Gute Daten zum testsolven
         #self.start_date = "2023-06-26"
@@ -245,8 +245,8 @@ class DataProcessing:
 
                 # Werte werden auf 1 gesetzt, wenn der Mitarbeiter arbeiten kann.
                 # Die Start- und Endzeiten werden in Viertelstunden umgerechnet.
-                start_hour = (self.time_to_int_2(start_time) - self.time_to_int_1(self.laden_oeffnet[weekday_index])) * 4
-                end_hour = (self.time_to_int_2(end_time) - self.time_to_int_1(self.laden_oeffnet[weekday_index])) * 4
+                start_hour = int(start_time.total_seconds() / 900) - int(self.laden_oeffnet[weekday_index].total_seconds() / 900)
+                end_hour = int(end_time.total_seconds() / 900) - int(self.laden_oeffnet[weekday_index].total_seconds() / 900)
                 for i in range(start_hour, end_hour):
                     if 0 <= i < len(binary_list):
                         binary_list[i] = 1
@@ -254,6 +254,7 @@ class DataProcessing:
                 binary_availability[user_id].append((date, binary_list))
 
         self.binary_availability = binary_availability
+
 
 
     def get_employment(self):
