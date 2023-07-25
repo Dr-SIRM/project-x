@@ -118,6 +118,49 @@ def new_user():
     return {'success': True}
 
 
+@app.route('/api/update', methods=["GET", "POST"])
+@jwt_required()
+def react_update():
+    current_user_id = get_jwt_identity()
+    
+    if request.method == 'POST':
+        user_data = request.get_json()
+
+        if user_data:
+            existing_user = User.query.get(current_user_id)
+            if existing_user:
+                existing_user.first_name = user_data.get('first_name')
+                existing_user.last_name = user_data.get('last_name')
+                existing_user.employment_level = user_data.get('employment_level')
+                existing_user.company_name = user_data.get('company_name')
+                existing_user.department = user_data.get('department')
+                existing_user.access_level = user_data.get('access_level')
+                existing_user.email = user_data.get('email')
+                existing_user.changed_by = User.query.get(current_user.company_id)
+                existing_user.update_timestamp = datetime.datetime.now()
+
+                db.session.commit()
+
+        return 'Success', 200
+    elif request.method == 'GET':
+        user = User.query.get(current_user_id)
+
+        if user:
+            user_data = {
+                'id': user.id,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'employment_level': user.employment_level,
+                'company_name': user.company_name,
+                'department': user.department,
+                'access_level': user.access_level,
+                'email': user.email,
+            }
+
+            return jsonify(user_data)
+        else:
+            return jsonify({"message": "User not found"}), 404
+
 '''
 @app.route('/api/update', methods=["GET", "POST"])
 def react_update():
@@ -141,8 +184,6 @@ def react_update():
 
 
     return render_template('update.html', data_tag=User.query.all(), account=new_data, template_form=user_form)
-
-    '''
 
 
 @app.route('/api/company', methods=['GET', 'POST'])
@@ -251,9 +292,6 @@ def get_company():
     
     
     return jsonify(company_list)
-
-
-from flask import jsonify
 
 
 @app.route('/api/availability', methods = ['GET', 'POST'])

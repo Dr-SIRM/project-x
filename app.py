@@ -102,8 +102,6 @@ def set_db():
     return "Employment column updated successfully."
 
 
-=======
->>>>>>> 7bfca8a1d0bf2f221570aeeec694fffa7122380f
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useTheme, Box, Button, TextField, InputAdornment, MenuItem, Select, FormControl, Snackbar  } from "@mui/material";
+import { useTheme, Box, Button, TextField, InputAdornment, Snackbar  } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -15,34 +15,42 @@ const Update = () => {
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [userData, setUserData] = useState({});
-
+  const [isLoading, setIsLoading] = useState(true);
+  const token = localStorage.getItem('session_token'); // Get the session token from local storage
 
   useEffect(() => {
-    const fetchCompany = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/update');
-        setUserData(response.data);
-      } catch (error) {
-        console.error('Error fetching company details:', error);
-      }
+    const fetchUser = async () => {
+        try {
+          const response = await axios.get('http://localhost:5000/api/update', {
+              headers: {
+                  'Authorization': `Bearer ${token}`
+              }
+          });
+          setUserData(response.data);
+        } catch (error) {
+          console.error('Error fetching update details:', error);
+        }
     };
 
-    fetchCompany();
+    fetchUser();
   }, []);
 
-  const handleFormSubmit = (values, { resetForm }) => {
-    axios
-      .post('http://localhost:5000/api/update', values)
-      .then((response) => {
-        console.log(response.data);
-        setShowSuccessNotification(true);
-        resetForm();
-      })
-      .catch((error) => {
-        console.error(error);
-        setShowErrorNotification(true);
-      });
+  
+  const handleFormSubmit = async (values) => {
+    try {
+      // Send the updated form values to the server for database update
+      await axios.post('http://localhost:5000/api/update', values, {
+    headers: {
+        'Authorization': `Bearer ${token}`
+        }
+    });
+      setShowSuccessNotification(true);
+    } catch (error) {
+      console.error('Error updating update details:', error);
+      setShowErrorNotification(true);
+    }
   };
+  
 
   return (
     <Box m="20px">
@@ -157,7 +165,7 @@ const Update = () => {
       <Snackbar
         open={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
-        message="Registration successful"
+        message="Update successful"
         autoHideDuration={3000}
         sx={{
           backgroundColor: "green !important", 
@@ -191,14 +199,11 @@ const Update = () => {
 
 
 const checkoutSchema = yup.object().shape({
-  first_name: yup.string().required("required"),
-  last_name: yup.string().required("required"),
-  email: yup.string().email("invalid email").required("required"),
-  employment_level: yup
-    .number()
-    .min(0, 'Company level must be greater than or equal to 0%')
-    .max(100, 'Company level must be less than or equal to 100%')
-    .required("required"),
+  first_name: yup.string().required('First name is required'),
+  last_name: yup.string().required('Last name is required'),
+  email: yup.string().email('Invalid email').required('Email is required'),
+  employment_level: yup.number().required('Employment level is required').min(1, 'Must be at least 1%').max(100, 'Cannot be more than 100%'),
+  department: yup.string().required('Department is required'),
 });
 
 export default Update;
