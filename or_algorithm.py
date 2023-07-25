@@ -22,13 +22,6 @@ Prio 1:
  - (erl.) Shifts/Employment_level aus der Datenbank ziehen
  - (erl.) auf Viertelstunden wechseln
 
-    Fragen:
-    ----------------------------------------------------------
-    - In der Entität Timetable noch user_id einbauen?
-    - Öffnungszeiten Geschäft "2"?
-    - Öffnungszeiten über den Tag hinaus? (z.B. 07:00 - 00:30)
-    ----------------------------------------------------------
-
  - (90%) Die gesolvten Daten in der Datenbank speichern
  - (30%) Den Übergang auf harte und weiche NBs machen? 
  - (10%) Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
@@ -712,8 +705,6 @@ class ORAlgorithm:
 
         # Speichern Sie das Workbook
         wb.save("Einsatzplan.xlsx")
-<<<<<<< HEAD
-=======
 
 
 
@@ -780,4 +771,3 @@ class ORAlgorithm:
             # Änderungen in der Datenbank speichern
             db.session.commit()
 
->>>>>>> fc05a3da2defe06d66e832667135b371eacfe4f9
