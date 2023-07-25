@@ -237,7 +237,25 @@ const Week = () => {
           />
         )}
       </Box>
-      <Button onClick={() => submit()} variant="contained" color="primary" sx={{ m: 1 }}>
+      <Button
+        variant="outlined"
+        color="inherit"
+        onClick={submit}
+        sx={{
+          borderColor: 'white',
+          '&.MuiButton-outlined': {
+            borderColor: 'white',
+          },
+          '&:hover': {
+            borderColor: 'white',
+          },
+          '&.MuiButton-text': {
+            borderColor: 'white',
+            color: 'white',
+            backgroundColor: '#2e7c67',
+          }
+        }}
+      >
         Submit
       </Button>
     </Box>
