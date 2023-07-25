@@ -98,7 +98,10 @@ def get_data():
             'last_name': user.last_name,
             'company_name': user.company_name,
             'email': user.email,
-            'access_level': user.access_level
+            'access_level': user.access_level,
+            'employment': user.employment,
+            'department': user.department,
+            'employment_level': user.employment_level,
         }
         user_list.append(user_dict)
     return jsonify(user_list)

@@ -57,6 +57,31 @@ const Team = () => {
       flex: 1,
     },
     {
+      field: "employment",
+      headerName: "Anstellung",
+      flex: 1,
+      valueGetter: (params) => {
+        const employment = params.row.employment;
+        return employment === "Perm" ? "Vollzeit" : employment === "Temp" ? "Teilzeit" : employment;
+      },
+    },  
+    {
+      field: "employment_level",
+      headerName: "Anstellungsgrad",
+      flex: 1,
+      valueGetter: (params) => {
+        const employment_level = params.row.employment_level;
+        const isValidNumber = !isNaN(employment_level);
+        const modifiedValue = isValidNumber ? `${employment_level * 100}%` : "";
+        return modifiedValue;
+      },
+    },
+    {
+      field: "department",
+      headerName: "Abteilung",
+      flex: 1,
+    },
+    {
       field: "access_level",
       headerName: "Access Level",
       flex: 1,
