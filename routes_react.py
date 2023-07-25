@@ -184,7 +184,7 @@ def react_update():
 
 
     return render_template('update.html', data_tag=User.query.all(), account=new_data, template_form=user_form)
-
+'''
 
 @app.route('/api/company', methods=['GET', 'POST'])
 @jwt_required()
