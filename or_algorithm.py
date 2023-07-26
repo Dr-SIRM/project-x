@@ -22,6 +22,17 @@ Prio 1:
  - (erl.) Shifts/Employment_level aus der Datenbank ziehen
  - (erl.) auf Viertelstunden wechseln
 
+ Fragen an die Runde:
+ -------------------------------
+ 1. Wenn die MA Stunden eintragen an einem Tag, sollen sie dann mindestens die min Stunden eintragen? 
+    Kann man das irgendwie lösen, das man schaut was die min Stunden sind und mindestens soviele bei der Verfügbarkeit einträgt? Umsetzbarkeit?
+
+
+
+ -------------------------------
+
+
+
  - (90%) Die gesolvten Daten in der Datenbank speichern
  - (30%) Den Übergang auf harte und weiche NBs machen? 
  - (10%) Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
@@ -258,6 +269,7 @@ class ORAlgorithm:
         for key, value in self.verfügbarkeit.items():
             print("MA_id: ", key)
             print("Wert: ", value)
+        print("2. self.verfügbarkeit: ", self.verfügbarkeit)
         print("3. self.kosten: ", self.kosten)
         print("4. self.max_zeit: ", self.max_zeit)
         print("5. self.min_zeit: ", self.min_zeit)
@@ -350,7 +362,25 @@ class ORAlgorithm:
 
         """
         ---------------------------------------------------------------------------------------------------------------
-        2. Haben alle MA zusammen genug Stunden eingegeben, um die verteilbaren Stunden zu erreichen?
+        2. Haben die MA mindestens die anzahl Stunden von gerechte_verteilung eingegeben?
+        ---------------------------------------------------------------------------------------------------------------
+        """
+        errors = []
+
+        for index, ma_id in enumerate(self.mitarbeiter):
+            if self.employment[index] == 'Temp':
+                total_hours_week = sum(sum(self.verfügbarkeit[ma_id][day]) for day in range(self.calc_time))
+                if total_hours_week < self.gerechte_verteilung[index]:
+                    errors.append(
+                        f"Temp-Mitarbeiter {ma_id} hat nur {total_hours_week} Stunden in der Woche eingetragen. "
+                        f"Das ist weniger als die erforderliche Gesamtstundenzahl von {self.gerechte_verteilung[index]} Stunden."
+                    )
+        if errors:
+            raise ValueError("Folgende Fehler wurden gefunden:\n" + "\n".join(errors))
+
+        """
+        ---------------------------------------------------------------------------------------------------------------
+        3. Haben alle MA zusammen genug Stunden eingegeben, um die verteilbaren Stunden zu erreichen?
         ---------------------------------------------------------------------------------------------------------------
         """
         total_hours_available = sum(self.gesamtstunden_verfügbarkeit)
@@ -361,7 +391,7 @@ class ORAlgorithm:
 
         """
         ---------------------------------------------------------------------------------------------------------------
-        3. Ist zu jeder notwendigen Zeit (self.min_anwesend) die mindestanzahl Mitarbeiter verfügbar?
+        4. Ist zu jeder notwendigen Zeit (self.min_anwesend) die mindestanzahl Mitarbeiter verfügbar?
         ---------------------------------------------------------------------------------------------------------------
         """
         for i in range(len(self.min_anwesend)):  # Für jeden Tag in der Woche
@@ -371,16 +401,22 @@ class ORAlgorithm:
 
         """
         ---------------------------------------------------------------------------------------------------------------
-        4. Können die MA die min. Zeit erreichen? - Evtl. auch gerechte Verteilung überprüfen
+        5. Können die MA die min. Zeit erreichen? Wenn 0 Stunden eingegeben wurden, läuft es durch! - Evtl. auch gerechte Verteilung überprüfen
         ---------------------------------------------------------------------------------------------------------------
         """
+        errors = []
+        for ma in self.mitarbeiter:
+            for day in range(self.calc_time):
+                total_hours = sum(self.verfügbarkeit[ma][day])
+                if 0 < total_hours < self.min_zeit[ma]:
+                    errors.append(
+                        f"Mitarbeiter {ma} hat am Tag {day+1} nur {total_hours/4} Stunden eingetragen. "
+                        f"Das ist weniger als die Mindestarbeitszeit von {self.min_zeit[ma]/4} Stunden."
+                    )
+        if errors:
+            raise ValueError("Folgende Fehler wurden gefunden:\n" + "\n".join(errors))
 
-
-        # HIER CODEN
-
-
-
-
+ 
 
 
 
