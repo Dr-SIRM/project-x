@@ -1,17 +1,15 @@
 import { useState, useEffect } from "react";
-import { useTheme, Box, Button, TextField, InputAdornment, Snackbar  } from "@mui/material";
+import { Box, Button, TextField, InputAdornment, Snackbar  } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
-import { tokens } from "../../theme";
-import axios from 'axios';
 import { ThreeDots } from "react-loader-spinner"; 
+import axios from 'axios';
+
 
 
 const Update = () => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
@@ -57,7 +55,6 @@ const Update = () => {
   if (isLoading) {
     return (
       <Box m="20px" display="flex" justifyContent="center" alignItems="center" height="100vh">
-        {/* Use the loading animation component here */}
         <ThreeDots type="ThreeDots" color="#70D8BD" height={80} width={80} />
       </Box>
     );

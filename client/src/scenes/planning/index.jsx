@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, TextField, ButtonGroup, Button } from '@mui/material';
+import { ThreeDots } from "react-loader-spinner"; 
 import axios from 'axios';
 
 // 24 hours * 4 slots/hour = 96 slots
@@ -12,8 +13,6 @@ const Day = ({ day, slotCounts = {}, setSlotCounts, openingHour, closingHour }) 
   const [selectedSlots, setSelectedSlots] = useState([]);
   const [employeeCount, setEmployeeCount] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-
-
 
   const [startHour, startMinute] = openingHour ? openingHour.split(':') : [0, 0];
   const [endHour, endMinute] = closingHour ? closingHour.split(':') : [0, 0];
@@ -139,10 +138,11 @@ const Week = () => {
   const [openingHours, setOpeningHours] = useState([]);
   const [closingHours, setClosingHours] = useState([]);
   const token = localStorage.getItem('session_token'); // Get the session token from local storage
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchCalendar = async (values) => {
+      setIsLoading(true);
         try {
           const response = await axios.get('http://localhost:5000/api/requirement/workforce', {
               headers: {
@@ -150,6 +150,7 @@ const Week = () => {
               }
           });
           setcalendarData(response.data);
+          setIsLoading(false);
           const fetchedData = response.data;
 
           if (fetchedData.weekdays) {
@@ -164,12 +165,14 @@ const Week = () => {
           }
           setOpeningHours(openingHours);
           setClosingHours(closingHours);
+          setIsLoading(false);
           console.log("Opening hours:", openingHours);
           console.log("Closing hours:", closingHours);
 
 
         } catch (error) {
           console.error('Error fetching company details:', error);
+          setIsLoading(false);
         }
     };
 
@@ -220,7 +223,13 @@ const Week = () => {
         setShowErrorNotification(true);
       }
     };
-
+    if (isLoading) {
+      return (
+        <Box m="20px" display="flex" justifyContent="center" alignItems="center" height="100vh">
+          <ThreeDots type="ThreeDots" color="#70D8BD" height={80} width={80} />
+        </Box>
+      );
+    }
   
 
   return (

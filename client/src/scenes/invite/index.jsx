@@ -6,6 +6,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { Select, MenuItem } from "@mui/material";
 import Header from "../../components/Header";
 import { tokens } from "../../theme";
+import { ThreeDots } from "react-loader-spinner"; 
 import axios from 'axios';
 
 
@@ -17,10 +18,12 @@ const Invite = ({ invite }) => {
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [inviteData, setinviteData] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
   const token = localStorage.getItem('session_token'); // Get the session token from local storage
 
   useEffect(() => {
     const fetchInvite = async () => {
+      setIsLoading(true);
         try {
           const response = await axios.get('http://localhost:5000/api/invite', {
               headers: {
@@ -28,8 +31,10 @@ const Invite = ({ invite }) => {
               }
           });
           setinviteData(response.data);
+          setIsLoading(false);
         } catch (error) {
           console.error('Error fetching invite details:', error);
+          setIsLoading(false);
         }
     };
 
@@ -52,7 +57,13 @@ const Invite = ({ invite }) => {
       setShowErrorNotification(true);
     }
   };
-
+  if (isLoading) {
+    return (
+      <Box m="20px" display="flex" justifyContent="center" alignItems="center" height="100vh">
+        <ThreeDots type="ThreeDots" color="#70D8BD" height={80} width={80} />
+      </Box>
+    );
+  }
 
   return (
     <Box m="20px">

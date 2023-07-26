@@ -1,10 +1,11 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { useTheme, Box, Button, TextField, Snackbar, Typography } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import { tokens } from "../../theme";
+import { ThreeDots } from "react-loader-spinner"; 
 import axios from 'axios';
 
 
@@ -16,11 +17,12 @@ const Company = ({ company }) => {
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [companyData, setcompanyData] = useState({});
-  const [currentUser, setCurrentUser] = useState(null); 
+  const [isLoading, setIsLoading] = useState(true); 
   const token = localStorage.getItem('session_token'); // Get the session token from local storage
 
   useEffect(() => {
     const fetchCompany = async () => {
+      setIsLoading(true);
         try {
           const response = await axios.get('http://localhost:5000/api/company', {
               headers: {
@@ -28,8 +30,10 @@ const Company = ({ company }) => {
               }
           });
           setcompanyData(response.data);
+          setIsLoading(false);
         } catch (error) {
           console.error('Error fetching company details:', error);
+          setIsLoading(false);
         }
     };
 
@@ -51,7 +55,13 @@ const Company = ({ company }) => {
       setShowErrorNotification(true);
     }
   };
-
+  if (isLoading) {
+    return (
+      <Box m="20px" display="flex" justifyContent="center" alignItems="center" height="100vh">
+        <ThreeDots type="ThreeDots" color="#70D8BD" height={80} width={80} />
+      </Box>
+    );
+  }
 
   return (
     <Box m="20px">

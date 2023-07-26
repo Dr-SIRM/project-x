@@ -6,6 +6,7 @@ import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettin
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import Header from "../../components/Header";
+import { ThreeDots } from "react-loader-spinner"; 
 import axios from "axios";
 
 
@@ -14,22 +15,33 @@ const Team = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [users, setUsers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [setMessage] = useState("");
 
   useEffect(() => {
     async function fetchData() {
+      setIsLoading(true);
       try {
         const response = await axios.get("http://localhost:5000/api/users");
         const data = response.data;
         setUsers(data);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error.response ? error.response : error);
+        setIsLoading(false);
         setMessage("An error occurred while fetching data.");
       }
     } 
     fetchData();
   }, []);
   
+  if (isLoading) {
+    return (
+      <Box m="20px" display="flex" justifyContent="center" alignItems="center" height="100vh">
+        <ThreeDots type="ThreeDots" color="#70D8BD" height={80} width={80} />
+      </Box>
+    );
+  }
 
 
   const columns = [
@@ -39,6 +51,7 @@ const Team = () => {
       headerName: "Vorname",
       flex: 1,
       cellClassName: "name-column--cell",
+      editable: true,
     },
     {
       field: "last_name",
