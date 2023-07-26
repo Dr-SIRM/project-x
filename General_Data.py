@@ -10,7 +10,7 @@
 # INSTALL FILES IN FLASK & REACT
 
     # pip install Flask Flask-Login Flask-Mail Flask-Cors Flask-Migrate Flask-JWT-Extended pandas openpyxl ortools WTForms Flask-WTF Flask-SQLAlchemy pymysql mysql
-    # npm install react react-router-dom axios react-dom formik yup @mui/material
+    # npm install react react-router-dom axios react-dom formik yup @mui/material react-loader-spinner
 
 # RUN REACT
 
