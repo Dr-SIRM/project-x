@@ -20,6 +20,7 @@ const Update = () => {
 
   useEffect(() => {
     const fetchUser = async () => {
+      setIsLoading(true);
         try {
           const response = await axios.get('http://localhost:5000/api/update', {
               headers: {
@@ -27,8 +28,10 @@ const Update = () => {
               }
           });
           setUserData(response.data);
+          setIsLoading(false);
         } catch (error) {
           console.error('Error fetching update details:', error);
+          setIsLoading(false);
         }
     };
 
@@ -50,7 +53,9 @@ const Update = () => {
       setShowErrorNotification(true);
     }
   };
-  
+  if (isLoading) {
+    return <div>Loading...</div>; // Render a loading message or a spinner
+  }
 
   return (
     <Box m="20px">

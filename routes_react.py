@@ -124,45 +124,38 @@ def new_user():
 @app.route('/api/update', methods=["GET", "POST"])
 @jwt_required()
 def react_update():
-    current_user_id = get_jwt_identity()
-    
+    react_user = get_jwt_identity()
+    user = User.query.filter_by(email=react_user).first()
+
+    if user is None:
+        return jsonify({"message": "User not found"}), 404
+
     if request.method == 'POST':
         user_data = request.get_json()
 
-        if user_data:
-            existing_user = User.query.get(current_user_id)
-            if existing_user:
-                existing_user.first_name = user_data.get('first_name')
-                existing_user.last_name = user_data.get('last_name')
-                existing_user.employment_level = user_data.get('employment_level')
-                existing_user.company_name = user_data.get('company_name')
-                existing_user.department = user_data.get('department')
-                existing_user.access_level = user_data.get('access_level')
-                existing_user.email = user_data.get('email')
-                existing_user.changed_by = User.query.get(current_user.company_id)
-                existing_user.update_timestamp = datetime.datetime.now()
+        if user_data is not None:
+            user.first_name = user_data.get('first_name', user.first_name)
+            user.last_name = user_data.get('last_name', user.last_name)
+            user.email = user_data.get('email', user.email)
+            user.employment_level = user_data.get('employment_level', user.employment_level)
+            user.department = user_data.get('department', user.department)
+            user.changed_by = react_user
+            user.update_timestamp = datetime.datetime.now()
 
-                db.session.commit()
+            db.session.commit()
+            return 'Success', 200
 
-        return 'Success', 200
-    elif request.method == 'GET':
-        user = User.query.get(current_user_id)
+    user_dict = {
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'email': user.email,
+        'employment_level': user.employment_level,
+        'department': user.department,
+    }
 
-        if user:
-            user_data = {
-                'id': user.id,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-                'employment_level': user.employment_level,
-                'company_name': user.company_name,
-                'department': user.department,
-                'access_level': user.access_level,
-                'email': user.email,
-            }
+    return jsonify(user_dict)
 
-            return jsonify(user_data)
-        else:
-            return jsonify({"message": "User not found"}), 404
+
 
 '''
 @app.route('/api/update', methods=["GET", "POST"])
