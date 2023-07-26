@@ -66,6 +66,7 @@ class ORAlgorithm:
         self.stunden_pro_tag = None                         # 11
         self.gesamtstunden_verfügbarkeit = []               # 12
         self.min_anwesend = []                              # 13
+        self.gerechte_verteilung = []                       # 14
 
         # Attribute der Methode "solver_selection"
         self.solver = None               
@@ -197,6 +198,38 @@ class ORAlgorithm:
         for _, values in sorted(self.time_req.items()):
             self.min_anwesend.append(list(values.values()))
 
+        # -- 14 --
+        # Eine Liste mit den Stunden wie sie gerecht verteilt werden
+        list_gesamtstunden = []
+        prozent_gesamtstunden = []
+        for i in range(len(self.mitarbeiter)):
+            if self.gesamtstunden_verfügbarkeit[i] > self.working_h:
+                arbeitsstunden_MA = self.employment_lvl_exact[i] * self.working_h
+            else:
+                arbeitsstunden_MA = self.employment_lvl_exact[i] * self.gesamtstunden_verfügbarkeit[i]
+            list_gesamtstunden.append(int(arbeitsstunden_MA))
+        # list_gesamtstunden = [35, 28, 28, 21, 21]
+        summe_stunden = sum(list_gesamtstunden)
+        # summe_stunden = 133
+        
+        for i in range(len(self.mitarbeiter)):
+            prozent_per_ma = list_gesamtstunden[i] / summe_stunden
+            prozent_gesamtstunden.append(prozent_per_ma)
+        print("Prozent Gesamtstunden:", prozent_gesamtstunden)
+        # prozent_gesamtstunden = [0.2631578947368421, 0.21052631578947367, 0.21052631578947367, 0.15789473684210525, 0.15789473684210525]
+        # Ein MA wird protenzual soviel eingeteilt, wie er Stunden eingetragen hat.
+        # Dabei wird ebenfalls der Anstellungsbeschäftigungsgrad berücksichtigt.
+
+        for i in range(len(self.mitarbeiter)):
+            if self.employment[i] == "Perm":
+                verteilende_h = self.working_h
+            else:
+                verteilende_h = prozent_gesamtstunden[i] * self.verteilbare_stunden
+                # +0.5, damit es immer aufgerundet
+            self.gerechte_verteilung.append(round(verteilende_h + 0.5)) 
+        # zum testen
+        self.gerechte_verteilung = [77, 65, 77, 74, 168, 168, 12, 19, 71, 55]
+
 
 
     def show_variables(self):
@@ -236,6 +269,7 @@ class ORAlgorithm:
         print("11. self.stunden_pro_tag: ", self.stunden_pro_tag)
         print("12. self.gesamtstunden_verfügbarkeit: ", self.gesamtstunden_verfügbarkeit)
         print("13. self.min_anwesend: ", self.min_anwesend)
+        print("14. self.gerechte_verteilung: ", self.gerechte_verteilung)
 
 
     def pre_check_programmer(self):
@@ -342,7 +376,7 @@ class ORAlgorithm:
         """
 
 
-        # blablabla
+        # HIER CODEN
 
 
 
@@ -553,53 +587,15 @@ class ORAlgorithm:
         
 
         # NB X - Innerhalb einer Woche immer gleiche Schichten
-        
 
 
-        # Hier den oberen Teil auslagern nach oben!!
         # WEICHE NB
-        # NB 6 - Verteilungsgrad MA - (entsprechend employment_lvl (keine Festanstellung) - muss noch angepasst werden, sobald feste MA eingeplant werden)
-        list_gesamtstunden = []
-        prozent_gesamtstunden = []
-        gerechte_verteilung = []
-        for i in range(len(self.mitarbeiter)):
-            if self.gesamtstunden_verfügbarkeit[i] > self.working_h:
-                arbeitsstunden_MA = self.employment_lvl_exact[i] * self.working_h
-            else:
-                arbeitsstunden_MA = self.employment_lvl_exact[i] * self.gesamtstunden_verfügbarkeit[i]
-            list_gesamtstunden.append(int(arbeitsstunden_MA))
-        # list_gesamtstunden = [35, 28, 28, 21, 21]
-        summe_stunden = sum(list_gesamtstunden)
-        # summe_stunden = 133
-        
-        for i in range(len(self.mitarbeiter)):
-            prozent_per_ma = list_gesamtstunden[i] / summe_stunden
-            prozent_gesamtstunden.append(prozent_per_ma)
-        print("Prozent Gesamtstunden:", prozent_gesamtstunden)
-        # prozent_gesamtstunden = [0.2631578947368421, 0.21052631578947367, 0.21052631578947367, 0.15789473684210525, 0.15789473684210525]
-        # Ein MA wird protenzual soviel eingeteilt, wie er Stunden eingetragen hat.
-        # Dabei wird ebenfalls der Anstellungsbeschäftigungsgrad berücksichtigt.
-
-        for i in range(len(self.mitarbeiter)):
-            if self.employment[i] == "Perm":
-                verteilende_h = self.working_h
-            else:
-                verteilende_h = prozent_gesamtstunden[i] * self.verteilbare_stunden
-                # +0.5, damit es immer aufgerundet
-            gerechte_verteilung.append(round(verteilende_h + 0.5))
-        print("Gerechte Verteilung: ", gerechte_verteilung)   
-
-        gerechte_verteilung = [77, 65, 77, 74, 168, 168, 12, 19, 71, 55]
-
-
-        # for loop für die gerechte Verteilung gemäss Liste gerechte_verteilung
+        # NB 6 - Verteilungsgrad MA
         verteilungsstunden = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
-        
-        # Toleranz später noch auslagern
-        tolerance = 0.3
+        tolerance = 0.3 # Toleranz später noch auslagern
         for i, ma in enumerate(self.mitarbeiter):
-            lower_bound = gerechte_verteilung[i] * (1 - tolerance)
-            upper_bound = gerechte_verteilung[i] * (1 + tolerance)
+            lower_bound = self.gerechte_verteilung[i] * (1 - tolerance)
+            upper_bound = self.gerechte_verteilung[i] * (1 + tolerance)
             self.solver.Add(verteilungsstunden[ma] <= upper_bound)
             self.solver.Add(verteilungsstunden[ma] >= lower_bound)
 
