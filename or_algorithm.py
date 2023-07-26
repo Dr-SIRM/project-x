@@ -261,7 +261,6 @@ class ORAlgorithm:
         print("109. user_employment: ", self.user_employment) 
         print()
         
-
         print("Attribute der Methode create_variables:")
         # Attribute der Methode "create_variables"
         print("1. self.mitarbeiter: ", self.mitarbeiter)
@@ -269,7 +268,6 @@ class ORAlgorithm:
         for key, value in self.verfügbarkeit.items():
             print("MA_id: ", key)
             print("Wert: ", value)
-        print("2. self.verfügbarkeit: ", self.verfügbarkeit)
         print("3. self.kosten: ", self.kosten)
         print("4. self.max_zeit: ", self.max_zeit)
         print("5. self.min_zeit: ", self.min_zeit)
@@ -282,6 +280,7 @@ class ORAlgorithm:
         print("12. self.gesamtstunden_verfügbarkeit: ", self.gesamtstunden_verfügbarkeit)
         print("13. self.min_anwesend: ", self.min_anwesend)
         print("14. self.gerechte_verteilung: ", self.gerechte_verteilung)
+
 
 
     def pre_check_programmer(self):
@@ -340,7 +339,6 @@ class ORAlgorithm:
         assert all(isinstance(val, list) for val in self.min_anwesend), "Alle Elemente in self.min_anwesend sollten Listen sein"
 
         
-  
 
     def pre_check_admin(self):
         # Wenn die einzelnen Überprüfungen nicht standhalten, wird ein ValueError ausgelöst und jeweils geprintet, woran das Problem liegt. 
@@ -401,7 +399,7 @@ class ORAlgorithm:
 
         """
         ---------------------------------------------------------------------------------------------------------------
-        5. Können die MA die min. Zeit erreichen? Wenn 0 Stunden eingegeben wurden, läuft es durch! - Evtl. auch gerechte Verteilung überprüfen
+        5. Können die MA die min. Zeit täglich erreichen? Wenn 0 Stunden eingegeben wurden, läuft es durch!
         ---------------------------------------------------------------------------------------------------------------
         """
         errors = []
@@ -418,10 +416,6 @@ class ORAlgorithm:
 
  
 
-
-
-
-
     def solver_selection(self):
         """
         Anwahl des geeigneten Solvers
@@ -431,6 +425,8 @@ class ORAlgorithm:
         # GLPK = Vielzahl von Algorithmen, einschließlich des Simplex-Verfahrens und des branch-and-bound-Verfahrens
         """
         self.solver = pywraplp.Solver.CreateSolver('SCIP')
+        # self.solver.SetTimeLimit(20000)  # Zeitlimit auf 20 Sekunden (in Millisekunden)
+
 
 
     def define_penalty_costs(self):
@@ -442,6 +438,7 @@ class ORAlgorithm:
         self.penalty_cost_nb4 = 100
         self.penalty_cost_nb5 = 100
         self.penalty_cost_nb6 = 100
+
 
 
     def decision_variables(self):
@@ -488,6 +485,7 @@ class ORAlgorithm:
                     self.s[i, j, k] = self.solver.IntVar(0, 1, f'y[{i}, {j}, {k}]') # Variabeln können nur die Werte 0 oder 1 annehmen
 
 
+
     def violation_variables(self):
         """
         Definiere Variablen für Nebenbedingungsverletzungen
@@ -500,6 +498,7 @@ class ORAlgorithm:
                 self.nb5_violation[i, j] = self.solver.NumVar(0, self.solver.infinity(), f'nb5_violation[{i}, {j}]')
                 self.nb6_violation[i, j] = self.solver.NumVar(0, self.solver.infinity(), f'nb6_violation[{i}, {j}]')
                 self.nb7_violation[i, j] = self.solver.NumVar(0, self.solver.infinity(), f'nb7_violation[{i}, {j}]')
+
 
 
     def objective_function(self):
