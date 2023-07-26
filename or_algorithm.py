@@ -791,6 +791,7 @@ class ORAlgorithm:
 
                 # Benutzer aus der Datenbank abrufen
                 user = User.query.get(user_id)
+                print(user)
                 if not user:
                     print(f"Kein Benutzer gefunden mit ID: {user_id}")
                     continue
@@ -798,7 +799,7 @@ class ORAlgorithm:
                 for day_index, day in enumerate(days):
                     # Wir gehen davon aus, dass der erste Tag im 'self.user_availability' das Startdatum ist
                     date = self.user_availability[user_id][0][0] + datetime.timedelta(days=day_index)
-
+                    print("DATE: ", date)
                     # Hier unterteilen wir den Tag in Schichten, basierend auf den Zeiten, zu denen der Mitarbeiter arbeitet
                     shifts = []
                     start_time_index = None
