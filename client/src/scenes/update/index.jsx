@@ -6,6 +6,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import axios from 'axios';
+import { ThreeDots } from "react-loader-spinner"; 
 
 
 const Update = () => {
@@ -54,7 +55,12 @@ const Update = () => {
     }
   };
   if (isLoading) {
-    return <div>Loading...</div>; // Render a loading message or a spinner
+    return (
+      <Box m="20px" display="flex" justifyContent="center" alignItems="center" height="100vh">
+        {/* Use the loading animation component here */}
+        <ThreeDots type="ThreeDots" color="#70D8BD" height={80} width={80} />
+      </Box>
+    );
   }
 
   return (
@@ -126,7 +132,7 @@ const Update = () => {
                 name="email"
                 error={!!touched.email && !!errors.email}
                 helpertext={touched.email && errors.email}
-                sx={{ gridColumn: "span 4" }}
+                sx={{ gridColumn: "span 2" }}
               />
               <TextField
                 fullWidth
@@ -142,7 +148,7 @@ const Update = () => {
                 InputProps={{
                   endAdornment: <InputAdornment position="end">%</InputAdornment>,
                 }}
-                sx={{ gridColumn: "span 4" }}
+                sx={{ gridColumn: "span 2" }}
               />
               <TextField
                 fullWidth
@@ -155,7 +161,7 @@ const Update = () => {
                 name="department"
                 error={!!touched.department && !!errors.department}
                 helpertext={touched.department && errors.department}
-                sx={{ gridColumn: "span 4" }}
+                sx={{ gridColumn: "span 2" }}
               />
              
             </Box>
@@ -170,7 +176,7 @@ const Update = () => {
       <Snackbar
         open={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
-        message="Update successful"
+        message="Update erfolgreich"
         autoHideDuration={3000}
         sx={{
           backgroundColor: "green !important", 
@@ -185,7 +191,7 @@ const Update = () => {
       <Snackbar
         open={showErrorNotification}
         onClose={() => setShowErrorNotification(false)}
-        message="Error occurred - Your email might already be in use"
+        message="Update nicht erfolgreich"
         autoHideDuration={3000}
         sx={{
           backgroundColor: "red !important", 

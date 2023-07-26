@@ -137,7 +137,12 @@ def react_update():
             user.first_name = user_data.get('first_name', user.first_name)
             user.last_name = user_data.get('last_name', user.last_name)
             user.email = user_data.get('email', user.email)
-            user.employment_level = user_data.get('employment_level', user.employment_level)
+            
+            # Convert the employment_level to its original range [0, 1] before saving
+            employment_level_percentage = user_data.get('employment_level')
+            if employment_level_percentage is not None:
+                user.employment_level = employment_level_percentage / 100.0
+            
             user.department = user_data.get('department', user.department)
             user.changed_by = react_user
             user.update_timestamp = datetime.datetime.now()
@@ -145,15 +150,19 @@ def react_update():
             db.session.commit()
             return 'Success', 200
 
+    # Convert the employment_level to a percentage before sending it to the frontend
+    employment_level_percentage = user.employment_level * 100
+
     user_dict = {
         'first_name': user.first_name,
         'last_name': user.last_name,
         'email': user.email,
-        'employment_level': user.employment_level,
+        'employment_level': employment_level_percentage,
         'department': user.department,
     }
 
     return jsonify(user_dict)
+
 
 
 
