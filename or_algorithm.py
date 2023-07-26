@@ -554,6 +554,7 @@ class ORAlgorithm:
         for i in range(len(self.mitarbeiter)):
             prozent_per_ma = list_gesamtstunden[i] / summe_stunden
             prozent_gesamtstunden.append(prozent_per_ma)
+        print("Prozent Gesamtstunden:", prozent_gesamtstunden)
         # prozent_gesamtstunden = [0.2631578947368421, 0.21052631578947367, 0.21052631578947367, 0.15789473684210525, 0.15789473684210525]
         # Ein MA wird protenzual soviel eingeteilt, wie er Stunden eingetragen hat.
         # Dabei wird ebenfalls der Anstellungsbeschäftigungsgrad berücksichtigt.
