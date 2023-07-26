@@ -147,7 +147,7 @@ class ORAlgorithm:
         self.max_zeit = {ma: 9*4 for ma in self.mitarbeiter}  # Maximale Arbeitszeit pro Tag
 
         # -- 5 --
-        self.min_zeit = {ma: 5*4 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
+        self.min_zeit = {ma: 3*4 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
 
         # -- 6 --
         # Maximale Arbeitszeit pro woche, wird später noch aus der Datenbank gezogen
@@ -335,6 +335,21 @@ class ORAlgorithm:
                 if sum([self.verfügbarkeit[ma][i][j] for ma in self.mitarbeiter]) < self.min_anwesend[i][j]:
                     raise ValueError(f"Es sind nicht genügend Mitarbeiter verfügbar zur notwendigen Zeit (Tag {i+1}, Stunde {j+1}).")
 
+        """
+        ---------------------------------------------------------------------------------------------------------------
+        4. Können die MA die min. Zeit erreichen? - Evtl. auch gerechte Verteilung überprüfen
+        ---------------------------------------------------------------------------------------------------------------
+        """
+
+
+        # blablabla
+
+
+
+
+
+
+
 
 
     def solver_selection(self):
@@ -501,6 +516,9 @@ class ORAlgorithm:
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 # Prüfen, ob der Mitarbeiter an diesem Tag arbeiten kann (z.B. [0, 1, 1] = sum(2))
+
+                # Wenn diese Bedingung nicht erfüllt ist, kann die min und max Zeit verletzt werden! Ändern
+
                 if sum(self.verfügbarkeit[i][j]) >= self.min_zeit[i]:
                     sum_hour = self.solver.Sum(self.x[i, j, k] for k in range(len(self.verfügbarkeit[i][j])))
                     # Es ist nötig, das die min und die max Zeit implementiert ist. 
@@ -536,6 +554,9 @@ class ORAlgorithm:
 
         # NB X - Innerhalb einer Woche immer gleiche Schichten
         
+
+
+        # Hier den oberen Teil auslagern nach oben!!
         # WEICHE NB
         # NB 6 - Verteilungsgrad MA - (entsprechend employment_lvl (keine Festanstellung) - muss noch angepasst werden, sobald feste MA eingeplant werden)
         list_gesamtstunden = []
@@ -566,7 +587,10 @@ class ORAlgorithm:
                 verteilende_h = prozent_gesamtstunden[i] * self.verteilbare_stunden
                 # +0.5, damit es immer aufgerundet
             gerechte_verteilung.append(round(verteilende_h + 0.5))
-        print("Gerechte Verteilung: ", gerechte_verteilung)     
+        print("Gerechte Verteilung: ", gerechte_verteilung)   
+
+        gerechte_verteilung = [77, 65, 77, 74, 168, 168, 12, 19, 71, 55]
+
 
         # for loop für die gerechte Verteilung gemäss Liste gerechte_verteilung
         verteilungsstunden = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
@@ -578,13 +602,14 @@ class ORAlgorithm:
             upper_bound = gerechte_verteilung[i] * (1 + tolerance)
             self.solver.Add(verteilungsstunden[ma] <= upper_bound)
             self.solver.Add(verteilungsstunden[ma] >= lower_bound)
-        
+
 
         # NB 7 - Feste Mitarbeiter zu employement_level fest einplanen
         total_hours = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
         for i, ma in enumerate(self.mitarbeiter):
             if self.employment[i] == "Perm": 
                 self.solver.Add(total_hours[ma] == self.working_h)
+
 
         # NB X - Wechselnde Schichten innerhalb 2 Wochen
 
