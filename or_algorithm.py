@@ -22,6 +22,17 @@ Prio 1:
  - (erl.) Shifts/Employment_level aus der Datenbank ziehen
  - (erl.) auf Viertelstunden wechseln
 
+ Fragen an die Runde:
+ -------------------------------
+ 1. Wenn die MA Stunden eintragen an einem Tag, sollen sie dann mindestens die min Stunden eintragen? 
+    Kann man das irgendwie lösen, das man schaut was die min Stunden sind und mindestens soviele bei der Verfügbarkeit einträgt? Umsetzbarkeit?
+
+
+
+ -------------------------------
+
+
+
  - (90%) Die gesolvten Daten in der Datenbank speichern
  - (30%) Den Übergang auf harte und weiche NBs machen? 
  - (10%) Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
@@ -66,6 +77,7 @@ class ORAlgorithm:
         self.stunden_pro_tag = None                         # 11
         self.gesamtstunden_verfügbarkeit = []               # 12
         self.min_anwesend = []                              # 13
+        self.gerechte_verteilung = []                       # 14
 
         # Attribute der Methode "solver_selection"
         self.solver = None               
@@ -147,7 +159,7 @@ class ORAlgorithm:
         self.max_zeit = {ma: 9*4 for ma in self.mitarbeiter}  # Maximale Arbeitszeit pro Tag
 
         # -- 5 --
-        self.min_zeit = {ma: 5*4 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
+        self.min_zeit = {ma: 3*4 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
 
         # -- 6 --
         # Maximale Arbeitszeit pro woche, wird später noch aus der Datenbank gezogen
@@ -197,6 +209,38 @@ class ORAlgorithm:
         for _, values in sorted(self.time_req.items()):
             self.min_anwesend.append(list(values.values()))
 
+        # -- 14 --
+        # Eine Liste mit den Stunden wie sie gerecht verteilt werden
+        list_gesamtstunden = []
+        prozent_gesamtstunden = []
+        for i in range(len(self.mitarbeiter)):
+            if self.gesamtstunden_verfügbarkeit[i] > self.working_h:
+                arbeitsstunden_MA = self.employment_lvl_exact[i] * self.working_h
+            else:
+                arbeitsstunden_MA = self.employment_lvl_exact[i] * self.gesamtstunden_verfügbarkeit[i]
+            list_gesamtstunden.append(int(arbeitsstunden_MA))
+        # list_gesamtstunden = [35, 28, 28, 21, 21]
+        summe_stunden = sum(list_gesamtstunden)
+        # summe_stunden = 133
+        
+        for i in range(len(self.mitarbeiter)):
+            prozent_per_ma = list_gesamtstunden[i] / summe_stunden
+            prozent_gesamtstunden.append(prozent_per_ma)
+        print("Prozent Gesamtstunden:", prozent_gesamtstunden)
+        # prozent_gesamtstunden = [0.2631578947368421, 0.21052631578947367, 0.21052631578947367, 0.15789473684210525, 0.15789473684210525]
+        # Ein MA wird protenzual soviel eingeteilt, wie er Stunden eingetragen hat.
+        # Dabei wird ebenfalls der Anstellungsbeschäftigungsgrad berücksichtigt.
+
+        for i in range(len(self.mitarbeiter)):
+            if self.employment[i] == "Perm":
+                verteilende_h = self.working_h
+            else:
+                verteilende_h = prozent_gesamtstunden[i] * self.verteilbare_stunden
+                # +0.5, damit es immer aufgerundet
+            self.gerechte_verteilung.append(round(verteilende_h + 0.5)) 
+        # zum testen
+        self.gerechte_verteilung = [77, 65, 77, 74, 168, 168, 12, 19, 71, 55]
+
 
 
     def show_variables(self):
@@ -217,7 +261,6 @@ class ORAlgorithm:
         print("109. user_employment: ", self.user_employment) 
         print()
         
-
         print("Attribute der Methode create_variables:")
         # Attribute der Methode "create_variables"
         print("1. self.mitarbeiter: ", self.mitarbeiter)
@@ -236,6 +279,8 @@ class ORAlgorithm:
         print("11. self.stunden_pro_tag: ", self.stunden_pro_tag)
         print("12. self.gesamtstunden_verfügbarkeit: ", self.gesamtstunden_verfügbarkeit)
         print("13. self.min_anwesend: ", self.min_anwesend)
+        print("14. self.gerechte_verteilung: ", self.gerechte_verteilung)
+
 
 
     def pre_check_programmer(self):
@@ -294,7 +339,6 @@ class ORAlgorithm:
         assert all(isinstance(val, list) for val in self.min_anwesend), "Alle Elemente in self.min_anwesend sollten Listen sein"
 
         
-  
 
     def pre_check_admin(self):
         # Wenn die einzelnen Überprüfungen nicht standhalten, wird ein ValueError ausgelöst und jeweils geprintet, woran das Problem liegt. 
@@ -316,7 +360,25 @@ class ORAlgorithm:
 
         """
         ---------------------------------------------------------------------------------------------------------------
-        2. Haben alle MA zusammen genug Stunden eingegeben, um die verteilbaren Stunden zu erreichen?
+        2. Haben die MA mindestens die anzahl Stunden von gerechte_verteilung eingegeben?
+        ---------------------------------------------------------------------------------------------------------------
+        """
+        errors = []
+
+        for index, ma_id in enumerate(self.mitarbeiter):
+            if self.employment[index] == 'Temp':
+                total_hours_week = sum(sum(self.verfügbarkeit[ma_id][day]) for day in range(self.calc_time))
+                if total_hours_week < self.gerechte_verteilung[index]:
+                    errors.append(
+                        f"Temp-Mitarbeiter {ma_id} hat nur {total_hours_week} Stunden in der Woche eingetragen. "
+                        f"Das ist weniger als die erforderliche Gesamtstundenzahl von {self.gerechte_verteilung[index]} Stunden."
+                    )
+        if errors:
+            raise ValueError("Folgende Fehler wurden gefunden:\n" + "\n".join(errors))
+
+        """
+        ---------------------------------------------------------------------------------------------------------------
+        3. Haben alle MA zusammen genug Stunden eingegeben, um die verteilbaren Stunden zu erreichen?
         ---------------------------------------------------------------------------------------------------------------
         """
         total_hours_available = sum(self.gesamtstunden_verfügbarkeit)
@@ -327,7 +389,7 @@ class ORAlgorithm:
 
         """
         ---------------------------------------------------------------------------------------------------------------
-        3. Ist zu jeder notwendigen Zeit (self.min_anwesend) die mindestanzahl Mitarbeiter verfügbar?
+        4. Ist zu jeder notwendigen Zeit (self.min_anwesend) die mindestanzahl Mitarbeiter verfügbar?
         ---------------------------------------------------------------------------------------------------------------
         """
         for i in range(len(self.min_anwesend)):  # Für jeden Tag in der Woche
@@ -335,7 +397,24 @@ class ORAlgorithm:
                 if sum([self.verfügbarkeit[ma][i][j] for ma in self.mitarbeiter]) < self.min_anwesend[i][j]:
                     raise ValueError(f"Es sind nicht genügend Mitarbeiter verfügbar zur notwendigen Zeit (Tag {i+1}, Stunde {j+1}).")
 
+        """
+        ---------------------------------------------------------------------------------------------------------------
+        5. Können die MA die min. Zeit täglich erreichen? Wenn 0 Stunden eingegeben wurden, läuft es durch!
+        ---------------------------------------------------------------------------------------------------------------
+        """
+        errors = []
+        for ma in self.mitarbeiter:
+            for day in range(self.calc_time):
+                total_hours = sum(self.verfügbarkeit[ma][day])
+                if 0 < total_hours < self.min_zeit[ma]:
+                    errors.append(
+                        f"Mitarbeiter {ma} hat am Tag {day+1} nur {total_hours/4} Stunden eingetragen. "
+                        f"Das ist weniger als die Mindestarbeitszeit von {self.min_zeit[ma]/4} Stunden."
+                    )
+        if errors:
+            raise ValueError("Folgende Fehler wurden gefunden:\n" + "\n".join(errors))
 
+ 
 
     def solver_selection(self):
         """
@@ -346,6 +425,8 @@ class ORAlgorithm:
         # GLPK = Vielzahl von Algorithmen, einschließlich des Simplex-Verfahrens und des branch-and-bound-Verfahrens
         """
         self.solver = pywraplp.Solver.CreateSolver('SCIP')
+        # self.solver.SetTimeLimit(20000)  # Zeitlimit auf 20 Sekunden (in Millisekunden)
+
 
 
     def define_penalty_costs(self):
@@ -357,6 +438,7 @@ class ORAlgorithm:
         self.penalty_cost_nb4 = 100
         self.penalty_cost_nb5 = 100
         self.penalty_cost_nb6 = 100
+
 
 
     def decision_variables(self):
@@ -403,6 +485,7 @@ class ORAlgorithm:
                     self.s[i, j, k] = self.solver.IntVar(0, 1, f'y[{i}, {j}, {k}]') # Variabeln können nur die Werte 0 oder 1 annehmen
 
 
+
     def violation_variables(self):
         """
         Definiere Variablen für Nebenbedingungsverletzungen
@@ -415,6 +498,7 @@ class ORAlgorithm:
                 self.nb5_violation[i, j] = self.solver.NumVar(0, self.solver.infinity(), f'nb5_violation[{i}, {j}]')
                 self.nb6_violation[i, j] = self.solver.NumVar(0, self.solver.infinity(), f'nb6_violation[{i}, {j}]')
                 self.nb7_violation[i, j] = self.solver.NumVar(0, self.solver.infinity(), f'nb7_violation[{i}, {j}]')
+
 
 
     def objective_function(self):
@@ -501,6 +585,9 @@ class ORAlgorithm:
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 # Prüfen, ob der Mitarbeiter an diesem Tag arbeiten kann (z.B. [0, 1, 1] = sum(2))
+
+                # Wenn diese Bedingung nicht erfüllt ist, kann die min und max Zeit verletzt werden! Ändern
+
                 if sum(self.verfügbarkeit[i][j]) >= self.min_zeit[i]:
                     sum_hour = self.solver.Sum(self.x[i, j, k] for k in range(len(self.verfügbarkeit[i][j])))
                     # Es ist nötig, das die min und die max Zeit implementiert ist. 
@@ -535,55 +622,25 @@ class ORAlgorithm:
         
 
         # NB X - Innerhalb einer Woche immer gleiche Schichten
-        
+
+
         # WEICHE NB
-        # NB 6 - Verteilungsgrad MA - (entsprechend employment_lvl (keine Festanstellung) - muss noch angepasst werden, sobald feste MA eingeplant werden)
-        list_gesamtstunden = []
-        prozent_gesamtstunden = []
-        gerechte_verteilung = []
-        for i in range(len(self.mitarbeiter)):
-            if self.gesamtstunden_verfügbarkeit[i] > self.working_h:
-                arbeitsstunden_MA = self.employment_lvl_exact[i] * self.working_h
-            else:
-                arbeitsstunden_MA = self.employment_lvl_exact[i] * self.gesamtstunden_verfügbarkeit[i]
-            list_gesamtstunden.append(int(arbeitsstunden_MA))
-        # list_gesamtstunden = [35, 28, 28, 21, 21]
-        summe_stunden = sum(list_gesamtstunden)
-        # summe_stunden = 133
-        
-        for i in range(len(self.mitarbeiter)):
-            prozent_per_ma = list_gesamtstunden[i] / summe_stunden
-            prozent_gesamtstunden.append(prozent_per_ma)
-        # prozent_gesamtstunden = [0.2631578947368421, 0.21052631578947367, 0.21052631578947367, 0.15789473684210525, 0.15789473684210525]
-        # Ein MA wird protenzual soviel eingeteilt, wie er Stunden eingetragen hat.
-        # Dabei wird ebenfalls der Anstellungsbeschäftigungsgrad berücksichtigt.
-
-        for i in range(len(self.mitarbeiter)):
-            if self.employment[i] == "Perm":
-                verteilende_h = self.working_h
-            else:
-                verteilende_h = prozent_gesamtstunden[i] * self.verteilbare_stunden
-                # +0.5, damit es immer aufgerundet
-            gerechte_verteilung.append(round(verteilende_h + 0.5))
-        print("Gerechte Verteilung: ", gerechte_verteilung)     
-
-        # for loop für die gerechte Verteilung gemäss Liste gerechte_verteilung
+        # NB 6 - Verteilungsgrad MA
         verteilungsstunden = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
-        
-        # Toleranz später noch auslagern
-        tolerance = 0.3
+        tolerance = 0.3 # Toleranz später noch auslagern
         for i, ma in enumerate(self.mitarbeiter):
-            lower_bound = gerechte_verteilung[i] * (1 - tolerance)
-            upper_bound = gerechte_verteilung[i] * (1 + tolerance)
+            lower_bound = self.gerechte_verteilung[i] * (1 - tolerance)
+            upper_bound = self.gerechte_verteilung[i] * (1 + tolerance)
             self.solver.Add(verteilungsstunden[ma] <= upper_bound)
             self.solver.Add(verteilungsstunden[ma] >= lower_bound)
-        
+
 
         # NB 7 - Feste Mitarbeiter zu employement_level fest einplanen
         total_hours = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
         for i, ma in enumerate(self.mitarbeiter):
             if self.employment[i] == "Perm": 
                 self.solver.Add(total_hours[ma] == self.working_h)
+
 
         # NB X - Wechselnde Schichten innerhalb 2 Wochen
 
