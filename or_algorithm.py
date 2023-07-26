@@ -159,7 +159,7 @@ class ORAlgorithm:
         self.max_zeit = {ma: 9*4 for ma in self.mitarbeiter}  # Maximale Arbeitszeit pro Tag
 
         # -- 5 --
-        self.min_zeit = {ma: 3*4 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
+        self.min_zeit = {ma: 2*4 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
 
         # -- 6 --
         # Maximale Arbeitszeit pro woche, wird später noch aus der Datenbank gezogen
@@ -544,14 +544,12 @@ class ORAlgorithm:
                     self.solver.Add(self.x[i, j, k] <= self.verfügbarkeit[i][j][k])
 
 
-
-        """
-        # WEICHE NB
+        # HARTE NB
         # NB 2 - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend 
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
                 self.solver.Add(self.solver.Sum([self.x[i, j, k] for i in self.mitarbeiter]) >= self.min_anwesend[j][k])
-        """
+ 
         
         # WEICHE NB -- TEST 26.07.2023 --
         # NB 2 - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend 
