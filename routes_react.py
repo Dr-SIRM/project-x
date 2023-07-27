@@ -770,7 +770,8 @@ def get_required_workforce():
     calendar_dict={
         'weekdays': weekdays,
         'opening_dict': opening_dict,
-        'day_num': day_num
+        'day_num': day_num,
+        'timereq_dict': timereq_dict
     }
 
     return jsonify(calendar_dict)
