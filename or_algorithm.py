@@ -31,8 +31,8 @@ Prio 1:
 
  -------------------------------
 
- -(0%) Gerechte Verteilung Anpassen, das Stunden von "Perm" Mitarbeiter abgezogen werden
-- (30%) Den Übergang auf harte und weiche NBs machen? 
+ - (0%) Gerechte Verteilung Anpassen, das Stunden von "Perm" Mitarbeiter abgezogen werden
+ - (30%) Den Übergang auf harte und weiche NBs machen? 
   
  - (90%) Die gesolvten Daten in der Datenbank speichern
  - (10%) Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
