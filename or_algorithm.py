@@ -837,7 +837,7 @@ class ORAlgorithm:
                 print(f"Verarbeite Benutzer-ID: {user_id}")
 
                 # Benutzer aus der Datenbank abrufen
-                user = User.query.get(user_id)
+                    
                 print(user)
                 if not user:
                     print(f"Kein Benutzer gefunden mit ID: {user_id}")
