@@ -496,6 +496,8 @@ class ORAlgorithm:
     def violation_variables(self):
         """
         Definiere Variablen für Nebenbedingungsverletzungen
+
+        self.solver.NumVar(0, self.solver.infinity() <-- Von 0 bis unendlich. für infinity kann man auch eine Zahl einsetzen
         """
         # NB2 violation variable
         self.nb2_violation = {}
@@ -510,7 +512,7 @@ class ORAlgorithm:
             self.nb7_violation[i] = self.solver.NumVar(0, self.solver.infinity(), f'nb7_violation[{i}]')
         print("self.nb7_violation: ", self.nb7_violation)
 
-
+        # Wird (noch) nicht gebraucht
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 # self.nb2_violation[i, j] = self.solver.NumVar(0, self.solver.infinity(), f'nb2_violation[{i}, {j}]')
@@ -535,11 +537,11 @@ class ORAlgorithm:
                     self.objective.SetCoefficient(self.x[i, j, k], self.kosten[i])
                     self.objective.SetCoefficient(self.nb2_violation[j, k], self.penalty_cost_nb2)
 
-        # NB7
+        # Kosten NB7
         for i in self.mitarbeiter:
             self.objective.SetCoefficient(self.nb7_violation[i], self.penalty_cost_nb7)
 
-        # Es wird veruscht, eine Kombination von Werten für die x[i, j, k] zu finden, die die Summe kosten[i]*x[i, j, k] minimiert            
+        # Es wird veruscht, eine Kombination von Werten für die x[i, j, k] zu finden, die die Summe kosten[i]*x[i, j, k] minimiert + weiche NBs            
         self.objective.SetMinimization()
 
 
@@ -559,7 +561,7 @@ class ORAlgorithm:
 
 
         # HARTE NB
-        # NB 2 - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend 
+        # NB 2 - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
                 self.solver.Add(self.solver.Sum([self.x[i, j, k] for i in self.mitarbeiter]) >= self.min_anwesend[j][k])
@@ -723,7 +725,6 @@ class ORAlgorithm:
         print('Die Strafen für die Verletzung der weichen Nebenbedingung NB2 betragen:', nb2_penalty_costs)
         print('Die Strafen für die Verletzung der weichen Nebenbedingung NB7 betragen:', nb7_penalty_costs)
         print('Die gesamten Kosten betragen:', self.objective.Value())
-
 
 
 
