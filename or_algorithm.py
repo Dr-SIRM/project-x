@@ -443,7 +443,8 @@ class ORAlgorithm:
         self.penalty_cost_nb4 = 100
         self.penalty_cost_nb5 = 100
         self.penalty_cost_nb6 = 100
-        self.penalty_cost_nb7 = 100
+
+        self.penalty_cost_nb7 = 1
 
 
 
@@ -496,6 +497,7 @@ class ORAlgorithm:
         """
         Definiere Variablen für Nebenbedingungsverletzungen
         """
+        # NB2 violation variable
         self.nb2_violation = {}
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):
@@ -515,7 +517,6 @@ class ORAlgorithm:
                 self.nb4_violation[i, j] = self.solver.NumVar(0, self.solver.infinity(), f'nb4_violation[{i}, {j}]')
                 self.nb5_violation[i, j] = self.solver.NumVar(0, self.solver.infinity(), f'nb5_violation[{i}, {j}]')
                 self.nb6_violation[i, j] = self.solver.NumVar(0, self.solver.infinity(), f'nb6_violation[{i}, {j}]')
-
 
 
 
@@ -572,10 +573,6 @@ class ORAlgorithm:
         total_hours = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
         for ma in self.mitarbeiter:
             self.solver.Add(total_hours[ma] <= self.working_h)
-
-
-
-
 
 
 
@@ -692,10 +689,12 @@ class ORAlgorithm:
 
         # Berechnen Sie die Strafen für die Verletzung der weichen Nebenbedingungen
         nb2_penalty_costs = sum(self.penalty_cost_nb2 * self.nb2_violation[j, k].solution_value() for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])))
+        nb7_penalty_costs = sum(self.penalty_cost_nb7 * self.nb7_violation[i].solution_value() for i in self.mitarbeiter)
 
         # Drucken Sie die Kosten
         print('Die Kosten für die Einstellung von Mitarbeitern betragen:', hiring_costs)
         print('Die Strafen für die Verletzung der weichen Nebenbedingung NB2 betragen:', nb2_penalty_costs)
+        print('Die Strafen für die Verletzung der weichen Nebenbedingung NB7 betragen:', nb7_penalty_costs)
         print('Die gesamten Kosten betragen:', self.objective.Value())
 
 
