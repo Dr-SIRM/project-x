@@ -502,12 +502,13 @@ class ORAlgorithm:
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):
                 self.nb2_violation[j, k] = self.solver.NumVar(0, self.solver.infinity(), f'nb2_violation[{j}, {k}]')
+        print("self.nb2_violation: ", self.nb2_violation)
 
         # NB7 violation variable
         self.nb7_violation = {}
         for i in self.mitarbeiter:
             self.nb7_violation[i] = self.solver.NumVar(0, self.solver.infinity(), f'nb7_violation[{i}]')
-
+        print("self.nb7_violation: ", self.nb7_violation)
 
 
         for i in self.mitarbeiter:
@@ -566,6 +567,8 @@ class ORAlgorithm:
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
                 self.solver.Add(self.solver.Sum([self.x[i, j, k] for i in self.mitarbeiter]) - self.min_anwesend[j][k] <= self.nb2_violation[j, k])
+                print("self.x[i, j, k] for i in self.mitarbeiter: ", [self.x[i, j, k] for i in self.mitarbeiter])
+                print("self.min_anwesend[j][k]: ", self.min_anwesend[j][k])
 
 
         # WEICHE NB
@@ -661,6 +664,8 @@ class ORAlgorithm:
             if self.employment[i] == "Perm": 
                 self.solver.Add(total_hours[ma] - self.working_h <= self.nb7_violation[ma])
                 self.solver.Add(self.working_h - total_hours[ma] <= self.nb7_violation[ma])
+                print("total_hours[ma]: ", total_hours[ma])
+                print("self.nb7_violation[ma]: ", self.nb7_violation[ma])
 
 
         # NB X - Wechselnde Schichten innerhalb 2 Wochen
