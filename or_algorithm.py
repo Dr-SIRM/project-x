@@ -526,6 +526,8 @@ class ORAlgorithm:
         Zielfunktion
         """
         self.objective = self.solver.Objective()
+
+        # Kosten MA + NB2
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
@@ -533,6 +535,7 @@ class ORAlgorithm:
                     self.objective.SetCoefficient(self.x[i, j, k], self.kosten[i])
                     self.objective.SetCoefficient(self.nb2_violation[j, k], self.penalty_cost_nb2)
 
+        # NB7
         for i in self.mitarbeiter:
             self.objective.SetCoefficient(self.nb7_violation[i], self.penalty_cost_nb7)
 
@@ -659,10 +662,29 @@ class ORAlgorithm:
         """
         # WEICHE NB
         # NB 7 - Feste Mitarbeiter zu employement_level fest einplanen -- NEU 27.07.23 --
+        """
+        Angenommen, wir haben einen Mitarbeiter (Mitarbeiter 0), und wir planen seine Arbeitszeit für einen Tag (24 Stunden). 
+        Wir möchten, dass er genau 8 Stunden arbeitet. 
+        Dafür haben wir eine Reihe von `x`-Variablen, eine für jede Stunde des Tages, die angibt, ob er in dieser Stunde arbeitet oder nicht.
+
+        Wenn der Mitarbeiter genau 8 Stunden arbeitet, könnten die `x`-Variablen wie folgt aussehen:
+        x[0, 0] bis x[0, 7] sind 1 (was bedeutet, dass der Mitarbeiter arbeitet), und x[0, 8] bis x[0, 23] sind 0 (was bedeutet, dass der Mitarbeiter nicht arbeitet).
+        Dann wäre `total_hours[0] = sum(x[0, i] for i in range(24)) = 8`, was genau unserer gewünschten Arbeitszeit von 8 Stunden entspricht.
+        Da es keine Verletzung der Arbeitszeitregel gibt, wäre `self.nb7_violation[0] = abs(self.working_h - total_hours[0]) = abs(8 - 8) = 0`.
+
+        Aber was ist, wenn der Mitarbeiter nur 7 Stunden arbeitet?
+        Angenommen, x[0, 0] bis x[0, 6] sind 1, und x[0, 7] bis x[0, 23] sind 0.
+        Dann wäre `total_hours[0] = sum(x[0, i] for i in range(24)) = 7`, was weniger als unsere gewünschte Arbeitszeit von 8 Stunden ist.
+        Da der Mitarbeiter 1 Stunde weniger als gewünscht arbeitet, wäre `self.nb7_violation[0] = abs(self.working_h - total_hours[0]) = abs(8 - 7) = 1`.
+
+        Das Gleiche würde gelten, wenn der Mitarbeiter 9 Stunden arbeiten würde - die Verletzung wäre dann ebenfalls 1, da der Mitarbeiter 1 Stunde mehr als gewünscht arbeitet.
+        Der Zweck der `self.nb7_violation[ma]`-Variable ist es also, die Menge der Verletzung der Arbeitszeitregel für jeden Mitarbeiter zu erfassen, unabhängig davon, ob er zu viel oder zu wenig arbeitet.
+        """
         total_hours = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
+        print("total_hours: ", total_hours)
         for i, ma in enumerate(self.mitarbeiter):
             if self.employment[i] == "Perm": 
-                self.solver.Add(total_hours[ma] - self.working_h <= self.nb7_violation[ma])
+                self.solver.Add(total_hours[ma] - self.working_h <= self.nb7_violation[ma]) # 0 oder positive Zahlen in self.nb7_violation
                 self.solver.Add(self.working_h - total_hours[ma] <= self.nb7_violation[ma])
                 print("total_hours[ma]: ", total_hours[ma])
                 print("self.nb7_violation[ma]: ", self.nb7_violation[ma])
