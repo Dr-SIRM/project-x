@@ -212,7 +212,6 @@ class ORAlgorithm:
         # -- 14 --
         # Eine Liste mit den Stunden wie sie gerecht verteilt werden
         list_gesamtstunden = []
-        prozent_gesamtstunden = []
         for i in range(len(self.mitarbeiter)):
             if self.gesamtstunden_verfügbarkeit[i] > self.working_h:
                 arbeitsstunden_MA = self.employment_lvl_exact[i] * self.working_h
@@ -220,32 +219,43 @@ class ORAlgorithm:
                 arbeitsstunden_MA = self.employment_lvl_exact[i] * self.gesamtstunden_verfügbarkeit[i]
             list_gesamtstunden.append(int(arbeitsstunden_MA))
         print("list_gesamtstunden: ", list_gesamtstunden)
-        summe_stunden = sum(list_gesamtstunden)
-        print("summe_stunden: ", summe_stunden)
 
-        
-        for i in range(len(self.mitarbeiter)):
-            prozent_per_ma = list_gesamtstunden[i] / summe_stunden
-            prozent_gesamtstunden.append(prozent_per_ma)
-        print("Prozent Gesamtstunden:", prozent_gesamtstunden)
-
-        # Ein MA wird protenzual soviel eingeteilt, wie er Stunden eingetragen hat.
-        # Dabei wird ebenfalls der Anstellungsbeschäftigungsgrad berücksichtigt.
-
+        # Berechnung der Arbeitsstunden für Perm und Temp Mitarbeiter
+        total_hours_assigned = 0
+        temp_employees = []
+        self.gerechte_verteilung = [0 for _ in range(len(self.mitarbeiter))]  # Initialisiere die Liste mit Platzhaltern
+        print("1. self.gerechte_verteilung: ", self.gerechte_verteilung)
         for i in range(len(self.mitarbeiter)):
             if self.employment[i] == "Perm":
-                verteilende_h = self.working_h
+                allocated_hours = self.employment_lvl_exact[i] * self.working_h
+                total_hours_assigned += allocated_hours
+                self.gerechte_verteilung[i] = round(allocated_hours + 0.5)
             else:
-                verteilende_h = prozent_gesamtstunden[i] * self.verteilbare_stunden
-                # +0.5, damit es immer aufgerundet
-            self.gerechte_verteilung.append(round(verteilende_h + 0.5)) 
+                temp_employees.append(i)
+        print("2. self.gerechte_verteilung: ", self.gerechte_verteilung)
 
-            print(self.gerechte_verteilung)
+        remaining_hours = self.verteilbare_stunden - total_hours_assigned
+        print("remaining_hours: ", remaining_hours)
+        for i in temp_employees:
+            temp_hours = remaining_hours * (self.employment_lvl_exact[i] / sum(self.employment_lvl_exact[j] for j in temp_employees))
+            self.gerechte_verteilung[i] = round(temp_hours + 0.5)
+        print("3. self.gerechte_verteilung: ", self.gerechte_verteilung)
+
+        # Wenn die Rundung dazu geführt hat, dass total_hours_assigned die verteilbare_stunden überschreitet, passen wir die Stunden für Temp-Mitarbeiter an
+        total_hours_assigned = sum(self.gerechte_verteilung)
+        print("remaining_hours2: ", remaining_hours)
+        if total_hours_assigned > self.verteilbare_stunden:
+            # Sortieren Sie Temp-Mitarbeiter nach zugeteilten Stunden in absteigender Reihenfolge
+            temp_employees.sort(key=lambda i: self.gerechte_verteilung[i], reverse=True)
+            # Ziehen Sie die überschüssigen Stunden von den Temp-Mitarbeitern ab, beginnend mit demjenigen mit den meisten Stunden
+            for i in temp_employees:
+                if total_hours_assigned == self.verteilbare_stunden:
+                    break
+                self.gerechte_verteilung[i] -= 1
+                total_hours_assigned -= 1
 
         print("GERECHTE VERTEILUNG ORIGINAL:", self.gerechte_verteilung)
-        
-        # zum testen --> Summe 600! 
-        self.gerechte_verteilung = [40, 40, 40, 40, 168, 168, 12, 19, 40, 33]
+        print("Summe gerechte_verteilung: ", sum(self.gerechte_verteilung))
 
 
 
