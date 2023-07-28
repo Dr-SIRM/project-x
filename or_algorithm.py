@@ -591,11 +591,13 @@ class ORAlgorithm:
                 # print("self.min_anwesend[j][k]: ", self.min_anwesend[j][k])
 
 
+        """
         # HARTE NB
         # NB 3 - Max. Arbeitszeit pro Woche 
         total_hours = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
         for ma in self.mitarbeiter:
             self.solver.Add(total_hours[ma] <= self.working_h)
+        """
 
         # WEICHE NB -- NEU 28.07.2023 -- --> Muss noch genauer überprüft werden ob es funktioniert!
         # Momentan werden die Kosten "doppelt" gezählt, da in der weichen NB7 auch bestraft wird.
