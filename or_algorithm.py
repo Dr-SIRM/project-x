@@ -241,13 +241,14 @@ class ORAlgorithm:
             self.gerechte_verteilung[i] = round(temp_hours + 0.5)
         print("3. self.gerechte_verteilung: ", self.gerechte_verteilung)
 
-        # Wenn die Rundung dazu geführt hat, dass total_hours_assigned die verteilbare_stunden überschreitet, passen wir die Stunden für Temp-Mitarbeiter an
+        # Wenn die Rundung dazu geführt hat, dass total_hours_assigned die verteilbare_stunden überschreitet, werden die Stunden für Temp-Mitarbeiter angepasst
         total_hours_assigned = sum(self.gerechte_verteilung)
         print("remaining_hours2: ", remaining_hours)
         if total_hours_assigned > self.verteilbare_stunden:
-            # Sortieren Sie Temp-Mitarbeiter nach zugeteilten Stunden in absteigender Reihenfolge
+            # Sortieren der Temp-Mitarbeiter nach zugeteilten Stunden in absteigender Reihenfolge
             temp_employees.sort(key=lambda i: self.gerechte_verteilung[i], reverse=True)
-            # Ziehen Sie die überschüssigen Stunden von den Temp-Mitarbeitern ab, beginnend mit demjenigen mit den meisten Stunden
+            print(temp_employees)
+            # Überschüssigen Stunden von den Temp-Mitarbeitern abziehen, beginnend mit demjenigen mit den meisten Stunden
             for i in temp_employees:
                 if total_hours_assigned == self.verteilbare_stunden:
                     break
