@@ -151,7 +151,7 @@ class ORAlgorithm:
 
         # -- 3 --
         # Kosten für jeden MA noch gleich, ebenfalls die max Zeit bei allen gleich
-        self.kosten = {ma: 20 for ma in self.mitarbeiter}  # Kosten pro Stunde
+        self.kosten = {ma: 10 for ma in self.mitarbeiter}  # Kosten pro Stunde
 
         # -- 4 --
         self.max_zeit = {ma: 9*4 for ma in self.mitarbeiter}  # Maximale Arbeitszeit pro Tag
@@ -450,7 +450,7 @@ class ORAlgorithm:
         """
         self.penalty_cost_nb2 = 100
         self.penalty_cost_nb3 = 100
-        self.penalty_cost_nb4 = 10000
+        self.penalty_cost_nb4 = 100
         self.penalty_cost_nb7 = 100
 
         # Werden noch nicht gebraucht
