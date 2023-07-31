@@ -5,7 +5,7 @@
     # curl ifconfig.me
     # sudo apt-get update
     # sudo apt-get install mysql-client
-    # mysql -h projectx4.cnoaam4bktuu.eu-central-1.rds.amazonaws.com -u admin -p
+    # mysql -h projectx3.cj6fxzhtmztu.eu-central-1.rds.amazonaws.com -u admin -p
 
 # INSTALL FILES IN FLASK & REACT
 
