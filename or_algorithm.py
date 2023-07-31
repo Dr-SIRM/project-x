@@ -448,10 +448,10 @@ class ORAlgorithm:
         """
         Definiere Strafkosten für weiche Nebenbedingungen
         """
-        self.penalty_cost_nb2 = 100
-        self.penalty_cost_nb3 = 100
-        self.penalty_cost_nb4 = 100
-        self.penalty_cost_nb7 = 100
+        self.penalty_cost_nb2 = 1
+        self.penalty_cost_nb3 = 1000
+        self.penalty_cost_nb4 = 1000
+        self.penalty_cost_nb7 = 1000
 
         # Werden noch nicht gebraucht
         self.penalty_cost_nb5 = 100
@@ -735,27 +735,27 @@ class ORAlgorithm:
 
     def solve_problem(self):
         """
-        Problem lösen
+        Problem lösen und Kosten ausgeben
         """
         self.solver.EnableOutput()
         self.status = self.solver.Solve()
 
-        # Berechnen Sie die Kosten für die Einstellung von Mitarbeitern
+        # Kosten für die Einstellung von Mitarbeitern
         hiring_costs = sum(self.kosten[i] * self.x[i, j, k].solution_value() for i in self.mitarbeiter for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[i][j])))
 
-        # Berechnen Sie die Strafen für die Verletzung der weichen Nebenbedingungen
+        # Strafen für die Verletzung der weichen Nebenbedingungen
         nb2_penalty_costs = sum(self.penalty_cost_nb2 * self.nb2_violation[j, k].solution_value() for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])))
         nb3_penalty_costs = sum(self.penalty_cost_nb3 * self.nb3_violation[i].solution_value() for i in self.mitarbeiter)
-        # nb4_penalty_costs = sum(self.penalty_cost_nb4 * self.nb4_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
+        nb4_penalty_costs = sum(self.penalty_cost_nb4 * self.nb4_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
         nb7_penalty_costs = sum(self.penalty_cost_nb7 * self.nb7_violation[i].solution_value() for i in self.mitarbeiter)
 
         # Drucken Sie die Kosten
-        print('Die Kosten für die Einstellung von Mitarbeitern betragen:', hiring_costs)
-        print('Die Strafen für die Verletzung der weichen Nebenbedingung NB2 betragen:', nb2_penalty_costs)
-        print('Die Strafen für die Verletzung der weichen Nebenbedingung NB3 betragen:', nb3_penalty_costs)
-        # print('Die Strafen für die Verletzung der weichen Nebenbedingung NB4 betragen:', nb4_penalty_costs)
-        print('Die Strafen für die Verletzung der weichen Nebenbedingung NB7 betragen:', nb7_penalty_costs)
-        print('Die gesamten Kosten betragen:', self.objective.Value())
+        print('Kosten Einstellung von Mitarbeitern:', hiring_costs)
+        print('Kosten NB2 (Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend):', nb2_penalty_costs)
+        print('Kosten NB3 (Max. Arbeitszeit pro Woche):', nb3_penalty_costs)
+        print('Kosten NB4 (Min. und Max. Arbeitszeit pro Tag):', nb4_penalty_costs)
+        print('Kosten NB7 (Feste Mitarbeiter zu employement_level fest einplanen):', nb7_penalty_costs)
+        print('Gesamtkosten:', self.objective.Value())
 
 
 
