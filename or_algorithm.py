@@ -83,7 +83,8 @@ class ORAlgorithm:
         # Attribute der Methode "define_penalty_costs"
         self.penalty_cost_nb2 = None
         self.penalty_cost_nb3 = None
-        self.penalty_cost_nb4 = None
+        self.penalty_cost_nb4_min = None
+        self.penalty_cost_nb4_max = None
         self.penalty_cost_nb5 = None
         self.penalty_cost_nb6 = None
         self.penalty_cost_nb7 = None
@@ -98,7 +99,8 @@ class ORAlgorithm:
         # Attribute der Methode "violation_variables"
         self.nb2_violation = {}
         self.nb3_violation = {}
-        self.nb4_violation = {}
+        self.nb4_min_violation = {}
+        self.nb4_max_violation = {}
         self.nb5_violation = {}
         self.nb6_violation = {}
         self.nb7_violation = {}
@@ -448,15 +450,15 @@ class ORAlgorithm:
         """
         Definiere Strafkosten für weiche Nebenbedingungen
         """
-        self.penalty_cost_nb2 = 1
-        self.penalty_cost_nb3 = 1000
-        self.penalty_cost_nb4 = 1000
-        self.penalty_cost_nb7 = 1000
+        self.penalty_cost_nb2 = 100
+        self.penalty_cost_nb3 = 100
+        self.penalty_cost_nb4_min = 100
+        self.penalty_cost_nb4_max = 100
+        self.penalty_cost_nb7 = 100
 
         # Werden noch nicht gebraucht
         self.penalty_cost_nb5 = 100
         self.penalty_cost_nb6 = 100
-
 
 
     def decision_variables(self):
@@ -523,11 +525,17 @@ class ORAlgorithm:
             self.nb3_violation[i] = self.solver.NumVar(0, self.solver.infinity(), f'nb3_violation[{i}]')
         # print("self.nb3_violation: ", self.nb3_violation)
 
-        # NB4 violation variable
-        self.nb4_violation = {}
+        # NB4 Mindestarbeitszeit Verletzungsvariable
+        self.nb4_min_violation = {}
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
-                self.nb4_violation[i, j] = self.solver.NumVar(0, self.solver.infinity(), 'nb4_violation[%i,%i]' % (i, j))
+                self.nb4_min_violation[i, j] = self.solver.NumVar(0, self.solver.infinity(), 'nb4_min_violation[%i,%i]' % (i, j))
+
+        # NB4 Höchstarbeitszeit Verletzungsvariable
+        self.nb4_max_violation = {}
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                self.nb4_max_violation[i, j] = self.solver.NumVar(0, self.solver.infinity(), 'nb4_max_violation[%i,%i]' % (i, j))
 
         # NB7 violation variable
         self.nb7_violation = {}
@@ -555,10 +563,15 @@ class ORAlgorithm:
         for i in self.mitarbeiter:
             self.objective.SetCoefficient(self.nb3_violation[i], self.penalty_cost_nb3)
 
-        # Kosten für NB4
+        # Kosten für NB4 Mindestarbeitszeit Verletzung
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
-                self.objective.SetCoefficient(self.nb4_violation[i, j], self.penalty_cost_nb4)
+                self.objective.SetCoefficient(self.nb4_min_violation[i, j], self.penalty_cost_nb4_min)
+
+        # Kosten für NB4 Höchstarbeitszeit Verletzung
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                self.objective.SetCoefficient(self.nb4_max_violation[i, j], self.penalty_cost_nb4_max)
 
         # Kosten NB7
         for i in self.mitarbeiter:
@@ -637,7 +650,7 @@ class ORAlgorithm:
                     # NB 4.1 - Die Arbeitszeit eines Mitarbeiters an einem Tag kann nicht mehr als die maximale Arbeitszeit pro Tag betragen
                     self.solver.Add(sum_hour <= self.max_zeit[i] * self.a[i, j])
         """
-
+        """
         # WEICHE NB
         # NB 4 - Min. und Max. Arbeitszeit pro Tag
         for i in self.mitarbeiter:
@@ -650,6 +663,21 @@ class ORAlgorithm:
 
                     # Prüfen, ob die Summe der Arbeitsstunden größer als die maximale Arbeitszeit ist
                     self.solver.Add(self.max_zeit[i] * self.a[i, j] - sum_hour <= self.nb4_violation[i, j])
+        """
+
+        # WEICHE NB -- NEU 31.07.2023 --
+        # NB 4 - Min. und Max. Arbeitszeit pro Tag
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                if sum(self.verfügbarkeit[i][j]) >= self.min_zeit[i]:
+                    sum_hour = self.solver.Sum(self.x[i, j, k] for k in range(len(self.verfügbarkeit[i][j])))
+
+                    # Prüfen, ob die Summe der Arbeitsstunden kleiner als die Mindestarbeitszeit ist
+                    self.solver.Add(sum_hour - self.min_zeit[i] * self.a[i, j] >= -self.nb4_min_violation[i, j])
+
+                    # Prüfen, ob die Summe der Arbeitsstunden größer als die maximale Arbeitszeit ist
+                    self.solver.Add(sum_hour - self.max_zeit[i] * self.a[i, j] <= self.nb4_max_violation[i, j])
+
 
 
 
@@ -746,15 +774,17 @@ class ORAlgorithm:
         # Strafen für die Verletzung der weichen Nebenbedingungen
         nb2_penalty_costs = sum(self.penalty_cost_nb2 * self.nb2_violation[j, k].solution_value() for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])))
         nb3_penalty_costs = sum(self.penalty_cost_nb3 * self.nb3_violation[i].solution_value() for i in self.mitarbeiter)
-        nb4_penalty_costs = sum(self.penalty_cost_nb4 * self.nb4_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
+        nb4_min_penalty_costs = sum(self.penalty_cost_nb4_min * self.nb4_min_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
+        nb4_max_penalty_costs = sum(self.penalty_cost_nb4_max * self.nb4_max_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
         nb7_penalty_costs = sum(self.penalty_cost_nb7 * self.nb7_violation[i].solution_value() for i in self.mitarbeiter)
 
         # Drucken Sie die Kosten
         print('Kosten Einstellung von Mitarbeitern:', hiring_costs)
         print('Kosten NB2 (Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend):', nb2_penalty_costs)
         print('Kosten NB3 (Max. Arbeitszeit pro Woche):', nb3_penalty_costs)
-        print('Kosten NB4 (Min. und Max. Arbeitszeit pro Tag):', nb4_penalty_costs)
-        print('Kosten NB7 (Feste Mitarbeiter zu employement_level fest einplanen):', nb7_penalty_costs)
+        print('Kosten NB4 Min. Arbeitszeit pro Tag:', nb4_min_penalty_costs)
+        print('Kosten NB4 Max. Arbeitszeit pro Tag:', nb4_max_penalty_costs)
+        print('Kosten NB7 (Feste Mitarbeiter zu employment_level fest einplanen):', nb7_penalty_costs)
         print('Gesamtkosten:', self.objective.Value())
 
 
