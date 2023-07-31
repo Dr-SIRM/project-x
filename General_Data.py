@@ -20,4 +20,4 @@
 # RUN DATABASE
 
     # curl ifconfig.me
-    # mysql -h projectx4.cnoaam4bktuu.eu-central-1.rds.amazonaws.com -u admin -p
+    # mysql -h projectx3.cj6fxzhtmztu.eu-central-1.rds.amazonaws.com -u admin -p
