@@ -672,7 +672,7 @@ def get_required_workforce():
     today = datetime.date.today()
     monday = today - datetime.timedelta(days=today.weekday())
     day_num = 7
-    week_adjustment = session.get('week_adjustment', 0)
+    week_adjustment = int(request.args.get('week_adjustment', 0))
     user = User.query.get(user.id)
     company_id = user.company_id
 

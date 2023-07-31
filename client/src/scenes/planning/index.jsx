@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, TextField, ButtonGroup, Button } from '@mui/material';
+import { Box, Typography, TextField, ButtonGroup, Button, IconButton } from '@mui/material';
+import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { ThreeDots } from "react-loader-spinner"; 
 import axios from 'axios';
 
@@ -139,12 +140,15 @@ const Week = () => {
   const [closingHours, setClosingHours] = useState([]);
   const token = localStorage.getItem('session_token'); // Get the session token from local storage
   const [isLoading, setIsLoading] = useState(true);
+  const [weekOffset, setWeekOffset] = useState(0);
+  const goToNextWeek = () => setWeekOffset(weekOffset + 1);
+  const goToPreviousWeek = () => setWeekOffset(weekOffset - 1);
 
   useEffect(() => {
     const fetchCalendar = async (values) => {
       setIsLoading(true);
         try {
-          const response = await axios.get('http://localhost:5000/api/requirement/workforce', {
+          const response = await axios.get('http://localhost:5000/api/requirement/workforce?week_adjustment=${weekOffset*7}', {
               headers: {
                   'Authorization': `Bearer ${token}`
               }
@@ -177,7 +181,7 @@ const Week = () => {
     };
 
     fetchCalendar();
-  }, []);
+  }, [weekOffset, token]);
   
 
 
@@ -234,6 +238,15 @@ const Week = () => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', overflowX: 'auto' }}>
+      <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: '1rem' }}>
+        <IconButton onClick={goToPreviousWeek} color="primary">
+          <ChevronLeft />
+        </IconButton>
+        <Typography variant="h5" sx={{margin: '0 1rem'}}>Week {weekOffset + 1}</Typography>
+        <IconButton onClick={goToNextWeek} color="primary">
+          <ChevronRight />
+        </IconButton>
+      </Box>
       <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
         {weekDays.map((day, index) => 
           <Day 
