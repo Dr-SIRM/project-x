@@ -148,7 +148,7 @@ const Week = () => {
     const fetchCalendar = async (values) => {
       setIsLoading(true);
         try {
-          const response = await axios.get('http://localhost:5000/api/requirement/workforce?week_adjustment=${weekOffset*7}', {
+          const response = await axios.get('http://localhost:5000/api/requirement/workforce', {
               headers: {
                   'Authorization': `Bearer ${token}`
               }
