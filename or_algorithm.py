@@ -110,7 +110,7 @@ class ORAlgorithm:
         self.status = None
 
         # Attribute der Methode "store_solved_data"
-        self.mitarbeiter_arbeitszeiten = None
+        self.mitarbeiter_arbeitszeiten = {}
 
 
     def run(self):
@@ -555,12 +555,10 @@ class ORAlgorithm:
         for i in self.mitarbeiter:
             self.objective.SetCoefficient(self.nb3_violation[i], self.penalty_cost_nb3)
 
-        """ 
         # Kosten für NB4
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 self.objective.SetCoefficient(self.nb4_violation[i, j], self.penalty_cost_nb4)
-        """
 
         # Kosten NB7
         for i in self.mitarbeiter:
@@ -623,6 +621,7 @@ class ORAlgorithm:
                 solver.Add(solver.Sum(x[i, j, k] for k in range(len(verfügbarkeit[i][j]))) <= max_zeit[i])
         """
      
+        """
         # HARTE NB
         # NB 4 - Min. und Max. Arbeitszeit pro Tag
         for i in self.mitarbeiter:
@@ -638,19 +637,20 @@ class ORAlgorithm:
                     # NB 4.1 - Die Arbeitszeit eines Mitarbeiters an einem Tag kann nicht mehr als die maximale Arbeitszeit pro Tag betragen
                     self.solver.Add(sum_hour <= self.max_zeit[i] * self.a[i, j])
         """
+
         # WEICHE NB
-        # NB 4 - Min. und Max. Arbeitszeit pro Tag  -- NEU 29.07.2023 -- FUNKTIONIERT NOCH NICHT!!!
+        # NB 4 - Min. und Max. Arbeitszeit pro Tag
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 if sum(self.verfügbarkeit[i][j]) >= self.min_zeit[i]:
                     sum_hour = self.solver.Sum(self.x[i, j, k] for k in range(len(self.verfügbarkeit[i][j])))
-                    
+
                     # Prüfen, ob die Summe der Arbeitsstunden kleiner als die Mindestarbeitszeit ist
-                    self.solver.Add(sum_hour - self.min_zeit[i] <= self.nb4_violation[i, j])
-                    
+                    self.solver.Add(sum_hour - self.min_zeit[i] * self.a[i, j] <= self.nb4_violation[i, j])
+
                     # Prüfen, ob die Summe der Arbeitsstunden größer als die maximale Arbeitszeit ist
-                    self.solver.Add(self.max_zeit[i] - sum_hour <= self.nb4_violation[i, j])
-        """
+                    self.solver.Add(self.max_zeit[i] * self.a[i, j] - sum_hour <= self.nb4_violation[i, j])
+
 
 
         # HARTE NB
@@ -764,7 +764,6 @@ class ORAlgorithm:
         mitarbeiter_arbeitszeiten Attribut befüllen
         """
         if self.status == pywraplp.Solver.OPTIMAL or self.status == pywraplp.Solver.FEASIBLE:
-            self.mitarbeiter_arbeitszeiten = {}
             for i in self.mitarbeiter:
                 self.mitarbeiter_arbeitszeiten[i] = []
                 for j in range(self.calc_time):
