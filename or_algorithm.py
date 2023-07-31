@@ -644,7 +644,7 @@ class ORAlgorithm:
             for j in range(self.calc_time):
                 if sum(self.verfügbarkeit[i][j]) >= self.min_zeit[i]:
                     sum_hour = self.solver.Sum(self.x[i, j, k] for k in range(len(self.verfügbarkeit[i][j])))
-
+                    
                     # Prüfen, ob die Summe der Arbeitsstunden kleiner als die Mindestarbeitszeit ist
                     self.solver.Add(sum_hour - self.min_zeit[i] * self.a[i, j] <= self.nb4_violation[i, j])
 
