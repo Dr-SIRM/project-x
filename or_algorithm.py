@@ -443,6 +443,7 @@ class ORAlgorithm:
         """
         self.solver = pywraplp.Solver.CreateSolver('SCIP')
         # self.solver.SetTimeLimit(20000)  # Zeitlimit auf 20 Sekunden (in Millisekunden)
+        # self.solver.SetSolverSpecificParametersAsString("limits/gap=0.01") # Wenn der gap kleiner 1% ist, bricht der Solver ab
 
 
 
@@ -450,11 +451,20 @@ class ORAlgorithm:
         """
         Definiere Strafkosten für weiche Nebenbedingungen
         """
+
+        # NB 2 - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend 
         self.penalty_cost_nb2 = 100
+
+        # NB 3 - Max. Arbeitszeit pro Woche
         self.penalty_cost_nb3 = 100
-        self.penalty_cost_nb4_min = 100
-        self.penalty_cost_nb4_max = 100
+
+        # NB 4 - Min. und Max. Arbeitszeit pro Tag
+        self.penalty_cost_nb4_min = 10
+        self.penalty_cost_nb4_max = 10
+
+        # NB 7 - Feste Mitarbeiter zu employement_level fest einplanen
         self.penalty_cost_nb7 = 100
+
 
         # Werden noch nicht gebraucht
         self.penalty_cost_nb5 = 100
@@ -508,8 +518,9 @@ class ORAlgorithm:
 
     def violation_variables(self):
         """
-        Definiere Variablen für Nebenbedingungsverletzungen
+        Verletzungsvariabeln
 
+        Definiere Variablen für Nebenbedingungsverletzungen
         self.solver.NumVar(0, self.solver.infinity() <-- Von 0 bis unendlich. für infinity kann man auch eine Zahl einsetzen
         """
         # NB2 violation variable
@@ -519,11 +530,13 @@ class ORAlgorithm:
                 self.nb2_violation[j, k] = self.solver.NumVar(0, self.solver.infinity(), f'nb2_violation[{j}, {k}]')
         # print("self.nb2_violation: ", self.nb2_violation)
 
+
         # NB3 violation variable
         self.nb3_violation = {}
         for i in self.mitarbeiter:
             self.nb3_violation[i] = self.solver.NumVar(0, self.solver.infinity(), f'nb3_violation[{i}]')
         # print("self.nb3_violation: ", self.nb3_violation)
+
 
         # NB4 Mindestarbeitszeit Verletzungsvariable
         self.nb4_min_violation = {}
@@ -536,6 +549,7 @@ class ORAlgorithm:
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 self.nb4_max_violation[i, j] = self.solver.NumVar(0, self.solver.infinity(), 'nb4_max_violation[%i,%i]' % (i, j))
+
 
         # NB7 violation variable
         self.nb7_violation = {}
@@ -672,12 +686,15 @@ class ORAlgorithm:
                 if sum(self.verfügbarkeit[i][j]) >= self.min_zeit[i]:
                     sum_hour = self.solver.Sum(self.x[i, j, k] for k in range(len(self.verfügbarkeit[i][j])))
 
+                    
                     # Prüfen, ob die Summe der Arbeitsstunden kleiner als die Mindestarbeitszeit ist
                     self.solver.Add(sum_hour - self.min_zeit[i] * self.a[i, j] >= -self.nb4_min_violation[i, j])
+                    # self.solver.Add(self.nb4_min_violation[i, j] >= 0)
 
+                    
                     # Prüfen, ob die Summe der Arbeitsstunden größer als die maximale Arbeitszeit ist
                     self.solver.Add(sum_hour - self.max_zeit[i] * self.a[i, j] <= self.nb4_max_violation[i, j])
-
+                    # self.solver.Add(self.nb4_max_violation[i, j] >= 0)
 
 
 
@@ -856,7 +873,7 @@ class ORAlgorithm:
                 row.extend(quarter_hours)
                 row.append(' ')  # Fügt eine leere Spalte nach jedem Tag hinzu
             ws.append(row)
-            ws.cell(row=idx, column=len(row) + 1, value=f"=SUM(B{idx}:{get_column_letter(len(row))}{idx})/4")
+            ws.cell(row=idx, column=len(row) + 1, value=f"=SUM(B{idx}:{get_column_letter(len(row))}{idx})")
 
 
         # Farben auf Basis der Zellenwerte festlegen und Schriftgröße für den Rest des Dokuments
