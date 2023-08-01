@@ -459,8 +459,8 @@ class ORAlgorithm:
         self.penalty_cost_nb3 = 100
 
         # NB 4 - Min. und Max. Arbeitszeit pro Tag
-        self.penalty_cost_nb4_min = 10
-        self.penalty_cost_nb4_max = 10
+        self.penalty_cost_nb4_min = 1
+        self.penalty_cost_nb4_max = 1000
 
         # NB 7 - Feste Mitarbeiter zu employement_level fest einplanen
         self.penalty_cost_nb7 = 100
@@ -683,7 +683,14 @@ class ORAlgorithm:
         # NB 4 - Min. und Max. Arbeitszeit pro Tag
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
-                if sum(self.verfügbarkeit[i][j]) >= self.min_zeit[i]:
+
+                # Wenn die if Bedingung auskommentiert wird, dann wird die min und max Zeit im gleichen Masse verteilt, funktioniert aber noch nicht!
+                # Irgendwo liegt der Fehler, ich weiss noch nicht wo?!
+                # Wenn die Kosten so eingestellt sind, funktioniert es:
+                # self.penalty_cost_nb4_min = 1
+                # self.penalty_cost_nb4_max = 1000
+
+                # if sum(self.verfügbarkeit[i][j]) >= self.min_zeit[i]:
                     sum_hour = self.solver.Sum(self.x[i, j, k] for k in range(len(self.verfügbarkeit[i][j])))
 
                     
