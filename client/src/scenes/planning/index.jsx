@@ -143,6 +143,8 @@ const Week = () => {
   const [weekOffset, setWeekOffset] = useState(0);
   const goToNextWeek = () => setWeekOffset(weekOffset + 1);
   const goToPreviousWeek = () => setWeekOffset(weekOffset - 1);
+  const [mondayDate, setMondayDate] = useState("");
+  
 
   useEffect(() => {
     const fetchCalendar = async (values) => {
@@ -153,6 +155,7 @@ const Week = () => {
                   'Authorization': `Bearer ${token}`
               }
           });
+          setMondayDate(response.data.monday);
           setcalendarData(response.data);
           setIsLoading(false);
           const fetchedData = response.data;
@@ -181,7 +184,7 @@ const Week = () => {
     };
 
     fetchCalendar();
-  }, [weekOffset, token]);
+  }, []);
   
 
 
@@ -239,11 +242,48 @@ const Week = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', overflowX: 'auto' }}>
       <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: '1rem' }}>
-        <IconButton onClick={goToPreviousWeek} color="primary">
+        <IconButton onClick={goToPreviousWeek} 
+        sx={{
+          borderColor: 'white',
+          '&.MuiButton-outlined': {
+            borderColor: 'white',
+          },
+          '&:hover': {
+            borderColor: 'white',
+          },
+          '&.MuiButton-text': {
+            borderColor: 'white',
+            color: 'white',
+            backgroundColor: '#2e7c67',
+          }
+        }}>
           <ChevronLeft />
         </IconButton>
-        <Typography variant="h5" sx={{margin: '0 1rem'}}>Week {weekOffset + 1}</Typography>
-        <IconButton onClick={goToNextWeek} color="primary">
+        <Typography variant="h5" sx={{margin: '0 1rem'}}>
+          {
+            new Intl.DateTimeFormat('de', { 
+              weekday: 'short', 
+              day: '2-digit', 
+              month: 'long', 
+              year: 'numeric'
+            }).format(new Date(mondayDate))
+          }
+        </Typography>
+        <IconButton onClick={goToNextWeek} 
+        sx={{
+          borderColor: 'white',
+          '&.MuiButton-outlined': {
+            borderColor: 'white',
+          },
+          '&:hover': {
+            borderColor: 'white',
+          },
+          '&.MuiButton-text': {
+            borderColor: 'white',
+            color: 'white',
+            backgroundColor: '#2e7c67',
+          }
+        }}>
           <ChevronRight />
         </IconButton>
       </Box>
