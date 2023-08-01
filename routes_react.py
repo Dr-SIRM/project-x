@@ -631,7 +631,7 @@ def get_admin_registration():
             if last_company_id is None:
                 new_company_id = 10000
             else:
-                new_company_id = last_company_id + 1
+                new_company_id = last_company_id.company_id + 1
 
             data = User(id = new_id, 
                         company_id = new_company_id, 

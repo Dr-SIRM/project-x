@@ -21,3 +21,8 @@
 
     # curl ifconfig.me
     # mysql -h projectx3.cj6fxzhtmztu.eu-central-1.rds.amazonaws.com -u admin -p
+
+# NEUER USER
+
+    # http://127.0.0.1:3000/registration/admin
+    # Ass&Titties

@@ -20,8 +20,8 @@ class DataProcessing:
         self.binary_availability = None
 
         # Zeitraum in dem gesolvet wird, wird noch angepasst!
-        self.start_date = "2023-07-24"
-        self.end_date = "2023-07-28"
+        self.start_date = "2023-07-31"
+        self.end_date = "2023-08-04"
 
         # Gute Daten zum testsolven
         #self.start_date = "2023-06-26"
