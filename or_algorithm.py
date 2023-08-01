@@ -689,12 +689,12 @@ class ORAlgorithm:
                     
                     # Prüfen, ob die Summe der Arbeitsstunden kleiner als die Mindestarbeitszeit ist
                     self.solver.Add(sum_hour - self.min_zeit[i] * self.a[i, j] >= -self.nb4_min_violation[i, j])
-                    # self.solver.Add(self.nb4_min_violation[i, j] >= 0)
+                    self.solver.Add(self.nb4_min_violation[i, j] >= 0)
 
                     
                     # Prüfen, ob die Summe der Arbeitsstunden größer als die maximale Arbeitszeit ist
                     self.solver.Add(sum_hour - self.max_zeit[i] * self.a[i, j] <= self.nb4_max_violation[i, j])
-                    # self.solver.Add(self.nb4_max_violation[i, j] >= 0)
+                    self.solver.Add(self.nb4_max_violation[i, j] >= 0)
 
 
 
@@ -799,8 +799,8 @@ class ORAlgorithm:
         print('Kosten Einstellung von Mitarbeitern:', hiring_costs)
         print('Kosten NB2 (Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend):', nb2_penalty_costs)
         print('Kosten NB3 (Max. Arbeitszeit pro Woche):', nb3_penalty_costs)
-        print('Kosten NB4 Min. Arbeitszeit pro Tag:', nb4_min_penalty_costs)
-        print('Kosten NB4 Max. Arbeitszeit pro Tag:', nb4_max_penalty_costs)
+        print('Kosten NB4 (Min. Arbeitszeit pro Tag):', nb4_min_penalty_costs)
+        print('Kosten NB4 (Max. Arbeitszeit pro Tag):', nb4_max_penalty_costs)
         print('Kosten NB7 (Feste Mitarbeiter zu employment_level fest einplanen):', nb7_penalty_costs)
         print('Gesamtkosten:', self.objective.Value())
 
