@@ -28,7 +28,7 @@ const Team = () => {
                   'Authorization': `Bearer ${token}`
               }
           });
-          setUsers(response.data); // <-- change is here
+          setUsers(response.data); 
           setIsLoading(false);
         } catch (error) {
           console.error('Error fetching update details:', error);
@@ -38,8 +38,32 @@ const Team = () => {
   
     fetchUser();
   }, []);
-  
-  
+    
+  const handleEditCellChangeCommitted = async ({ id, field, props }) => {
+    console.log("handleEditCellChangeCommitted called", { id, field, props });  
+    const newValue = props.value;
+
+    try {
+        await axios.put(`http://localhost:5000/api/users/${id}`, {
+            [field]: newValue
+        }, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        const updatedUsers = users.map(user => {
+            if (user.id === id) {
+                return { ...user, [field]: newValue };
+            }
+            return user;
+        });
+        setUsers(updatedUsers);
+    } catch (error) {
+        console.error('Error updating user:', error);
+    }
+};
+
   if (isLoading) {
     return (
       <Box m="20px" display="flex" justifyContent="center" alignItems="center" height="100vh">
@@ -47,7 +71,7 @@ const Team = () => {
       </Box>
     );
   }
-
+  
 
   const columns = [
     { field: "id", headerName: "ID" },
@@ -63,6 +87,7 @@ const Team = () => {
       headerName: "Nachname",
       flex: 1,
       cellClassName: "name-column--cell",
+      editable: true
     },
     {
       field: "company_name",
@@ -73,6 +98,7 @@ const Team = () => {
       field: "email",
       headerName: "E-mail",
       flex: 1,
+      editable: true,
     },
     {
       field: "employment",
@@ -82,6 +108,7 @@ const Team = () => {
         const employment = params.row.employment;
         return employment === "Perm" ? "Vollzeit" : employment === "Temp" ? "Teilzeit" : employment;
       },
+      editable: true,
     },  
     {
       field: "employment_level",
@@ -98,6 +125,7 @@ const Team = () => {
       field: "department",
       headerName: "Abteilung",
       flex: 1,
+      editable: true,
     },
     {
       field: "access_level",
@@ -164,7 +192,12 @@ const Team = () => {
           },
         }}
       >
-        <DataGrid checkboxSelection rows={users} columns={columns} />
+        <DataGrid
+            checkboxSelection
+            rows={users}
+            columns={columns}
+            onEditCellChangeCommitted={handleEditCellChangeCommitted}
+        />
       </Box>
     </Box>
   );

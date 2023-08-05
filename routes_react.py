@@ -118,6 +118,22 @@ def get_data():
 
     return jsonify(user_list) 
 
+@app.route('/api/users/<int:user_id>', methods=['PUT'])
+@jwt_required()
+def update_user(user_id):
+    data = request.get_json()
+    user = User.query.get(user_id)
+
+    if user is None:
+        return jsonify({"message": "User not found"}), 404
+
+    for key, value in data.items():
+        setattr(user, key, value)
+
+    db.session.commit()
+
+    return jsonify({"message": "User updated"}), 200
+
 @app.route('/api/new_user', methods=['POST'])
 def new_user():
     data = request.json
@@ -131,7 +147,6 @@ def new_user():
     db.session.add(user)
     db.session.commit()
     return {'success': True}
-
 
 @app.route('/api/update', methods=["GET", "POST"])
 @jwt_required()
