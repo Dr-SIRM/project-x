@@ -16,24 +16,29 @@ const Team = () => {
   const colors = tokens(theme.palette.mode);
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [setMessage] = useState("");
+  const token = localStorage.getItem('session_token'); 
+  const [userData, setUserData] = useState({});
 
   useEffect(() => {
-    async function fetchData() {
+    const fetchUser = async () => {
       setIsLoading(true);
-      try {
-        const response = await axios.get("http://localhost:5000/api/users");
-        const data = response.data;
-        setUsers(data);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error.response ? error.response : error);
-        setIsLoading(false);
-        setMessage("An error occurred while fetching data.");
-      }
-    } 
-    fetchData();
+        try {
+          const response = await axios.get('http://localhost:5000/api/users', {
+              headers: {
+                  'Authorization': `Bearer ${token}`
+              }
+          });
+          setUsers(response.data); // <-- change is here
+          setIsLoading(false);
+        } catch (error) {
+          console.error('Error fetching update details:', error);
+          setIsLoading(false);
+        }
+    };
+  
+    fetchUser();
   }, []);
+  
   
   if (isLoading) {
     return (

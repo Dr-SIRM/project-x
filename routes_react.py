@@ -85,11 +85,22 @@ def current_react_user():
     }
 
     return jsonify(user_dict)
-    
 
 @app.route('/api/users')
+@jwt_required()
 def get_data():
-    users = User.query.all()
+    react_user_email = get_jwt_identity()
+    current_user = User.query.filter_by(email=react_user_email).first()
+    
+    if current_user is None:
+        return jsonify({"message": "User not found"}), 404
+    
+    # Get the company name of the current logged-in user
+    current_company_name = current_user.company_name
+
+    # Query users who are members of the same company
+    users = User.query.filter_by(company_name=current_company_name).all()
+
     user_list = []
     for user in users:
         user_dict = {
@@ -104,7 +115,8 @@ def get_data():
             'employment_level': user.employment_level,
         }
         user_list.append(user_dict)
-    return jsonify(user_list)
+
+    return jsonify(user_list) 
 
 @app.route('/api/new_user', methods=['POST'])
 def new_user():
