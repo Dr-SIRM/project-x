@@ -803,3 +803,13 @@ def get_required_workforce():
     }
 
     return jsonify(calendar_dict)
+
+mitarbeiter_planung = [
+    {'name': 'Max Mustermann', 'arbeitszeit': '08:00 - 16:00'},
+    {'name': 'Erika Mustermann', 'arbeitszeit': '10:00 - 18:00'},
+    
+]
+
+@app.route('/api/mitarbeiter', methods=['GET'])
+def get_mitarbeiter():
+    return jsonify(mitarbeiter_planung)
