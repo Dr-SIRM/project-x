@@ -133,9 +133,9 @@ const Day = ({ day, slotCounts = {}, setSlotCounts, openingHour, closingHour }) 
 const Week = () => {
   const [weekDays, setWeekDays] = useState([]); 
   const [slotCounts, setSlotCounts] = useState({});
-  const [setcalendarData] = useState([]);
-  const [setShowSuccessNotification] = useState(false);
-  const [setShowErrorNotification] = useState(false);
+  const [calendarData, setcalendarData] = useState([]);
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
+  const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [openingHours, setOpeningHours] = useState([]);
   const [closingHours, setClosingHours] = useState([]);
   const token = localStorage.getItem('session_token'); // Get the session token from local storage
