@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { Box, Typography, TextField, Button, Alert, useTheme, Link, CircularProgress, Snackbar } from '@mui/material';
 import Header from "../../components/Header";
 import { useNavigate } from 'react-router-dom';
+import { tokens } from "../../theme";
 import { AuthContext } from "../../AuthContext";
 
 const Login = () => {
@@ -11,6 +12,8 @@ const Login = () => {
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
 
   useEffect(() => {
     if (error) {
