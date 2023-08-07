@@ -1,11 +1,11 @@
-import { useState, useEffect, useContext } from "react";
-import { BrowserRouter as Router, Routes, Route, Outlet } from "react-router-dom";
+import { useState, useContext } from "react";
+import { BrowserRouter as Routes, Route } from "react-router-dom";
 import AuthProvider, { AuthContext } from "./AuthContext";
 import PrivateRoute from "./PrivateRoute";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
 import Login from "./scenes/login";
-import Token_Registration from "./scenes/token_registration";
+import TokenRegistration from "./scenes/token_registration";
 import Registration from "./scenes/registration_supervisor";
 import ForgetPassword from "./scenes/forget_password";
 import Dashboard from "./scenes/dashboard";
@@ -58,7 +58,7 @@ function AppContent({ isSidebar, setIsSidebar }) {
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/forget_password" element={<ForgetPassword />} />
-          <Route path="/token_registration" element={<Token_Registration />} />
+          <Route path="/token_registration" element={<TokenRegistration />} />
           <Route path="/registration/admin" element={<Registration />} />
           <Route path="/dashboard" element={<PrivateRoute component={Dashboard} accessLevels={["Super_Admin", "Admin", "User"]} />} />
           <Route path="/solver" element={<PrivateRoute component={Solver} accessLevels={["Super_Admin", "Admin"]} />} />

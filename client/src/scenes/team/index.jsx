@@ -17,7 +17,7 @@ const Team = () => {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const token = localStorage.getItem('session_token'); 
-  const [userData, setUserData] = useState({});
+  //const [userData, setUserData] = useState({});
 
   useEffect(() => {
     const fetchUser = async () => {
