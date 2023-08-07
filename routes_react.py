@@ -697,11 +697,17 @@ def get_required_workforce():
     creation_date = datetime.datetime.now()
     weekdays = {0: 'Monday', 1: 'Tuesday', 2: 'Wednesday', 3: 'Thursday', 4: 'Friday', 5: 'Saturday', 6: 'Sunday'}
     today = datetime.date.today()
-    monday = today - datetime.timedelta(days=today.weekday())
+    
     day_num = 7
-    week_adjustment = int(request.args.get('week_adjustment', 0))
+    
     user = User.query.get(user.id)
     company_id = user.company_id
+
+
+    # Week with adjustments
+    monday = today - datetime.timedelta(days=today.weekday())
+    week_adjustment = int(request.args.get('week_adjustment', 0))
+    monday += datetime.timedelta(days=week_adjustment)
 
 
     timereq_dict = {}
