@@ -23,13 +23,13 @@ const AuthProvider = ({ children }) => {
       }
       const data = await response.json();
       console.log('Server response:', data);
-      setUser( data.user );
+      setUser(data.user);
       localStorage.setItem('session_token', data.session_token);
       localStorage.setItem('user', JSON.stringify(data.user));
-  } catch (error) {
-    setError('Invalid email or password');
-  }
-};
+    } catch (error) {
+      setError('Invalid email or password');
+    }
+  };
 
   useEffect(() => {
     if (user) {
@@ -42,7 +42,6 @@ const AuthProvider = ({ children }) => {
   }, [user]); // This useEffect hook logs the value of 'user' whenever it changes
 
   const logout = () => {
-    // Clear user data and access token from localStorage
     setUser(null);
     localStorage.removeItem('session_token');
     localStorage.removeItem('user');
@@ -50,7 +49,7 @@ const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, error, setError }}>
       {children}
     </AuthContext.Provider>
   );

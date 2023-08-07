@@ -85,11 +85,22 @@ def current_react_user():
     }
 
     return jsonify(user_dict)
-    
 
 @app.route('/api/users')
+@jwt_required()
 def get_data():
-    users = User.query.all()
+    react_user_email = get_jwt_identity()
+    current_user = User.query.filter_by(email=react_user_email).first()
+    
+    if current_user is None:
+        return jsonify({"message": "User not found"}), 404
+    
+    # Get the company name of the current logged-in user
+    current_company_name = current_user.company_name
+
+    # Query users who are members of the same company
+    users = User.query.filter_by(company_name=current_company_name).all()
+
     user_list = []
     for user in users:
         user_dict = {
@@ -104,7 +115,24 @@ def get_data():
             'employment_level': user.employment_level,
         }
         user_list.append(user_dict)
-    return jsonify(user_list)
+
+    return jsonify(user_list) 
+
+@app.route('/api/users/<int:user_id>', methods=['PUT'])
+@jwt_required()
+def update_user(user_id):
+    data = request.get_json()
+    user = User.query.get(user_id)
+
+    if user is None:
+        return jsonify({"message": "User not found"}), 404
+
+    for key, value in data.items():
+        setattr(user, key, value)
+
+    db.session.commit()
+
+    return jsonify({"message": "User updated"}), 200
 
 @app.route('/api/new_user', methods=['POST'])
 def new_user():
@@ -119,7 +147,6 @@ def new_user():
     db.session.add(user)
     db.session.commit()
     return {'success': True}
-
 
 @app.route('/api/update', methods=["GET", "POST"])
 @jwt_required()
@@ -776,3 +803,13 @@ def get_required_workforce():
     }
 
     return jsonify(calendar_dict)
+
+mitarbeiter_planung = [
+    {'name': 'Max Mustermann', 'arbeitszeit': '08:00 - 16:00'},
+    {'name': 'Erika Mustermann', 'arbeitszeit': '10:00 - 18:00'},
+    
+]
+
+@app.route('/api/mitarbeiter', methods=['GET'])
+def get_mitarbeiter():
+    return jsonify(mitarbeiter_planung)

@@ -1,32 +1,38 @@
-import React, { useContext, useState } from 'react';
-import { Box, Typography, TextField, Button, Alert, useTheme, Link, CircularProgress } from '@mui/material';
+import React, { useContext, useState, useEffect } from 'react';
+import { Box, Typography, TextField, Button, Alert, useTheme, Link, CircularProgress, Snackbar } from '@mui/material';
 import Header from "../../components/Header";
 import { useNavigate } from 'react-router-dom';
 import { tokens } from "../../theme";
 import { AuthContext } from "../../AuthContext";
 
 const Login = () => {
-  const { login } = useContext(AuthContext);
+  const { login, error, setError } = useContext(AuthContext); // Fetch error and setError from the context
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false); // New loading state
+  const [showErrorNotification, setShowErrorNotification] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  useEffect(() => {
+    if (error) {
+      setShowErrorNotification(true);
+    }
+  }, [error]);
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      setLoading(true); // Set loading state to true
+      setLoading(true);
       await login(email, password);
       setTimeout(() => {
-        navigate('/dashboard'); // Navigate after 2 seconds
-      }, 5000);
+        navigate('/dashboard'); 
+      }, 3000);
     } catch (error) {
-      setError(error.message);
-      setLoading(false); // Set loading state to false if there's an error
+      setError('Invalid email or password');
+      setLoading(false);
     }
   };
 
@@ -79,6 +85,21 @@ const Login = () => {
             </Typography>
           </Box>
         </form>
+        <Snackbar
+          open={showErrorNotification}
+          onClose={() => setShowErrorNotification(false)}
+          message="Email or Password is incorrect"
+          autoHideDuration={3000}
+          sx={{
+            backgroundColor: "red !important",
+            color: "white",
+            "& .MuiSnackbarContent-root": {
+              borderRadius: "4px",
+              padding: "15px",
+              fontSize: "16px",
+            },
+          }}
+        />
       </Box>
     </Box>
   );
