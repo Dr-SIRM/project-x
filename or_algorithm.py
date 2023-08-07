@@ -21,28 +21,28 @@ Prio 1:
  - (erl.) Als Key oder i für MA soll nicht mehr MA1, MA2 usw stehen, sondern die user_id (zB. 1002)
  - (erl.) Shifts/Employment_level aus der Datenbank ziehen
  - (erl.) auf Viertelstunden wechseln
+ - (erl.) Gerechte Verteilung Anpassen, das Stunden von "Perm" Mitarbeiter abgezogen werden
 
- To-Do's Samstag
+ To-Do's 
  -------------------------------
  1. Weiche NB3 überprüfen ob alles richtig definiert wurde
  2. Weiche NB4 implementieren, hat noch nicht wunschgemäss geklappt
+ 3. MA mit verschiedenen Profilen?
 
  -------------------------------
 
- - (0%) Gerechte Verteilung Anpassen, das Stunden von "Perm" Mitarbeiter abgezogen werden
- - (30%) Den Übergang auf harte und weiche NBs machen? 
-  
+ - (60%) Den Übergang auf harte und weiche NBs machen? 
  - (90%) Die gesolvten Daten in der Datenbank speichern
  - (10%) Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
 
  - working_h noch diskutieren, ist das max. arbeitszeit oder norm Arbeiszeit?
  - Jeder MA muss vor dem Solven eingegeben haben, wann er arbeiten kann. Auch wenn es alles 0 sind.
+ - Daten für Solven in die Datenbank einpflegen (max. Zeit, min. Zeit, Solvingzeitraum, ...)
 
 
 
 Prio 2:
  - start_time und end_time zwei und drei noch implementieren
- - die max und min Zeit für die MA soll der Admin eingeben können. Diese Daten dann aus der Datenbank ziehen
  - der Admin kann auch die Kosten der MA, wenn er will, eintragen. 
 
 
@@ -159,7 +159,7 @@ class ORAlgorithm:
         self.max_zeit = {ma: 9*4 for ma in self.mitarbeiter}  # Maximale Arbeitszeit pro Tag
 
         # -- 5 --
-        self.min_zeit = {ma: 2*4 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
+        self.min_zeit = {ma: 3*4 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
 
         # -- 6 --
         # Maximale Arbeitszeit pro woche, wird später noch aus der Datenbank gezogen

@@ -140,17 +140,15 @@ const Week = () => {
   const [closingHours, setClosingHours] = useState([]);
   const token = localStorage.getItem('session_token'); // Get the session token from local storage
   const [isLoading, setIsLoading] = useState(true);
-  const [weekOffset, setWeekOffset] = useState(0);
-  const goToNextWeek = () => setWeekOffset(weekOffset + 1);
-  const goToPreviousWeek = () => setWeekOffset(weekOffset - 1);
   const [mondayDate, setMondayDate] = useState("");
+  const [weekAdjustment, setWeekAdjustment] = useState(0);
   
 
   useEffect(() => {
     const fetchCalendar = async (values) => {
       setIsLoading(true);
         try {
-          const response = await axios.get('http://localhost:5000/api/requirement/workforce', {
+          const response = await axios.get('http://localhost:5000/api/requirement/workforce?week_adjustment=' + weekAdjustment, {
               headers: {
                   'Authorization': `Bearer ${token}`
               }
@@ -184,9 +182,15 @@ const Week = () => {
     };
 
     fetchCalendar();
-  }, []);
+  }, [weekAdjustment, token, setcalendarData]);
   
+  const goToNextWeek = () => {
+    setWeekAdjustment(weekAdjustment + 7);
+  };
 
+  const goToPreviousWeek = () => {
+    setWeekAdjustment(weekAdjustment - 7);
+  };
 
     const submit = async (values) => {
       const formattedCounts = Object.keys(slotCounts).reduce((formatted, day) => {
