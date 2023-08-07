@@ -805,9 +805,9 @@ def get_required_workforce():
     return jsonify(calendar_dict)
 
 mitarbeiter_planung = [
-    {'name': 'Max Mustermann', 'arbeitszeit': '08:00 - 16:00'},
-    {'name': 'Erika Mustermann', 'arbeitszeit': '10:00 - 18:00'},
-    
+    {'name': 'Max Mustermann', 'arbeitszeit': {'Montag': '07:00 - 12:00', 'Dienstag': '12:00 - 17:00'}},
+    {'name': 'Erika Mustermann', 'arbeitszeit': {'Montag': '10:00 - 18:00', 'Dienstag': '08:00 - 14:00'}},
+    # usw.
 ]
 
 @app.route('/api/mitarbeiter', methods=['GET'])

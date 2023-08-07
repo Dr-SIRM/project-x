@@ -1,44 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Container, Table, TableBody, TableCell, TableHead, TableRow, Paper, Typography } from '@mui/material';
+import React, { useEffect, useRef } from 'react';
+import { DataSet } from 'vis-data';
+import { Timeline } from 'vis-timeline';
+import 'vis-timeline/styles/vis-timeline-graph2d.min.css';
 
-const MitarbeiterUebersicht = () => {
-  const [mitarbeiter, setMitarbeiter] = useState([]);
+const MyTimeline = () => {
+  const containerRef = useRef(null);
 
   useEffect(() => {
-    // Die Daten von der API abrufen
-    axios.get('http://localhost:5000/api/mitarbeiter')
-      .then((response) => {
-        setMitarbeiter(response.data);
-      })
-      .catch((error) => {
-        console.error('Ein Fehler ist aufgetreten:', error);
-      });
+    if (containerRef.current) {
+      const groups = new DataSet([
+        { id: 1, content: 'Max Mustermann' },
+        { id: 2, content: 'Erika Mustermann' },
+        // Weitere Gruppen/Mitarbeiter hinzufügen
+      ]);
+
+      const items = new DataSet([
+        { id: 1, group: 1, content: '', start: '2022-08-08', end: '2022-08-08 12:00:00' },
+        { id: 2, group: 2, content: '', start: '2022-08-09', end: '2022-08-09 14:00:00' },
+        // Weitere Items hinzufügen
+      ]);
+
+      const options = {
+        orientation: 'top',
+        verticalScroll: true,
+        zoomable: true,
+      };
+
+      new Timeline(containerRef.current, items, groups, options);
+    }
   }, []);
 
-  return (
-    <Container>
-      <Typography variant="h4" gutterBottom>Mitarbeiterübersicht</Typography>
-      <Paper>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Arbeitszeit</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {mitarbeiter.map((m, index) => (
-              <TableRow key={index}>
-                <TableCell>{m.name}</TableCell>
-                <TableCell>{m.arbeitszeit}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Paper>
-    </Container>
-  );
+  return <div ref={containerRef} style={{ height: '400px' }}></div>;
 };
 
-export default MitarbeiterUebersicht;
+export default MyTimeline;
