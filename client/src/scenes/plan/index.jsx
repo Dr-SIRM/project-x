@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import '../../App.css';
 import { DataSet } from 'vis-data';
 import { Timeline } from 'vis-timeline';
 import 'vis-timeline/styles/vis-timeline-graph2d.min.css';
@@ -15,7 +16,7 @@ const MyTimeline = () => {
       ]);
 
       const items = new DataSet([
-        { id: 1, group: 1, content: '', start: '2022-08-08', end: '2022-08-08 12:00:00' },
+        { id: 1, group: 1, content: 'test', start: '2022-08-08', end: '2022-08-08 12:00:00' },
         { id: 2, group: 2, content: '', start: '2022-08-09', end: '2022-08-09 14:00:00' },
         // Weitere Items hinzufügen
       ]);
@@ -26,7 +27,12 @@ const MyTimeline = () => {
         zoomable: true,
       };
 
-      new Timeline(containerRef.current, items, groups, options);
+      const timeline = new Timeline(containerRef.current, items, groups, options);
+
+  // Bereinigungsfunktion
+      return () => {
+        timeline.destroy();
+      };
     }
   }, []);
 
