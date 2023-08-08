@@ -1,0 +1,9 @@
+
+  .vis-label .vis-inner {
+    color: rgb(0, 128, 87);
+    font-size: 18px;
+    font-weight: bold;
+    border-left: 2px solid #ccc;
+    padding-left: 10px;
+    background-color: #cccccc2a;
+}
