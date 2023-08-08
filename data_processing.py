@@ -20,12 +20,12 @@ class DataProcessing:
         self.binary_availability = None
 
         # Zeitraum in dem gesolvet wird, wird noch angepasst!
-        self.start_date = "2023-08-07"
-        self.end_date = "2023-08-11"
+        # self.start_date = "2023-08-07"
+        # self.end_date = "2023-08-11"
 
         # Gute Daten zum testsolven
-        # self.start_date = "2023-07-31"
-        # self.end_date = "2023-08-04"
+        self.start_date = "2023-07-31"
+        self.end_date = "2023-08-04"
         
         
     def run(self):

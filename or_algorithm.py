@@ -22,12 +22,14 @@ Prio 1:
  - (erl.) Shifts/Employment_level aus der Datenbank ziehen
  - (erl.) auf Viertelstunden wechseln
  - (erl.) Gerechte Verteilung Anpassen, das Stunden von "Perm" Mitarbeiter abgezogen werden
+ - (erl.) Weiche NB4 implementieren, hat noch nicht wunschgemäss geklappt
+
 
  To-Do's 
  -------------------------------
  1. Weiche NB3 überprüfen ob alles richtig definiert wurde
- 2. Weiche NB4 implementieren, hat noch nicht wunschgemäss geklappt
- 3. MA mit verschiedenen Profilen?
+ 2. exponentieller Anstieg der Kosten in den weichen NBs
+ 3. MA mit verschiedenen Profilen - Department (Koch, Service, ..)?
 
  -------------------------------
 
@@ -38,7 +40,6 @@ Prio 1:
  - working_h noch diskutieren, ist das max. arbeitszeit oder norm Arbeiszeit?
  - Jeder MA muss vor dem Solven eingegeben haben, wann er arbeiten kann. Auch wenn es alles 0 sind.
  - Daten für Solven in die Datenbank einpflegen (max. Zeit, min. Zeit, Solvingzeitraum, ...)
-
 
 
 Prio 2:
@@ -159,7 +160,7 @@ class ORAlgorithm:
         self.max_zeit = {ma: 9*4 for ma in self.mitarbeiter}  # Maximale Arbeitszeit pro Tag
 
         # -- 5 --
-        self.min_zeit = {ma: 3*4 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
+        self.min_zeit = {ma: 2*4 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
 
         # -- 6 --
         # Maximale Arbeitszeit pro woche, wird später noch aus der Datenbank gezogen
@@ -459,7 +460,7 @@ class ORAlgorithm:
         self.penalty_cost_nb3 = 100
 
         # NB 4 - Min. und Max. Arbeitszeit pro Tag
-        self.penalty_cost_nb4_min = 1
+        self.penalty_cost_nb4_min = 1000
         self.penalty_cost_nb4_max = 1000
 
         # NB 7 - Feste Mitarbeiter zu employement_level fest einplanen
@@ -602,22 +603,39 @@ class ORAlgorithm:
         # (Die solver.Add() Funktion nimmt eine Bedingung als Argument und fügt sie dem Optimierungsproblem hinzu.)
         """
 
+        # -------------------------------------------------------------------------------------------------------
+        # HARTE NB -- NEU 08.08.2023 --
+        # NB 0 - Variable a ist 1, wenn der Mitarbeiter an einem Tag arbeitet, sonst 0
+        # -------------------------------------------------------------------------------------------------------
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                # sum_x ist die Summe an der ein MA am Tag arbeiten kann
+                sum_x = self.solver.Sum(self.x[i, j, k] for k in range(len(self.verfügbarkeit[i][j])))
+                self.solver.Add(self.a[i, j] >= sum_x * 1.0 / (len(self.verfügbarkeit[i][j]) + 1))
+                self.solver.Add(self.a[i, j] <= sum_x)
+
+
+        # -------------------------------------------------------------------------------------------------------
         # HARTE NB
         # NB 1 - MA nur einteilen, wenn er verfügbar ist. 
+        # -------------------------------------------------------------------------------------------------------
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
                     self.solver.Add(self.x[i, j, k] <= self.verfügbarkeit[i][j][k])
 
 
+        # -------------------------------------------------------------------------------------------------------
         # HARTE NB
         # NB 2 - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend
+        # -------------------------------------------------------------------------------------------------------
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
                 self.solver.Add(self.solver.Sum([self.x[i, j, k] for i in self.mitarbeiter]) >= self.min_anwesend[j][k])
- 
+        # -------------------------------------------------------------------------------------------------------
         # WEICHE NB -- NEU 26.07.2023 --
         # NB 2 - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend 
+        # -------------------------------------------------------------------------------------------------------
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
                 self.solver.Add(self.solver.Sum([self.x[i, j, k] for i in self.mitarbeiter]) - self.min_anwesend[j][k] <= self.nb2_violation[j, k])
@@ -633,9 +651,11 @@ class ORAlgorithm:
             self.solver.Add(total_hours[ma] <= self.working_h)
         """
 
+        # -------------------------------------------------------------------------------------------------------
         # WEICHE NB -- NEU 28.07.2023 -- --> Muss noch genauer überprüft werden ob es funktioniert!
         # Momentan werden die Kosten "doppelt" gezählt, da in der weichen NB7 auch bestraft wird.
         # NB 3 - Max. Arbeitszeit pro Woche
+        # -------------------------------------------------------------------------------------------------------
         total_hours = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
         for ma in self.mitarbeiter:
             self.solver.Add(total_hours[ma] - self.working_h <= self.nb3_violation[ma]) 
@@ -664,31 +684,15 @@ class ORAlgorithm:
                     # NB 4.1 - Die Arbeitszeit eines Mitarbeiters an einem Tag kann nicht mehr als die maximale Arbeitszeit pro Tag betragen
                     self.solver.Add(sum_hour <= self.max_zeit[i] * self.a[i, j])
         """
-        """
-        # WEICHE NB
-        # NB 4 - Min. und Max. Arbeitszeit pro Tag
-        for i in self.mitarbeiter:
-            for j in range(self.calc_time):
-                if sum(self.verfügbarkeit[i][j]) >= self.min_zeit[i]:
-                    sum_hour = self.solver.Sum(self.x[i, j, k] for k in range(len(self.verfügbarkeit[i][j])))
-                    
-                    # Prüfen, ob die Summe der Arbeitsstunden kleiner als die Mindestarbeitszeit ist
-                    self.solver.Add(sum_hour - self.min_zeit[i] * self.a[i, j] <= self.nb4_violation[i, j])
 
-                    # Prüfen, ob die Summe der Arbeitsstunden größer als die maximale Arbeitszeit ist
-                    self.solver.Add(self.max_zeit[i] * self.a[i, j] - sum_hour <= self.nb4_violation[i, j])
-        """
-
+        # -------------------------------------------------------------------------------------------------------
         # WEICHE NB -- NEU 31.07.2023 --
         # NB 4 - Min. und Max. Arbeitszeit pro Tag
+        # -------------------------------------------------------------------------------------------------------
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
 
                 # Wenn die if Bedingung auskommentiert wird, dann wird die min und max Zeit im gleichen Masse verteilt, funktioniert aber noch nicht!
-                # Irgendwo liegt der Fehler, ich weiss noch nicht wo?!
-                # Wenn die Kosten so eingestellt sind, funktioniert es:
-                # self.penalty_cost_nb4_min = 1
-                # self.penalty_cost_nb4_max = 1000
 
                 # if sum(self.verfügbarkeit[i][j]) >= self.min_zeit[i]:
                     sum_hour = self.solver.Sum(self.x[i, j, k] for k in range(len(self.verfügbarkeit[i][j])))
@@ -704,9 +708,10 @@ class ORAlgorithm:
                     self.solver.Add(self.nb4_max_violation[i, j] >= 0)
 
 
-
+        # -------------------------------------------------------------------------------------------------------
         # HARTE NB
         # NB 5 - Anzahl Arbeitsblöcke
+        # -------------------------------------------------------------------------------------------------------
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 # Für die erste Stunde des Tages
@@ -718,11 +723,16 @@ class ORAlgorithm:
                 self.solver.Add(self.solver.Sum(self.y[i, j, k] for k in range(len(self.verfügbarkeit[i][j]))) <= 1)
         
 
+
+
         # NB X - Innerhalb einer Woche immer gleiche Schichten
 
 
+
+        # -------------------------------------------------------------------------------------------------------
         # HARTE NB --> Könnte man sogar lassen mit der Toleranz? Toleranz kann vom Admin geändert werden...
         # NB 6 - Verteilungsgrad MA
+        # -------------------------------------------------------------------------------------------------------
         verteilungsstunden = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
         tolerance = 0.3 # Toleranz später noch auslagern
         for i, ma in enumerate(self.mitarbeiter):
@@ -741,8 +751,10 @@ class ORAlgorithm:
                 self.solver.Add(total_hours[ma] == self.working_h)
         """
 
-        # WEICHE NB
-        # NB 7 - Feste Mitarbeiter zu employement_level fest einplanen -- NEU 27.07.23 --
+        # -------------------------------------------------------------------------------------------------------
+        # WEICHE NB -- NEU 27.07.23 --
+        # NB 7 - Feste Mitarbeiter zu employement_level fest einplanen
+        # -------------------------------------------------------------------------------------------------------
         """
         Angenommen, wir haben einen Mitarbeiter (Mitarbeiter 0), und wir planen seine Arbeitszeit für einen Tag (24 Stunden). 
         Wir möchten, dass er genau 8 Stunden arbeitet. 
@@ -769,6 +781,7 @@ class ORAlgorithm:
                 self.solver.Add(self.working_h - total_hours[ma] <= self.nb7_violation[ma])
                 # print("total_hours[ma]: ", total_hours[ma])
                 # print("self.nb7_violation[ma]: ", self.nb7_violation[ma])
+
 
 
         # NB X - Wechselnde Schichten innerhalb 2 Wochen
