@@ -672,13 +672,6 @@ class ORAlgorithm:
         for ma in self.mitarbeiter:
             self.solver.Add(total_hours[ma] - self.working_h <= self.nb3_violation[ma]) 
 
-
-        """ 
-        # NB X - Max. Arbeitszeit pro Tag - Diese NB ist nicht mehr nötig, da die max zeit bereits in der NB4 implementiert ist
-        for i in mitarbeiter:
-            for j in range(calc_time):
-                solver.Add(solver.Sum(x[i, j, k] for k in range(len(verfügbarkeit[i][j]))) <= max_zeit[i])
-        """
      
         """
         # HARTE NB
@@ -735,12 +728,6 @@ class ORAlgorithm:
                 self.solver.Add(self.solver.Sum(self.y[i, j, k] for k in range(len(self.verfügbarkeit[i][j]))) <= 1)
         
 
-
-
-        # NB X - Innerhalb einer Woche immer gleiche Schichten
-
-
-
         # -------------------------------------------------------------------------------------------------------
         # HARTE NB --> Könnte man sogar lassen mit der Toleranz? Toleranz kann vom Admin geändert werden...
         # NB 6 - Verteilungsgrad MA
@@ -762,37 +749,10 @@ class ORAlgorithm:
             if self.employment[i] == "Perm": 
                 self.solver.Add(total_hours[ma] == self.working_h)
         """
-
         # -------------------------------------------------------------------------------------------------------
         # WEICHE NB -- NEU 08.08.23 --
         # NB 7 - Feste Mitarbeiter zu employement_level fest einplanen
         # -------------------------------------------------------------------------------------------------------
-        """
-        Angenommen, wir haben einen Mitarbeiter (Mitarbeiter 0), und wir planen seine Arbeitszeit für einen Tag (24 Stunden). 
-        Wir möchten, dass er genau 8 Stunden arbeitet. 
-        Dafür haben wir eine Reihe von `x`-Variablen, eine für jede Stunde des Tages, die angibt, ob er in dieser Stunde arbeitet oder nicht.
-
-        Wenn der Mitarbeiter genau 8 Stunden arbeitet, könnten die `x`-Variablen wie folgt aussehen:
-        x[0, 0] bis x[0, 7] sind 1 (was bedeutet, dass der Mitarbeiter arbeitet), und x[0, 8] bis x[0, 23] sind 0 (was bedeutet, dass der Mitarbeiter nicht arbeitet).
-        Dann wäre `total_hours[0] = sum(x[0, i] for i in range(24)) = 8`, was genau unserer gewünschten Arbeitszeit von 8 Stunden entspricht.
-        Da es keine Verletzung der Arbeitszeitregel gibt, wäre `self.nb7_violation[0] = abs(self.working_h - total_hours[0]) = abs(8 - 8) = 0`.
-
-        Aber was ist, wenn der Mitarbeiter nur 7 Stunden arbeitet?
-        Angenommen, x[0, 0] bis x[0, 6] sind 1, und x[0, 7] bis x[0, 23] sind 0.
-        Dann wäre `total_hours[0] = sum(x[0, i] for i in range(24)) = 7`, was weniger als unsere gewünschte Arbeitszeit von 8 Stunden ist.
-        Da der Mitarbeiter 1 Stunde weniger als gewünscht arbeitet, wäre `self.nb7_violation[0] = abs(self.working_h - total_hours[0]) = abs(8 - 7) = 1`.
-
-        Das Gleiche würde gelten, wenn der Mitarbeiter 9 Stunden arbeiten würde - die Verletzung wäre dann ebenfalls 1, da der Mitarbeiter 1 Stunde mehr als gewünscht arbeitet.
-        Der Zweck der `self.nb7_violation[ma]`-Variable ist es also, die Menge der Verletzung der Arbeitszeitregel für jeden Mitarbeiter zu erfassen, unabhängig davon, ob er zu viel oder zu wenig arbeitet.
-        """
-        """
-        total_hours = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
-        print("total_hours: ", total_hours)
-        for i, ma in enumerate(self.mitarbeiter):
-            if self.employment[i] == "Perm": 
-                self.solver.Add(total_hours[ma] - self.working_h <= self.nb7_violation[ma]) # 0 oder positive Zahlen in self.nb7_violation
-                self.solver.Add(self.working_h - total_hours[ma] <= self.nb7_violation[ma])
-        """
         total_hours = {ma: self.solver.Sum(self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))) for ma in self.mitarbeiter}
         for i, ma in enumerate(self.mitarbeiter):
             if self.employment[i] == "Perm": 
@@ -806,7 +766,7 @@ class ORAlgorithm:
 
 
 
-
+        # NB X - Innerhalb einer Woche immer gleiche Schichten
 
         # NB X - Wechselnde Schichten innerhalb 2 Wochen
 
