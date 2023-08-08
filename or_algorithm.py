@@ -765,8 +765,8 @@ class ORAlgorithm:
                 self.solver.Add(self.nb7_max_violation[ma] >= 0)
 
 
-
         # NB X - Innerhalb einer Woche immer gleiche Schichten
+        
 
         # NB X - Wechselnde Schichten innerhalb 2 Wochen
 
