@@ -290,7 +290,6 @@ class DataProcessing:
                 self.user_employment = user_employment
 
 
-
     def pre_check_admin(self):
         """
         ---------------------------------------------------------------------------------------------------------------

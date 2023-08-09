@@ -527,12 +527,11 @@ class ORAlgorithm:
             for j in range(1, self.calc_time):  # Von Tag 1 an, da es keinen Vortag für Tag 0 gibt
                 self.c[i, j] = self.solver.BoolVar(f'c[{i}, {j}]')
 
-        # Schichtvariable - WIRD NOCH NICHT GENUTZT!
+        # Schichtvariable -- IN BEARBEITUNG 09.08.23 --
         self.s = {}
         for i in self.mitarbeiter:
             for j in range(self.calc_time):  # Für jeden Tag der Woche
-                for k in range(len(self.verfügbarkeit[i][j])):  # Für jede Stunde des Tages, an dem die Firma geöffnet ist
-                    self.s[i, j, k] = self.solver.IntVar(0, 1, f'y[{i}, {j}, {k}]') # Variabeln können nur die Werte 0 oder 1 annehmen
+                self.s[i, j] = self.solver.IntVar(0, 1, f's[{i}, {j}]') # Variabeln können nur die Werte 0 oder 1 annehmen
 
 
 
@@ -781,18 +780,39 @@ class ORAlgorithm:
                 self.solver.Add(self.nb7_max_violation[ma] >= 0)
 
 
-        # NB X - Innerhalb einer Woche immer gleiche Schichten
-        
-        # NB X - Wechselnde Schichten innerhalb 2 Wochen
+        # -- IN BEARBEITUNG 09.08.2023
+
+        # self.company_shifts  <-- Anzahl Schichten der Company!
+
+        # HARTE NB
+        # NB 8 - Innerhalb einer Woche immer gleiche Schichten
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                # Die Anzahl der Stunden in der ersten Schicht berechnen
+                sum_first_shift = self.solver.Sum(self.x[i, j, k] for k in range(0, 6))
+                # Die Anzahl der Stunden in der zweiten Schicht berechnen
+                sum_second_shift = self.solver.Sum(self.x[i, j, k] for k in range(6, 12))
+
+                # Setzen Sie s[i, j] auf 0, wenn die erste Schicht mehr Zeit hat, sonst auf 1
+                self.solver.Add(self.s[i, j] == (sum_second_shift > sum_first_shift))
+
+                # Stellen Sie sicher, dass die Schicht an jedem Tag der Woche gleich bleibt
+                if j > 0:
+                    self.solver.Add(self.s[i, j] == self.s[i, j - 1])
 
         """
-        # NB X - Gleiche Verteilung der Stunden über eine Woche # -- IN BEARBEITUNG 01.07.2023 --
+        # HARTE NB
+        # NB 9 - Wechselnde Schichten innerhalb von 2 Wochen
         for i in self.mitarbeiter:
-            for j in range(1, self.calc_time):  # Starten bei Tag 1, da es keinen Vortag für Tag 0 gibt
-                for k in range(len(self.verfügbarkeit[i][j])):
-                    self.solver.Add(self.c[i, j] >= (self.x[i, j-1, k] + self.x[i, j, k] - 1))  # Schicht am gleichen Zeitpunkt wie am Vortag
-                    self.solver.Add(self.c[i, j] <= self.x[i, j-1, k])  # Muss am Vortag gearbeitet haben
-                    self.solver.Add(self.c[i, j] <= self.x[i, j, k])  # Muss an diesem Tag arbeiten
+            for j in range(1, self.calc_time):  # Von Tag 1 an, da es keinen Vortag für Tag 0 gibt
+                week_number = j // 7
+                # Wenn wir in eine neue Woche wechseln, setzen Sie c[i, j] auf den Wert von s[i, j - 1]
+                if j % 7 == 0:
+                    self.solver.Add(self.c[i, j] == self.s[i, j - 1])
+
+                # Wenn wir uns in einer ungeraden Woche befinden, muss die Schicht anders sein als in der vorherigen Woche
+                if week_number % 2 != 0:
+                    self.solver.Add(self.s[i, j] != self.c[i, j])
         """
 
 
