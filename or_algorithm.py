@@ -448,7 +448,7 @@ class ORAlgorithm:
         if errors:
             raise ValueError("Folgende Fehler wurden gefunden:\n" + "\n".join(errors))
 
- 
+
 
     def solver_selection(self):
         """
@@ -682,21 +682,12 @@ class ORAlgorithm:
         # WEICHE NB -- NEU 28.07.2023 -- --> Muss noch genauer überprüft werden ob es funktioniert!
         # NB 3 - Max. Arbeitszeit pro Woche (für "Temp" Mitarbeiter)
         # -------------------------------------------------------------------------------------------------------
-        """
         total_hours = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
         for ma in self.mitarbeiter:
             self.solver.Add(total_hours[ma] - self.working_h <= self.nb3_violation[ma]) 
-        """
-        # Momentan werden die Kosten "doppelt" gezählt, da in der weichen NB7 auch bestraft wird. --> gilt seit dem Update nicht mehr!
-        # -- UPDATE 09.08.2023 --
-        total_hours = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
-        for i, ma in enumerate(self.mitarbeiter):
-            if self.employment[i] == "Temp":
-                print("!!!!!!!!!!!", self.employment[i])
-                self.solver.Add(total_hours[ma] - self.working_h <= self.nb3_violation[ma]) 
-        
-        
 
+        
+    
      
         """
         # HARTE NB
