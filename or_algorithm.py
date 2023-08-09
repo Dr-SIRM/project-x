@@ -29,9 +29,14 @@ Prio 1:
  -------------------------------
  1. Weiche NB3 überprüfen ob alles richtig definiert wurde
  2. exponentieller Anstieg der Kosten in den weichen NBs
- 3. MA mit verschiedenen Profilen - Department (Koch, Service, ..)?
- 
- --> rechtliches? 
+
+ Fragen an die Runde:
+ -------------------------------
+ - MA mit verschiedenen Profilen - Department (Koch, Service, ..)? Wie genau lösen wir das?
+ - Was machen wenn nicht genug Stunden von MA eingegeben wurden? Einen virtuellen MA der anzeigt, an welchen Stunden noch MA eingeteilt werden müssen?
+   Andere Vorschläge?
+
+ - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden?
  -------------------------------
 
  - (80%) Den Übergang auf harte und weiche NBs machen? 
@@ -89,7 +94,9 @@ class ORAlgorithm:
         self.penalty_cost_nb4_max = None
         self.penalty_cost_nb5 = None
         self.penalty_cost_nb6 = None
-        self.penalty_cost_nb7 = None
+        self.penalty_cost_nb7_min = None
+        self.penalty_cost_nb7_max = None
+
 
         # Attribute der Methode "decision_variables"
         self.x = None
@@ -462,6 +469,8 @@ class ORAlgorithm:
 
         # NB 4 - Min. und Max. Arbeitszeit pro Tag
         self.penalty_cost_nb4_min = 100 # Strafkosten für Unterschreitung
+        # self.penalty_cost_nb4_min = [0, 10, 50, 100, 300]
+
         self.penalty_cost_nb4_max = 100 # Strafkosten für Überschreitung
 
         # NB 7 - Feste Mitarbeiter zu employement_level fest einplanen (Achtung, pro 1/4h wird momentan bestraft!)
@@ -651,8 +660,6 @@ class ORAlgorithm:
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
                 self.solver.Add(self.solver.Sum([self.x[i, j, k] for i in self.mitarbeiter]) - self.min_anwesend[j][k] <= self.nb2_violation[j, k])
-                # print("self.x[i, j, k] for i in self.mitarbeiter: ", [self.x[i, j, k] for i in self.mitarbeiter])
-                # print("self.min_anwesend[j][k]: ", self.min_anwesend[j][k])
 
 
         """
@@ -665,12 +672,21 @@ class ORAlgorithm:
 
         # -------------------------------------------------------------------------------------------------------
         # WEICHE NB -- NEU 28.07.2023 -- --> Muss noch genauer überprüft werden ob es funktioniert!
-        # Momentan werden die Kosten "doppelt" gezählt, da in der weichen NB7 auch bestraft wird.
-        # NB 3 - Max. Arbeitszeit pro Woche
+        # NB 3 - Max. Arbeitszeit pro Woche (für "Temp" Mitarbeiter)
         # -------------------------------------------------------------------------------------------------------
+        """
         total_hours = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
         for ma in self.mitarbeiter:
             self.solver.Add(total_hours[ma] - self.working_h <= self.nb3_violation[ma]) 
+        """
+        # Momentan werden die Kosten "doppelt" gezählt, da in der weichen NB7 auch bestraft wird. --> gilt seit dem Update nicht mehr!
+        # -- UPDATE 09.08.2023 --
+        total_hours = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
+        for i, ma in enumerate(self.mitarbeiter):
+            if self.employment[i] == "Temp":
+                self.solver.Add(total_hours[ma] - self.working_h <= self.nb3_violation[ma]) 
+
+        
 
      
         """
@@ -751,7 +767,7 @@ class ORAlgorithm:
         """
         # -------------------------------------------------------------------------------------------------------
         # WEICHE NB -- NEU 08.08.23 --
-        # NB 7 - Feste Mitarbeiter zu employement_level fest einplanen
+        # NB 7 - "Perm" Mitarbeiter zu employement_level fest einplanen
         # -------------------------------------------------------------------------------------------------------
         total_hours = {ma: self.solver.Sum(self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))) for ma in self.mitarbeiter}
         for i, ma in enumerate(self.mitarbeiter):
@@ -767,7 +783,6 @@ class ORAlgorithm:
 
         # NB X - Innerhalb einer Woche immer gleiche Schichten
         
-
         # NB X - Wechselnde Schichten innerhalb 2 Wochen
 
         """
@@ -805,7 +820,7 @@ class ORAlgorithm:
         # Drucken Sie die Kosten
         print('Kosten Einstellung von Mitarbeitern:', hiring_costs)
         print('Kosten NB2 (Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend):', nb2_penalty_costs)
-        print('Kosten NB3 (Max. Arbeitszeit pro Woche):', nb3_penalty_costs)
+        print('Kosten NB3 (Max. Arbeitszeit pro Woche "Temp" MA):', nb3_penalty_costs)
         print('Kosten NB4 (Min. Arbeitszeit pro Tag):', nb4_min_penalty_costs)
         print('Kosten NB4 (Max. Arbeitszeit pro Tag):', nb4_max_penalty_costs)
         # print('Kosten NB7 (Feste Mitarbeiter zu employment_level fest einplanen):', nb7_penalty_costs)
