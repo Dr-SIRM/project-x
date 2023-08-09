@@ -1,8 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { Box, Typography, useTheme } from "@mui/material";
 import '../../App.css';
 import { DataSet } from 'vis-data';
 import { Timeline } from 'vis-timeline';
 import 'vis-timeline/styles/vis-timeline-graph2d.min.css';
+import Header from "../../components/Header";
 
 const MyTimeline = () => {
   const containerRef = useRef(null);
@@ -36,7 +38,14 @@ const MyTimeline = () => {
     }
   }, []);
 
-  return <div ref={containerRef} style={{ height: '400px' }}></div>;
+  return (
+  <Box m="20px">
+    <Header title="Schichtplan" subtitle="Übersicht von den eingeteilten Schichten / Mitglieder" /> 
+    <Box 
+      ref={containerRef} style={{ height: '400px' }}>
+    </Box>
+  </Box>
+  );
 };
 
 export default MyTimeline;
