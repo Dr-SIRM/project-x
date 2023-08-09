@@ -29,19 +29,27 @@ Prio 1:
  -------------------------------
  1. Weiche NB3 überprüfen ob alles richtig definiert wurde
  2. exponentieller Anstieg der Kosten in den weichen NBs
+ 3. Die Kosten der weichen NBs müssen mit einer reihe von Tests erprobt werden, dafür 3-4 Firmen erstellen und alles mögliche durchtesten und dokumentieren/auswerten.
+    Tests wenn möglich auf dem eigenen Rechner laufen lassen.
+
+ - (80%) Den Übergang auf harte und weiche NBs machen? 
+ - (80%) Die gesolvten Daten in der Datenbank speichern
+ - (10%) Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
+
 
  Fragen an die Runde:
  -------------------------------
  - MA mit verschiedenen Profilen - Department (Koch, Service, ..)? Wie genau lösen wir das?
  - Was machen wenn nicht genug Stunden von MA eingegeben wurden? Einen virtuellen MA der anzeigt, an welchen Stunden noch MA eingeteilt werden müssen?
    Andere Vorschläge?
+ - Sobald gesolvt wird, kann die Webseite nicht mehr bedient werden. Wie können wir das lösen?
+   "Eine Möglichkeit, dies zu umgehen, wäre, die Berechnung in einen Hintergrundprozess oder einen separaten Thread zu verschieben."
+   "Sie könnten einen Hintergrund-Worker wie Celery verwenden, um die Optimierungsaufgabe zu verwalten."
+ - Wie oft darf gesolvt werden? zb. max 2x pro Woche?
 
  - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden?
  -------------------------------
 
- - (80%) Den Übergang auf harte und weiche NBs machen? 
- - (80%) Die gesolvten Daten in der Datenbank speichern
- - (10%) Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
 
  - working_h noch diskutieren, ist das max. arbeitszeit oder norm Arbeiszeit?
  - Jeder MA muss vor dem Solven eingegeben haben, wann er arbeiten kann. Auch wenn es alles 0 sind.
@@ -684,8 +692,9 @@ class ORAlgorithm:
         total_hours = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
         for i, ma in enumerate(self.mitarbeiter):
             if self.employment[i] == "Temp":
+                print("!!!!!!!!!!!", self.employment[i])
                 self.solver.Add(total_hours[ma] - self.working_h <= self.nb3_violation[ma]) 
-
+        
         
 
      
