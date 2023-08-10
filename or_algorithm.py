@@ -459,6 +459,7 @@ class ORAlgorithm:
         # GLPK = Vielzahl von Algorithmen, einschließlich des Simplex-Verfahrens und des branch-and-bound-Verfahrens
         """
         self.solver = pywraplp.Solver.CreateSolver('SCIP')
+        # self.solver.SetNumThreads(2) # Auf mehreren Kernen gleichzeitig arbeiten
         # self.solver.SetTimeLimit(20000)  # Zeitlimit auf 20 Sekunden (in Millisekunden)
         # self.solver.SetSolverSpecificParametersAsString("limits/gap=0.01") # Wenn der gap kleiner 1% ist, bricht der Solver ab
 
@@ -826,6 +827,12 @@ class ORAlgorithm:
                     # Hilfsvariable mit s2[i, j] verknüpfen
                     self.solver.Add(self.s2[i, j] == delta)
 
+            # Harte nb Option zum testen
+            for i in self.mitarbeiter:
+                for j in range(1, self.calc_time):
+                    self.solver.Add(self.s2[i, j] - self.s2[i, j-1] == 0)
+
+            """     
             # Bedingungen, um sicherzustellen, dass innerhalb einer Woche immer die gleiche Schicht gearbeitet wird
             for i in self.mitarbeiter:
                 for j in range(1, self.calc_time):
@@ -833,11 +840,11 @@ class ORAlgorithm:
                     
                     # Setzen Sie diff gleich der Differenz
                     self.solver.Add(diff == self.s2[i, j] - self.s2[i, j-1])
-                    
+         
                     # Bedingungen für den "absoluten Wert"
                     self.solver.Add(self.nb8_violation[i, j] >= diff)
                     self.solver.Add(self.nb8_violation[i, j] >= -diff)
-
+            """
 
         elif self.company_shifts == 3:
             for i in self.mitarbeiter:
@@ -898,6 +905,13 @@ class ORAlgorithm:
         self.solver.EnableOutput()
         self.status = self.solver.Solve()
 
+        # Die Werte von s2 printen
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                # Drucken Sie den Wert von s2[i, j]
+                print(f"s2[{i}][{j}] =", self.s2[i, j].solution_value())
+
+
         # Kosten für die Einstellung von Mitarbeitern
         hiring_costs = sum(self.kosten[i] * self.x[i, j, k].solution_value() for i in self.mitarbeiter for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[i][j])))
 
@@ -910,7 +924,6 @@ class ORAlgorithm:
         nb7_min_penalty_costs = sum(self.penalty_cost_nb7_min * self.nb7_min_violation[i].solution_value() for i in self.mitarbeiter)
         nb7_max_penalty_costs = sum(self.penalty_cost_nb7_max * self.nb7_max_violation[i].solution_value() for i in self.mitarbeiter)
         nb8_penalty_costs = sum(self.penalty_cost_nb8 * self.nb8_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
-        print(self.nb8_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
 
 
         # Drucken Sie die Kosten
