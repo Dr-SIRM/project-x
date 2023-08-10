@@ -485,6 +485,8 @@ class ORAlgorithm:
         self.penalty_cost_nb7_min = 100  # Strafkosten für Unterschreitung
         self.penalty_cost_nb7_max = 100  # Strafkosten für Überschreitung
 
+        # NB 8 - Innerhalb einer Woche immer gleiche Schichten
+        self.penalty_cost_nb8 = 1
 
         # Werden noch nicht gebraucht
         self.penalty_cost_nb5 = 100
@@ -519,20 +521,25 @@ class ORAlgorithm:
             for j in range(self.calc_time):  # Für jeden Tag der Woche
                 self.a[i, j] = self.solver.BoolVar(f'a[{i}, {j}]') # Variablen können nur die Werte 0 oder 1 annehmen
 
+        # Schichtvariable (2-Schicht) 
+        self.s2 = {}
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):  # Für jeden Tag der Woche
+                self.s2[i, j] = self.solver.IntVar(0, 1, f's2[{i}, {j}]') # Variabeln können nur die Werte 0 oder 1 annehmen
+
+        # Schichtvariable (3-Schicht) 
+        self.s3 = {}
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):  # Für jeden Tag der Woche
+                self.s3[i, j] = self.solver.IntVar(0, 2, f's3[{i}, {j}]') # Variabeln können nur die Werte 0, 1 oder 2 annehmen
 
 
-        # Gleiche Schichten -- IN BEARBEITUNG 01.07.23 --
+
+        # Gleiche Schichten -- IN BEARBEITUNG 10.08.23 --
         self.c = {}
         for i in self.mitarbeiter:
             for j in range(1, self.calc_time):  # Von Tag 1 an, da es keinen Vortag für Tag 0 gibt
                 self.c[i, j] = self.solver.BoolVar(f'c[{i}, {j}]')
-
-        # Schichtvariable -- IN BEARBEITUNG 09.08.23 --
-        self.s = {}
-        for i in self.mitarbeiter:
-            for j in range(self.calc_time):  # Für jeden Tag der Woche
-                self.s[i, j] = self.solver.IntVar(0, 1, f's[{i}, {j}]') # Variabeln können nur die Werte 0 oder 1 annehmen
-
 
 
     def violation_variables(self):
@@ -581,8 +588,15 @@ class ORAlgorithm:
             self.nb7_max_violation[i] = self.solver.NumVar(0, self.solver.infinity(), f'nb7_max_violation[{i}]')
 
 
+        # NB8 Schicht - Verletzungsvariable
+        self.nb8_violation = {}
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                self.nb8_violation[i, j] = self.solver.NumVar(0, self.solver.infinity(), 'nb8_violation[%i,%i]' % (i, j))
         
 
+
+    
     def objective_function(self):
         """
         Zielfunktion
@@ -618,6 +632,11 @@ class ORAlgorithm:
         # Kosten für NB7 Höchstarbeitszeit Verletzung
         for i in self.mitarbeiter:
             self.objective.SetCoefficient(self.nb7_max_violation[i], self.penalty_cost_nb7_max)
+
+        # Kosten für NB8 "Innerhalb einer Woche immer gleiche Schichten"
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                self.objective.SetCoefficient(self.nb8_violation[i, j], self.penalty_cost_nb8)
 
 
         # Es wird veruscht, eine Kombination von Werten für die x[i, j, k] zu finden, die die Summe kosten[i]*x[i, j, k] minimiert + weiche NBs            
@@ -780,33 +799,80 @@ class ORAlgorithm:
                 self.solver.Add(self.nb7_max_violation[ma] >= 0)
 
 
-        # -- IN BEARBEITUNG 09.08.2023
 
         # self.company_shifts  <-- Anzahl Schichten der Company!
-
-        
-        # HARTE NB
+        # -------------------------------------------------------------------------------------------------------
+        # WEICHE NB
         # NB 8 - Innerhalb einer Woche immer gleiche Schichten
-        # Definition der Schicht für jeden Mitarbeiter und Tag basierend auf Arbeitsstunden
-        for i in self.mitarbeiter:
-            for j in range(self.calc_time):
-                first_shift_hours = self.solver.Sum(self.x[i, j, k] for k in range(0, int(len(self.verfügbarkeit[i][j]) / 2))) # Stunden in der ersten Schicht
-                second_shift_hours = self.solver.Sum(self.x[i, j, k] for k in range(int(len(self.verfügbarkeit[i][j]) / 2), len(self.verfügbarkeit[i][j]))) # Stunden in der zweiten Schicht
-                
-                # Kann 0 oder 1 annehmen
-                delta = self.solver.BoolVar("delta")
-                
-                self.solver.Add(first_shift_hours - second_shift_hours - 1000 * delta <= 0)
-                self.solver.Add(second_shift_hours - first_shift_hours - 1000 * (1 - delta) <= 0)
-                
-                # Hilfsvariable mit s[i, j] verknüpfen
-                self.solver.Add(self.s[i, j] == delta)
+        # -------------------------------------------------------------------------------------------------------
+        self.company_shifts = 2
 
-        # Bedingungen für gleiche Schicht innerhalb einer Woche
-        for i in self.mitarbeiter:
-            for j in range(1, self.calc_time): # Beginnt bei 1, da es keinen Vortag für Tag 0 gibt
-                self.solver.Add(self.s[i, j] == self.s[i, j - 1]) # Gleiche Schicht wie am Vortag
-        
+        if self.company_shifts <= 1:
+            pass
+
+
+        elif self.company_shifts == 2:
+            for i in self.mitarbeiter:
+                for j in range(self.calc_time):
+                    first_shift_hours = self.solver.Sum(self.x[i, j, k] for k in range(0, int(len(self.verfügbarkeit[i][j]) / 2))) # Stunden in der ersten Schicht
+                    second_shift_hours = self.solver.Sum(self.x[i, j, k] for k in range(int(len(self.verfügbarkeit[i][j]) / 2), len(self.verfügbarkeit[i][j]))) # Stunden in der zweiten Schicht
+                    
+                    # Kann 0 oder 1 annehmen
+                    delta = self.solver.BoolVar("delta")
+                    
+                    self.solver.Add(first_shift_hours - second_shift_hours - 1000 * delta <= 0)
+                    self.solver.Add(second_shift_hours - first_shift_hours - 1000 * (1 - delta) <= 0)
+                    
+                    # Hilfsvariable mit s2[i, j] verknüpfen
+                    self.solver.Add(self.s2[i, j] == delta)
+
+            # Bedingungen, um sicherzustellen, dass innerhalb einer Woche immer die gleiche Schicht gearbeitet wird
+            for i in self.mitarbeiter:
+                for j in range(1, self.calc_time):
+                    diff = self.solver.IntVar(-1, 1, "diff")
+                    
+                    # Setzen Sie diff gleich der Differenz
+                    self.solver.Add(diff == self.s2[i, j] - self.s2[i, j-1])
+                    
+                    # Bedingungen für den "absoluten Wert"
+                    self.solver.Add(self.nb8_violation[i, j] >= diff)
+                    self.solver.Add(self.nb8_violation[i, j] >= -diff)
+
+
+        elif self.company_shifts == 3:
+            for i in self.mitarbeiter:
+                for j in range(self.calc_time):
+                    # Definiere die Stunden für jede der drei Schichten
+                    first_shift_hours = self.solver.Sum(self.x[i, j, k] for k in range(0, int(len(self.verfügbarkeit[i][j]) / 3)))
+                    second_shift_hours = self.solver.Sum(self.x[i, j, k] for k in range(int(len(self.verfügbarkeit[i][j]) / 3), 2 * int(len(self.verfügbarkeit[i][j]) / 3)))
+                    third_shift_hours = self.solver.Sum(self.x[i, j, k] for k in range(2 * int(len(self.verfügbarkeit[i][j]) / 3), len(self.verfügbarkeit[i][j])))
+
+                    # Boolesche Variablen zur Bestimmung der Schicht
+                    delta1 = self.solver.BoolVar("delta1")
+                    delta2 = self.solver.BoolVar("delta2")
+                    
+                    # Bedingungen zur Bestimmung der Schicht
+                    self.solver.Add(first_shift_hours - second_shift_hours - 1000 * delta1 <= 0)
+                    self.solver.Add(second_shift_hours - first_shift_hours - 1000 * (1 - delta1) <= 0)
+
+                    self.solver.Add(second_shift_hours - third_shift_hours - 1000 * delta2 <= 0)
+                    self.solver.Add(third_shift_hours - second_shift_hours - 1000 * (1 - delta2) <= 0)
+
+                    # Verknüpfung der Hilfsvariablen mit s3[i, j]
+                    self.solver.Add(self.s3[i, j] == 2 * delta2 + delta1)
+
+            # Bedingungen, um sicherzustellen, dass innerhalb einer Woche immer die gleiche Schicht gearbeitet wird
+            for i in self.mitarbeiter:
+                for j in range(1, self.calc_time):
+                    diff = self.solver.IntVar(0, 2, "diff") # Unterschied kann 0, 1 oder 2 sein
+                    
+                    # Differenz zwischen aktuellen und vorherigen Schichten
+                    self.solver.Add(diff == abs(self.s3[i, j] - self.s3[i, j-1]))
+                    
+                    # Verletzung, wenn die Differenz größer als 0 ist
+                    self.solver.Add(self.nb8_violation[i, j] == min(diff, 1)) # Wenn der Unterschied 2 ist, zählen wir es als 1
+
+
 
         """
         # HARTE NB
@@ -843,6 +909,8 @@ class ORAlgorithm:
         # nb7_penalty_costs = sum(self.penalty_cost_nb7 * self.nb7_violation[i].solution_value() for i in self.mitarbeiter)
         nb7_min_penalty_costs = sum(self.penalty_cost_nb7_min * self.nb7_min_violation[i].solution_value() for i in self.mitarbeiter)
         nb7_max_penalty_costs = sum(self.penalty_cost_nb7_max * self.nb7_max_violation[i].solution_value() for i in self.mitarbeiter)
+        nb8_penalty_costs = sum(self.penalty_cost_nb8 * self.nb8_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
+        print(self.nb8_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
 
 
         # Drucken Sie die Kosten
@@ -854,6 +922,7 @@ class ORAlgorithm:
         # print('Kosten NB7 (Feste Mitarbeiter zu employment_level fest einplanen):', nb7_penalty_costs)
         print('Kosten NB7 (Unterschreitung der festen Mitarbeiter zu employment_level):', nb7_min_penalty_costs)
         print('Kosten NB7 (Überschreitung der festen Mitarbeiter zu employment_level):', nb7_max_penalty_costs)
+        print('Kosten NB8 (Immer die gleiche Schicht in einer Woche):', nb8_penalty_costs)
         print('Gesamtkosten:', self.objective.Value())
 
 
