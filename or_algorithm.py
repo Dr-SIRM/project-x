@@ -173,10 +173,10 @@ class ORAlgorithm:
         self.kosten = {ma: 20 for ma in self.mitarbeiter}  # Kosten pro Stunde
 
         # -- 4 --
-        self.max_zeit = {ma: 9*4 for ma in self.mitarbeiter}  # Maximale Arbeitszeit pro Tag
+        self.max_zeit = {ma: 8*4 for ma in self.mitarbeiter}  # Maximale Arbeitszeit pro Tag
 
         # -- 5 --
-        self.min_zeit = {ma: 2*4 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
+        self.min_zeit = {ma: 3*4 for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
 
         # -- 6 --
         # Maximale Arbeitszeit pro woche, wird später noch aus der Datenbank gezogen
@@ -784,21 +784,29 @@ class ORAlgorithm:
 
         # self.company_shifts  <-- Anzahl Schichten der Company!
 
+        
         # HARTE NB
         # NB 8 - Innerhalb einer Woche immer gleiche Schichten
+        # Definition der Schicht für jeden Mitarbeiter und Tag basierend auf Arbeitsstunden
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
-                # Die Anzahl der Stunden in der ersten Schicht berechnen
-                sum_first_shift = self.solver.Sum(self.x[i, j, k] for k in range(0, 6))
-                # Die Anzahl der Stunden in der zweiten Schicht berechnen
-                sum_second_shift = self.solver.Sum(self.x[i, j, k] for k in range(6, 12))
+                first_shift_hours = self.solver.Sum(self.x[i, j, k] for k in range(0, int(len(self.verfügbarkeit[i][j]) / 2))) # Stunden in der ersten Schicht
+                second_shift_hours = self.solver.Sum(self.x[i, j, k] for k in range(int(len(self.verfügbarkeit[i][j]) / 2), len(self.verfügbarkeit[i][j]))) # Stunden in der zweiten Schicht
+                
+                # Kann 0 oder 1 annehmen
+                delta = self.solver.BoolVar("delta")
+                
+                self.solver.Add(first_shift_hours - second_shift_hours - 1000 * delta <= 0)
+                self.solver.Add(second_shift_hours - first_shift_hours - 1000 * (1 - delta) <= 0)
+                
+                # Hilfsvariable mit s[i, j] verknüpfen
+                self.solver.Add(self.s[i, j] == delta)
 
-                # Setzen Sie s[i, j] auf 0, wenn die erste Schicht mehr Zeit hat, sonst auf 1
-                self.solver.Add(self.s[i, j] == (sum_second_shift > sum_first_shift))
-
-                # Stellen Sie sicher, dass die Schicht an jedem Tag der Woche gleich bleibt
-                if j > 0:
-                    self.solver.Add(self.s[i, j] == self.s[i, j - 1])
+        # Bedingungen für gleiche Schicht innerhalb einer Woche
+        for i in self.mitarbeiter:
+            for j in range(1, self.calc_time): # Beginnt bei 1, da es keinen Vortag für Tag 0 gibt
+                self.solver.Add(self.s[i, j] == self.s[i, j - 1]) # Gleiche Schicht wie am Vortag
+        
 
         """
         # HARTE NB
