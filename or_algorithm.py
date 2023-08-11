@@ -806,7 +806,7 @@ class ORAlgorithm:
         # WEICHE NB
         # NB 8 - Innerhalb einer Woche immer gleiche Schichten
         # -------------------------------------------------------------------------------------------------------
-        self.company_shifts = 3
+        self.company_shifts = 2
 
         if self.company_shifts <= 1:
             pass
@@ -918,7 +918,7 @@ class ORAlgorithm:
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 # Drucken Sie den Wert von s2[i, j]
-                print(f"s3[{i}][{j}] =", self.s3[i, j].solution_value())
+                print(f"s2[{i}][{j}] =", self.s2[i, j].solution_value())
 
 
         # Kosten für die Einstellung von Mitarbeitern
