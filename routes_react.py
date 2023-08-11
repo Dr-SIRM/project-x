@@ -677,7 +677,6 @@ def solver_req():
 
     if request.method =='POST':
         solver_req_data = request.get_json()
-        creation_date = datetime.datetime.now()
 
         SolverRequirement.query.filter_by(company_name=user.company_name).delete()
         db.session.commit()
@@ -763,10 +762,12 @@ def solver_req():
         "nb18": nb18,
         "nb19": nb19,
         "nb20": nb20
-    }
+        }
+
+        print(solver_req_dict)
 
     
-    return jsonify(solver_req_dict)
+        return jsonify(solver_req_dict)
 
 
 
