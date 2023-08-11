@@ -550,7 +550,7 @@ class ORAlgorithm:
         Definiere Variablen für Nebenbedingungsverletzungen
         self.solver.NumVar(0, self.solver.infinity() <-- Von 0 bis unendlich. für infinity kann man auch eine Zahl einsetzen
         """
-        # NB2 violation variable
+        # NB2 violation variable - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend 
         self.nb2_violation = {}
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):
@@ -558,7 +558,7 @@ class ORAlgorithm:
         # print("self.nb2_violation: ", self.nb2_violation)
 
 
-        # NB3 violation variable
+        # NB3 violation variable - Max. Arbeitszeit pro Woche
         self.nb3_violation = {}
         for i in self.mitarbeiter:
             self.nb3_violation[i] = self.solver.NumVar(0, self.solver.infinity(), f'nb3_violation[{i}]')
@@ -569,24 +569,24 @@ class ORAlgorithm:
         self.nb4_min_violation = {}
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
-                self.nb4_min_violation[i, j] = self.solver.NumVar(0, 2, 'nb4_min_violation[%i,%i]' % (i, j))
+                self.nb4_min_violation[i, j] = self.solver.NumVar(0, 4, 'nb4_min_violation[%i,%i]' % (i, j))
 
         # NB4 Höchstarbeitszeit Verletzungsvariable
         self.nb4_max_violation = {}
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
-                self.nb4_max_violation[i, j] = self.solver.NumVar(0, 2, 'nb4_max_violation[%i,%i]' % (i, j))
+                self.nb4_max_violation[i, j] = self.solver.NumVar(0, 4, 'nb4_max_violation[%i,%i]' % (i, j))
 
 
         # NB7 Mindestarbeitszeit Verletzungsvariable
         self.nb7_min_violation = {}
         for i in self.mitarbeiter:
-            self.nb7_min_violation[i] = self.solver.NumVar(0, self.solver.infinity(), f'nb7_min_violation[{i}]')
+            self.nb7_min_violation[i] = self.solver.NumVar(0, 8, f'nb7_min_violation[{i}]')
 
         # NB7 Höchstarbeitszeit Verletzungsvariable
         self.nb7_max_violation = {}
         for i in self.mitarbeiter:
-            self.nb7_max_violation[i] = self.solver.NumVar(0, self.solver.infinity(), f'nb7_max_violation[{i}]')
+            self.nb7_max_violation[i] = self.solver.NumVar(0, 8, f'nb7_max_violation[{i}]')
 
 
         # NB8 Schicht - Verletzungsvariable
@@ -699,7 +699,7 @@ class ORAlgorithm:
 
         # -------------------------------------------------------------------------------------------------------
         # WEICHE NB -- NEU 28.07.2023 -- --> Muss noch genauer überprüft werden ob es funktioniert!
-        # NB 3 - Max. Arbeitszeit pro Woche (für "Temp" Mitarbeiter)
+        # NB 3 - Max. Arbeitszeit pro Woche
         # -------------------------------------------------------------------------------------------------------
         total_hours = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
         for ma in self.mitarbeiter:
@@ -825,7 +825,7 @@ class ORAlgorithm:
                     self.solver.Add(second_shift_hours - first_shift_hours - 1000 * (1 - delta) <= 0)
                     
                     # Hilfsvariable mit s2[i, j] verknüpfen
-                    self.solver.Add(self.s2[i, j] == delta)
+                    self.solver.Add(self.s2[i, j] == 1 - delta)
 
             # Harte nb Option zum testen
             for i in self.mitarbeiter:
