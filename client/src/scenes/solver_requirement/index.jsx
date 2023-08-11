@@ -10,7 +10,7 @@ import axios from 'axios';
 
 
 
-const Solver = ({ solver }) => {
+const SolverReq = ({ solverreq }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
@@ -65,7 +65,40 @@ const Solver = ({ solver }) => {
       <Formik
         onSubmit={handleFormSubmit}
         enableReinitialize={true}
-        initialValues={{}}
+        initialValues={{
+          company_name: solverData.company_name,
+          weekly_hours: solverData.weekly_hours,
+          shifts: solverData.shifts,
+          desired_min_time_day: solverData.desired_min_time_day,
+          desired_max_time_day: solverData.desired_max_time_day,
+          min_time_day: solverData.min_time_day,
+          max_time_day: solverData.max_time_day,
+          desired_max_time_week: solverData.desired_max_time_week,
+          max_time_week: solverData.max_time_week,
+          hour_devider: solverData.hour_devider,
+          fair_distribution: solverData.fair_distribution,
+          week_timeframe: solverData.week_timeframe,
+          nb1: solverData.nb1,
+          nb2: solverData.nb2,
+          nb3: solverData.nb3,
+          nb4: solverData.nb4,
+          nb5: solverData.nb5,
+          nb6: solverData.nb6,
+          nb7: solverData.nb7,
+          nb8: solverData.nb8,
+          nb9: solverData.nb9,
+          nb10: solverData.nb10,
+          nb11: solverData.nb11,
+          nb12: solverData.nb12,
+          nb13: solverData.nb13,
+          nb14: solverData.nb14,
+          nb15: solverData.nb15,
+          nb16: solverData.nb16,
+          nb17: solverData.nb17,
+          nb18: solverData.nb18,
+          nb19: solverData.nb19,
+          nb20: solverData.nb20
+        }}
       >
         {({
           values,
@@ -961,4 +994,4 @@ const Solver = ({ solver }) => {
 
 
 
-export default Solver;
+export default SolverReq;
