@@ -12,7 +12,8 @@ from app import app
 #-------------------------------------------------------------------------
 
 from models import User, Availability, TimeReq, Company, OpeningHours, Timetable, \
-    TemplateAvailability, TemplateTimeRequirement, RegistrationToken, PasswordReset
+    TemplateAvailability, TemplateTimeRequirement, RegistrationToken, PasswordReset, \
+    SolverRequirement
 
 
 
@@ -596,6 +597,177 @@ def run_solver():
         else:
             return jsonify({'message': 'Solver button was not clicked'}), 200
     return jsonify({'message': 'Solver Go'}), 200
+
+
+
+@app.route('/api/solver/requirement', methods = ['GET', 'POST'])
+@jwt_required()
+def solver_req():
+    react_user = get_jwt_identity()
+    user = User.query.filter_by(email=react_user).first()
+    company = Company.query.filter_by(email=react_user).first()
+    solver_requirement = SolverRequirement.query.filter_by(company_name=user.company_name).first()
+
+    if solver_requirement is None:
+        company_name = "",
+        weekly_hours = "",
+        shifts = "",
+        desired_min_time_day = "",
+        desired_max_time_day = "",
+        min_time_day = "",
+        max_time_day = "",
+        desired_max_time_week = "",
+        max_time_week = "",
+        hour_devider = "",
+        fair_distribution = "",
+        week_timeframe = "",
+        nb1 = "",
+        nb2 = "",
+        nb3 = "",
+        nb4 = "",
+        nb5 = "",
+        nb6 = "",
+        nb7 = "",
+        nb8 = "",
+        nb9 = "",
+        nb10 = "",
+        nb11 = "",
+        nb12 = "",
+        nb13 = "",
+        nb14 = "",
+        nb15 = "",
+        nb16 = "",
+        nb17 = "",
+        nb18 = "",
+        nb19 = "",
+        nb20 = ""
+    else:
+        company_name = solver_requirement.company_name,
+        weekly_hours = solver_requirement.weekly_hours,
+        shifts = solver_requirement.shifts,
+        desired_min_time_day = solver_requirement.desired_min_time_day,
+        desired_max_time_day = solver_requirement.desired_max_time_day,
+        min_time_day = solver_requirement.min_time_day,
+        max_time_day = solver_requirement.max_time_day,
+        desired_max_time_week = solver_requirement.desired_max_time_week,
+        max_time_week = solver_requirement.max_time_week,
+        hour_devider = solver_requirement.hour_devider,
+        fair_distribution = solver_requirement.fair_distribution,
+        week_timeframe = solver_requirement.week_timeframe,
+        nb1 = solver_requirement.nb1,
+        nb2 = solver_requirement.nb2,
+        nb3 = solver_requirement.nb3,
+        nb4 = solver_requirement.nb4,
+        nb5 = solver_requirement.nb5,
+        nb6 = solver_requirement.nb6,
+        nb7 = solver_requirement.nb7,
+        nb8 = solver_requirement.nb8,
+        nb9 = solver_requirement.nb9,
+        nb10 = solver_requirement.nb10,
+        nb11 = solver_requirement.nb11,
+        nb12 = solver_requirement.nb12,
+        nb13 = solver_requirement.nb13,
+        nb14 = solver_requirement.nb14,
+        nb15 = solver_requirement.nb15,
+        nb16 = solver_requirement.nb16,
+        nb17 = solver_requirement.nb17,
+        nb18 = solver_requirement.nb18,
+        nb19 = solver_requirement.nb19,
+        nb20 =solver_requirement.nb20
+
+    if request.method =='POST':
+        solver_req_data = request.get_json()
+        creation_date = datetime.datetime.now()
+
+        SolverRequirement.query.filter_by(company_name=user.company_name).delete()
+        db.session.commit()
+
+        last = SolverRequirement.query.order_by(SolverRequirement.id.desc()).first()
+        if last is None:
+            new_id = 1
+        else:
+            new_id = last.id + 1
+
+        data = SolverRequirement(       
+                                id = new_id,
+                                company_name = user.company_name,
+                                weekly_hours = company.weekly_hours,
+                                shifts = company.shifts,
+                                desired_min_time_day = solver_req_data['desired_min_time_day'],
+                                desired_max_time_day = solver_req_data['desired_max_time_day'],
+                                min_time_day = solver_req_data['min_time_day'],
+                                max_time_day = solver_req_data['max_time_day'],
+                                desired_max_time_week = solver_req_data['desired_max_time_week'],
+                                max_time_week = solver_req_data['max_time_week'],
+                                hour_devider = solver_req_data['hour_devider'],
+                                fair_distribution = solver_req_data['fair_distribution'],
+                                week_timeframe = solver_req_data['week_timeframe'],
+                                nb1 = solver_req_data['nb1'],
+                                nb2 = solver_req_data['nb2'],
+                                nb3 = solver_req_data['nb3'],
+                                nb4 = solver_req_data['nb4'],
+                                nb5 = solver_req_data['nb5'],
+                                nb6 = solver_req_data['nb6'],
+                                nb7 = solver_req_data['nb7'],
+                                nb8 = solver_req_data['nb8'],
+                                nb9 = solver_req_data['nb9'],
+                                nb10 = solver_req_data['nb10'],
+                                nb11 = solver_req_data['nb11'],
+                                nb12 = solver_req_data['nb12'],
+                                nb13 = 0,
+                                nb14 = 0,
+                                nb15 = 0,
+                                nb16 = 0,
+                                nb17 = 0,
+                                nb18 = 0,
+                                nb19 = 0,
+                                nb20 = 0,
+                                created_by = user.company_id,
+                                changed_by = user.company_id,
+                                creation_timestamp = creation_date
+                                )
+        db.session.add(data)
+        db.session.commit()
+
+        solver_req_dict = {
+        "company_name": company_name,
+        "weekly_hours": weekly_hours,
+        "shifts": shifts,
+        "desired_min_time_day": desired_min_time_day,
+        "desired_max_time_day": desired_max_time_day,
+        "min_time_day": min_time_day,
+        "max_time_day": max_time_day,
+        "desired_max_time_week": desired_max_time_week,
+        "max_time_week": max_time_week,
+        "hour_devider": hour_devider,
+        "fair_distribution": fair_distribution,
+        "week_timeframe": week_timeframe,
+        "nb1": nb1,
+        "nb2": nb2,
+        "nb3": nb3,
+        "nb4": nb4,
+        "nb5": nb5,
+        "nb6": nb6,
+        "nb7": nb7,
+        "nb8": nb8,
+        "nb9": nb9,
+        "nb10": nb10,
+        "nb11": nb11,
+        "nb12": nb12,
+        "nb13": nb13,
+        "nb14": nb14,
+        "nb15": nb15,
+        "nb16": nb16,
+        "nb17": nb17,
+        "nb18": nb18,
+        "nb19": nb19,
+        "nb20": nb20
+    }
+
+    
+    return jsonify(solver_req_dict)
+
+
 
 
 
