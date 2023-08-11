@@ -569,13 +569,13 @@ class ORAlgorithm:
         self.nb4_min_violation = {}
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
-                self.nb4_min_violation[i, j] = self.solver.NumVar(0, self.solver.infinity(), 'nb4_min_violation[%i,%i]' % (i, j))
+                self.nb4_min_violation[i, j] = self.solver.NumVar(0, 2, 'nb4_min_violation[%i,%i]' % (i, j))
 
         # NB4 Höchstarbeitszeit Verletzungsvariable
         self.nb4_max_violation = {}
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
-                self.nb4_max_violation[i, j] = self.solver.NumVar(0, self.solver.infinity(), 'nb4_max_violation[%i,%i]' % (i, j))
+                self.nb4_max_violation[i, j] = self.solver.NumVar(0, 2, 'nb4_max_violation[%i,%i]' % (i, j))
 
 
         # NB7 Mindestarbeitszeit Verletzungsvariable
@@ -800,7 +800,7 @@ class ORAlgorithm:
                 self.solver.Add(self.nb7_max_violation[ma] >= 0)
 
 
-
+        
         # self.company_shifts  <-- Anzahl Schichten der Company!
         # -------------------------------------------------------------------------------------------------------
         # WEICHE NB
