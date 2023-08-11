@@ -10,7 +10,6 @@ import { ThreeDots } from "react-loader-spinner";
 import axios from "axios";
 
 
-
 const Team = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -44,7 +43,7 @@ const Team = () => {
     const newValue = props.value;
 
     try {
-        await axios.put(`http://localhost:5000/api/users/${id}`, {
+        await axios.put('http://localhost:5000/api/users/update', {
             [field]: newValue
         }, {
             headers: {
@@ -74,7 +73,6 @@ const Team = () => {
   
 
   const columns = [
-    { field: "id", headerName: "ID" },
     {
       field: "first_name",
       headerName: "Vorname",
@@ -88,11 +86,6 @@ const Team = () => {
       flex: 1,
       cellClassName: "name-column--cell",
       editable: true
-    },
-    {
-      field: "company_name",
-      headerName: "Firma",
-      flex: 1,
     },
     {
       field: "email",
