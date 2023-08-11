@@ -806,7 +806,7 @@ class ORAlgorithm:
         # WEICHE NB
         # NB 8 - Innerhalb einer Woche immer gleiche Schichten
         # -------------------------------------------------------------------------------------------------------
-        self.company_shifts = 2
+        self.company_shifts = 3
 
         if self.company_shifts <= 1:
             pass
@@ -827,12 +827,13 @@ class ORAlgorithm:
                     # Hilfsvariable mit s2[i, j] verknüpfen
                     self.solver.Add(self.s2[i, j] == 1 - delta)
 
+            """
             # Harte nb Option zum testen
             for i in self.mitarbeiter:
                 for j in range(1, self.calc_time):
                     self.solver.Add(self.s2[i, j] - self.s2[i, j-1] == 0)
+            """
 
-            """     
             # Bedingungen, um sicherzustellen, dass innerhalb einer Woche immer die gleiche Schicht gearbeitet wird
             for i in self.mitarbeiter:
                 for j in range(1, self.calc_time):
@@ -844,7 +845,7 @@ class ORAlgorithm:
                     # Bedingungen für den "absoluten Wert"
                     self.solver.Add(self.nb8_violation[i, j] >= diff)
                     self.solver.Add(self.nb8_violation[i, j] >= -diff)
-            """
+            
 
         elif self.company_shifts == 3:
             for i in self.mitarbeiter:
@@ -871,13 +872,15 @@ class ORAlgorithm:
             # Bedingungen, um sicherzustellen, dass innerhalb einer Woche immer die gleiche Schicht gearbeitet wird
             for i in self.mitarbeiter:
                 for j in range(1, self.calc_time):
-                    diff = self.solver.IntVar(0, 2, "diff") # Unterschied kann 0, 1 oder 2 sein
+                    diff = self.solver.IntVar(-2, 2, "diff") # Unterschied kann -2, -1, 0, 1 oder 2 sein
                     
-                    # Differenz zwischen aktuellen und vorherigen Schichten
-                    self.solver.Add(diff == abs(self.s3[i, j] - self.s3[i, j-1]))
-                    
-                    # Verletzung, wenn die Differenz größer als 0 ist
-                    self.solver.Add(self.nb8_violation[i, j] == min(diff, 1)) # Wenn der Unterschied 2 ist, zählen wir es als 1
+                    # Setzen Sie diff gleich der Differenz
+                    self.solver.Add(diff == self.s3[i, j] - self.s3[i, j-1])
+
+                    # Bedingungen für den "absoluten Wert"
+                    self.solver.Add(self.nb8_violation[i, j] >= diff)
+                    self.solver.Add(self.nb8_violation[i, j] >= -diff)
+                    self.solver.Add(self.nb8_violation[i, j] <= 1)  # Die Verletzung sollte maximal 1 betragen
 
 
 
@@ -909,7 +912,7 @@ class ORAlgorithm:
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 # Drucken Sie den Wert von s2[i, j]
-                print(f"s2[{i}][{j}] =", self.s2[i, j].solution_value())
+                print(f"s3[{i}][{j}] =", self.s3[i, j].solution_value())
 
 
         # Kosten für die Einstellung von Mitarbeitern
