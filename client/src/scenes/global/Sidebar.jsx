@@ -177,6 +177,15 @@ const Sidebar = () => {
               requiredAccessLevel={["Super_Admin", "Admin"]}
               accessLevel={user.accessLevel}
             />
+            <Item
+              title="Solver Req"
+              to="/solver/requirement"
+              icon={<HomeOutlinedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              requiredAccessLevel={["Super_Admin", "Admin"]}
+              accessLevel={user.accessLevel}
+            />
 
             <Typography
               variant="h6"
