@@ -104,10 +104,10 @@ const Solver = ({ solver }) => {
                 label= ""
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.max_min_Arbeitszeit}
-                name="max_min_Arbeitszeit"
-                error={!!touched.max_min_Arbeitszeit && !!errors.max_min_Arbeitszeit}
-                helperText={touched.max_min_Arbeitszeit && errors.max_min_Arbeitszeit}
+                value={values.desired_min_time_day}
+                name="desired_min_time_day"
+                error={!!touched.desired_min_time_day && !!errors.desired_min_time_day}
+                helperText={touched.desired_min_time_day && errors.desired_min_time_day}
                 sx={{ gridColumn: "span 1" }}
               />
               <Typography
@@ -139,10 +139,10 @@ const Solver = ({ solver }) => {
                 label= ""
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.max_max_Arbeitszeit}
-                name="max_max_Arbeitszeit"
-                error={!!touched.max_max_Arbeitszeit && !!errors.max_max_Arbeitszeit}
-                helperText={touched.max_max_Arbeitszeit && errors.max_max_Arbeitszeit}
+                value={values.desired_max_time_day}
+                name="desired_max_time_day"
+                error={!!touched.desired_max_time_day && !!errors.desired_max_time_day}
+                helperText={touched.desired_max_time_day && errors.desired_max_time_day}
                 sx={{ gridColumn: "span 1" }}
               />
               <Typography
@@ -174,10 +174,10 @@ const Solver = ({ solver }) => {
                 label= ""
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.min_Arbeitszeit}
-                name="min_Arbeitszeit"
-                error={!!touched.min_Arbeitszeit && !!errors.min_Arbeitszeit}
-                helperText={touched.min_Arbeitszeit && errors.min_Arbeitszeit}
+                value={values.min_time_day}
+                name="min_time_day"
+                error={!!touched.min_time_day && !!errors.min_time_day}
+                helperText={touched.min_time_day && errors.min_time_day}
                 sx={{ gridColumn: "span 1" }}
               />
               <Typography
@@ -209,10 +209,85 @@ const Solver = ({ solver }) => {
                 label= ""
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.max_Arbeitszeit}
-                name="max_Arbeitszeit"
-                error={!!touched.max_Arbeitszeit && !!errors.max_Arbeitszeit}
-                helperText={touched.max_Arbeitszeit && errors.max_Arbeitszeit}
+                value={values.max_time_day}
+                name="max_time_day"
+                error={!!touched.max_time_day && !!errors.max_time_day}
+                helperText={touched.max_time_day && errors.max_time_day}
+                sx={{ gridColumn: "span 1" }}
+              />
+              <Typography
+                color={colors.greenAccent[500]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "right",
+                  height: "100%",
+                }}
+              >
+                Max. Zeit pro Tag
+              </Typography>
+              <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label= ""
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.max_time_day}
+                name="max_time_day"
+                error={!!touched.max_time_day && !!errors.max_time_day}
+                helperText={touched.max_time_day && errors.max_time_day}
+                sx={{ gridColumn: "span 1" }}
+              />
+              <Typography
+                color={colors.greenAccent[500]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "right",
+                  height: "100%",
+                }}
+              >
+                Max. Zeit pro Woche
+              </Typography>
+              <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label= ""
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.max_time_week}
+                name="max_time_week"
+                error={!!touched.max_time_week && !!errors.max_time_week}
+                helperText={touched.max_time_week && errors.max_time_week}
+                sx={{ gridColumn: "span 1" }}
+              />
+              <Typography
+                color={colors.greenAccent[500]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "right",
+                  height: "100%",
+                }}
+              >
+                Gewünschte max. Zeit pro Woche
+              </Typography>
+              <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label= ""
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.desired_max_time_week}
+                name="desired_max_time_week"
+                error={!!touched.desired_max_time_week && !!errors.desired_max_time_week}
+                helperText={touched.desired_max_time_week && errors.desired_max_time_week}
                 sx={{ gridColumn: "span 1" }}
               />
               <Typography
@@ -244,12 +319,70 @@ const Solver = ({ solver }) => {
                 label= ""
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.solving_time}
-                name="solving_time"
-                error={!!touched.solving_time && !!errors.solving_time}
-                helperText={touched.solving_time && errors.solving_time}
+                value={values.fair_distribution}
+                name="fair_distribution"
+                error={!!touched.fair_distribution && !!errors.fair_distribution}
+                helperText={touched.fair_distribution && errors.fair_distribution}
                 sx={{ gridColumn: "span 1" }}
               />
+              <Typography
+                color={colors.greenAccent[500]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "right",
+                  height: "100%",
+                }}
+              >
+                Stunden Teiler
+              </Typography>
+              <Select
+                fullWidth
+                variant="filled"
+                type="text"
+                label= ""
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.hour_devider}
+                name="hour_devider"
+                error={!!touched.hour_devider && !!errors.hour_devider}
+                helperText={touched.hour_devider && errors.hour_devider}
+                sx={{ gridColumn: "span 1" }}
+              >
+                <MenuItem value={ 1 }>1 Stunde</MenuItem>
+                <MenuItem value={ 2 }>30 Min</MenuItem>
+                <MenuItem value={ 4 }>15 Min</MenuItem>
+                </Select>
+                <Typography
+                color={colors.greenAccent[500]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "right",
+                  height: "100%",
+                }}
+              >
+                Solver Zeitraum
+              </Typography>
+              <Select
+                fullWidth
+                variant="filled"
+                type="text"
+                label= ""
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.week_timeframe}
+                name="week_timeframe"
+                error={!!touched.week_timeframe && !!errors.week_timeframe}
+                helperText={touched.week_timeframe && errors.week_timeframe}
+                sx={{ gridColumn: "span 1" }}
+              >
+                <MenuItem value={ 1 }>1 Woche</MenuItem>
+                <MenuItem value={ 2 }>2 Wochen</MenuItem>
+                <MenuItem value={ 4 }>4 Wochen</MenuItem>
+                </Select>
               <Typography
                 color={colors.greenAccent[500]}
                 variant=""
