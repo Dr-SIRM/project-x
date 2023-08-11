@@ -104,7 +104,6 @@ def get_data():
     user_list = []
     for user in users:
         user_dict = {
-            'id': user.id,
             'first_name': user.first_name,
             'last_name': user.last_name,
             'company_name': user.company_name,

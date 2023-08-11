@@ -74,7 +74,6 @@ const Team = () => {
   
 
   const columns = [
-    { field: "id", headerName: "ID" },
     {
       field: "first_name",
       headerName: "Vorname",
@@ -88,11 +87,6 @@ const Team = () => {
       flex: 1,
       cellClassName: "name-column--cell",
       editable: true
-    },
-    {
-      field: "company_name",
-      headerName: "Firma",
-      flex: 1,
     },
     {
       field: "email",
