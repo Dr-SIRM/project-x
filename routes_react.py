@@ -117,7 +117,7 @@ def get_data():
 
     return jsonify(user_list) 
 
-@app.route('/api/users/<int:user_id>', methods=['PUT'])
+@app.route('/api/users/update', methods=['POST'])
 @jwt_required()
 def update_user(user_id):
     data = request.get_json()
@@ -126,12 +126,26 @@ def update_user(user_id):
     if user is None:
         return jsonify({"message": "User not found"}), 404
 
-    for key, value in data.items():
-        setattr(user, key, value)
+    user.first_name = data.get('first_name', user.first_name)
+    user.last_name = data.get('last_name', user.last_name)
+    user.email = data.get('email', user.email)
+    
+    # Convert the employment_level to its original range [0, 1] before saving
+    employment_level_percentage = data.get('employment_level')
+    if employment_level_percentage is not None:
+        user.employment_level = employment_level_percentage / 100.0
+    
+    user.department = data.get('department', user.department)
 
-    db.session.commit()
+    try:
+        db.session.commit()
+        return jsonify({"message": "User updated"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": "Failed to update user"}), 500
+    finally:
+        db.session.close()
 
-    return jsonify({"message": "User updated"}), 200
 
 @app.route('/api/new_user', methods=['POST'])
 def new_user():
