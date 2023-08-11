@@ -281,3 +281,65 @@ class PasswordReset(db.Model, UserMixin):
         self.id = id
         self.email = email
         self.token = token
+
+
+
+class SolverRequirement(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    company_name = db.Column(db.String(200), index=True, unique=False)
+    weekly_hours = db.Column(db.Integer)
+    shifts = db.Column(db.Integer)
+    min_time_day = db.Column(db.Integer, index=True, unique=False)
+    max_time_day = db.Column(db.Integer, index=True, unique=False)
+    max_min_time_day = db.Column(db.Integer, index=True, unique=False)
+    max_max_time_day = db.Column(db.Integer, index=True, unique=False)
+    max_time_week = db.Column(db.Integer, index=True, unique=False)
+    max_max_time_week = db.Column(db.Integer, index=True, unique=False)
+    hour_devider = db.Column(db.Integer, index=True, unique=False)
+    fair_distribution = db.Column(db.Integer, index=True, unique=False)
+    week_timeframe = db.Column(db.Integer, index=True, unique=False)
+    batch_run = db.Column(db.Integer, index=True, unique=False)
+
+    nb1 = db.Column(db.Integer, index=True, unique=False)
+    nb2 = db.Column(db.Integer, index=True, unique=False)
+    nb3 = db.Column(db.Integer, index=True, unique=False)
+    nb4 = db.Column(db.Integer, index=True, unique=False)
+    nb5 = db.Column(db.Integer, index=True, unique=False)
+    nb6 = db.Column(db.Integer, index=True, unique=False)
+    nb7 = db.Column(db.Integer, index=True, unique=False)
+    nb8 = db.Column(db.Integer, index=True, unique=False)
+    nb9 = db.Column(db.Integer, index=True, unique=False)
+    nb10 = db.Column(db.Integer, index=True, unique=False)
+    nb11 = db.Column(db.Integer, index=True, unique=False)
+    nb12 = db.Column(db.Integer, index=True, unique=False)
+    nb13 = db.Column(db.Integer, index=True, unique=False)
+    nb14 = db.Column(db.Integer, index=True, unique=False)
+    nb15 = db.Column(db.Integer, index=True, unique=False)
+    nb16 = db.Column(db.Integer, index=True, unique=False)
+    nb17 = db.Column(db.Integer, index=True, unique=False)
+    nb18 = db.Column(db.Integer, index=True, unique=False)
+    nb19 = db.Column(db.Integer, index=True, unique=False)
+    nb20 = db.Column(db.Integer, index=True, unique=False)
+
+    created_by = db.Column(db.Integer, index=True, unique=False)
+    changed_by = db.Column(db.Integer, index=True, unique=False)
+    creation_timestamp = db.Column(db.DateTime)
+    update_timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
+
+
+    def __init__(self, id, company_id, first_name, last_name, employment, email, password, employment_level, company_name, department,
+                 access_level, created_by, changed_by, creation_timestamp):
+        self.id = id
+        self.company_id = company_id
+        self.first_name = first_name
+        self.last_name = last_name
+        self.employment = employment
+        self.email = email
+        self.password = password
+        self.employment_level = employment_level
+        self.company_name = company_name
+        self.department = department
+        self.access_level = access_level
+        self.created_by = created_by
+        self.changed_by = changed_by
+        self.creation_timestamp = creation_timestamp
