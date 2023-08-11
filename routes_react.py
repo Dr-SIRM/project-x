@@ -605,7 +605,7 @@ def run_solver():
 def solver_req():
     react_user = get_jwt_identity()
     user = User.query.filter_by(email=react_user).first()
-    company = Company.query.filter_by(email=react_user).first()
+    company = Company.query.filter_by(company_name=user.company_name).first()
     solver_requirement = SolverRequirement.query.filter_by(company_name=user.company_name).first()
 
     if solver_requirement is None:
@@ -724,7 +724,8 @@ def solver_req():
                                 nb20 = 0,
                                 created_by = user.company_id,
                                 changed_by = user.company_id,
-                                creation_timestamp = creation_date
+                                creation_timestamp = datetime.datetime.now(),
+                                update_timestamp = datetime.datetime.now()
                                 )
         db.session.add(data)
         db.session.commit()
