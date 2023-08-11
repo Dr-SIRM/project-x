@@ -869,6 +869,12 @@ class ORAlgorithm:
                     # Verknüpfung der Hilfsvariablen mit s3[i, j]
                     self.solver.Add(self.s3[i, j] == 2 * delta2 + delta1)
 
+            # Harte NB
+            for i in self.mitarbeiter:
+                for j in range(1, self.calc_time):
+                    self.solver.Add(self.s3[i, j] - self.s3[i, j-1] == 0)
+
+            """
             # Bedingungen, um sicherzustellen, dass innerhalb einer Woche immer die gleiche Schicht gearbeitet wird
             for i in self.mitarbeiter:
                 for j in range(1, self.calc_time):
@@ -881,7 +887,7 @@ class ORAlgorithm:
                     self.solver.Add(self.nb8_violation[i, j] >= diff)
                     self.solver.Add(self.nb8_violation[i, j] >= -diff)
                     self.solver.Add(self.nb8_violation[i, j] <= 1)  # Die Verletzung sollte maximal 1 betragen
-
+            """
 
 
         """
