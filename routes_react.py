@@ -894,7 +894,6 @@ def get_required_workforce():
     # Week with adjustments
     monday = today - datetime.timedelta(days=today.weekday())
     week_adjustment = int(request.args.get('week_adjustment', 0))
-    monday += datetime.timedelta(days=week_adjustment)
 
 
     timereq_dict = {}
@@ -959,6 +958,9 @@ def get_required_workforce():
     #Submit the required FTE per hour
     if request.method =='POST':
         workforce_data = request.get_json()
+        week_adjustment = int(request.args.get('week_adjustment', 0))
+        print(request.args)
+        print(request.args.get('week_adjustment'))
         for i in range(day_num):
             for quarter in range(96): # There are 96 quarters in a day
                 quarter_hour = quarter / 4  # Each quarter represents 15 minutes, so divided by 4 gives hour
@@ -972,6 +974,7 @@ def get_required_workforce():
                     else:
                         new_id = last.id + 1
                     new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+                    print("Received week_adjustment:", week_adjustment)
                     """
                     time_num = hour * 100"
                     """
