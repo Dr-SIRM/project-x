@@ -10,6 +10,7 @@ import { ThreeDots } from "react-loader-spinner";
 import axios from "axios";
 
 
+
 const Team = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -21,20 +22,26 @@ const Team = () => {
   useEffect(() => {
     const fetchUser = async () => {
       setIsLoading(true);
-        try {
-          const response = await axios.get('http://localhost:5000/api/users', {
-              headers: {
-                  'Authorization': `Bearer ${token}`
-              }
-          });
-          setUsers(response.data); 
-          setIsLoading(false);
-        } catch (error) {
-          console.error('Error fetching update details:', error);
-          setIsLoading(false);
-        }
+      try {
+        const response = await axios.get('http://localhost:5000/api/users', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const usersWithId = response.data.map((user, index) => ({
+          ...user,
+          id: index + 1, 
+        }));
+
+        setUsers(usersWithId);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error fetching update details:', error);
+        setIsLoading(false);
+      }
     };
-  
+
     fetchUser();
   }, []);
     
@@ -43,7 +50,7 @@ const Team = () => {
     const newValue = props.value;
 
     try {
-        await axios.put('http://localhost:5000/api/users/update', {
+        await axios.put(`http://localhost:5000/api/users/${id}`, {
             [field]: newValue
         }, {
             headers: {
