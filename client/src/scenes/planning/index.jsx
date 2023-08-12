@@ -140,14 +140,12 @@ const Week = () => {
   const [closingHours, setClosingHours] = useState([]);
   const token = localStorage.getItem('session_token'); // Get the session token from local storage
   const [isLoading, setIsLoading] = useState(true);
-  const [mondayDate, setMondayDate] = useState("");
   const [weekAdjustment, setWeekAdjustment] = useState(0);
   
 
   useEffect(() => {
     const fetchCalendar = async (values) => {
       setIsLoading(true);
-      console.log("Sending weekAdjustment:", weekAdjustment);
         try {
           const response = await axios.get('http://localhost:5000/api/requirement/workforce?week_adjustment=' + weekAdjustment, {
               headers: {
