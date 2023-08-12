@@ -36,6 +36,9 @@ class DataProcessing:
         self.get_shift_emp_lvl()
         self.binaere_liste()
         self.get_employment()
+
+        self.get_solver_requirement()
+        
         self.pre_check_admin()
 
 
@@ -288,6 +291,10 @@ class DataProcessing:
                     user_employment[user_id] = employment
 
                 self.user_employment = user_employment
+
+
+    def get_solver_requirement(self):
+        pass
 
 
     def pre_check_admin(self):
