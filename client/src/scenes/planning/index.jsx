@@ -140,7 +140,6 @@ const Week = () => {
   const [closingHours, setClosingHours] = useState([]);
   const token = localStorage.getItem('session_token'); // Get the session token from local storage
   const [isLoading, setIsLoading] = useState(true);
-  const [mondayDate, setMondayDate] = useState("");
   const [weekAdjustment, setWeekAdjustment] = useState(0);
   
 
@@ -153,7 +152,6 @@ const Week = () => {
                   'Authorization': `Bearer ${token}`
               }
           });
-          setMondayDate(response.data.monday);
           setcalendarData(response.data);
           setIsLoading(false);
           const fetchedData = response.data;
@@ -214,7 +212,7 @@ const Week = () => {
 
       try {
         // Send the updated form values to the server for database update
-        await axios.post('http://localhost:5000/api/requirement/workforce', formattedCounts, {
+        await axios.post('http://localhost:5000/api/requirement/workforce?week_adjustment=' + weekAdjustment, formattedCounts, {
       headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -270,7 +268,7 @@ const Week = () => {
               day: '2-digit', 
               month: 'long', 
               year: 'numeric'
-            }).format(new Date(mondayDate))
+            }).format(new Date(calendarData.monday))
           }
         </Typography>
         <IconButton onClick={goToNextWeek} 

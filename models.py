@@ -281,3 +281,92 @@ class PasswordReset(db.Model, UserMixin):
         self.id = id
         self.email = email
         self.token = token
+
+
+
+class SolverRequirement(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    company_name = db.Column(db.String(200), index=True, unique=False)
+    weekly_hours = db.Column(db.Integer)
+    shifts = db.Column(db.Integer)
+    desired_min_time_day = db.Column(db.Integer, index=True, unique=False)
+    desired_max_time_day = db.Column(db.Integer, index=True, unique=False)
+    min_time_day = db.Column(db.Integer, index=True, unique=False)
+    max_time_day = db.Column(db.Integer, index=True, unique=False)
+    desired_max_time_week = db.Column(db.Integer, index=True, unique=False)
+    max_time_week = db.Column(db.Integer, index=True, unique=False)
+    hour_devider = db.Column(db.Integer, index=True, unique=False)
+    fair_distribution = db.Column(db.Integer, index=True, unique=False)
+    week_timeframe = db.Column(db.Integer, index=True, unique=False)
+
+    nb1 = db.Column(db.Integer, index=True, unique=False)
+    nb2 = db.Column(db.Integer, index=True, unique=False)
+    nb3 = db.Column(db.Integer, index=True, unique=False)
+    nb4 = db.Column(db.Integer, index=True, unique=False)
+    nb5 = db.Column(db.Integer, index=True, unique=False)
+    nb6 = db.Column(db.Integer, index=True, unique=False)
+    nb7 = db.Column(db.Integer, index=True, unique=False)
+    nb8 = db.Column(db.Integer, index=True, unique=False)
+    nb9 = db.Column(db.Integer, index=True, unique=False)
+    nb10 = db.Column(db.Integer, index=True, unique=False)
+    nb11 = db.Column(db.Integer, index=True, unique=False)
+    nb12 = db.Column(db.Integer, index=True, unique=False)
+    nb13 = db.Column(db.Integer, index=True, unique=False)
+    nb14 = db.Column(db.Integer, index=True, unique=False)
+    nb15 = db.Column(db.Integer, index=True, unique=False)
+    nb16 = db.Column(db.Integer, index=True, unique=False)
+    nb17 = db.Column(db.Integer, index=True, unique=False)
+    nb18 = db.Column(db.Integer, index=True, unique=False)
+    nb19 = db.Column(db.Integer, index=True, unique=False)
+    nb20 = db.Column(db.Integer, index=True, unique=False)
+
+    created_by = db.Column(db.Integer, index=True, unique=False)
+    changed_by = db.Column(db.Integer, index=True, unique=False)
+    creation_timestamp = db.Column(db.DateTime)
+    update_timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
+
+
+    def __init__(self, id, company_name, weekly_hours, shifts, desired_min_time_day, desired_max_time_day, 
+                 min_time_day, max_time_day, desired_max_time_week, max_time_week, hour_devider, 
+                 fair_distribution, week_timeframe, nb1, nb2, nb3, nb4, nb5, nb6, nb7, nb8, nb9, nb10, 
+                 nb11, nb12, nb13, nb14, nb15, nb16, nb17, nb18, nb19, nb20, created_by, changed_by, 
+                 creation_timestamp, update_timestamp):
+        self.id = id
+        self.company_name = company_name
+        self.weekly_hours = weekly_hours
+        self.shifts = shifts
+        self.desired_min_time_day = desired_min_time_day
+        self.desired_max_time_day = desired_max_time_day
+        self.min_time_day = min_time_day
+        self.max_time_day = max_time_day
+        self.desired_max_time_week = desired_max_time_week
+        self.max_time_week = max_time_week
+        self.hour_devider = hour_devider
+        self.fair_distribution = fair_distribution
+        self.week_timeframe = week_timeframe
+
+        self.nb1 = nb1
+        self.nb2 = nb2
+        self.nb3 = nb3
+        self.nb4 = nb4
+        self.nb5 = nb5
+        self.nb6 = nb6
+        self.nb7 = nb7
+        self.nb8 = nb8
+        self.nb9 = nb9
+        self.nb10 = nb10
+        self.nb11 = nb11
+        self.nb12 = nb12
+        self.nb13 = nb13
+        self.nb14 = nb14
+        self.nb15 = nb15
+        self.nb16 = nb16
+        self.nb17 = nb17
+        self.nb18 = nb18
+        self.nb19 = nb19
+        self.nb20 = nb20
+
+        self.created_by = created_by
+        self.changed_by = changed_by
+        self.creation_timestamp = creation_timestamp
+        self.update_timestamp = update_timestamp

@@ -10,6 +10,7 @@ import Registration from "./scenes/registration_supervisor";
 import ForgetPassword from "./scenes/forget_password";
 import Dashboard from "./scenes/dashboard";
 import Solver from "./scenes/solver";
+import SolverRequirement from "./scenes/solver_requirement";
 import Team from "./scenes/team";
 import Availability from "./scenes/availability";
 import Update from "./scenes/update";
@@ -62,6 +63,7 @@ function AppContent({ isSidebar, setIsSidebar }) {
           <Route path="/registration/admin" element={<Registration />} />
           <Route path="/dashboard" element={<PrivateRoute component={Dashboard} accessLevels={["Super_Admin", "Admin", "User"]} />} />
           <Route path="/solver" element={<PrivateRoute component={Solver} accessLevels={["Super_Admin", "Admin"]} />} />
+          <Route path="/solver/requirement" element={<PrivateRoute component={SolverRequirement} accessLevels={["Super_Admin", "Admin"]} />} />
           <Route path="/availability" element={<PrivateRoute component={Availability} accessLevels={["Super_Admin", "Admin", "User"]} />} />
           <Route path="/Team" element={<PrivateRoute component={Team} accessLevels={["Super_Admin", "Admin", "User"]} />} />
           <Route path="/Update" element={<PrivateRoute component={Update} accessLevels={["Super_Admin", "Admin", "User"]} />} />
