@@ -899,17 +899,21 @@ def get_required_workforce():
 
     timereq_dict = {}
     for i in range(day_num):
-        for hour in range(24):
+        for hour in range(96):
             new_date = monday + datetime.timedelta(days=i)
-            time_num = hour * 100
-            time = f'{time_num:04d}'
-            new_time = datetime.datetime.strptime(time, '%H%M').time()
+            quarter_hour = hour / 4  # Each quarter represents 15 minutes, so divided by 4 gives hour
+            quarter_minute = (hour % 4) * 15  # Remainder gives the quarter in the hour
+            formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+            time = f'{formatted_time}:00'
+            new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
             temp = TimeReq.query.filter_by(company_name=user.company_name, date=new_date, start_time=new_time).first()
             if temp is None:
                 pass
             else:
                 new_i = i + 1
                 timereq_dict[str(new_i) + str(hour)] = temp.worker
+
+    print(timereq_dict)
     
     opening_dict = {}
     for i in range(day_num):
@@ -943,8 +947,6 @@ def get_required_workforce():
     if request.method =='POST':
         workforce_data = request.get_json()
         week_adjustment = int(request.args.get('week_adjustment', 0))
-        print(request.args)
-        print(request.args.get('week_adjustment'))
         for i in range(day_num):
             for quarter in range(96): # There are 96 quarters in a day
                 quarter_hour = quarter / 4  # Each quarter represents 15 minutes, so divided by 4 gives hour
@@ -958,10 +960,6 @@ def get_required_workforce():
                     else:
                         new_id = last.id + 1
                     new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
-                    print("Received week_adjustment:", week_adjustment)
-                    """
-                    time_num = hour * 100"
-                    """
                     time = f'{formatted_time}:00'
                     new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
 

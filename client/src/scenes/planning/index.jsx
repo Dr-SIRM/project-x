@@ -10,7 +10,7 @@ const slots = Array.from({ length: 96 }, (_, i) => ({
   time: `${String(Math.floor(i / 4)).padStart(2, '0')}:${String((i % 4) * 15).padStart(2, '0')}`,
 }));
 
-const Day = ({ day, slotCounts = {}, setSlotCounts, openingHour, closingHour }) => {
+const Day = ({ day, dayIndex, slotCounts = {}, setSlotCounts, openingHour, closingHour, timereq }) => {
   const [selectedSlots, setSelectedSlots] = useState([]);
   const [employeeCount, setEmployeeCount] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -22,6 +22,11 @@ const Day = ({ day, slotCounts = {}, setSlotCounts, openingHour, closingHour }) 
   let endSlotIndex = parseInt(endHour) * 4 + parseInt(endMinute) / 15;
 
   const filteredSlots = slots.filter((_, index) => index >= startSlotIndex && index < endSlotIndex);
+
+  const requiredEmployeeCount = (slotId) => {
+    const combinedIndex = dayIndex * 100 + slotId;
+    return timereq[combinedIndex] || 0;
+  };
 
   const selectSlot = (filteredSlots, e) => {
     if (e.type === 'mousedown') {
@@ -96,13 +101,16 @@ const Day = ({ day, slotCounts = {}, setSlotCounts, openingHour, closingHour }) 
         {filteredSlots.map(filteredSlots => {
           const isSelected = selectedSlots.includes(filteredSlots.id);
           const isEntered = slotCounts[day] && slotCounts[day][filteredSlots.id];
+          const defaultCount = requiredEmployeeCount(filteredSlots.id);
+          
+
           return (
             <Button 
               onMouseDown={(e) => selectSlot(filteredSlots.id, e)}
               onMouseUp={(e) => selectSlot(filteredSlots.id, e)}
               onMouseOver={(e) => selectSlot(filteredSlots.id, e)}
-              variant={isEntered ? 'text' : (isSelected ? 'contained' : 'outlined')}
-              color={isEntered ? 'error' : (isSelected ? 'success' : 'inherit')}
+              variant={(isEntered || defaultCount > 0) ? 'text' : (isSelected ? 'contained' : 'outlined')}
+              color={(isEntered || defaultCount > 0) ? 'error' : (isSelected ? 'success' : 'inherit')}
               key={filteredSlots.id}
               sx={{
                 borderColor: 'white', 
@@ -121,6 +129,7 @@ const Day = ({ day, slotCounts = {}, setSlotCounts, openingHour, closingHour }) 
             >
               {filteredSlots.time}
               {isEntered && <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{slotCounts[day][filteredSlots.id]}</span>}
+              {!isEntered && defaultCount > 0 && <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{defaultCount}</span>}
             </Button>
           );
         })}
@@ -292,7 +301,9 @@ const Week = () => {
       <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
         {weekDays.map((day, index) => 
           <Day 
-            day={day} 
+            day={day}
+            dayIndex={index+1}
+            timereq={calendarData.timereq_dict}
             key={day} 
             slotCounts={slotCounts} 
             setSlotCounts={setSlotCounts}
