@@ -884,6 +884,10 @@ def get_required_workforce():
     creation_date = datetime.datetime.now()
     weekdays = {0: 'Monday', 1: 'Tuesday', 2: 'Wednesday', 3: 'Thursday', 4: 'Friday', 5: 'Saturday', 6: 'Sunday'}
     today = datetime.date.today()
+    solverreq = SolverRequirement.query.filter_by(company_name=user.company_name).first()
+    hour_divider = solverreq.hour_devider
+    daily_slots = 24 * hour_divider
+    minutes = 60 / hour_divider
     
     day_num = 7
     
@@ -899,10 +903,10 @@ def get_required_workforce():
 
     timereq_dict = {}
     for i in range(day_num):
-        for hour in range(96):
-            new_date = monday + datetime.timedelta(days=i)
-            quarter_hour = hour / 4  # Each quarter represents 15 minutes, so divided by 4 gives hour
-            quarter_minute = (hour % 4) * 15  # Remainder gives the quarter in the hour
+        for hour in range(daily_slots):
+            new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+            quarter_hour = hour / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
+            quarter_minute = (hour % hour_divider) * minutes  # Remainder gives the quarter in the hour
             formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
             time = f'{formatted_time}:00'
             new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
@@ -948,9 +952,9 @@ def get_required_workforce():
         workforce_data = request.get_json()
         week_adjustment = int(request.args.get('week_adjustment', 0))
         for i in range(day_num):
-            for quarter in range(96): # There are 96 quarters in a day
-                quarter_hour = quarter / 4  # Each quarter represents 15 minutes, so divided by 4 gives hour
-                quarter_minute = (quarter % 4) * 15  # Remainder gives the quarter in the hour
+            for quarter in range(daily_slots): # There are 96 quarters in a day
+                quarter_hour = quarter / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
+                quarter_minute = (quarter % hour_divider) * minutes  # Remainder gives the quarter in the hour
                 formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
                 capacity = workforce_data.get(f'worker_{i}_{formatted_time}')
                 if capacity:
@@ -977,7 +981,10 @@ def get_required_workforce():
         'opening_dict': opening_dict,
         'day_num': day_num,
         'timereq_dict': timereq_dict,
-        'week_start': week_start
+        'week_start': week_start,
+        'hour_divider': hour_divider,
+        'daily_slots': daily_slots,
+        'minutes': minutes
     }
 
     return jsonify(calendar_dict)
