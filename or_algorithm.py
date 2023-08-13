@@ -570,24 +570,24 @@ class ORAlgorithm:
         self.nb4_min_violation = {}
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
-                self.nb4_min_violation[i, j] = self.solver.NumVar(0, 4, 'nb4_min_violation[%i,%i]' % (i, j))
+                self.nb4_min_violation[i, j] = self.solver.NumVar(0, self.solver.infinity(), 'nb4_min_violation[%i,%i]' % (i, j))
 
         # NB4 Höchstarbeitszeit Verletzungsvariable
         self.nb4_max_violation = {}
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
-                self.nb4_max_violation[i, j] = self.solver.NumVar(0, 4, 'nb4_max_violation[%i,%i]' % (i, j))
+                self.nb4_max_violation[i, j] = self.solver.NumVar(0, self.solver.infinity(), 'nb4_max_violation[%i,%i]' % (i, j))
 
 
         # NB7 Mindestarbeitszeit Verletzungsvariable
         self.nb7_min_violation = {}
         for i in self.mitarbeiter:
-            self.nb7_min_violation[i] = self.solver.NumVar(0, 8, f'nb7_min_violation[{i}]')
+            self.nb7_min_violation[i] = self.solver.NumVar(0, self.solver.infinity(), f'nb7_min_violation[{i}]')
 
         # NB7 Höchstarbeitszeit Verletzungsvariable
         self.nb7_max_violation = {}
         for i in self.mitarbeiter:
-            self.nb7_max_violation[i] = self.solver.NumVar(0, 8, f'nb7_max_violation[{i}]')
+            self.nb7_max_violation[i] = self.solver.NumVar(0, self.solver.infinity(), f'nb7_max_violation[{i}]')
 
 
         # NB8 Schicht - Verletzungsvariable
@@ -808,7 +808,7 @@ class ORAlgorithm:
         # NB 8 - Innerhalb einer Woche immer gleiche Schichten
         # 0 == Frühschicht
         # -------------------------------------------------------------------------------------------------------
-        self.company_shifts = 2
+        self.company_shifts = 3
 
         if self.company_shifts <= 1:
             pass
@@ -852,24 +852,25 @@ class ORAlgorithm:
         elif self.company_shifts == 3:
             for i in self.mitarbeiter:
                 for j in range(self.calc_time):
-                    # Definiere die Stunden für jede der drei Schichten
-                    first_shift_hours = self.solver.Sum(self.x[i, j, k] for k in range(0, int(len(self.verfügbarkeit[i][j]) / 3)))
-                    second_shift_hours = self.solver.Sum(self.x[i, j, k] for k in range(int(len(self.verfügbarkeit[i][j]) / 3), 2 * int(len(self.verfügbarkeit[i][j]) / 3)))
-                    third_shift_hours = self.solver.Sum(self.x[i, j, k] for k in range(2 * int(len(self.verfügbarkeit[i][j]) / 3), len(self.verfügbarkeit[i][j])))
+                    third_shift_len = len(self.verfügbarkeit[i][j]) // 3
+                    
+                    first_shift_hours = self.solver.Sum(self.x[i, j, k] for k in range(0, third_shift_len))
+                    second_shift_hours = self.solver.Sum(self.x[i, j, k] for k in range(third_shift_len, 2 * third_shift_len))
+                    third_shift_hours = self.solver.Sum(self.x[i, j, k] for k in range(2 * third_shift_len, len(self.verfügbarkeit[i][j])))
 
-                    # Boolesche Variablen zur Bestimmung der Schicht
+                    # Kann 0, 1 oder 2 annehmen
                     delta1 = self.solver.BoolVar("delta1")
                     delta2 = self.solver.BoolVar("delta2")
                     
-                    # Bedingungen zur Bestimmung der Schicht
-                    self.solver.Add(first_shift_hours - second_shift_hours - 1000 * delta1 <= 0)
-                    self.solver.Add(second_shift_hours - first_shift_hours - 1000 * (1 - delta1) <= 0)
+                    # Bedingungen, um sicherzustellen, dass nur eine Schicht pro Tag ausgewählt wird.
+                    self.solver.Add(first_shift_hours - 1000 * delta1 <= 0)
+                    self.solver.Add(second_shift_hours - 1000 * delta2 <= 0)
+                    self.solver.Add(third_shift_hours - 1000 * (1 - delta1 - delta2) <= 0)
+                    
+                    # Hilfsvariable mit s3[i, j] verknüpfen
+                    self.solver.Add(self.s3[i, j] == 2 * delta1 + delta2)
 
-                    self.solver.Add(second_shift_hours - third_shift_hours - 1000 * delta2 <= 0)
-                    self.solver.Add(third_shift_hours - second_shift_hours - 1000 * (1 - delta2) <= 0)
 
-                    # Verknüpfung der Hilfsvariablen mit s3[i, j]
-                    self.solver.Add(self.s3[i, j] == 2 * delta2 + delta1)
 
             # Harte NB
             for i in self.mitarbeiter:
@@ -916,11 +917,11 @@ class ORAlgorithm:
         self.solver.EnableOutput()
         self.status = self.solver.Solve()
 
-        # Die Werte von s2 printen
+        # Die Werte von s3 printen
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
-                # Drucken Sie den Wert von s2[i, j]
-                print(f"s2[{i}][{j}] =", self.s2[i, j].solution_value())
+                # Drucken Sie den Wert von s3[i, j]
+                print(f"s3[{i}][{j}] =", self.s3[i, j].solution_value())
 
 
         # Kosten für die Einstellung von Mitarbeitern

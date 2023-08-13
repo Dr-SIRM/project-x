@@ -19,7 +19,7 @@
 
 # RUN DATABASE
 
-    # curl ifconfig.me
+    # url ifconfig.mec
     # mysql -h projectx3.cj6fxzhtmztu.eu-central-1.rds.amazonaws.com -u admin -p
 
 # NEUER USER
