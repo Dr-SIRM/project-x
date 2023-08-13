@@ -865,35 +865,35 @@ class ORAlgorithm:
                     second_shift_hours = self.solver.Sum(self.x[i, j, k] for k in range(first_shift_len, first_shift_len + second_shift_len))
                     third_shift_hours = self.solver.Sum(self.x[i, j, k] for k in range(first_shift_len + second_shift_len, total_len))
 
-                    delta1 = self.solver.BoolVar("delta1")
-                    delta2 = self.solver.BoolVar("delta2")
-                    delta3 = self.solver.BoolVar("delta3")
+                    delta1 = self.solver.BoolVar(f"delta1_{i}_{j}")
+                    delta2 = self.solver.BoolVar(f"delta2_{i}_{j}")
+                    delta3 = self.solver.BoolVar(f"delta3_{i}_{j}")
 
-                    M = 1000
+                    # Erzwingen, dass der Mitarbeiter in der Schicht mit den meisten Stunden arbeitet
+                    self.solver.Add(first_shift_hours >= second_shift_hours)
+                    self.solver.Add(first_shift_hours >= third_shift_hours)
+                    self.solver.Add(delta1 == 1)
 
-                    # Erste Schicht
-                    self.solver.Add(first_shift_hours >= 1 - M * (1 - delta1))
-                    self.solver.Add(first_shift_hours <= M * delta1)
+                    self.solver.Add(second_shift_hours >= first_shift_hours)
+                    self.solver.Add(second_shift_hours >= third_shift_hours)
+                    self.solver.Add(delta2 == 1)
 
-                    # Zweite Schicht
-                    self.solver.Add(second_shift_hours >= 1 - M * (1 - delta2))
-                    self.solver.Add(second_shift_hours <= M * delta2)
-
-                    # Dritte Schicht
-                    self.solver.Add(third_shift_hours >= 1 - M * (1 - delta3))
-                    self.solver.Add(third_shift_hours <= M * delta3)
+                    self.solver.Add(third_shift_hours >= first_shift_hours)
+                    self.solver.Add(third_shift_hours >= second_shift_hours)
+                    self.solver.Add(delta3 == 1)
 
                     # Sicherstellen, dass nur eine Schicht ausgewählt wird
                     self.solver.Add(delta1 + delta2 + delta3 == 1)
 
                     # Hilfsvariable mit s3[i, j] verknüpfen
                     self.solver.Add(self.s3[i, j] == 0 * delta1 + 1 * delta2 + 2 * delta3)
-                    
 
             # Harte Bedingung, dass innerhalb einer Woche immer die gleiche Schicht gearbeitet wird
             for i in self.mitarbeiter:
                 for j in range(1, self.calc_time):
                     self.solver.Add(self.s3[i, j] - self.s3[i, j-1] == 0)
+
+
 
 
             """
