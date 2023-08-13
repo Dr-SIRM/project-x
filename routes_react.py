@@ -894,6 +894,7 @@ def get_required_workforce():
     # Week with adjustments
     monday = today - datetime.timedelta(days=today.weekday())
     week_adjustment = int(request.args.get('week_adjustment', 0))
+    week_start = monday + datetime.timedelta(days=week_adjustment)
 
 
     timereq_dict = {}
@@ -921,23 +922,6 @@ def get_required_workforce():
             opening_dict[str(new_i) + '&1'] = opening.end_time.strftime("%H:%M") if opening.end_time else None
 
     """
-    #Prev Week
-    if time_form.prev_week.data:
-        week_adjustment -=7
-        session['week_adjustment'] = week_adjustment
-
-        monday = monday + datetime.timedelta(days=week_adjustment)
-
-
-    #Next Week
-    if time_form.next_week.data:
-        week_adjustment +=7
-        session['week_adjustment'] = week_adjustment
-
-        monday = monday + datetime.timedelta(days=week_adjustment)
-    
-    
-
     # Set Template
     if time_form.template1.data:
         temp_dict = {}
@@ -995,7 +979,7 @@ def get_required_workforce():
         'opening_dict': opening_dict,
         'day_num': day_num,
         'timereq_dict': timereq_dict,
-        'monday': monday
+        'week_start': week_start
     }
 
     return jsonify(calendar_dict)

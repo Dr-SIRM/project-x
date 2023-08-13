@@ -268,7 +268,7 @@ const Week = () => {
               day: '2-digit', 
               month: 'long', 
               year: 'numeric'
-            }).format(new Date(calendarData.monday))
+            }).format(new Date(calendarData.week_start))
           }
         </Typography>
         <IconButton onClick={goToNextWeek} 
