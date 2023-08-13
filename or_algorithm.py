@@ -808,7 +808,7 @@ class ORAlgorithm:
         # NB 8 - Innerhalb einer Woche immer gleiche Schichten
         # 0 == Frühschicht
         # -------------------------------------------------------------------------------------------------------
-        self.company_shifts = 3
+        self.company_shifts = 2
 
         if self.company_shifts <= 1:
             pass
