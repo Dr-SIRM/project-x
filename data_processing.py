@@ -17,6 +17,7 @@ class DataProcessing:
         self.company_shifts = None
         self.employment_lvl = None
         self.user_employment = None
+        self.solver_requirements = None
         self.binary_availability = None
 
         # Zeitraum in dem gesolvet wird, wird noch angepasst!
@@ -36,9 +37,7 @@ class DataProcessing:
         self.get_shift_emp_lvl()
         self.binaere_liste()
         self.get_employment()
-
         self.get_solver_requirement()
-        
         self.pre_check_admin()
 
 
@@ -294,7 +293,63 @@ class DataProcessing:
 
 
     def get_solver_requirement(self):
-        pass
+        """ In dieser Methode werden die Anforderungen des Solvers für das Unternehmen gezogen """
+        with app.app_context():
+            # Hole den company_name des aktuellen Benutzers
+            sql = text("""
+                SELECT company_name
+                FROM user
+                WHERE id = :current_user_id
+            """)
+            result = db.session.execute(sql, {"current_user_id": self.current_user_id})
+            company_name = result.fetchone()[0]
+            
+            # Hole die Solver-Anforderungen für das Unternehmen
+            sql = text("""
+                SELECT 
+                    id,
+                    company_name,
+                    weekly_hours,
+                    shifts,
+                    desired_min_time_day,
+                    desired_max_time_day,
+                    min_time_day,
+                    max_time_day,
+                    desired_max_time_week,
+                    max_time_week,
+                    hour_devider,
+                    nb1, nb2, nb3, nb4, nb5,
+                    nb6, nb7, nb8, nb9, nb10,
+                    nb11, nb12, nb13, nb14, nb15,
+                    nb16, nb17, nb18, nb19, nb20
+                FROM solver_requirement
+                WHERE company_name = :company_name
+            """)
+            result = db.session.execute(sql, {"company_name": company_name})
+            solver_requirements = result.fetchall()
+
+            solver_req_dict = {}
+            for row in solver_requirements:
+                row_dict = {
+                    'id': row[0],
+                    'company_name': row[1],
+                    'weekly_hours': row[2],
+                    'shifts': row[3],
+                    'desired_min_time_day': row[4],
+                    'desired_max_time_day': row[5],
+                    'min_time_day': row[6],
+                    'max_time_day': row[7],
+                    'desired_max_time_week': row[8],
+                    'max_time_week': row[9],
+                    'hour_devider': row[10],
+                    'nb1': row[11], 'nb2': row[12], 'nb3': row[13], 'nb4': row[14], 'nb5': row[15],
+                    'nb6': row[16], 'nb7': row[17], 'nb8': row[18], 'nb9': row[19], 'nb10': row[20],
+                    'nb11': row[21], 'nb12': row[22], 'nb13': row[23], 'nb14': row[24], 'nb15': row[25],
+                    'nb16': row[26], 'nb17': row[27], 'nb18': row[28], 'nb19': row[29], 'nb20': row[30]
+                }
+                solver_req_dict[row[1]] = row_dict  # company_name wird als Schlüssel des dict verwendet
+
+            self.solver_requirements = solver_req_dict
 
 
     def pre_check_admin(self):

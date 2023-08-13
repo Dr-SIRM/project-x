@@ -75,6 +75,7 @@ class ORAlgorithm:
         self.employment_lvl = dp.employment_lvl             # 107
         self.time_req = dp.time_req                         # 108    
         self.user_employment = dp.user_employment           # 109
+        self.solver_requirements = dp.solver_requirements   # 110
 
         # Attribute der Methode "create_variables"
         self.mitarbeiter = None                             # 1
@@ -141,7 +142,6 @@ class ORAlgorithm:
         self.define_penalty_costs()
         self.decision_variables()
         self.violation_variables()
-
         self.objective_function()
         self.constraints()
         self.solve_problem()
@@ -293,6 +293,7 @@ class ORAlgorithm:
         print("107. self.employment_lvl: ", self.employment_lvl) 
         print("108. self.time_req: ", self.time_req) 
         print("109. user_employment: ", self.user_employment) 
+        print("110. solver_requirements: ", self.solver_requirements)
         print()
         
         print("Attribute der Methode create_variables:")
