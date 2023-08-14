@@ -832,14 +832,13 @@ class ORAlgorithm:
                     # Hilfsvariable mit s2[i, j] verknüpfen
                     self.solver.Add(self.s2[i, j] == 1 - delta)
 
-            
+            """
             # Harte nb Option zum testen
             for i in self.mitarbeiter:
                 for j in range(1, self.calc_time):
                     self.solver.Add(self.s2[i, j] - self.s2[i, j-1] == 0)
-            
-
             """ 
+
             # Bedingungen, um sicherzustellen, dass innerhalb einer Woche immer die gleiche Schicht gearbeitet wird
             for i in self.mitarbeiter:
                 for j in range(1, self.calc_time):
@@ -851,7 +850,7 @@ class ORAlgorithm:
                     # Bedingungen für den "absoluten Wert"
                     self.solver.Add(self.nb8_violation[i, j] >= diff)
                     self.solver.Add(self.nb8_violation[i, j] >= -diff)
-            """
+            
 
         elif self.company_shifts == 3:
             for i in self.mitarbeiter:
@@ -869,18 +868,16 @@ class ORAlgorithm:
                     delta2 = self.solver.BoolVar(f"delta2_{i}_{j}")
                     delta3 = self.solver.BoolVar(f"delta3_{i}_{j}")
 
-                    # Erzwingen, dass der Mitarbeiter in der Schicht mit den meisten Stunden arbeitet
-                    self.solver.Add(first_shift_hours >= second_shift_hours)
-                    self.solver.Add(first_shift_hours >= third_shift_hours)
-                    self.solver.Add(delta1 == 1)
+                    M = 1000
 
-                    self.solver.Add(second_shift_hours >= first_shift_hours)
-                    self.solver.Add(second_shift_hours >= third_shift_hours)
-                    self.solver.Add(delta2 == 1)
+                    self.solver.Add(first_shift_hours >= second_shift_hours - M * (1 - delta1))
+                    self.solver.Add(first_shift_hours >= third_shift_hours - M * (1 - delta1))
 
-                    self.solver.Add(third_shift_hours >= first_shift_hours)
-                    self.solver.Add(third_shift_hours >= second_shift_hours)
-                    self.solver.Add(delta3 == 1)
+                    self.solver.Add(second_shift_hours >= first_shift_hours - M * (1 - delta2))
+                    self.solver.Add(second_shift_hours >= third_shift_hours - M * (1 - delta2))
+
+                    self.solver.Add(third_shift_hours >= first_shift_hours - M * (1 - delta3))
+                    self.solver.Add(third_shift_hours >= second_shift_hours - M * (1 - delta3))
 
                     # Sicherstellen, dass nur eine Schicht ausgewählt wird
                     self.solver.Add(delta1 + delta2 + delta3 == 1)
@@ -888,15 +885,14 @@ class ORAlgorithm:
                     # Hilfsvariable mit s3[i, j] verknüpfen
                     self.solver.Add(self.s3[i, j] == 0 * delta1 + 1 * delta2 + 2 * delta3)
 
+            """
             # Harte Bedingung, dass innerhalb einer Woche immer die gleiche Schicht gearbeitet wird
             for i in self.mitarbeiter:
                 for j in range(1, self.calc_time):
                     self.solver.Add(self.s3[i, j] - self.s3[i, j-1] == 0)
-
-
-
-
             """
+
+            
             # Bedingungen, um sicherzustellen, dass innerhalb einer Woche immer die gleiche Schicht gearbeitet wird
             for i in self.mitarbeiter:
                 for j in range(1, self.calc_time):
@@ -909,8 +905,7 @@ class ORAlgorithm:
                     self.solver.Add(self.nb8_violation[i, j] >= diff)
                     self.solver.Add(self.nb8_violation[i, j] >= -diff)
                     self.solver.Add(self.nb8_violation[i, j] <= 1)  # Die Verletzung sollte maximal 1 betragen
-            """
-
+            
 
         """
         # HARTE NB
