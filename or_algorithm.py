@@ -72,6 +72,7 @@ class ORAlgorithm:
         self.laden_schliesst = dp.laden_schliesst           # 104
         self.binary_availability = dp.binary_availability   # 105
         self.company_shifts = dp.company_shifts             # 106
+        self.weekly_hours = dp.weekly_hours                 # 106.5
         self.employment_lvl = dp.employment_lvl             # 107
         self.time_req = dp.time_req                         # 108    
         self.user_employment = dp.user_employment           # 109
@@ -83,7 +84,7 @@ class ORAlgorithm:
         self.kosten = None                                  # 3
         self.max_zeit = None                                # 4
         self.min_zeit = None                                # 5
-        self.desired_max_time_week = None                            # 6   
+        self.desired_max_time_week = None                   # 6   
         self.calc_time = None                               # 7
         self.employment_lvl_exact = []                      # 8
         self.employment = []                                # 9
@@ -185,7 +186,6 @@ class ORAlgorithm:
             self.desired_max_time_week = self.solver_requirements[key]
 
         self.desired_max_time_week = self.desired_max_time_week * 4               # Diese 4 neu dann variabel machen
-        print(self.desired_max_time_week)
 
         # -- 7 --
         # Berechnung der calc_time (Anzahl Tage an denen die MA eingeteilt werden)
@@ -465,7 +465,7 @@ class ORAlgorithm:
         # GLPK = Vielzahl von Algorithmen, einschließlich des Simplex-Verfahrens und des branch-and-bound-Verfahrens
         """
         self.solver = pywraplp.Solver.CreateSolver('SCIP')
-        # self.solver.SetNumThreads(2) # Auf mehreren Kernen gleichzeitig arbeiten
+        self.solver.SetNumThreads(4) # Auf mehreren Kernen gleichzeitig arbeiten
         # self.solver.SetTimeLimit(20000)  # Zeitlimit auf 20 Sekunden (in Millisekunden)
         # self.solver.SetSolverSpecificParametersAsString("limits/gap=0.01") # Wenn der gap kleiner 1% ist, bricht der Solver ab
 
