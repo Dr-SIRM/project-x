@@ -328,7 +328,6 @@ class DataProcessing:
             result = db.session.execute(sql, {"company_name": company_name})
             solver_requirements = result.fetchall()
 
-            solver_req_dict = {}
             for row in solver_requirements:
                 row_dict = {
                     'id': row[0],
@@ -347,9 +346,8 @@ class DataProcessing:
                     'nb11': row[21], 'nb12': row[22], 'nb13': row[23], 'nb14': row[24], 'nb15': row[25],
                     'nb16': row[26], 'nb17': row[27], 'nb18': row[28], 'nb19': row[29], 'nb20': row[30]
                 }
-                solver_req_dict[row[1]] = row_dict  # company_name wird als Schlüssel des dict verwendet
 
-            self.solver_requirements = solver_req_dict
+            self.solver_requirements = row_dict
 
 
     def pre_check_admin(self):
