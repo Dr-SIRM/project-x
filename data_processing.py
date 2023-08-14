@@ -21,12 +21,12 @@ class DataProcessing:
         self.binary_availability = None
 
         # Zeitraum in dem gesolvet wird, wird noch angepasst!
-        self.start_date = "2023-08-07"
-        self.end_date = "2023-08-11"
+        # self.start_date = "2023-08-07"
+        # self.end_date = "2023-08-11"
 
         # Gute Daten zum testsolven
-        # self.start_date = "2023-07-31"
-        # self.end_date = "2023-08-04"
+        self.start_date = "2023-07-31"
+        self.end_date = "2023-08-04"
         
         
     def run(self):
@@ -34,7 +34,7 @@ class DataProcessing:
         self.get_availability()
         self.get_opening_hours()
         self.get_time_req()
-        self.get_shift_emp_lvl()
+        self.get_shift_weeklyhours_emp_lvl()
         self.binaere_liste()
         self.get_employment()
         self.get_solver_requirement()
@@ -194,8 +194,8 @@ class DataProcessing:
         self.time_req = time_req_dict_2
 
     
-    def get_shift_emp_lvl(self):
-        """ In dieser Funktion wird als Key die user_id verwendet und die shift und employment_level aus der Datenbank gezogen """
+    def get_shift_weeklyhours_emp_lvl(self):
+        """ In dieser Funktion wird als Key die user_id verwendet und die shift, employment_level und weekly_hours aus der Datenbank gezogen """
         with app.app_context():
             # Hole den Firmennamen des aktuellen Benutzers
             sql = text("""
@@ -215,6 +215,15 @@ class DataProcessing:
             result = db.session.execute(sql, {"company_name": company_name})
             company_shifts = result.fetchone()[0]
 
+            # Hole die weekly_hours für die Firma des aktuellen Benutzers
+            sql = text("""
+                SELECT weekly_hours
+                FROM company
+                WHERE company_name = :company_name
+            """)
+            result = db.session.execute(sql, {"company_name": company_name})
+            weekly_hours = result.fetchone()[0]
+
             # Hole das employment_level für jeden Benutzer, der in der gleichen Firma arbeitet wie der aktuelle Benutzer
             sql = text("""
                 SELECT id, employment_level
@@ -225,6 +234,7 @@ class DataProcessing:
             employment_lvl = {user_id: employment_level for user_id, employment_level in result.fetchall()}
 
         self.company_shifts = company_shifts
+        self.weekly_hours = weekly_hours
         self.employment_lvl = employment_lvl
 
 
