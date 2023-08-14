@@ -75,29 +75,29 @@ const SolverReq = ({ solverreq }) => {
           max_time_day: solverData.max_time_day,
           desired_max_time_week: solverData.desired_max_time_week,
           max_time_week: solverData.max_time_week,
-          hour_devider: solverData.hour_devider,
+          hour_devider: String(solverData.hour_devider),
           fair_distribution: solverData.fair_distribution,
-          week_timeframe: solverData.week_timeframe,
-          nb1: solverData.nb1,
-          nb2: solverData.nb2,
-          nb3: solverData.nb3,
-          nb4: solverData.nb4,
-          nb5: solverData.nb5,
-          nb6: solverData.nb6,
-          nb7: solverData.nb7,
-          nb8: solverData.nb8,
-          nb9: solverData.nb9,
-          nb10: solverData.nb10,
-          nb11: solverData.nb11,
-          nb12: solverData.nb12,
-          nb13: solverData.nb13,
-          nb14: solverData.nb14,
-          nb15: solverData.nb15,
-          nb16: solverData.nb16,
-          nb17: solverData.nb17,
-          nb18: solverData.nb18,
-          nb19: solverData.nb19,
-          nb20: solverData.nb20
+          week_timeframe: String(solverData.week_timeframe),
+          nb1: String(solverData.nb1),
+          nb2: String(solverData.nb2),
+          nb3: String(solverData.nb3),
+          nb4: String(solverData.nb4),
+          nb5: String(solverData.nb5),
+          nb6: String(solverData.nb6),
+          nb7: String(solverData.nb7),
+          nb8: String(solverData.nb8),
+          nb9: String(solverData.nb9),
+          nb10: String(solverData.nb10),
+          nb11: String(solverData.nb11),
+          nb12: String(solverData.nb12),
+          nb13: String(solverData.nb13),
+          nb14: String(solverData.nb14),
+          nb15: String(solverData.nb15),
+          nb16: String(solverData.nb16),
+          nb17: String(solverData.nb17),
+          nb18: String(solverData.nb18),
+          nb19: String(solverData.nb19),
+          nb20: String(solverData.nb20)
         }}
       >
         {({
@@ -388,9 +388,9 @@ const SolverReq = ({ solverreq }) => {
                 helperText={touched.hour_devider && errors.hour_devider}
                 sx={{ gridColumn: "span 1" }}
               >
-                <MenuItem value={ '1' }>1 Stunde</MenuItem>
-                <MenuItem value={ '2' }>30 Min</MenuItem>
-                <MenuItem value={ '4' }>15 Min</MenuItem>
+                <MenuItem value={ '1' }>1</MenuItem>
+                <MenuItem value={ '2' }>2</MenuItem>
+                <MenuItem value={ '4' }>4</MenuItem>
                 </Select>
                 <Typography
                 color={colors.greenAccent[500]}
@@ -427,9 +427,9 @@ const SolverReq = ({ solverreq }) => {
                 helperText={touched.week_timeframe && errors.week_timeframe}
                 sx={{ gridColumn: "span 1" }}
               >
-                <MenuItem value={ '1' }>1 Woche</MenuItem>
-                <MenuItem value={ '2' }>2 Wochen</MenuItem>
-                <MenuItem value={ '4' }>4 Wochen</MenuItem>
+                <MenuItem value={ '1' }>1</MenuItem>
+                <MenuItem value={ '2' }>2</MenuItem>
+                <MenuItem value={ '4' }>4</MenuItem>
                 </Select>
                 <Typography
                 color={colors.greenAccent[500]}
@@ -466,12 +466,12 @@ const SolverReq = ({ solverreq }) => {
                 helperText={touched.nb1 && errors.nb1}
                 sx={{ gridColumn: "span 1" }}
               >
-                <MenuItem value={ '0' }>Egal</MenuItem>
-                <MenuItem value={ '10' }>1</MenuItem>
-                <MenuItem value={ '30' }>2</MenuItem>
-                <MenuItem value={ '80' }>3</MenuItem>
-                <MenuItem value={ '200' }>4</MenuItem>
-                <MenuItem value={ '100000' }>Nicht verletzen</MenuItem>
+                <MenuItem value={ '0' }>0</MenuItem>
+                <MenuItem value={ '1' }>1</MenuItem>
+                <MenuItem value={ '2' }>2</MenuItem>
+                <MenuItem value={ '3' }>3</MenuItem>
+                <MenuItem value={ '4' }>4</MenuItem>
+                <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
                 color={colors.greenAccent[500]}
@@ -508,12 +508,12 @@ const SolverReq = ({ solverreq }) => {
                 helperText={touched.nb2 && errors.nb2}
                 sx={{ gridColumn: "span 1" }}
                 >
-                <MenuItem value={ '0' }>Egal</MenuItem>
-                <MenuItem value={ '10' }>1</MenuItem>
-                <MenuItem value={ '30' }>2</MenuItem>
-                <MenuItem value={ '80' }>3</MenuItem>
-                <MenuItem value={ '200' }>4</MenuItem>
-                <MenuItem value={ '100000' }>Nicht verletzen</MenuItem>
+                <MenuItem value={ '0' }>0</MenuItem>
+                <MenuItem value={ '1' }>1</MenuItem>
+                <MenuItem value={ '2' }>2</MenuItem>
+                <MenuItem value={ '3' }>3</MenuItem>
+                <MenuItem value={ '4' }>4</MenuItem>
+                <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
                 color={colors.greenAccent[500]}
@@ -550,12 +550,12 @@ const SolverReq = ({ solverreq }) => {
                 helperText={touched.nb3 && errors.nb3}
                 sx={{ gridColumn: "span 1" }}
                 >
-                <MenuItem value={ '0' }>Egal</MenuItem>
-                <MenuItem value={ '10' }>1</MenuItem>
-                <MenuItem value={ '30' }>2</MenuItem>
-                <MenuItem value={ '80' }>3</MenuItem>
-                <MenuItem value={ '200' }>4</MenuItem>
-                <MenuItem value={ '100000' }>Nicht verletzen</MenuItem>
+                <MenuItem value={ '0' }>0</MenuItem>
+                <MenuItem value={ '1' }>1</MenuItem>
+                <MenuItem value={ '2' }>2</MenuItem>
+                <MenuItem value={ '3' }>3</MenuItem>
+                <MenuItem value={ '4' }>4</MenuItem>
+                <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
                 color={colors.greenAccent[500]}
@@ -592,12 +592,12 @@ const SolverReq = ({ solverreq }) => {
                 helperText={touched.nb4 && errors.nb4}
                 sx={{ gridColumn: "span 1" }}
                 >
-                <MenuItem value={ '0' }>Egal</MenuItem>
-                <MenuItem value={ '10' }>1</MenuItem>
-                <MenuItem value={ '30' }>2</MenuItem>
-                <MenuItem value={ '80' }>3</MenuItem>
-                <MenuItem value={ '200' }>4</MenuItem>
-                <MenuItem value={ '100000' }>Nicht verletzen</MenuItem>
+                <MenuItem value={ '0' }>0</MenuItem>
+                <MenuItem value={ '1' }>1</MenuItem>
+                <MenuItem value={ '2' }>2</MenuItem>
+                <MenuItem value={ '3' }>3</MenuItem>
+                <MenuItem value={ '4' }>4</MenuItem>
+                <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
                 color={colors.greenAccent[500]}
@@ -634,12 +634,12 @@ const SolverReq = ({ solverreq }) => {
                 helperText={touched.nb5 && errors.nb5}
                 sx={{ gridColumn: "span 1" }}
                 >
-                <MenuItem value={ '0' }>Egal</MenuItem>
-                <MenuItem value={ '10' }>1</MenuItem>
-                <MenuItem value={ '30' }>2</MenuItem>
-                <MenuItem value={ '80' }>3</MenuItem>
-                <MenuItem value={ '200' }>4</MenuItem>
-                <MenuItem value={ '100000' }>Nicht verletzen</MenuItem>
+                <MenuItem value={ '0' }>0</MenuItem>
+                <MenuItem value={ '1' }>1</MenuItem>
+                <MenuItem value={ '2' }>2</MenuItem>
+                <MenuItem value={ '3' }>3</MenuItem>
+                <MenuItem value={ '4' }>4</MenuItem>
+                <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
                 color={colors.greenAccent[500]}
@@ -676,12 +676,12 @@ const SolverReq = ({ solverreq }) => {
                 helperText={touched.nb6 && errors.nb6}
                 sx={{ gridColumn: "span 1" }}
                 >
-                <MenuItem value={ '0' }>Egal</MenuItem>
-                <MenuItem value={ '10' }>1</MenuItem>
-                <MenuItem value={ '30' }>2</MenuItem>
-                <MenuItem value={ '80' }>3</MenuItem>
-                <MenuItem value={ '200' }>4</MenuItem>
-                <MenuItem value={ '100000' }>Nicht verletzen</MenuItem>
+                <MenuItem value={ '0' }>0</MenuItem>
+                <MenuItem value={ '1' }>1</MenuItem>
+                <MenuItem value={ '2' }>2</MenuItem>
+                <MenuItem value={ '3' }>3</MenuItem>
+                <MenuItem value={ '4' }>4</MenuItem>
+                <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
                 color={colors.greenAccent[500]}
@@ -718,12 +718,12 @@ const SolverReq = ({ solverreq }) => {
                 helperText={touched.nb7 && errors.nb7}
                 sx={{ gridColumn: "span 1" }}
                 >
-                <MenuItem value={ '0' }>Egal</MenuItem>
-                <MenuItem value={ '10' }>1</MenuItem>
-                <MenuItem value={ '30' }>2</MenuItem>
-                <MenuItem value={ '80' }>3</MenuItem>
-                <MenuItem value={ '200' }>4</MenuItem>
-                <MenuItem value={ '100000' }>Nicht verletzen</MenuItem>
+                <MenuItem value={ '0' }>0</MenuItem>
+                <MenuItem value={ '1' }>1</MenuItem>
+                <MenuItem value={ '2' }>2</MenuItem>
+                <MenuItem value={ '3' }>3</MenuItem>
+                <MenuItem value={ '4' }>4</MenuItem>
+                <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
                 color={colors.greenAccent[500]}
@@ -760,12 +760,12 @@ const SolverReq = ({ solverreq }) => {
                 helperText={touched.nb8 && errors.nb8}
                 sx={{ gridColumn: "span 1" }}
                 >
-                <MenuItem value={ '0' }>Egal</MenuItem>
-                <MenuItem value={ '10' }>1</MenuItem>
-                <MenuItem value={ '30' }>2</MenuItem>
-                <MenuItem value={ '80' }>3</MenuItem>
-                <MenuItem value={ '200' }>4</MenuItem>
-                <MenuItem value={ '100000' }>Nicht verletzen</MenuItem>
+                <MenuItem value={ '0' }>0</MenuItem>
+                <MenuItem value={ '1' }>1</MenuItem>
+                <MenuItem value={ '2' }>2</MenuItem>
+                <MenuItem value={ '3' }>3</MenuItem>
+                <MenuItem value={ '4' }>4</MenuItem>
+                <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
                 color={colors.greenAccent[500]}
@@ -802,12 +802,12 @@ const SolverReq = ({ solverreq }) => {
                 helperText={touched.nb9 && errors.nb9}
                 sx={{ gridColumn: "span 1" }}
                 >
-                <MenuItem value={ '0' }>Egal</MenuItem>
-                <MenuItem value={ '10' }>1</MenuItem>
-                <MenuItem value={ '30' }>2</MenuItem>
-                <MenuItem value={ '80' }>3</MenuItem>
-                <MenuItem value={ '200' }>4</MenuItem>
-                <MenuItem value={ '100000' }>Nicht verletzen</MenuItem>
+                <MenuItem value={ '0' }>0</MenuItem>
+                <MenuItem value={ '1' }>1</MenuItem>
+                <MenuItem value={ '2' }>2</MenuItem>
+                <MenuItem value={ '3' }>3</MenuItem>
+                <MenuItem value={ '4' }>4</MenuItem>
+                <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
                 color={colors.greenAccent[500]}
@@ -844,12 +844,12 @@ const SolverReq = ({ solverreq }) => {
                 helperText={touched.nb10 && errors.nb10}
                 sx={{ gridColumn: "span 1" }}
                 >
-                <MenuItem value={ '0' }>Egal</MenuItem>
-                <MenuItem value={ '10' }>1</MenuItem>
-                <MenuItem value={ '30' }>2</MenuItem>
-                <MenuItem value={ '80' }>3</MenuItem>
-                <MenuItem value={ '200' }>4</MenuItem>
-                <MenuItem value={ '100000' }>Nicht verletzen</MenuItem>
+                <MenuItem value={ '0' }>0</MenuItem>
+                <MenuItem value={ '1' }>1</MenuItem>
+                <MenuItem value={ '2' }>2</MenuItem>
+                <MenuItem value={ '3' }>3</MenuItem>
+                <MenuItem value={ '4' }>4</MenuItem>
+                <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
                 color={colors.greenAccent[500]}
@@ -886,12 +886,12 @@ const SolverReq = ({ solverreq }) => {
                 helperText={touched.nb11 && errors.nb11}
                 sx={{ gridColumn: "span 1" }}
                 >
-                <MenuItem value={ '0' }>Egal</MenuItem>
-                <MenuItem value={ '10' }>1</MenuItem>
-                <MenuItem value={ '30' }>2</MenuItem>
-                <MenuItem value={ '80' }>3</MenuItem>
-                <MenuItem value={ '200' }>4</MenuItem>
-                <MenuItem value={ '100000' }>Nicht verletzen</MenuItem>
+                <MenuItem value={ '0' }>0</MenuItem>
+                <MenuItem value={ '1' }>1</MenuItem>
+                <MenuItem value={ '2' }>2</MenuItem>
+                <MenuItem value={ '3' }>3</MenuItem>
+                <MenuItem value={ '4' }>4</MenuItem>
+                <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
                 color={colors.greenAccent[500]}
@@ -928,12 +928,12 @@ const SolverReq = ({ solverreq }) => {
                 helperText={touched.nb12 && errors.nb12}
                 sx={{ gridColumn: "span 1" }}
                 >
-                <MenuItem value={ '0' }>Egal</MenuItem>
-                <MenuItem value={ '10' }>1</MenuItem>
-                <MenuItem value={ '30' }>2</MenuItem>
-                <MenuItem value={ '80' }>3</MenuItem>
-                <MenuItem value={ '200' }>4</MenuItem>
-                <MenuItem value={ '100000' }>Nicht verletzen</MenuItem>
+                <MenuItem value={ '0' }>0</MenuItem>
+                <MenuItem value={ '1' }>1</MenuItem>
+                <MenuItem value={ '2' }>2</MenuItem>
+                <MenuItem value={ '3' }>3</MenuItem>
+                <MenuItem value={ '4' }>4</MenuItem>
+                <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
                 color={colors.greenAccent[500]}
