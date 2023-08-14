@@ -906,6 +906,14 @@ def get_required_workforce():
     week_adjustment = int(request.args.get('week_adjustment', 0))
     week_start = monday + datetime.timedelta(days=week_adjustment)
 
+    slot_dict = {}
+    for i in range(daily_slots):
+        quarter_hour = i / hour_divider
+        quarter_minute = (i % hour_divider) * minutes  # Remainder gives the quarter in the hour
+        formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+        slot_dict[i] = formatted_time
+
+    print(slot_dict)   
 
     timereq_dict = {}
     for i in range(day_num):
@@ -923,7 +931,6 @@ def get_required_workforce():
                 new_i = i + 1
                 timereq_dict[str(new_i) + str(hour)] = temp.worker
 
-    print(timereq_dict)
     
     opening_dict = {}
     for i in range(day_num):
@@ -985,6 +992,7 @@ def get_required_workforce():
     calendar_dict={
         'weekdays': weekdays,
         'opening_dict': opening_dict,
+        'slots_dict': slot_dict,
         'day_num': day_num,
         'timereq_dict': timereq_dict,
         'week_start': week_start,
