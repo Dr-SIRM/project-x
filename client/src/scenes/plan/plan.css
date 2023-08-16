@@ -8,11 +8,32 @@
     margin-bottom: 10px;
   }
   
+  .gantt-controls button {
+    background-color: #3da58a;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition-duration: 0.4s;
+  }
+  
+  .gantt-controls button:hover {
+    background-color: white;
+    color: #3da58a;
+  }
+  
   .gantt-timeline {
     display: flex;
     justify-content: space-between;
-    width: 100%;
+    width: calc(100% - 120px);
     padding: 0 10px;
+    margin-left: 130px;
   }
   
   .gantt-row {
@@ -40,6 +61,6 @@
   .gantt-bar {
     position: absolute;
     height: 100%;
-    background-color: #0077b6;
+    background-color: #3da58a;
   }
   
