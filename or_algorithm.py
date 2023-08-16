@@ -31,7 +31,7 @@ Prio 1:
  To-Do's 
  -------------------------------
  - "Gewünschte max. Zeit pro Woche" in Solver Req muss gelöscht werden
- - (10%) Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
+ - (100%) Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
 
 
  Fragen an die Runde:
@@ -72,8 +72,7 @@ class ORAlgorithm:
         self.time_req = dp.time_req                         # 108    
         self.user_employment = dp.user_employment           # 109
         self.solver_requirements = dp.solver_requirements   # 110
-
-        self.week_timeframe = dp.week_timeframe
+        self.week_timeframe = dp.week_timeframe             # 111
 
         # Attribute der Methode "create_variables"
         self.mitarbeiter = None                             # 1
@@ -210,8 +209,21 @@ class ORAlgorithm:
 
         self.max_time_week = self.max_time_week * 4                  # Diese 4 neu dann variabel machen
         self.weekly_hours = self.weekly_hours * 4                    # Diese 4 neu dann variabel machen
+
+
+
+
+
+        # DAS HIER MACHT NICHT WIRKLICH SINN! DA MUSS EINE LÖSUNG HER
         self.max_time_week = self.max_time_week * self.week_timeframe  # Wenn 2 oder 4 Wochen
         self.weekly_hours = self.weekly_hours * self.week_timeframe    # Wenn 2 oder 4 Wochen
+
+
+
+
+
+
+
 
         # -- 7 ------------------------------------------------------------------------------------------------------------
         # Berechnung der calc_time (Anzahl Tage an denen die MA eingeteilt werden)
@@ -331,6 +343,7 @@ class ORAlgorithm:
         print("108. self.time_req: ", self.time_req) 
         print("109. user_employment: ", self.user_employment) 
         print("110. solver_requirements: ", self.solver_requirements)
+        print("111. week_timeframe: ", self.week_timeframe)
         print()
         
         print("Attribute der Methode create_variables:")
@@ -865,8 +878,6 @@ class ORAlgorithm:
         # NB 8 - Innerhalb einer Woche immer gleiche Schichten
         # ***** Weiche Nebenbedingung 7 *****
         # -------------------------------------------------------------------------------------------------------
-        self.company_shifts = 1
-
         if self.company_shifts <= 1:
             pass
 
