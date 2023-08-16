@@ -21,12 +21,12 @@ class DataProcessing:
         self.binary_availability = None
 
         # Zeitraum in dem gesolvet wird, wird noch angepasst!
-        # self.start_date = "2023-08-07"
-        # self.end_date = "2023-08-11"
+        self.start_date = "2023-08-07"
+        self.end_date = "2023-08-11"
 
         # Gute Daten zum testsolven
-        self.start_date = "2023-07-31"
-        self.end_date = "2023-08-04"
+        # self.start_date = "2023-07-31"
+        # self.end_date = "2023-08-04"
         
         
     def run(self):
@@ -328,6 +328,8 @@ class DataProcessing:
                     desired_max_time_week,
                     max_time_week,
                     hour_devider,
+                    fair_distribution,
+                    week_timeframe,
                     nb1, nb2, nb3, nb4, nb5,
                     nb6, nb7, nb8, nb9, nb10,
                     nb11, nb12, nb13, nb14, nb15,
@@ -351,13 +353,16 @@ class DataProcessing:
                     'desired_max_time_week': row[8],
                     'max_time_week': row[9],
                     'hour_devider': row[10],
-                    'nb1': row[11], 'nb2': row[12], 'nb3': row[13], 'nb4': row[14], 'nb5': row[15],
-                    'nb6': row[16], 'nb7': row[17], 'nb8': row[18], 'nb9': row[19], 'nb10': row[20],
-                    'nb11': row[21], 'nb12': row[22], 'nb13': row[23], 'nb14': row[24], 'nb15': row[25],
-                    'nb16': row[26], 'nb17': row[27], 'nb18': row[28], 'nb19': row[29], 'nb20': row[30]
+                    'fair_distribution': row[11],
+                    'week_timeframe': row[12],
+                    'nb1': row[13], 'nb2': row[14], 'nb3': row[15], 'nb4': row[16], 'nb5': row[17],
+                    'nb6': row[18], 'nb7': row[19], 'nb8': row[20], 'nb9': row[21], 'nb10': row[22],
+                    'nb11': row[23], 'nb12': row[24], 'nb13': row[25], 'nb14': row[26], 'nb15': row[27],
+                    'nb16': row[28], 'nb17': row[29], 'nb18': row[30], 'nb19': row[31], 'nb20': row[32]
                 }
 
             self.solver_requirements = row_dict
+
 
 
     def pre_check_admin(self):
