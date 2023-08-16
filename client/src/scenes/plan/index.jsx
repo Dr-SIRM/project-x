@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import './plan.css';
+import { useTheme, Box, Button} from "@mui/material";
+import Header from "../../components/Header";
 
 const GanttChart = () => {
   const [view, setView] = useState('day');
@@ -64,6 +66,12 @@ const GanttChart = () => {
     };
 
     return (
+      <Box m="20px">
+      <Header
+        title="Schichtplan"
+        subtitle=""
+        />
+        <h2>Übersicht über die eingeplanten Schichten</h2>
         <div className="gantt-container">
             <div className="gantt-controls">
                 <button onClick={() => setView('day')}>Day</button>
@@ -87,6 +95,7 @@ const GanttChart = () => {
                 </div>
             ))}
         </div>
+      </Box>
     );
 };
 
