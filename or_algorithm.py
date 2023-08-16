@@ -1082,43 +1082,33 @@ class ORAlgorithm:
         """
         Excel ausgabe
         """
-        # Daten verarbeiten
-        new_data = {}
-        for ma, days in self.mitarbeiter_arbeitszeiten.items():
-            new_days = []
-            for i in range(0, len(days), 5):
-                new_days.extend(days[i:i+5])
-                if i + 5 < len(days):
-                    new_days.extend([[None]*40]*2)
-            new_data[ma] = new_days
+        data = self.mitarbeiter_arbeitszeiten
 
-        data = new_data
-        
-        # Farbdefinitionen
+        # Legen Sie die Füllungen fest
         green_fill = PatternFill(start_color="00FF00", end_color="00FF00", fill_type="solid")
         red_fill = PatternFill(start_color="FF0000", end_color="FF0000", fill_type="solid")
-        
-        # Schriftgrößen
+
+        # Festlegen der Schriftgröße
         font = Font(size=10)
-        header_font = Font(size=5)
-        
-        # Erstellen eines Workbook
+        header_font = Font(size=5)  # Schriftgröße für die Spaltentitel
+
+        # Erstellen Sie ein Workbook
         wb = Workbook()
         ws = wb.active
-        
-        # Schreiben der Überschriften
+
+        # Schreiben Sie die Überschriften
         headers = ["user_id"]
-        for i in range(1, self.week_timeframe*5 + 1):
+        for i in range(1, len(data[list(data.keys())[0]]) + 1):
             headers.extend(["T{}, {}:{}".format(i, j+8, k*15) for j in range(10) for k in range(4)])
             headers.append(' ')
-            headers.append("Total Hours")
+        headers.append("Total Hours") 
         ws.append(headers)
-        
-        # Schriftgröße der Spaltentitel
+
+        # Ändern der Schriftgröße der Spaltentitel
         for cell in ws[1]:
             cell.font = header_font
-        
-        # Schreiben der Daten
+
+        # Schreiben Sie die Daten
         for idx, (ma, days) in enumerate(data.items(), start=2):
             row = [ma]
             for day in days:
@@ -1126,21 +1116,21 @@ class ORAlgorithm:
                 row.extend(quarter_hours)
                 row.append(' ')  # Fügt eine leere Spalte nach jedem Tag hinzu
             ws.append(row)
-            total_hours_col = len(headers)
+            total_hours_col = len(headers)  # Wir verwenden die Anzahl der Überschriften, um die richtige Spalte zu erhalten
             ws.cell(row=idx, column=total_hours_col, value=f"=SUM(B{idx}:{get_column_letter(total_hours_col-1)}{idx})")
-        
-        # Farben festlegen und Schriftgröße ändern
+
+
+
+        # Farben auf Basis der Zellenwerte festlegen und Schriftgröße für den Rest des Dokuments
         for row in ws.iter_rows(min_row=2, values_only=False):
             for cell in row[1:]:
                 if cell.value == 1:
                     cell.fill = green_fill
                 elif cell.value == 0:
                     cell.fill = red_fill
-                elif cell.value is None:
-                    cell.value = ""
                 cell.font = font
-        
-        # Spaltenbreite ändern
+
+        # Ändern der Spaltenbreite
         for column in ws.columns:
             max_length = 0
             column = [cell for cell in column]
@@ -1154,9 +1144,10 @@ class ORAlgorithm:
             if adjusted_width > 3:
                 adjusted_width = 3
             ws.column_dimensions[get_column_letter(column[0].column)].width = adjusted_width
-        
-        # Workbook speichern
+
+        # Speichern Sie das Workbook
         wb.save("Einsatzplan.xlsx")
+
 
 
     def save_data_in_database(self):
