@@ -160,11 +160,11 @@ class ORAlgorithm:
         Allgemeine Variabeln
         """
 
-        # -- 1 -- 
+        # -- 1 ------------------------------------------------------------------------------------------------------------
         # user_ids Liste, wird als Key in der Ausgabe verwendet
         self.mitarbeiter = [user_id for user_id in self.binary_availability]
 
-        # -- 2 --
+        # -- 2 ------------------------------------------------------------------------------------------------------------
         # Aus dem binary_availability dict. die Verfügbarkeits-Informationen ziehen
         for i, (user_id, availabilities) in enumerate(self.binary_availability.items()):
             self.verfügbarkeit[self.mitarbeiter[i]] = []
@@ -214,12 +214,12 @@ class ORAlgorithm:
         self.weekly_hours = self.weekly_hours * 4                 # Diese 4 neu dann variabel machen
 
 
-        # -- 7 --
+        # -- 7 ------------------------------------------------------------------------------------------------------------
         # Berechnung der calc_time (Anzahl Tage an denen die MA eingeteilt werden)
         # Es werden nur die Tage des ersten MA berechnet, da jeder MA die gleiche Wochenlänge hat
         self.calc_time = len(next(iter(self.binary_availability.values())))
 
-        # -- 8 --
+        # -- 8 ------------------------------------------------------------------------------------------------------------
         # Empolyment_level aus dem employment_lvl dict in einer Liste speichern (nur MA die berücksichtigt werden)
         # Iterieren Sie über die Schlüssel in binary_availability
         for user_id in self.binary_availability.keys():
@@ -229,14 +229,14 @@ class ORAlgorithm:
                 self.employment_lvl_exact.append(self.employment_lvl[user_id])
         # self.employment_lvl_exact = [1, 0.8, 0.8, 0.6, 0.6] # Damit die Liste noch selbst manipuliert werden kann.
 
-        # -- 9 --
+        # -- 9 ------------------------------------------------------------------------------------------------------------
         # Iteration of the key within binary_availability
         for user_id in self.binary_availability.keys():
             if user_id in self.user_employment:
                 self.employment.append(self.user_employment[user_id])
         # self.employment = ["Perm", "Temp", "Temp", "Temp", "Temp"] # selbst manipuliert
 
-        # -- 10 --
+        # -- 10 ------------------------------------------------------------------------------------------------------------
         # verteilbare Stunden (Wieviele Mannstunden benötigt die Firma im definierten Zeitraum)
         self.verteilbare_stunden = 0
         for date in self.time_req:
@@ -244,21 +244,21 @@ class ORAlgorithm:
                 self.verteilbare_stunden += self.time_req[date][hour]
                 self.verteilbare_stunden = self.verteilbare_stunden
 
-        # -- 11 --
+        # -- 11 ------------------------------------------------------------------------------------------------------------
         # gesamtstunden Verfügbarkeit pro MA pro Woche
         self.stunden_pro_tag = 1 # flexibler wenn einmal 1/4h eingebaut werden          !!!  -- EVTL KANN DAS GANZ RAUSGELÖSCHT WERDEN --  !!!
 
-        # -- 12 --
+        # -- 12 ------------------------------------------------------------------------------------------------------------
         for key in self.binary_availability:
             gesamt_stunden = sum(sum(day_data[1]) * self.stunden_pro_tag for day_data in self.binary_availability[key])
             self.gesamtstunden_verfügbarkeit.append(gesamt_stunden)
 
-        # -- 13 --
+        # -- 13 ------------------------------------------------------------------------------------------------------------
         # Eine Liste mit den min. anwesendheiten der MA wird erstellt
         for _, values in sorted(self.time_req.items()):
             self.min_anwesend.append(list(values.values()))
 
-        # -- 14 --
+        # -- 14 ------------------------------------------------------------------------------------------------------------
         # Eine Liste mit den Stunden wie sie gerecht verteilt werden
         list_gesamtstunden = []
         for i in range(len(self.mitarbeiter)):
@@ -304,12 +304,12 @@ class ORAlgorithm:
                 self.gerechte_verteilung[i] -= 1
                 total_hours_assigned -= 1
 
-        # -- 15 --
+        # -- 15 ------------------------------------------------------------------------------------------------------------
         # Toleranz der gerechten Verteilung
         key = "fair_distribution"
         if key in self.solver_requirements:
             self.fair_distribution = self.solver_requirements[key]
-        self.fair_distribution = self.fair_distribution / 100       #Prozentumrechnung
+        self.fair_distribution = self.fair_distribution / 100      # Prozentumrechnung
         
 
 
@@ -509,7 +509,14 @@ class ORAlgorithm:
         Definiere Strafkosten für weiche Nebenbedingungen
         """
 
-        # NB 1 - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesendd
+        # NB 1 - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend
+        key = "nb1"
+        if key in self.solver_requirements:
+            nb1 = self.solver_requirements[key]
+
+        if nb1 == 0:
+            pass
+        
         self.penalty_cost_nb1 = 100
 
         # NB 2 - Max. Arbeitszeit pro Woche
