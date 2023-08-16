@@ -509,30 +509,40 @@ class ORAlgorithm:
         Definiere Strafkosten für weiche Nebenbedingungen
         """
 
-        # NB 1 - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend
-        key = "nb1"
-        if key in self.solver_requirements:
-            nb1 = self.solver_requirements[key]
+        # Definiere ein Dictionary für die Strafkosten für jede NB
+        penalty_values = {
+            "nb1": {0: 100, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb2": {0: 100, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb3": {0: 100, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb4": {0: 100, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb5": {0: 100, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb6": {0: 100, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb7": {0: 100, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000}
+        }
 
-        if nb1 == 0:
-            pass
-        
-        self.penalty_cost_nb1 = 100
+        # Mapping für die entsprechenden Namen der Klassenattribute
+        penalty_cost_names = {
+            "nb1": "penalty_cost_nb1",
+            "nb2": "penalty_cost_nb2",
+            "nb3": "penalty_cost_nb3_min",
+            "nb4": "penalty_cost_nb4_max",
+            "nb5": "penalty_cost_nb5_min",
+            "nb6": "penalty_cost_nb6_max",
+            "nb7": "penalty_cost_nb7"
+        }
 
-        # NB 2 - Max. Arbeitszeit pro Woche
-        self.penalty_cost_nb2 = 100
+        # Setze die Strafkosten für jede NB basierend auf dem Dictionary
+        for key, values in penalty_values.items():
+            if key in self.solver_requirements:
+                nb_value = self.solver_requirements[key]
+                if nb_value in values:
+                    setattr(self, penalty_cost_names[key], values[nb_value])
+                    print(f"{penalty_cost_names[key].upper()}: {getattr(self, penalty_cost_names[key])}")
+                else:
+                    print(f"Zahl für {penalty_cost_names[key].upper()} wurde nicht gefunden")
+            else:
+                print(f"{penalty_cost_names[key].upper()} nicht in solver_requirements gefunden")
 
-        # NB 3 und 4 - Min. und Max. Arbeitszeit pro Tag
-        self.penalty_cost_nb3_min = 100 # Strafkosten für Unterschreitung
-        # self.penalty_cost_nb4_min = [0, 10, 50, 100, 300]
-        self.penalty_cost_nb4_max = 100 # Strafkosten für Überschreitung
-
-        # NB 5 und 6 - Feste Mitarbeiter zu employement_level fest einplanen (Achtung, pro 1/4h wird momentan bestraft!)
-        self.penalty_cost_nb5_min = 100  # Strafkosten für Unterschreitung
-        self.penalty_cost_nb6_max = 100  # Strafkosten für Überschreitung
-
-        # NB 7 - Innerhalb einer Woche immer gleiche Schichten
-        self.penalty_cost_nb7 = 100
 
 
     def decision_variables(self):
