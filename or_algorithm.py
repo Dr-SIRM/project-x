@@ -500,6 +500,22 @@ class ORAlgorithm:
         if errors:
             raise ValueError("Folgende Fehler wurden gefunden:\n" + "\n".join(errors))
 
+        """
+        ---------------------------------------------------------------------------------------------------------------
+        6. Ist die min. Zeit pro Tag so klein, dass die Stunden in der gerechten Verteilung nicht erfüllt werden können?
+        ---------------------------------------------------------------------------------------------------------------
+        """
+
+
+
+        """
+        ---------------------------------------------------------------------------------------------------------------
+        7. Ist die Toleranz der gerechten Verteilung zu klein gewählt? --> Evtl. die Bedingung weich machen!
+        ---------------------------------------------------------------------------------------------------------------
+        """
+
+
+
 
 
     def solver_selection(self):
