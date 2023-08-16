@@ -23,17 +23,14 @@ Prio 1:
  - (erl.) auf Viertelstunden wechseln
  - (erl.) Gerechte Verteilung Anpassen, das Stunden von "Perm" Mitarbeiter abgezogen werden
  - (erl.) Weiche NB4 implementieren, hat noch nicht wunschgemäss geklappt
+ - (erl.) Den Übergang auf harte und weiche NBs machen? 
+ - (erl.) Die gesolvten Daten in der Datenbank speichern
+ - (erl.) Daten für Solven in die Datenbank einpflegen (max. Zeit, min. Zeit, Solvingzeitraum, Toleranz für die Stundenverteilung, ...)
 
 
  To-Do's 
  -------------------------------
- 1. Weiche NB3 überprüfen ob alles richtig definiert wurde
- 2. exponentieller Anstieg der Kosten in den weichen NBs
- 3. Die Kosten der weichen NBs müssen mit einer reihe von Tests erprobt werden, dafür 3-4 Firmen erstellen und alles mögliche durchtesten und dokumentieren/auswerten.
-    Tests wenn möglich auf dem eigenen Rechner laufen lassen.
-
- - (80%) Den Übergang auf harte und weiche NBs machen? 
- - (80%) Die gesolvten Daten in der Datenbank speichern
+ - "Gewünschte max. Zeit pro Woche" in Solver Req muss gelöscht werden
  - (10%) Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
 
 
@@ -51,7 +48,7 @@ Prio 1:
  -------------------------------
 
  - Jeder MA muss vor dem Solven eingegeben haben, wann er arbeiten kann. Auch wenn es alles 0 sind.
- - Daten für Solven in die Datenbank einpflegen (max. Zeit, min. Zeit, Solvingzeitraum, Toleranz für die Stundenverteilung, ...)
+
 
 
 Prio 2:
@@ -110,12 +107,12 @@ class ORAlgorithm:
         self.penalty_cost_nb6_max = None
         self.penalty_cost_nb7 = None
 
-
         # Attribute der Methode "decision_variables"
         self.x = None
         self.y = None
-        self.s = None
         self.a = None
+        self.s2 = None
+        self.s3 = None
         self.c = None # -- IN BEARBEITUNG 01.07.2023 --
 
         # Attribute der Methode "violation_variables"
@@ -151,7 +148,6 @@ class ORAlgorithm:
         self.solve_problem()
         self.store_solved_data()
         self.output_result_excel()
-
         self.save_data_in_database()
 
 
@@ -985,12 +981,13 @@ class ORAlgorithm:
         self.solver.EnableOutput()
         self.status = self.solver.Solve()
 
+        """
         # Die Werte von s3 printen
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 # Drucken Sie den Wert von s3[i, j]
                 print(f"s3[{i}][{j}] =", self.s3[i, j].solution_value())
-
+        """
 
         # Kosten für die Einstellung von Mitarbeitern
         hiring_costs = sum(self.kosten[i] * self.x[i, j, k].solution_value() for i in self.mitarbeiter for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[i][j])))
