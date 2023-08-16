@@ -3,6 +3,7 @@ from sqlalchemy import text
 from datetime import datetime, time
 from dateutil.relativedelta import relativedelta
 from collections import defaultdict
+from collections import OrderedDict
 from app import app, db, timedelta
 
 
@@ -129,6 +130,10 @@ class DataProcessing:
             for user_id, date, start_time, end_time in times:
                 user_availability[user_id].append((date, start_time, end_time))
 
+            # Sortieren der Einträge in der Liste für jeden Benutzer nach Datum
+            for user_id, availabilities in user_availability.items():
+                user_availability[user_id] = sorted(availabilities, key=lambda x: x[0])
+
             self.user_availability = user_availability
 
 
@@ -200,7 +205,10 @@ class DataProcessing:
 
         # Berechne die Öffnungszeiten für jeden Wochentag und speichere sie in einer Liste
         self.opening_hours = [(self.time_to_int(self.laden_schliesst[i]) - self.time_to_int(self.laden_oeffnet[i])) for i in range(7)]
-
+        # Wenn ich 2 oder 4 Wochen solve, wird auch die opening_hours Liste dementsprechend länger
+        self.laden_oeffnet = self.laden_oeffnet * self.week_timeframe
+        self.laden_schliesst = self.laden_schliesst * self.week_timeframe
+        self.opening_hours = self.opening_hours * self.week_timeframe
 
         
     def get_time_req(self):
@@ -222,30 +230,33 @@ class DataProcessing:
                 WHERE t.company_name = :company_name
                 AND t.date BETWEEN :start_date AND :end_date
             """)
-            # execute = rohe Mysql Abfrage.
             result = db.session.execute(sql, {"company_name": company_name, "start_date": self.start_date, "end_date": self.end_date})
-
-            # fetchall = alle Zeilen der Datenbank werden abgerufen und in einem Tupel gespeichert
             time_reqs = result.fetchall()
 
             # Erstellen eines Dictionaries mit Datum und Stunde als Schlüssel:
             time_req_dict_2 = defaultdict(dict)
             for date, start_time, worker in time_reqs:
-                # Wochentag als Index (0 = Montag, 1 = Dienstag, usw.) erhalten
                 weekday_index = date.weekday()
-
-                # Prüfen, ob die Start- und Endzeiten innerhalb der Öffnungszeiten liegen
                 if (self.laden_oeffnet[weekday_index] <= start_time < self.laden_schliesst[weekday_index]):
-                    # Umwandlung der Startzeit in Viertelstunden
                     start_hour = int(start_time.total_seconds() // 900) - int(self.laden_oeffnet[weekday_index].total_seconds() // 900)
-                    # Ensure start_hour is not negative
                     if start_hour < 0:
                         start_hour = 0
                     time_req_dict_2[date][start_hour] = worker
 
-        self.time_req = time_req_dict_2
+            # Umwandeln des Strings in ein datetime.date-Objekt
+            current_date = datetime.strptime(self.start_date, '%Y-%m-%d').date()
+
+            # Füge fehlende Tage hinzu
+            while current_date <= datetime.strptime(self.end_date, '%Y-%m-%d').date():
+                if current_date not in time_req_dict_2:
+                    time_req_dict_2[current_date] = {}
+                current_date += timedelta(days=1)
+
+            # Sortiere das Wörterbuch nach Datum
+            self.time_req = OrderedDict(sorted(time_req_dict_2.items()))
 
     
+
     def get_shift_weeklyhours_emp_lvl(self):
         """ In dieser Funktion wird als Key die user_id verwendet und die shift, employment_level und weekly_hours aus der Datenbank gezogen """
         with app.app_context():

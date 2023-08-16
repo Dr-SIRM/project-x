@@ -73,6 +73,8 @@ class ORAlgorithm:
         self.user_employment = dp.user_employment           # 109
         self.solver_requirements = dp.solver_requirements   # 110
 
+        self.week_timeframe = dp.week_timeframe
+
         # Attribute der Methode "create_variables"
         self.mitarbeiter = None                             # 1
         self.verfügbarkeit = {}                             # 2
@@ -138,7 +140,7 @@ class ORAlgorithm:
         self.create_variables()
         self.show_variables()
         self.pre_check_programmer()
-        self.pre_check_admin()
+        # self.pre_check_admin()
         self.solver_selection()
         self.define_penalty_costs()
         self.decision_variables()
@@ -206,9 +208,10 @@ class ORAlgorithm:
         if key in self.solver_requirements:
             self.max_time_week = self.solver_requirements[key]
 
-        self.max_time_week = self.max_time_week * 4               # Diese 4 neu dann variabel machen
-        self.weekly_hours = self.weekly_hours * 4                 # Diese 4 neu dann variabel machen
-
+        self.max_time_week = self.max_time_week * 4                  # Diese 4 neu dann variabel machen
+        self.weekly_hours = self.weekly_hours * 4                    # Diese 4 neu dann variabel machen
+        self.max_time_week = self.max_time_week * self.week_timeframe  # Wenn 2 oder 4 Wochen
+        self.weekly_hours = self.weekly_hours * self.week_timeframe    # Wenn 2 oder 4 Wochen
 
         # -- 7 ------------------------------------------------------------------------------------------------------------
         # Berechnung der calc_time (Anzahl Tage an denen die MA eingeteilt werden)
@@ -299,6 +302,7 @@ class ORAlgorithm:
                     break
                 self.gerechte_verteilung[i] -= 1
                 total_hours_assigned -= 1
+        print("4. self.gerechte_verteilung: ", self.gerechte_verteilung)       
 
         # -- 15 ------------------------------------------------------------------------------------------------------------
         # Toleranz der gerechten Verteilung
@@ -505,7 +509,7 @@ class ORAlgorithm:
         Definiere Strafkosten für weiche Nebenbedingungen
         """
 
-        # Definiere ein Dictionary für die Strafkosten für jede NB
+        # Strafkosten für jede NB
         penalty_values = {
             "nb1": {0: 100, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
             "nb2": {0: 100, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
@@ -736,6 +740,7 @@ class ORAlgorithm:
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
                 self.solver.Add(self.solver.Sum([self.x[i, j, k] for i in self.mitarbeiter]) - self.min_anwesend[j][k] <= self.nb1_violation[j, k])
+                
 
 
         """
