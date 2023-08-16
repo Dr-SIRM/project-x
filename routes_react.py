@@ -609,70 +609,70 @@ def solver_req():
     solver_requirement = SolverRequirement.query.filter_by(company_name=user.company_name).first()
 
     if solver_requirement is None:
-        company_name = "",
-        weekly_hours = "",
-        shifts = "",
-        desired_min_time_day = "",
-        desired_max_time_day = "",
-        min_time_day = "",
-        max_time_day = "",
-        desired_max_time_week = "",
-        max_time_week = "",
-        hour_devider = "",
-        fair_distribution = "",
-        week_timeframe = "",
-        nb1 = "",
-        nb2 = "",
-        nb3 = "",
-        nb4 = "",
-        nb5 = "",
-        nb6 = "",
-        nb7 = "",
-        nb8 = "",
-        nb9 = "",
-        nb10 = "",
-        nb11 = "",
-        nb12 = "",
-        nb13 = "",
-        nb14 = "",
-        nb15 = "",
-        nb16 = "",
-        nb17 = "",
-        nb18 = "",
-        nb19 = "",
+        company_name = ""
+        weekly_hours = ""
+        shifts = ""
+        desired_min_time_day = ""
+        desired_max_time_day = ""
+        min_time_day = ""
+        max_time_day = ""
+        desired_max_time_week = ""
+        max_time_week = ""
+        hour_devider = ""
+        fair_distribution = ""
+        week_timeframe = ""
+        nb1 = ""
+        nb2 = ""
+        nb3 = ""
+        nb4 = ""
+        nb5 = ""
+        nb6 = ""
+        nb7 = ""
+        nb8 = ""
+        nb9 = ""
+        nb10 = ""
+        nb11 = ""
+        nb12 = ""
+        nb13 = ""
+        nb14 = ""
+        nb15 = ""
+        nb16 = ""
+        nb17 = ""
+        nb18 = ""
+        nb19 = ""
         nb20 = ""
     else:
-        company_name = solver_requirement.company_name,
-        weekly_hours = solver_requirement.weekly_hours,
-        shifts = solver_requirement.shifts,
-        desired_min_time_day = solver_requirement.desired_min_time_day,
-        desired_max_time_day = solver_requirement.desired_max_time_day,
-        min_time_day = solver_requirement.min_time_day,
-        max_time_day = solver_requirement.max_time_day,
-        desired_max_time_week = solver_requirement.desired_max_time_week,
-        max_time_week = solver_requirement.max_time_week,
-        hour_devider = solver_requirement.hour_devider,
-        fair_distribution = solver_requirement.fair_distribution,
-        week_timeframe = solver_requirement.week_timeframe,
-        nb1 = solver_requirement.nb1,
-        nb2 = solver_requirement.nb2,
-        nb3 = solver_requirement.nb3,
-        nb4 = solver_requirement.nb4,
-        nb5 = solver_requirement.nb5,
-        nb6 = solver_requirement.nb6,
-        nb7 = solver_requirement.nb7,
-        nb8 = solver_requirement.nb8,
-        nb9 = solver_requirement.nb9,
-        nb10 = solver_requirement.nb10,
-        nb11 = solver_requirement.nb11,
-        nb12 = solver_requirement.nb12,
-        nb13 = solver_requirement.nb13,
-        nb14 = solver_requirement.nb14,
-        nb15 = solver_requirement.nb15,
-        nb16 = solver_requirement.nb16,
-        nb17 = solver_requirement.nb17,
-        nb18 = solver_requirement.nb18,
-        nb19 = solver_requirement.nb19,
+        company_name = company.company_name
+        weekly_hours = company.weekly_hours
+        shifts = company.shifts
+        desired_min_time_day = solver_requirement.desired_min_time_day
+        desired_max_time_day = solver_requirement.desired_max_time_day
+        min_time_day = solver_requirement.min_time_day
+        max_time_day = solver_requirement.max_time_day
+        desired_max_time_week = company.weekly_hours
+        max_time_week = solver_requirement.max_time_week
+        hour_devider = solver_requirement.hour_devider
+        fair_distribution = solver_requirement.fair_distribution
+        week_timeframe = solver_requirement.week_timeframe
+        nb1 = solver_requirement.nb1
+        nb2 = solver_requirement.nb2
+        nb3 = solver_requirement.nb3
+        nb4 = solver_requirement.nb4
+        nb5 = solver_requirement.nb5
+        nb6 = solver_requirement.nb6
+        nb7 = solver_requirement.nb7
+        nb8 = solver_requirement.nb8
+        nb9 = solver_requirement.nb9
+        nb10 = solver_requirement.nb10
+        nb11 = solver_requirement.nb11
+        nb12 = solver_requirement.nb12
+        nb13 = solver_requirement.nb13
+        nb14 = solver_requirement.nb14
+        nb15 = solver_requirement.nb15
+        nb16 = solver_requirement.nb16
+        nb17 = solver_requirement.nb17
+        nb18 = solver_requirement.nb18
+        nb19 = solver_requirement.nb19
         nb20 =solver_requirement.nb20
 
     if request.method =='POST':
@@ -726,48 +726,54 @@ def solver_req():
                                 creation_timestamp = datetime.datetime.now(),
                                 update_timestamp = datetime.datetime.now()
                                 )
-        db.session.add(data)
-        db.session.commit()
+        try:
+            db.session.add(data)
+            db.session.commit()
+            return jsonify({'message': 'Succesful Registration'}), 200
+        except:
+            db.session.rollback()
+            return jsonify({'message': 'Registration went wrong!'}), 200
 
-        solver_req_dict = {
-        "company_name": company_name,
-        "weekly_hours": weekly_hours,
-        "shifts": shifts,
-        "desired_min_time_day": desired_min_time_day,
-        "desired_max_time_day": desired_max_time_day,
-        "min_time_day": min_time_day,
-        "max_time_day": max_time_day,
-        "desired_max_time_week": desired_max_time_week,
-        "max_time_week": max_time_week,
-        "hour_devider": hour_devider,
-        "fair_distribution": fair_distribution,
-        "week_timeframe": week_timeframe,
-        "nb1": nb1,
-        "nb2": nb2,
-        "nb3": nb3,
-        "nb4": nb4,
-        "nb5": nb5,
-        "nb6": nb6,
-        "nb7": nb7,
-        "nb8": nb8,
-        "nb9": nb9,
-        "nb10": nb10,
-        "nb11": nb11,
-        "nb12": nb12,
-        "nb13": nb13,
-        "nb14": nb14,
-        "nb15": nb15,
-        "nb16": nb16,
-        "nb17": nb17,
-        "nb18": nb18,
-        "nb19": nb19,
-        "nb20": nb20
-        }
 
-        print(solver_req_dict)
+    solver_req_dict = {
+    "company_name": company_name,
+    "weekly_hours": weekly_hours,
+    "shifts": shifts,
+    "desired_min_time_day": desired_min_time_day,
+    "desired_max_time_day": desired_max_time_day,
+    "min_time_day": min_time_day,
+    "max_time_day": max_time_day,
+    "desired_max_time_week": desired_max_time_week,
+    "max_time_week": max_time_week,
+    "hour_devider": hour_devider,
+    "fair_distribution": fair_distribution,
+    "week_timeframe": week_timeframe,
+    "nb1": nb1,
+    "nb2": nb2,
+    "nb3": nb3,
+    "nb4": nb4,
+    "nb5": nb5,
+    "nb6": nb6,
+    "nb7": nb7,
+    "nb8": nb8,
+    "nb9": nb9,
+    "nb10": nb10,
+    "nb11": nb11,
+    "nb12": nb12,
+    "nb13": nb13,
+    "nb14": nb14,
+    "nb15": nb15,
+    "nb16": nb16,
+    "nb17": nb17,
+    "nb18": nb18,
+    "nb19": nb19,
+    "nb20": nb20
+    }
+
+    print(solver_req_dict)
 
     
-        return jsonify(solver_req_dict)
+    return jsonify(solver_req_dict)
 
 
 
@@ -900,6 +906,14 @@ def get_required_workforce():
     week_adjustment = int(request.args.get('week_adjustment', 0))
     week_start = monday + datetime.timedelta(days=week_adjustment)
 
+    slot_dict = {}
+    for i in range(daily_slots):
+        quarter_hour = i / hour_divider
+        quarter_minute = (i % hour_divider) * minutes  # Remainder gives the quarter in the hour
+        formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+        slot_dict[i] = formatted_time
+
+    print(slot_dict)   
 
     timereq_dict = {}
     for i in range(day_num):
@@ -917,7 +931,6 @@ def get_required_workforce():
                 new_i = i + 1
                 timereq_dict[str(new_i) + str(hour)] = temp.worker
 
-    print(timereq_dict)
     
     opening_dict = {}
     for i in range(day_num):
@@ -979,6 +992,7 @@ def get_required_workforce():
     calendar_dict={
         'weekdays': weekdays,
         'opening_dict': opening_dict,
+        'slots_dict': slot_dict,
         'day_num': day_num,
         'timereq_dict': timereq_dict,
         'week_start': week_start,
@@ -986,6 +1000,8 @@ def get_required_workforce():
         'daily_slots': daily_slots,
         'minutes': minutes
     }
+
+
 
     return jsonify(calendar_dict)
 

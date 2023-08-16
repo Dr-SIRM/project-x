@@ -1,6 +1,7 @@
 import pymysql
 from sqlalchemy import text
 from datetime import datetime, time
+from dateutil.relativedelta import relativedelta
 from collections import defaultdict
 from app import app, db, timedelta
 
@@ -9,6 +10,9 @@ class DataProcessing:
     def __init__(self, current_user_id):
         # Attribute
         self.current_user_id = current_user_id
+        self.week_timeframe = None
+        self.start_date = None
+        self.end_date = None
         self.opening_hours = None
         self.laden_oeffnet = None
         self.laden_schliesst = None
@@ -19,26 +23,75 @@ class DataProcessing:
         self.user_employment = None
         self.solver_requirements = None
         self.binary_availability = None
-
-        # Zeitraum in dem gesolvet wird, wird noch angepasst!
-        # self.start_date = "2023-08-07"
-        # self.end_date = "2023-08-11"
-
-        # Gute Daten zum testsolven
-        self.start_date = "2023-07-31"
-        self.end_date = "2023-08-04"
         
         
     def run(self):
         """ Die einzelnen Methoden werden in der Reihe nach ausgeführt """
+        self.solving_period()
         self.get_availability()
         self.get_opening_hours()
         self.get_time_req()
-        self.get_shift_emp_lvl()
+        self.get_shift_weeklyhours_emp_lvl()
         self.binaere_liste()
         self.get_employment()
         self.get_solver_requirement()
         self.pre_check_admin()
+
+
+
+    def solving_period(self):
+        with app.app_context():
+            # Hole den company_name des aktuellen Benutzers
+            sql = text("""
+                SELECT company_name
+                FROM user
+                WHERE id = :current_user_id
+            """)
+            result = db.session.execute(sql, {"current_user_id": self.current_user_id})
+            company_name = result.fetchone()[0]
+            
+            # Hole die Solver-Anforderungen für das Unternehmen
+            sql = text("""
+                SELECT week_timeframe
+                FROM solver_requirement
+                WHERE company_name = :company_name
+            """)
+            result = db.session.execute(sql, {"company_name": company_name})
+            week_timeframe = result.fetchone()[0]
+            self.week_timeframe = week_timeframe
+
+        # Holen Sie sich das heutige Datum
+        today = datetime.today()
+
+        # Finden Sie den nächsten Montag
+        next_monday = today + timedelta(days=(0-today.weekday() + 7) % 7)
+
+        # Berechnen Sie das Enddatum basierend auf week_timeframe
+        if self.week_timeframe == 1:
+            self.end_date = next_monday + relativedelta(weeks=1) - timedelta(days=1)
+        elif self.week_timeframe == 2:
+            self.end_date = next_monday + relativedelta(weeks=2) - timedelta(days=1)
+        elif self.week_timeframe == 4:
+            self.end_date = next_monday + relativedelta(weeks=4) - timedelta(days=1)
+        else:
+            raise ValueError("Invalid value for week_timeframe.")
+        
+        self.start_date = next_monday.strftime("%Y-%m-%d")
+        self.end_date = self.end_date.strftime("%Y-%m-%d")
+
+        # Zeitraum selbst manipulieren
+        # self.start_date = "2023-08-07"
+        # self.end_date = "2023-08-13"
+        # Gute Daten zum testsolven
+        # self.start_date = "2023-07-31"
+        # self.end_date = "2023-08-04"
+
+        print(self.start_date)
+        print(self.end_date)
+        print(self.week_timeframe)
+        
+        return self.start_date, self.end_date
+
 
 
     def get_availability(self):
@@ -77,7 +130,6 @@ class DataProcessing:
                 user_availability[user_id].append((date, start_time, end_time))
 
             self.user_availability = user_availability
-            print("user_availability:", self.user_availability)
 
 
     
@@ -194,8 +246,8 @@ class DataProcessing:
         self.time_req = time_req_dict_2
 
     
-    def get_shift_emp_lvl(self):
-        """ In dieser Funktion wird als Key die user_id verwendet und die shift und employment_level aus der Datenbank gezogen """
+    def get_shift_weeklyhours_emp_lvl(self):
+        """ In dieser Funktion wird als Key die user_id verwendet und die shift, employment_level und weekly_hours aus der Datenbank gezogen """
         with app.app_context():
             # Hole den Firmennamen des aktuellen Benutzers
             sql = text("""
@@ -215,6 +267,15 @@ class DataProcessing:
             result = db.session.execute(sql, {"company_name": company_name})
             company_shifts = result.fetchone()[0]
 
+            # Hole die weekly_hours für die Firma des aktuellen Benutzers
+            sql = text("""
+                SELECT weekly_hours
+                FROM company
+                WHERE company_name = :company_name
+            """)
+            result = db.session.execute(sql, {"company_name": company_name})
+            weekly_hours = result.fetchone()[0]
+
             # Hole das employment_level für jeden Benutzer, der in der gleichen Firma arbeitet wie der aktuelle Benutzer
             sql = text("""
                 SELECT id, employment_level
@@ -225,6 +286,7 @@ class DataProcessing:
             employment_lvl = {user_id: employment_level for user_id, employment_level in result.fetchall()}
 
         self.company_shifts = company_shifts
+        self.weekly_hours = weekly_hours
         self.employment_lvl = employment_lvl
 
 
@@ -318,6 +380,8 @@ class DataProcessing:
                     desired_max_time_week,
                     max_time_week,
                     hour_devider,
+                    fair_distribution,
+                    week_timeframe,
                     nb1, nb2, nb3, nb4, nb5,
                     nb6, nb7, nb8, nb9, nb10,
                     nb11, nb12, nb13, nb14, nb15,
@@ -328,7 +392,6 @@ class DataProcessing:
             result = db.session.execute(sql, {"company_name": company_name})
             solver_requirements = result.fetchall()
 
-            solver_req_dict = {}
             for row in solver_requirements:
                 row_dict = {
                     'id': row[0],
@@ -342,16 +405,18 @@ class DataProcessing:
                     'desired_max_time_week': row[8],
                     'max_time_week': row[9],
                     'hour_devider': row[10],
-                    'nb1': row[11], 'nb2': row[12], 'nb3': row[13], 'nb4': row[14], 'nb5': row[15],
-                    'nb6': row[16], 'nb7': row[17], 'nb8': row[18], 'nb9': row[19], 'nb10': row[20],
-                    'nb11': row[21], 'nb12': row[22], 'nb13': row[23], 'nb14': row[24], 'nb15': row[25],
-                    'nb16': row[26], 'nb17': row[27], 'nb18': row[28], 'nb19': row[29], 'nb20': row[30]
+                    'fair_distribution': row[11],
+                    'week_timeframe': row[12],
+                    'nb1': row[13], 'nb2': row[14], 'nb3': row[15], 'nb4': row[16], 'nb5': row[17],
+                    'nb6': row[18], 'nb7': row[19], 'nb8': row[20], 'nb9': row[21], 'nb10': row[22],
+                    'nb11': row[23], 'nb12': row[24], 'nb13': row[25], 'nb14': row[26], 'nb15': row[27],
+                    'nb16': row[28], 'nb17': row[29], 'nb18': row[30], 'nb19': row[31], 'nb20': row[32]
                 }
-                solver_req_dict[row[1]] = row_dict  # company_name wird als Schlüssel des dict verwendet
 
-            self.solver_requirements = solver_req_dict
+            self.solver_requirements = row_dict
 
 
+    
     def pre_check_admin(self):
         """
         ---------------------------------------------------------------------------------------------------------------
