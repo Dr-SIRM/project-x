@@ -507,7 +507,7 @@ class ORAlgorithm:
         Definiere Strafkosten für weiche Nebenbedingungen
         """
 
-        # NB 2 - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend 
+        # NB 2 - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesendd
         self.penalty_cost_nb2 = 100
 
         # NB 3 - Max. Arbeitszeit pro Woche
