@@ -805,13 +805,15 @@ class ORAlgorithm:
         # -------------------------------------------------------------------------------------------------------
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
-                # Für die erste Stunde des Tages
-                self.solver.Add(self.y[i, j, 0] >= self.x[i, j, 0])
-                # Für die restlichen Stunden des Tages
-                for k in range(1, len(self.verfügbarkeit[i][j])):
-                    self.solver.Add(self.y[i, j, k] >= self.x[i, j, k] - self.x[i, j, k-1])
-                # Die Summe der y[i, j, k] für einen bestimmten Tag j sollte nicht größer als 1 sein
-                self.solver.Add(self.solver.Sum(self.y[i, j, k] for k in range(len(self.verfügbarkeit[i][j]))) <= 1)
+                # Überprüfen, ob der Betrieb an diesem Tag geöffnet ist
+                if self.opening_hours[j] > 0:
+                    # Für die erste Stunde des Tages
+                    self.solver.Add(self.y[i, j, 0] >= self.x[i, j, 0])
+                    # Für die restlichen Stunden des Tages
+                    for k in range(1, len(self.verfügbarkeit[i][j])):
+                        self.solver.Add(self.y[i, j, k] >= self.x[i, j, k] - self.x[i, j, k-1])
+                    # Die Summe der y[i, j, k] für einen bestimmten Tag j sollte nicht größer als 1 sein
+                    self.solver.Add(self.solver.Sum(self.y[i, j, k] for k in range(len(self.verfügbarkeit[i][j]))) <= 1)
         
 
         # -------------------------------------------------------------------------------------------------------
@@ -1082,7 +1084,9 @@ class ORAlgorithm:
                 row.extend(quarter_hours)
                 row.append(' ')  # Fügt eine leere Spalte nach jedem Tag hinzu
             ws.append(row)
-            ws.cell(row=idx, column=len(row) + 1, value=f"=SUM(B{idx}:{get_column_letter(len(row))}{idx})")
+            total_hours_col = len(headers)  # Wir verwenden die Anzahl der Überschriften, um die richtige Spalte zu erhalten
+            ws.cell(row=idx, column=total_hours_col, value=f"=SUM(B{idx}:{get_column_letter(total_hours_col-1)}{idx})")
+
 
 
         # Farben auf Basis der Zellenwerte festlegen und Schriftgröße für den Rest des Dokuments
