@@ -324,8 +324,12 @@ def get_availability():
     monday = today - datetime.timedelta(days=today.weekday())
     weekdays = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
     day_num = 7
-    week_adjustment = session.get('week_adjustment', 0)
     company_id = user.company_id
+
+    # Week with adjustments
+    monday = today - datetime.timedelta(days=today.weekday())
+    week_adjustment = int(request.args.get('week_adjustment', 0))
+    week_start = monday + datetime.timedelta(days=week_adjustment)
 
 
     temp_dict = {}
@@ -342,32 +346,12 @@ def get_availability():
             temp_dict[str(new_i) + '&4'] = temp.start_time3.strftime("%H:%M") if temp.start_time else None
             temp_dict[str(new_i) + '&5'] = temp.end_time3.strftime("%H:%M") if temp.end_time else None
 
-    """
-    if planning_form.prev_week.data:
-        week_adjustment -=7
-        session['week_adjustment'] = week_adjustment
-
-        monday = monday + datetime.timedelta(days=week_adjustment)
-
-        return render_template('planning.html', template_form=planning_form, monday=monday, weekdays=weekdays,
-                               day_num=day_num)
-
-    if planning_form.next_week.data:
-        week_adjustment +=7
-        session['week_adjustment'] = week_adjustment
-
-        monday = monday + datetime.timedelta(days=week_adjustment)
-
-        return render_template('planning.html', template_form=planning_form, monday=monday, weekdays=weekdays,
-                               day_num=day_num, temp_dict=temp_dict)
-    """
-
-
+    
     #Save Availability
     if request.method == 'POST':
         availability_data = request.get_json()
         for i in range(day_num):
-            new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+            new_date = week_start + datetime.timedelta(days=week_adjustment)
             Availability.query.filter_by(user_id=user.id, date=new_date).delete()
             db.session.commit()
 
@@ -491,6 +475,7 @@ def get_availability():
         'weekdays': weekdays,
         'day_num': day_num,
         'temp_dict': temp_dict,
+        'week_start': week_start,
     }
 
     return jsonify(availability_list)

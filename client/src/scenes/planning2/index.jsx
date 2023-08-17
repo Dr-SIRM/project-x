@@ -5,12 +5,8 @@ import { ThreeDots } from "react-loader-spinner";
 import axios from 'axios';
 
 // 24 hours * 4 slots/hour = 96 slots
-const slots = Array.from({ length: 96 }, (_, i) => ({
-  id: i,
-  time: `${String(Math.floor(i / 4)).padStart(2, '0')}:${String((i % 4) * 15).padStart(2, '0')}`,
-}));
 
-const Day = ({ day, dayIndex, slotCounts = {}, setSlotCounts, openingHour, closingHour, timereq }) => {
+const Day = ({ day, dayIndex, slotCounts = {}, setSlotCounts, openingHour, closingHour, timereq, slots}) => {
   const [selectedSlots, setSelectedSlots] = useState([]);
   const [employeeCount, setEmployeeCount] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -41,14 +37,18 @@ const Day = ({ day, dayIndex, slotCounts = {}, setSlotCounts, openingHour, closi
   let startSlotIndex = parseInt(startHour) * 4 + parseInt(startMinute) / 15;
   let endSlotIndex = parseInt(endHour) * 4 + parseInt(endMinute) / 15;
 
-  const filteredSlots = slots.filter((_, index) => index >= startSlotIndex && index < endSlotIndex);
+  const timesArray = Object.values(slots);
+  const filteredSlots = timesArray.map((time, index) => ({
+  id: index,
+  time,
+  })).filter(slot => slot.id >= startSlotIndex && slot.id < endSlotIndex);
 
   const requiredEmployeeCount = (slotId) => {
     const combinedIndex = dayIndex * 100 + slotId;
     return timereq[combinedIndex] || 0;
   };
 
-  const selectSlot = (filteredSlots, e) => {
+  const selectSlot = (slotId) => (e) => {
     if (e.type === 'mousedown') {
       setIsDragging(true);
     }
@@ -56,7 +56,7 @@ const Day = ({ day, dayIndex, slotCounts = {}, setSlotCounts, openingHour, closi
     if (isDragging || e.type === 'mouseup') {
       setSelectedSlots(prevSlots => {
         // Check if slot is already selected
-        if (prevSlots.includes(filteredSlots)) {
+        if (prevSlots.includes(slotId)) {
           // If it is, remove it from the array
           return prevSlots.filter(s => s !== filteredSlots);
         } else {
@@ -118,17 +118,17 @@ const Day = ({ day, dayIndex, slotCounts = {}, setSlotCounts, openingHour, closi
       </Button>
       <Box sx={{ overflowY: 'auto', maxHeight: '450px' }}>
       <ButtonGroup orientation="vertical" fullWidth>
-        {filteredSlots.map(filteredSlots => {
-          const isSelected = selectedSlots.includes(filteredSlots.id);
-          const isEntered = slotCounts[day] && slotCounts[day][filteredSlots.id];
-          const defaultCount = requiredEmployeeCount(filteredSlots.id);
+      {filteredSlots.map(slot => {
+        const isSelected = selectedSlots.includes(slot.id);
+        const isEntered = slotCounts[day] && slotCounts[day][slot.id];
+        const defaultCount = requiredEmployeeCount(slot.id);
           
 
           return (
             <Button 
-              onMouseDown={(e) => selectSlot(filteredSlots.id, e)}
-              onMouseUp={(e) => selectSlot(filteredSlots.id, e)}
-              onMouseOver={(e) => selectSlot(filteredSlots.id, e)}
+              onMouseDown={selectSlot(slot.id)}
+              onMouseUp={selectSlot(slot.id)}
+              onMouseOver={selectSlot(slot.id)}
               variant={(isEntered || defaultCount > 0) ? 'text' : (isSelected ? 'contained' : 'outlined')}
               color={(isEntered || defaultCount > 0) ? 'error' : (isSelected ? 'success' : 'inherit')}
               key={filteredSlots.id}
@@ -147,7 +147,7 @@ const Day = ({ day, dayIndex, slotCounts = {}, setSlotCounts, openingHour, closi
                 }
               }}
             >
-              {filteredSlots.time}
+              {slot.time}
               {isEntered && <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{slotCounts[day][filteredSlots.id]}</span>}
               {!isEntered && defaultCount > 0 && <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{defaultCount}</span>}
             </Button>
@@ -170,6 +170,7 @@ const Week = () => {
   const token = localStorage.getItem('session_token'); // Get the session token from local storage
   const [isLoading, setIsLoading] = useState(true);
   const [weekAdjustment, setWeekAdjustment] = useState(0);
+  const [slotsDict, setSlotsDict] = useState({});
   
 
   useEffect(() => {
@@ -185,6 +186,8 @@ const Week = () => {
           setIsLoading(false);
           const fetchedData = response.data;
 
+          console.log("Slot Dict:", fetchedData.slots_dict);
+
           if (fetchedData.weekdays) {
             setWeekDays(Object.values(fetchedData.weekdays));
           }
@@ -197,6 +200,8 @@ const Week = () => {
           }
           setOpeningHours(openingHours);
           setClosingHours(closingHours);
+
+          setSlotsDict(fetchedData.slots_dict);
 
         } catch (error) {
           console.error('Error fetching company details:', error);
@@ -216,11 +221,12 @@ const Week = () => {
   };
 
     const submit = async (values) => {
+      const slots = calendarData.slots_dict;
       const formattedCounts = Object.keys(slotCounts).reduce((formatted, day) => {
         const dayCounts = slotCounts[day];
         const formattedDayCounts = Object.keys(dayCounts).reduce((formattedDay, slotId) => {
           const dayIndex = weekDays.indexOf(day);
-          const formattedKey = `worker_${dayIndex}_${slots[slotId].time}`;
+          const formattedKey = `worker_${dayIndex}_${slots[slotId]}`;
           return {
             ...formattedDay,
             [formattedKey]: dayCounts[slotId],
@@ -323,6 +329,7 @@ const Week = () => {
             key={day} 
             slotCounts={slotCounts} 
             setSlotCounts={setSlotCounts}
+            slots={calendarData.daily_slots}
             openingHour={openingHours[index]}
             closingHour={closingHours[index]}
           />
