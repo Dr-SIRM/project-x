@@ -643,12 +643,19 @@ class ORAlgorithm:
         """
         diff_1 = self.max_time_week - self.weekly_hours
         print("Differenz max Time Week:", diff_1)
-        for i in self.mitarbeiter:
-            self.nb2_violation[i] = self.solver.NumVar(0, diff_1, f'nb2_violation[{i}]')
+
+        # verschachtelte Dictionary initialisieren
+        self.nb2_violation = {ma: {} for ma in self.mitarbeiter}
+        # Das verschachtelte Dictionary mit Verletzungsvariablen für jede Woche füllen
+        for ma in self.mitarbeiter:
+            for week in range(1, self.week_timeframe + 1):
+                self.nb2_violation[ma][week] = self.solver.NumVar(0, diff_1, f'nb2_violation[{ma}][{week}]')
+                print(self.nb2_violation[ma][week])
+
 
 
         # NB3 Mindestarbeitszeit Verletzungsvariable
-        diff_2 = self.desired_min_time_day - self.min_time_day
+        diff_2 = self.desired_min_time_day - self.min_time_day    
         print("Differenz min Time day:", diff_2)
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
@@ -695,7 +702,9 @@ class ORAlgorithm:
 
         # Kosten Weiche NB2
         for i in self.mitarbeiter:
-            self.objective.SetCoefficient(self.nb2_violation[i], self.penalty_cost_nb2)
+            for week in range(1, self.week_timeframe + 1):
+                self.objective.SetCoefficient(self.nb2_violation[i][week], self.penalty_cost_nb2)
+
 
         # Kosten für Weiche NB3 Mindestarbeitszeit Verletzung
         for i in self.mitarbeiter:
@@ -785,12 +794,30 @@ class ORAlgorithm:
         # NB 3 - Max. Arbeitszeit pro Woche
         # ***** Weiche Nebenbedingung 2 *****
         # -------------------------------------------------------------------------------------------------------
-        total_hours = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
-        for ma in self.mitarbeiter:
-            self.solver.Add(total_hours[ma] - self.weekly_hours <= self.nb2_violation[ma]) 
+        if self.week_timeframe == 1:
+            total_hours = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
+            for ma in self.mitarbeiter:
+                self.solver.Add(total_hours[ma] - self.weekly_hours <= self.nb2_violation[ma][1])
+                
+        elif self.week_timeframe == 2:
+            total_hours_week1 = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time // 2) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
+            total_hours_week2 = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time // 2, self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
+            for ma in self.mitarbeiter:
+                self.solver.Add(total_hours_week1[ma] - self.weekly_hours <= self.nb2_violation[ma][1])
+                self.solver.Add(total_hours_week2[ma] - self.weekly_hours <= self.nb2_violation[ma][2])
+                
+        elif self.week_timeframe == 4:
+            total_hours_week1 = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time // 4) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
+            total_hours_week2 = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time // 4, self.calc_time // 2) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
+            total_hours_week3 = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(self.calc_time // 2, 3 * self.calc_time // 4) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
+            total_hours_week4 = {ma: self.solver.Sum([self.x[ma, j, k] for j in range(3 * self.calc_time // 4, self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
+            
+            for ma in self.mitarbeiter:
+                self.solver.Add(total_hours_week1[ma] - self.weekly_hours <= self.nb2_violation[ma][1])
+                self.solver.Add(total_hours_week2[ma] - self.weekly_hours <= self.nb2_violation[ma][2])
+                self.solver.Add(total_hours_week3[ma] - self.weekly_hours <= self.nb2_violation[ma][3])
+                self.solver.Add(total_hours_week4[ma] - self.weekly_hours <= self.nb2_violation[ma][4])
 
-        
-    
      
         """
         # HARTE NB
@@ -1028,7 +1055,7 @@ class ORAlgorithm:
 
         # Strafen für die Verletzung der weichen Nebenbedingungen
         nb1_penalty_costs = sum(self.penalty_cost_nb1 * self.nb1_violation[j, k].solution_value() for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])))
-        nb2_penalty_costs = sum(self.penalty_cost_nb2 * self.nb2_violation[i].solution_value() for i in self.mitarbeiter)
+        nb2_penalty_costs = sum(self.penalty_cost_nb2 * self.nb2_violation[i][week].solution_value() for i in self.mitarbeiter for week in range(1, self.week_timeframe + 1))
         nb3_min_penalty_costs = sum(self.penalty_cost_nb3_min * self.nb3_min_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
         nb4_max_penalty_costs = sum(self.penalty_cost_nb4_max * self.nb4_max_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
         nb5_min_penalty_costs = sum(self.penalty_cost_nb5_min * self.nb5_min_violation[i].solution_value() for i in self.mitarbeiter)
