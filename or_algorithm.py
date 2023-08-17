@@ -1126,6 +1126,14 @@ class ORAlgorithm:
                     # Wir gehen davon aus, dass der erste Tag im 'self.user_availability' das Startdatum ist
                     date = self.user_availability[user_id][0][0] + datetime.timedelta(days=day_index)
                     print("DATE: ", date)
+
+                    # Löschen der jeweiligen Tage
+                    """
+                
+                    Timetable.query.filter_by(company_name=user.company_name, date=date).delete()
+                    db.session.commit()
+                    """
+
                     # Hier unterteilen wir den Tag in Schichten, basierend auf den Zeiten, zu denen der Mitarbeiter arbeitet
                     shifts = []
                     start_time_index = None
