@@ -653,7 +653,6 @@ class ORAlgorithm:
                 print(self.nb2_violation[ma][week])
 
 
-
         # NB3 Mindestarbeitszeit Verletzungsvariable
         diff_2 = self.desired_min_time_day - self.min_time_day    
         print("Differenz min Time day:", diff_2)
