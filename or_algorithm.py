@@ -1233,11 +1233,9 @@ class ORAlgorithm:
                     print("DATE: ", date)
 
                     # Löschen der jeweiligen Tage
-                    """
-                
-                    Timetable.query.filter_by(company_name=user.company_name, date=date).delete()
+                    Timetable.query.filter_by(email=user.email, date=date).delete()
                     db.session.commit()
-                    """
+                    
 
                     # Hier unterteilen wir den Tag in Schichten, basierend auf den Zeiten, zu denen der Mitarbeiter arbeitet
                     shifts = []
