@@ -667,7 +667,7 @@ class ORAlgorithm:
             for j in range(self.calc_time):
                 self.nb4_max_violation[i, j] = self.solver.NumVar(0, diff_3, 'nb4_max_violation[%i,%i]' % (i, j))
 
-
+        """
         # NB5 Mindestarbeitszeit Verletzungsvariable
         for i in self.mitarbeiter:
             self.nb5_min_violation[i] = self.solver.NumVar(0, self.solver.infinity(), f'nb5_min_violation[{i}]')
@@ -675,6 +675,17 @@ class ORAlgorithm:
         # NB6 Höchstarbeitszeit Verletzungsvariable
         for i in self.mitarbeiter:
             self.nb6_max_violation[i] = self.solver.NumVar(0, self.solver.infinity(), f'nb6_max_violation[{i}]')
+        """
+
+        # NB5 Mindestarbeitszeit Verletzungsvariable
+        for i in self.mitarbeiter:
+            self.nb5_min_violation[i] = [self.solver.NumVar(0, self.solver.infinity(), f'nb5_min_violation[{i}][{week}]') for week in range(1, self.week_timeframe + 1)]
+
+        # NB6 Höchstarbeitszeit Verletzungsvariable
+        for i in self.mitarbeiter:
+            self.nb6_max_violation[i] = [self.solver.NumVar(0, self.solver.infinity(), f'nb6_max_violation[{i}][{week}]') for week in range(1, self.week_timeframe + 1)]
+
+
 
 
         # NB7 Innerhalb einer Woche die gleiche Schicht - Verletzungsvariable
@@ -715,6 +726,7 @@ class ORAlgorithm:
             for j in range(self.calc_time):
                 self.objective.SetCoefficient(self.nb4_max_violation[i, j], self.penalty_cost_nb4_max)
 
+        """
         # Kosten für Weiche NB5 Mindestarbeitszeit Verletzung
         for i in self.mitarbeiter:
             self.objective.SetCoefficient(self.nb5_min_violation[i], self.penalty_cost_nb5_min)
@@ -722,6 +734,21 @@ class ORAlgorithm:
         # Kosten für Weiche NB6 Höchstarbeitszeit Verletzung
         for i in self.mitarbeiter:
             self.objective.SetCoefficient(self.nb6_max_violation[i], self.penalty_cost_nb6_max)
+        """
+
+        # Kosten für Weiche NB5 Mindestarbeitszeit Verletzung
+        for i in self.mitarbeiter:
+            for week in range(1, self.week_timeframe + 1):
+                self.objective.SetCoefficient(self.nb5_min_violation[i][week-1], self.penalty_cost_nb5_min)
+
+        # Kosten für Weiche NB6 Höchstarbeitszeit Verletzung
+        for i in self.mitarbeiter:
+            for week in range(1, self.week_timeframe + 1):
+                self.objective.SetCoefficient(self.nb6_max_violation[i][week-1], self.penalty_cost_nb6_max)
+
+
+
+
 
         # Kosten für Weiche NB7 "Innerhalb einer Woche immer gleiche Schichten"
         for i in self.mitarbeiter:
@@ -901,6 +928,7 @@ class ORAlgorithm:
         # NB 7 - "Perm" Mitarbeiter zu employement_level fest einplanen
         # ***** Weiche Nebenbedingung 5 und 6 *****
         # -------------------------------------------------------------------------------------------------------
+        """
         total_hours = {ma: self.solver.Sum(self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))) for ma in self.mitarbeiter}
         for i, ma in enumerate(self.mitarbeiter):
             if self.employment[i] == "Perm": 
@@ -911,6 +939,27 @@ class ORAlgorithm:
                 # Prüfen, ob die Gesamtstunden größer als die vorgegebenen Arbeitsstunden sind (Überschreitung)
                 self.solver.Add(self.weekly_hours - total_hours[ma] <= -self.nb6_max_violation[ma])
                 self.solver.Add(self.nb6_max_violation[ma] >= 0)
+        """
+
+        for i, ma in enumerate(self.mitarbeiter):
+            if self.employment[i] == "Perm":
+                for week in range(1, self.week_timeframe + 1):
+                    week_start = (week - 1) * (self.calc_time // self.week_timeframe)
+                    week_end = week * (self.calc_time // self.week_timeframe)
+                    print(f'Week start for employee {ma} in week {week}: {week_start}')
+                    print(f'Week end for employee {ma} in week {week}: {week_end}')
+
+                    total_hours_week = self.solver.Sum(self.x[ma, j, k] for j in range(week_start, week_end) for k in range(len(self.verfügbarkeit[ma][j])))
+                    print(f'Total hours for employee {ma} in week {week}: {total_hours_week}')
+
+                    # Prüfen, ob die Gesamtstunden kleiner als die vorgegebenen Arbeitsstunden sind (Unterschreitung)
+                    self.solver.Add(total_hours_week - self.weekly_hours <= self.nb5_min_violation[ma][week - 1])
+                    self.solver.Add(self.nb5_min_violation[ma][week - 1] >= 0)
+
+                    # Prüfen, ob die Gesamtstunden größer als die vorgegebenen Arbeitsstunden sind (Überschreitung)
+                    self.solver.Add(self.weekly_hours - total_hours_week <= -self.nb6_max_violation[ma][week - 1])
+                    self.solver.Add(self.nb6_max_violation[ma][week - 1] >= 0)
+
 
 
         
@@ -1038,7 +1087,7 @@ class ORAlgorithm:
         """
         Problem lösen und Kosten ausgeben
         """
-        self.solver.EnableOutput()
+        self.solver.EnableOutput(False)
         self.status = self.solver.Solve()
 
         """
@@ -1057,8 +1106,12 @@ class ORAlgorithm:
         nb2_penalty_costs = sum(self.penalty_cost_nb2 * self.nb2_violation[i][week].solution_value() for i in self.mitarbeiter for week in range(1, self.week_timeframe + 1))
         nb3_min_penalty_costs = sum(self.penalty_cost_nb3_min * self.nb3_min_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
         nb4_max_penalty_costs = sum(self.penalty_cost_nb4_max * self.nb4_max_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
-        nb5_min_penalty_costs = sum(self.penalty_cost_nb5_min * self.nb5_min_violation[i].solution_value() for i in self.mitarbeiter)
-        nb6_max_penalty_costs = sum(self.penalty_cost_nb6_max * self.nb6_max_violation[i].solution_value() for i in self.mitarbeiter)
+
+        # nb5_min_penalty_costs = sum(self.penalty_cost_nb5_min * self.nb5_min_violation[i].solution_value() for i in self.mitarbeiter)
+        # nb6_max_penalty_costs = sum(self.penalty_cost_nb6_max * self.nb6_max_violation[i].solution_value() for i in self.mitarbeiter)
+        nb5_min_penalty_costs = sum(self.penalty_cost_nb5_min * self.nb5_min_violation[i][week - 1].solution_value() for i in self.mitarbeiter for week in range(1, self.week_timeframe + 1))
+        nb6_max_penalty_costs = sum(self.penalty_cost_nb6_max * self.nb6_max_violation[i][week - 1].solution_value() for i in self.mitarbeiter for week in range(1, self.week_timeframe + 1))
+
         nb7_penalty_costs = sum(self.penalty_cost_nb7 * self.nb7_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
 
 
