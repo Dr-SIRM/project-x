@@ -207,23 +207,8 @@ class ORAlgorithm:
         if key in self.solver_requirements:
             self.max_time_week = self.solver_requirements[key]
 
-        self.max_time_week = self.max_time_week * 4                  # Diese 4 neu dann variabel machen
-        self.weekly_hours = self.weekly_hours * 4                    # Diese 4 neu dann variabel machen
-
-
-
-
-
-        # DAS HIER MACHT NICHT WIRKLICH SINN! DA MUSS EINE LÖSUNG HER
-        self.max_time_week = self.max_time_week * self.week_timeframe  # Wenn 2 oder 4 Wochen
-        self.weekly_hours = self.weekly_hours * self.week_timeframe    # Wenn 2 oder 4 Wochen
-
-
-
-
-
-
-
+        self.max_time_week = self.max_time_week * 4                  # Diese 4 neu dann variabel machen (für 1/4h)
+        self.weekly_hours = self.weekly_hours * 4                    # Diese 4 neu dann variabel machen (für 1/4h)
 
         # -- 7 ------------------------------------------------------------------------------------------------------------
         # Berechnung der calc_time (Anzahl Tage an denen die MA eingeteilt werden)
@@ -273,8 +258,8 @@ class ORAlgorithm:
         # Eine Liste mit den Stunden wie sie gerecht verteilt werden
         list_gesamtstunden = []
         for i in range(len(self.mitarbeiter)):
-            if self.gesamtstunden_verfügbarkeit[i] > self.weekly_hours:
-                arbeitsstunden_MA = self.employment_lvl_exact[i] * self.weekly_hours
+            if self.gesamtstunden_verfügbarkeit[i] > self.weekly_hours * self.week_timeframe:
+                arbeitsstunden_MA = self.employment_lvl_exact[i] * self.weekly_hours * self.week_timeframe
             else:
                 arbeitsstunden_MA = self.employment_lvl_exact[i] * self.gesamtstunden_verfügbarkeit[i]
             list_gesamtstunden.append(int(arbeitsstunden_MA))
@@ -287,7 +272,7 @@ class ORAlgorithm:
         print("1. self.gerechte_verteilung: ", self.gerechte_verteilung)
         for i in range(len(self.mitarbeiter)):
             if self.employment[i] == "Perm":
-                allocated_hours = self.employment_lvl_exact[i] * self.weekly_hours
+                allocated_hours = self.employment_lvl_exact[i] * self.weekly_hours * self.week_timeframe
                 total_hours_assigned += allocated_hours
                 self.gerechte_verteilung[i] = round(allocated_hours + 0.5)
             else:
@@ -357,6 +342,7 @@ class ORAlgorithm:
         print("4. self.max_zeit: ", self.max_zeit)
         print("5. self.min_zeit: ", self.min_zeit)
         print("6. self.max_time_week: ", self.max_time_week)
+        print("6.1. self.weekly_hours: ", self.weekly_hours)
         print("7. self.calc_time: ", self.calc_time)
         print("8. self.empolyment_lvl_exact: ", self.employment_lvl_exact)
         print("9. self.employment: ", self.employment)
@@ -667,6 +653,7 @@ class ORAlgorithm:
             for j in range(self.calc_time):
                 self.nb4_max_violation[i, j] = self.solver.NumVar(0, diff_3, 'nb4_max_violation[%i,%i]' % (i, j))
 
+
         """
         # NB5 Mindestarbeitszeit Verletzungsvariable
         for i in self.mitarbeiter:
@@ -679,13 +666,14 @@ class ORAlgorithm:
 
         # NB5 Mindestarbeitszeit Verletzungsvariable
         for i in self.mitarbeiter:
-            self.nb5_min_violation[i] = [self.solver.NumVar(0, self.solver.infinity(), f'nb5_min_violation[{i}][{week}]') for week in range(1, self.week_timeframe + 1)]
+            self.nb5_min_violation[i] = [self.solver.NumVar(0, self.solver.infinity(), f'nb5_min_violation[{i}][{week}]') for week in range(1, self.week_timeframe + 1)] 
+            # Printen zum überprüfen
+            for week in range(1, self.week_timeframe + 1):
+                print(f'nb5_min_violation[{i}][{week}] = {self.nb5_min_violation[i][week - 1]}')
 
         # NB6 Höchstarbeitszeit Verletzungsvariable
         for i in self.mitarbeiter:
             self.nb6_max_violation[i] = [self.solver.NumVar(0, self.solver.infinity(), f'nb6_max_violation[{i}][{week}]') for week in range(1, self.week_timeframe + 1)]
-
-
 
 
         # NB7 Innerhalb einer Woche die gleiche Schicht - Verletzungsvariable
@@ -739,15 +727,12 @@ class ORAlgorithm:
         # Kosten für Weiche NB5 Mindestarbeitszeit Verletzung
         for i in self.mitarbeiter:
             for week in range(1, self.week_timeframe + 1):
-                self.objective.SetCoefficient(self.nb5_min_violation[i][week-1], self.penalty_cost_nb5_min)
+                self.objective.SetCoefficient(self.nb5_min_violation[i][week-1], self.penalty_cost_nb5_min) # Der 0te Wert der Liste, in welchem [week = 1] ist
 
         # Kosten für Weiche NB6 Höchstarbeitszeit Verletzung
         for i in self.mitarbeiter:
             for week in range(1, self.week_timeframe + 1):
                 self.objective.SetCoefficient(self.nb6_max_violation[i][week-1], self.penalty_cost_nb6_max)
-
-
-
 
 
         # Kosten für Weiche NB7 "Innerhalb einer Woche immer gleiche Schichten"
@@ -929,6 +914,7 @@ class ORAlgorithm:
         # ***** Weiche Nebenbedingung 5 und 6 *****
         # -------------------------------------------------------------------------------------------------------
         """
+        Alte NB ohne die Wochenrücksicht:
         total_hours = {ma: self.solver.Sum(self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))) for ma in self.mitarbeiter}
         for i, ma in enumerate(self.mitarbeiter):
             if self.employment[i] == "Perm": 
@@ -940,7 +926,6 @@ class ORAlgorithm:
                 self.solver.Add(self.weekly_hours - total_hours[ma] <= -self.nb6_max_violation[ma])
                 self.solver.Add(self.nb6_max_violation[ma] >= 0)
         """
-
         for i, ma in enumerate(self.mitarbeiter):
             if self.employment[i] == "Perm":
                 for week in range(1, self.week_timeframe + 1):
@@ -961,9 +946,6 @@ class ORAlgorithm:
                     self.solver.Add(self.nb6_max_violation[ma][week - 1] >= 0)
 
 
-
-        
-        # self.company_shifts  <-- Anzahl Schichten der Company!
         # -------------------------------------------------------------------------------------------------------
         # WEICHE NB
         # NB 8 - Innerhalb einer Woche immer gleiche Schichten
@@ -1087,7 +1069,7 @@ class ORAlgorithm:
         """
         Problem lösen und Kosten ausgeben
         """
-        self.solver.EnableOutput(False)
+        self.solver.EnableOutput()
         self.status = self.solver.Solve()
 
         """
@@ -1097,6 +1079,7 @@ class ORAlgorithm:
                 # Drucken Sie den Wert von s3[i, j]
                 print(f"s3[{i}][{j}] =", self.s3[i, j].solution_value())
         """
+
 
         # Kosten für die Einstellung von Mitarbeitern
         hiring_costs = sum(self.kosten[i] * self.x[i, j, k].solution_value() for i in self.mitarbeiter for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[i][j])))
