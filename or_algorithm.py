@@ -957,7 +957,7 @@ class ORAlgorithm:
 
         elif self.company_shifts == 2:
             for i in self.mitarbeiter:
-                for j in range(self.calc_time):
+                for j in range(self.calc_time): # (7 * self.week_timeframe)
 
                     # Hier noch einbauen, das wenn die Stundenanzahl ungerade ist!!
 
@@ -1098,7 +1098,7 @@ class ORAlgorithm:
         nb7_penalty_costs = sum(self.penalty_cost_nb7 * self.nb7_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
 
 
-        # Drucken Sie die Kosten
+        # Kosten der einzelnen NBs ausgeben
         print('Kosten Einstellung von Mitarbeitern:', hiring_costs)
         print('Kosten Weiche NB1 (Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend):', nb1_penalty_costs)
         print('Kosten Weiche NB2 (Max. Arbeitszeit pro Woche "Temp" MA):', nb2_penalty_costs)
