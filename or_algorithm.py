@@ -603,7 +603,7 @@ class ORAlgorithm:
         # Gleiche Schichten innerhalb 2 und 4 Wochen  -- IN BEARBEITUNG 10.08.23 --
         self.c = {}
         for i in self.mitarbeiter:
-            for j in range(self.week_timeframe):  # Von Tag 1 an, da es keinen Vortag für Tag 0 gibt
+            for j in range(self.week_timeframe): # Woche 
                 self.c[i, j] = self.solver.BoolVar(f'c[{i}, {j}]')
 
 
@@ -1030,7 +1030,6 @@ class ORAlgorithm:
                 for j in range(1, self.calc_time):
                     self.solver.Add(self.s3[i, j] - self.s3[i, j-1] == 0)
             """
-
             
             # Bedingungen, um sicherzustellen, dass innerhalb einer Woche immer die gleiche Schicht gearbeitet wird
             for i in self.mitarbeiter:
@@ -1045,23 +1044,26 @@ class ORAlgorithm:
                     self.solver.Add(self.nb7_violation[i, j] >= -diff)
                     self.solver.Add(self.nb7_violation[i, j] <= 1)  # Die Verletzung sollte maximal 1 betragen
             
+
         # -------------------------------------------------------------------------------------------------------
         # WEICHE NB
         # NB 9 - Wechselnde Schichten innerhalb von 2 und 4 Wochen
         # ***** Weiche Nebenbedingung 8 *****
         # -------------------------------------------------------------------------------------------------------
-        """
-        for i in self.mitarbeiter:
-            for j in range(1, self.calc_time):  # Von Tag 1 an, da es keinen Vortag für Tag 0 gibt
-                week_number = j // 7
-                # Wenn wir in eine neue Woche wechseln, setzen Sie c[i, j] auf den Wert von s[i, j - 1]
-                if j % 7 == 0:
-                    self.solver.Add(self.c[i, j] == self.s[i, j - 1])
+        if self.week_timeframe > 1:
+            if self.company_shifts == 2:
+                for i in self.mitarbeiter:
+                    for j in range(0, self.calc_time, 7):
+                        if j + 7 < self.calc_time:  # Überprüfen, ob es eine nächste Woche gibt
+                            self.solver.Add(self.s2[i, j] - self.s2[i, j + 7] <= -1)
+                            self.solver.Add(self.s2[i, j] - self.s2[i, j + 7] >= 1)
 
-                # Wenn wir uns in einer ungeraden Woche befinden, muss die Schicht anders sein als in der vorherigen Woche
-                if week_number % 2 != 0:
-                    self.solver.Add(self.s[i, j] != self.c[i, j])
-        """
+            elif self.company_shifts == 3:
+                for i in self.mitarbeiter:
+                    for j in range(0, self.calc_time, 7):
+                        if j + 7 < self.calc_time:  # Überprüfen, ob es eine nächste Woche gibt
+                            self.solver.Add(self.s3[i, j] - self.s3[i, j + 7] <= -1)
+                            self.solver.Add(self.s3[i, j] - self.s3[i, j + 7] >= 1)
 
 
 
@@ -1072,13 +1074,13 @@ class ORAlgorithm:
         self.solver.EnableOutput()
         self.status = self.solver.Solve()
 
-        """
-        # Die Werte von s3 printen
+        
+        # Die Werte von s2 printen
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 # Drucken Sie den Wert von s3[i, j]
-                print(f"s3[{i}][{j}] =", self.s3[i, j].solution_value())
-        """
+                print(f"s2[{i}][{j}] =", self.s2[i, j].solution_value())
+        
 
 
         # Kosten für die Einstellung von Mitarbeitern
