@@ -588,24 +588,22 @@ class ORAlgorithm:
             for j in range(self.calc_time):  # Für jeden Tag der Woche
                 self.a[i, j] = self.solver.BoolVar(f'a[{i}, {j}]') # Variablen können nur die Werte 0 oder 1 annehmen
 
-        # Schichtvariable (2-Schicht) 
+        # Schichtvariable Woche (2-Schicht) 
         self.s2 = {}
         for i in self.mitarbeiter:
             for j in range(self.calc_time):  # Für jeden Tag der Woche
                 self.s2[i, j] = self.solver.IntVar(0, 1, f's2[{i}, {j}]') # Variabeln können nur die Werte 0 oder 1 annehmen
 
-        # Schichtvariable (3-Schicht) 
+        # Schichtvariable Woche  (3-Schicht) 
         self.s3 = {}
         for i in self.mitarbeiter:
             for j in range(self.calc_time):  # Für jeden Tag der Woche
                 self.s3[i, j] = self.solver.IntVar(0, 2, f's3[{i}, {j}]') # Variabeln können nur die Werte 0, 1 oder 2 annehmen
 
-
-
-        # Gleiche Schichten -- IN BEARBEITUNG 10.08.23 --
+        # Gleiche Schichten innerhalb 2 und 4 Wochen  -- IN BEARBEITUNG 10.08.23 --
         self.c = {}
         for i in self.mitarbeiter:
-            for j in range(1, self.calc_time):  # Von Tag 1 an, da es keinen Vortag für Tag 0 gibt
+            for j in range(self.week_timeframe):  # Von Tag 1 an, da es keinen Vortag für Tag 0 gibt
                 self.c[i, j] = self.solver.BoolVar(f'c[{i}, {j}]')
 
 
@@ -1047,10 +1045,12 @@ class ORAlgorithm:
                     self.solver.Add(self.nb7_violation[i, j] >= -diff)
                     self.solver.Add(self.nb7_violation[i, j] <= 1)  # Die Verletzung sollte maximal 1 betragen
             
-
+        # -------------------------------------------------------------------------------------------------------
+        # WEICHE NB
+        # NB 9 - Wechselnde Schichten innerhalb von 2 und 4 Wochen
+        # ***** Weiche Nebenbedingung 8 *****
+        # -------------------------------------------------------------------------------------------------------
         """
-        # HARTE NB
-        # NB 9 - Wechselnde Schichten innerhalb von 2 Wochen
         for i in self.mitarbeiter:
             for j in range(1, self.calc_time):  # Von Tag 1 an, da es keinen Vortag für Tag 0 gibt
                 week_number = j // 7
