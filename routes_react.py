@@ -87,6 +87,20 @@ def current_react_user():
 
     return jsonify(user_dict)
 
+@app.route('/api/current_react_user')
+def get_general_data():
+    react_user = get_jwt_identity()
+    user = User.query.filter_by(email=react_user).first()
+    company = Company.query.filter_by(company_name=user.company_name).first()
+    timereq = TimeReq.query.filter_by(company_name=user.company_name).first()
+
+    general_dict = {
+        'id': user.id,
+        'hour_divider': timereq.hour_devider,
+    }
+
+    return jsonify(general_dict)
+
 @app.route('/api/users')
 @jwt_required()
 def get_data():
@@ -334,7 +348,8 @@ def get_availability():
 
     temp_dict = {}
     for i in range(day_num):
-        temp = Availability.query.filter_by(email=user.email, weekday=weekdays[i]).first()
+        new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+        temp = Availability.query.filter_by(email=user.email, date=new_date, weekday=weekdays[i]).first()
         if temp is None:
             pass
         else:
@@ -351,7 +366,7 @@ def get_availability():
     if request.method == 'POST':
         availability_data = request.get_json()
         for i in range(day_num):
-            new_date = week_start + datetime.timedelta(days=week_adjustment)
+            new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
             Availability.query.filter_by(user_id=user.id, date=new_date).delete()
             db.session.commit()
 
@@ -898,8 +913,6 @@ def get_required_workforce():
         formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
         slot_dict[i] = formatted_time
 
-    print(slot_dict)   
-
     timereq_dict = {}
     for i in range(day_num):
         for hour in range(daily_slots):
@@ -977,7 +990,7 @@ def get_required_workforce():
     calendar_dict={
         'weekdays': weekdays,
         'opening_dict': opening_dict,
-        'slots_dict': slot_dict,
+        #'slots_dict': slot_dict,
         'day_num': day_num,
         'timereq_dict': timereq_dict,
         'week_start': week_start,
