@@ -961,49 +961,43 @@ class ORAlgorithm:
             pass
 
         # Neu 18.08.23
-        if self.company_shifts == 2:
+        elif self.company_shifts == 2:
             for i in self.mitarbeiter:
-                for j in range(7):  # Für die ersten sieben Tage
-                    first_shift_hours = self.solver.Sum(self.x[i, j, k] for k in range(0, int(len(self.verfügbarkeit[i][j]) / 2)))  # Stunden in der ersten Schicht
-                    second_shift_hours = self.solver.Sum(self.x[i, j, k] for k in range(int(len(self.verfügbarkeit[i][j]) / 2), len(self.verfügbarkeit[i][j])))  # Stunden in der zweiten Schicht
+                for j in range(7): # (7 * self.week_timeframe)
 
+                    # Hier noch einbauen, das wenn die Stundenanzahl ungerade ist!!
+
+                    first_shift_hours = self.solver.Sum(self.x[i, j, k] for k in range(0, int(len(self.verfügbarkeit[i][j]) / 2))) # Stunden in der ersten Schicht
+                    second_shift_hours = self.solver.Sum(self.x[i, j, k] for k in range(int(len(self.verfügbarkeit[i][j]) / 2), len(self.verfügbarkeit[i][j]))) # Stunden in der zweiten Schicht
+                    
                     # Kann 0 oder 1 annehmen
                     delta = self.solver.BoolVar("delta")
-
+                    
                     self.solver.Add(first_shift_hours - second_shift_hours - 1000 * delta <= 0)
                     self.solver.Add(second_shift_hours - first_shift_hours - 1000 * (1 - delta) <= 0)
-
+                    
                     # Hilfsvariable mit s2[i, j] verknüpfen
                     self.solver.Add(self.s2[i, j] == 1 - delta)
 
+            """
+            # Harte nb Option zum testen
             for i in self.mitarbeiter:
-                for j in range(7, self.calc_time):  # Ab dem 8. Tag
-                    self.solver.Add(self.s2[i, j] == 1 - self.s2[i, j-7])
+                for j in range(1, self.calc_time):
+                    self.solver.Add(self.s2[i, j] - self.s2[i, j-1] == 0)
+            """ 
 
             # Bedingungen, um sicherzustellen, dass innerhalb einer Woche immer die gleiche Schicht gearbeitet wird
             for i in self.mitarbeiter:
-                for j in range(1, self.calc_time):
+                for j in range(1, 7):
                     diff = self.solver.IntVar(-1, 1, "diff")
-
+                    
                     # Setzen Sie diff gleich der Differenz
                     self.solver.Add(diff == self.s2[i, j] - self.s2[i, j-1])
-
+         
                     # Bedingungen für den "absoluten Wert"
                     self.solver.Add(self.nb7_violation[i, j] >= diff)
                     self.solver.Add(self.nb7_violation[i, j] >= -diff)
 
-            # Anforderung, dass Mitarbeiter, die in der ersten Woche mehr Frühschichten als Spätschichten hatten, in der folgenden Woche in der Spätschicht arbeiten sollten, und umgekehrt
-            for i in self.mitarbeiter:
-                for j in range(0, self.calc_time - 7, 7):  # Schichtwechsel alle 7 Tage
-                    # Bestimmen Sie, ob ein Mitarbeiter in der ersten Woche mehr Frühschichten oder Spätschichten hatte
-                    prev_week_s2_sum = self.solver.Sum(self.s2[i, k] for k in range(j, j+7))
-                    # Fügen Sie die Bedingung hinzu, dass die Schicht in der folgenden Woche umgekehrt werden sollte
-                    big_m = 1000
-                    self.solver.Add(self.s2[i, j+7] >= prev_week_s2_sum - 3 - big_m*(1 - self.c_next[i, j]))
-                    self.solver.Add(self.s2[i, j+7] <= 3 + big_m*self.c_next[i, j])
-                    self.solver.Add(prev_week_s2_sum >= 4 - big_m*self.c_next[i, j])
-                    self.solver.Add(prev_week_s2_sum <= 3 + big_m*(1 - self.c_next[i, j]))
-            
 
 
         elif self.company_shifts == 3:
