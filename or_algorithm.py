@@ -961,7 +961,7 @@ class ORAlgorithm:
             pass
 
         # Neu 18.08.23
-        elif self.company_shifts == 2:
+        if self.company_shifts == 2:
             for i in self.mitarbeiter:
                 for j in range(7):  # Für die ersten sieben Tage
                     first_shift_hours = self.solver.Sum(self.x[i, j, k] for k in range(0, int(len(self.verfügbarkeit[i][j]) / 2)))  # Stunden in der ersten Schicht
@@ -991,6 +991,18 @@ class ORAlgorithm:
                     # Bedingungen für den "absoluten Wert"
                     self.solver.Add(self.nb7_violation[i, j] >= diff)
                     self.solver.Add(self.nb7_violation[i, j] >= -diff)
+
+            # Anforderung, dass Mitarbeiter, die in der ersten Woche mehr Frühschichten als Spätschichten hatten, in der folgenden Woche in der Spätschicht arbeiten sollten, und umgekehrt
+            for i in self.mitarbeiter:
+                for j in range(0, self.calc_time - 7, 7):  # Schichtwechsel alle 7 Tage
+                    # Bestimmen Sie, ob ein Mitarbeiter in der ersten Woche mehr Frühschichten oder Spätschichten hatte
+                    prev_week_s2_sum = self.solver.Sum(self.s2[i, k] for k in range(j, j+7))
+                    # Fügen Sie die Bedingung hinzu, dass die Schicht in der folgenden Woche umgekehrt werden sollte
+                    big_m = 1000
+                    self.solver.Add(self.s2[i, j+7] >= prev_week_s2_sum - 3 - big_m*(1 - self.c_next[i, j]))
+                    self.solver.Add(self.s2[i, j+7] <= 3 + big_m*self.c_next[i, j])
+                    self.solver.Add(prev_week_s2_sum >= 4 - big_m*self.c_next[i, j])
+                    self.solver.Add(prev_week_s2_sum <= 3 + big_m*(1 - self.c_next[i, j]))
             
 
 
@@ -1053,6 +1065,7 @@ class ORAlgorithm:
         # NB 9 - Wechselnde Schichten innerhalb von 2 und 4 Wochen
         # ***** Weiche Nebenbedingung 8 *****
         # -------------------------------------------------------------------------------------------------------
+        """
         if self.company_shifts == 2:
             for i in self.mitarbeiter:
                 for j in range(0, self.week_timeframe - 1):
@@ -1068,7 +1081,7 @@ class ORAlgorithm:
 
                     for d in range(7):
                         self.solver.Add(self.s3[i, 7 * (j + 1) + d] == self.c_next[i, j])
-
+        """
 
 
 
