@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTheme, Box, Button, TextField, Snackbar, Typography, ButtonGroup, IconButton } from "@mui/material";
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { Formik } from "formik";
@@ -9,18 +9,70 @@ import { tokens } from "../../theme";
 import { ThreeDots } from "react-loader-spinner"; 
 import axios from 'axios';
 
+const LOADER_BOX_STYLE = {
+  m: "20px",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  height: "100vh"
+};
+
+const BUTTON_STYLE = {
+  borderColor: "white",
+  "&.MuiButton-outlined": {
+    borderColor: "white",
+  },
+  "&:hover": {
+    borderColor: "white",
+  },
+  "&.MuiButton-text": {
+    borderColor: "white",
+    color: "white",
+    backgroundColor: "#2e7c67",
+  },
+};
+
 const TimeReq = ({ timereq }) => {
-    const theme = useTheme();
+  const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [timereqData, setTimeReqData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [openingHours, setOpeningHours] = useState([]);
+  const [closingHours, setClosingHours] = useState([]);
   const [weekAdjustment, setWeekAdjustment] = useState(0);
   const token = localStorage.getItem('session_token'); 
+  const [employeeCount, setEmployeeCount] = useState(0);
+  const [selectedButtons, setSelectedButtons] = useState([]);
+  const [isDragging, setIsDragging] = useState(false);
 
-    useEffect(() => {
+  useEffect(() => {
+    const endDrag = () => setIsDragging(false);
+    window.addEventListener('mouseup', endDrag);
+    
+    return () => {
+        window.removeEventListener('mouseup', endDrag);
+    }
+  }, []);  
+
+  const handleMouseDown = useCallback((colIndex, btnIndex) => {
+    setIsDragging(true);
+    toggleButtonSelection(colIndex, btnIndex);
+  }, []);
+
+  const toggleButtonSelection = useCallback((columnIndex, btnIndex) => {
+    const selectedKey = `${columnIndex}-${btnIndex}`;
+    if (selectedButtons.includes(selectedKey)) {
+      setSelectedButtons(selectedButtons.filter(key => key !== selectedKey));
+    } else {
+      setSelectedButtons([...selectedButtons, selectedKey]);
+    }
+  }, [selectedButtons]);
+  
+  
+  useEffect(() => {
     const fetchTimeReqData = async () => {
       setIsLoading(true);
         try {
@@ -29,8 +81,23 @@ const TimeReq = ({ timereq }) => {
                   'Authorization': `Bearer ${token}`
               }
           });
-          setTimeReqData(response.data);
+          
+          const data = response.data;
+          setTimeReqData(data);
+
+          const openingHours = [];
+          const closingHours = [];
+          
+          for (let i = 0; i < data.day_num; i++) {
+            openingHours.push(data.opening_dict[`${i+1}&0`]);
+            closingHours.push(data.opening_dict[`${i+1}&1`]);
+          }
+
+          setOpeningHours(openingHours);
+          setClosingHours(closingHours);
+
           setIsLoading(false);
+
         } catch (error) {
           console.error('Error fetching Time Requirements:', error);
           setIsLoading(false);
@@ -48,7 +115,11 @@ const TimeReq = ({ timereq }) => {
     setWeekAdjustment(weekAdjustment - 7);
   };
 
+  const setEmployees = (event) => {
+    setEmployeeCount(event.target.value);
+  };
 
+  
   const handleFormSubmit = async (values) => {
     try {
       // Send the updated form values to the server for database update
@@ -77,21 +148,9 @@ const TimeReq = ({ timereq }) => {
         subtitle="Plan your workforce on weekly base and ensure minimal costs!"
       />
       <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: '1rem' }}>
-              <IconButton onClick={goToPreviousWeek} 
-              sx={{
-                borderColor: 'white',
-                '&.MuiButton-outlined': {
-                  borderColor: 'white',
-                },
-                '&:hover': {
-                  borderColor: 'white',
-                },
-                '&.MuiButton-text': {
-                  borderColor: 'white',
-                  color: 'white',
-                  backgroundColor: '#2e7c67',
-                }
-              }}>
+              <IconButton 
+                onClick={goToPreviousWeek} 
+                style={BUTTON_STYLE}>
                 <ChevronLeft />
               </IconButton>
               <Typography variant="h5" sx={{margin: '0 1rem'}}>
@@ -104,74 +163,117 @@ const TimeReq = ({ timereq }) => {
                   }).format(new Date(timereqData.week_start))
                 }
               </Typography>
-              <IconButton onClick={goToNextWeek} 
-              sx={{
-                borderColor: 'white',
-                '&.MuiButton-outlined': {
-                  borderColor: 'white',
-                },
-                '&:hover': {
-                  borderColor: 'white',
-                },
-                '&.MuiButton-text': {
-                  borderColor: 'white',
-                  color: 'white',
-                  backgroundColor: '#2e7c67',
-                }
-              }}>
+              <IconButton 
+                onClick={goToNextWeek} 
+                style={BUTTON_STYLE}>
                 <ChevronRight />
               </IconButton>
             </Box>
             <Box sx={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(7, 1fr)', // 7 columns for each box
+                gridTemplateColumns: 'repeat(7, 1fr)', // 7 columns for each day
                 gap: theme.spacing(2),
                 marginBottom: '1rem'
-                }}>
+            }}>
 
-                {Array.from({ length: 7 }).map((_, columnIndex) => (
-                    <Box 
-                        key={`column-${columnIndex}`} 
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            width: 150, // Set a fixed width
-                            height: 500, // Set a fixed height
-                            overflowY: 'auto', // To allow scrolling if the content exceeds the fixed height
-                            border: '1px solid', // Optional, but can help visualize the box
-                          }}>
-                    <Typography color={colors.greenAccent[500]}>
-                        {columnIndex}
-                    </Typography>
-                    {Array.from({ length: 96 }).map((_, btnIndex) => (
-                        <Button
+            {Array.from({ length: timereqData.day_num }).map((_, columnIndex) => (
+              <Box key={`column-${columnIndex}`} sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  width: 100, // Set a fixed width
+              }}>
+                <Typography variant="h4" gutterBottom component="div">
+                  {timereqData.weekdays[columnIndex]}
+                </Typography>
+                <TextField 
+                  type="number" 
+                  value={employeeCount} 
+                  onChange={setEmployees} 
+                  label="Enter employee count" 
+                  variant="outlined"
+                  fullWidth
+                  inputProps={{ min: 0 }}
+                />
+                <Box 
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        width: '100%', // Full width
+                        height: 500, // Set a fixed height
+                        overflowY: 'auto', // To allow scrolling if the content exceeds the fixed height
+                        border: '1px solid', // To visualize the box
+                      }}>
+                
+                {Array.from({ length: timereqData.daily_slots }).map((_, btnIndex) => {
+                  const currentTime = timereqData.slots_dict[btnIndex];
+                  const [currentHour, currentMinute] = currentTime.split(":");
+                  const currentTimeMinutes =
+                    parseInt(currentHour) * 60 + parseInt(currentMinute);
+                  
+                  // Find the index of the current day's opening and closing hours
+                  const currentDayIndex = btnIndex % timereqData.day_num;
+                  const openingHour = openingHours[currentDayIndex];
+                  const closingHour = closingHours[currentDayIndex];
+                  
+                  const [openingHourHour, openingHourMinute] = openingHour.split(":");
+                  const openingTimeMinutes =
+                    parseInt(openingHourHour) * 60 + parseInt(openingHourMinute);
+                  
+                  const [closingHourHour, closingHourMinute] = closingHour.split(":");
+                  const closingTimeMinutes =
+                    parseInt(closingHourHour) * 60 + parseInt(closingHourMinute);
+                  
+                  // Check if the current time is within the opening and closing hours
+                  if (
+                    currentTimeMinutes >= openingTimeMinutes &&
+                    currentTimeMinutes <= closingTimeMinutes
+                  ) 
+                  {
+                    const isSelected = selectedButtons.includes(`${columnIndex}-${btnIndex}`);
+                    return (
+                      <Button
                         key={`btn-${btnIndex}`}
-                        variant="outlined"
+                        variant={isSelected ? "contained" : "outlined"}
                         color="inherit"
-                        sx={{
-                            borderColor: 'white',
-                            '&.MuiButton-outlined': {
-                            borderColor: 'white',
-                            },
-                            '&:hover': {
-                            borderColor: 'white',
-                            },
-                            '&.MuiButton-text': {
-                            borderColor: 'white',
-                            color: 'white',
-                            backgroundColor: '#2e7c67',
-                            marginTop: theme.spacing(2) // spacing between buttons
-                            }
+                        onMouseDown={() => handleMouseDown(columnIndex, btnIndex)}
+                        onMouseOver={() => {
+                          if (isDragging) {
+                            toggleButtonSelection(columnIndex, btnIndex);
+                        }
+                      }}
+                        onMouseUp={() => {
+                            setIsDragging(false);
                         }}
-                        >
-                        {btnIndex}
-                        </Button>
-                    ))}
-                    </Box>
-                ))}
+                        sx={{
+                          borderColor: "white",
+                          "&.MuiButton-outlined": {
+                            borderColor: "white",
+                          },
+                          "&:hover": {
+                            borderColor: "white",
+                          },
+                          "&.MuiButton-text": {
+                            borderColor: "white",
+                            color: "white",
+                            backgroundColor: "#2e7c67",
+                            marginTop: theme.spacing(2), // spacing between buttons
+                          },
+                        }}
+                      >
+                        {timereqData.slots_dict && timereqData.slots_dict[btnIndex]}
+                      </Button>
+                    );
+                  }
+                  return null; // Return null if the current time is outside the opening and closing hours
+                })}
 
                 </Box>
+              </Box>
+            ))}
+
+            </Box>
          
       <Snackbar
         open={showSuccessNotification}

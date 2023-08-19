@@ -990,7 +990,7 @@ def get_required_workforce():
     calendar_dict={
         'weekdays': weekdays,
         'opening_dict': opening_dict,
-        #'slots_dict': slot_dict,
+        'slots_dict': slot_dict,
         'day_num': day_num,
         'timereq_dict': timereq_dict,
         'week_start': week_start,
