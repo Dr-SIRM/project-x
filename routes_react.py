@@ -1005,12 +1005,50 @@ def get_required_workforce():
 
     return jsonify(calendar_dict)
 
-mitarbeiter_planung = [
-    {'name': 'Max Mustermann', 'arbeitszeit': {'Montag': '07:00 - 12:00', 'Dienstag': '12:00 - 17:00'}},
-    {'name': 'Erika Mustermann', 'arbeitszeit': {'Montag': '10:00 - 18:00', 'Dienstag': '08:00 - 14:00'}},
-    # usw.
-]
 
-@app.route('/api/mitarbeiter', methods=['GET'])
-def get_mitarbeiter():
-    return jsonify(mitarbeiter_planung)
+@app.route('/api/schichtplanung', methods=['POST','GET'])
+@jwt_required()
+def get_shift():
+    react_user_email = get_jwt_identity()
+    current_user = User.query.filter_by(email=react_user_email).first()
+    
+    if current_user is None:
+        return jsonify({"message": "User not found"}), 404
+    
+    # Get the company name of the current logged-in user
+    current_company_name = current_user.company_name
+
+    # Query users who are members of the same company
+    users = User.query.filter_by(company_name=current_company_name).all()
+
+    user_list = []
+    for user in users:
+        user_dict = {
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+        }
+        user_list.append(user_dict)
+
+    return jsonify(user_list) 
+
+'''
+const GanttChart = () => {
+  const [view, setView] = useState('day');
+  const [workers, setWorkers] = useState([]);
+  const [shifts, setShifts] = useState([]); // You can update shifts using API calls as well
+  const token = localStorage.getItem('session_token'); 
+  
+  useEffect(() => {
+    const fetchWorkers = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/schichtplanung', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setWorkers(response.data);
+      } catch (error) {
+        console.error('Error fetching workers:', error);
+      }
+    };
+    fetchWorkers();
+  }, []);
+  '''
