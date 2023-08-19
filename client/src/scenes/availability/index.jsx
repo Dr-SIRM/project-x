@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
-import { useTheme, Box, Button, TextField, Snackbar, Typography } from "@mui/material";
+import { useTheme, Box, Button, TextField, Snackbar, Typography, ButtonGroup, IconButton } from "@mui/material";
+import { ChevronLeft, ChevronRight } from '@mui/icons-material';
+
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -16,13 +18,14 @@ const Availability = ({ availability }) => {
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [availabilityData, setAvailabilityData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [weekAdjustment, setWeekAdjustment] = useState(0);
   const token = localStorage.getItem('session_token'); 
 
     useEffect(() => {
     const fetchAvailabilityData = async () => {
       setIsLoading(true);
         try {
-          const response = await axios.get('http://localhost:5000/api/availability', {
+          const response = await axios.get('http://localhost:5000/api/availability?week_adjustment=' + weekAdjustment, {
               headers: {
                   'Authorization': `Bearer ${token}`
               }
@@ -36,13 +39,20 @@ const Availability = ({ availability }) => {
     };
 
     fetchAvailabilityData();
-  }, []);
+  }, [weekAdjustment]);
 
+  const goToNextWeek = () => {
+    setWeekAdjustment(weekAdjustment + 7);
+  };
+
+  const goToPreviousWeek = () => {
+    setWeekAdjustment(weekAdjustment - 7);
+  };
 
   const handleFormSubmit = async (values) => {
     try {
       // Send the updated form values to the server for database update
-      await axios.post('http://localhost:5000/api/availability', values, {
+      await axios.post('http://localhost:5000/api/availability?week_adjustment=' + weekAdjustment, values, {
     headers: {
         'Authorization': `Bearer ${token}`
         }
@@ -96,7 +106,52 @@ const Availability = ({ availability }) => {
           <form onSubmit={handleSubmit}>
             
             <></>
-           
+            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: '1rem' }}>
+              <IconButton onClick={goToPreviousWeek} 
+              sx={{
+                borderColor: 'white',
+                '&.MuiButton-outlined': {
+                  borderColor: 'white',
+                },
+                '&:hover': {
+                  borderColor: 'white',
+                },
+                '&.MuiButton-text': {
+                  borderColor: 'white',
+                  color: 'white',
+                  backgroundColor: '#2e7c67',
+                }
+              }}>
+                <ChevronLeft />
+              </IconButton>
+              <Typography variant="h5" sx={{margin: '0 1rem'}}>
+                {
+                  new Intl.DateTimeFormat('de', { 
+                    weekday: 'short', 
+                    day: '2-digit', 
+                    month: 'long', 
+                    year: 'numeric'
+                  }).format(new Date(availabilityData.week_start))
+                }
+              </Typography>
+              <IconButton onClick={goToNextWeek} 
+              sx={{
+                borderColor: 'white',
+                '&.MuiButton-outlined': {
+                  borderColor: 'white',
+                },
+                '&:hover': {
+                  borderColor: 'white',
+                },
+                '&.MuiButton-text': {
+                  borderColor: 'white',
+                  color: 'white',
+                  backgroundColor: '#2e7c67',
+                }
+              }}>
+                <ChevronRight />
+              </IconButton>
+            </Box>
             <Box
               display="grid"
               gap="30px"

@@ -87,6 +87,20 @@ def current_react_user():
 
     return jsonify(user_dict)
 
+@app.route('/api/current_react_user')
+def get_general_data():
+    react_user = get_jwt_identity()
+    user = User.query.filter_by(email=react_user).first()
+    company = Company.query.filter_by(company_name=user.company_name).first()
+    timereq = TimeReq.query.filter_by(company_name=user.company_name).first()
+
+    general_dict = {
+        'id': user.id,
+        'hour_divider': timereq.hour_devider,
+    }
+
+    return jsonify(general_dict)
+
 @app.route('/api/users')
 @jwt_required()
 def get_data():
@@ -324,13 +338,18 @@ def get_availability():
     monday = today - datetime.timedelta(days=today.weekday())
     weekdays = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
     day_num = 7
-    week_adjustment = session.get('week_adjustment', 0)
     company_id = user.company_id
+
+    # Week with adjustments
+    monday = today - datetime.timedelta(days=today.weekday())
+    week_adjustment = int(request.args.get('week_adjustment', 0))
+    week_start = monday + datetime.timedelta(days=week_adjustment)
 
 
     temp_dict = {}
     for i in range(day_num):
-        temp = Availability.query.filter_by(email=user.email, weekday=weekdays[i]).first()
+        new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+        temp = Availability.query.filter_by(email=user.email, date=new_date, weekday=weekdays[i]).first()
         if temp is None:
             pass
         else:
@@ -342,27 +361,7 @@ def get_availability():
             temp_dict[str(new_i) + '&4'] = temp.start_time3.strftime("%H:%M") if temp.start_time else None
             temp_dict[str(new_i) + '&5'] = temp.end_time3.strftime("%H:%M") if temp.end_time else None
 
-    """
-    if planning_form.prev_week.data:
-        week_adjustment -=7
-        session['week_adjustment'] = week_adjustment
-
-        monday = monday + datetime.timedelta(days=week_adjustment)
-
-        return render_template('planning.html', template_form=planning_form, monday=monday, weekdays=weekdays,
-                               day_num=day_num)
-
-    if planning_form.next_week.data:
-        week_adjustment +=7
-        session['week_adjustment'] = week_adjustment
-
-        monday = monday + datetime.timedelta(days=week_adjustment)
-
-        return render_template('planning.html', template_form=planning_form, monday=monday, weekdays=weekdays,
-                               day_num=day_num, temp_dict=temp_dict)
-    """
-
-
+    
     #Save Availability
     if request.method == 'POST':
         availability_data = request.get_json()
@@ -491,6 +490,7 @@ def get_availability():
         'weekdays': weekdays,
         'day_num': day_num,
         'temp_dict': temp_dict,
+        'week_start': week_start,
     }
 
     return jsonify(availability_list)
@@ -912,8 +912,6 @@ def get_required_workforce():
         quarter_minute = (i % hour_divider) * minutes  # Remainder gives the quarter in the hour
         formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
         slot_dict[i] = formatted_time
-
-    print(slot_dict)   
 
     timereq_dict = {}
     for i in range(day_num):
