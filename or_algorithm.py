@@ -1085,16 +1085,16 @@ class ORAlgorithm:
                         first_shift_hours_second_week = self.solver.Sum(self.x[i, j, k] for k in range(0, int(len(self.verfügbarkeit[i][j]) / 2)))
                         second_shift_hours_second_week = self.solver.Sum(self.x[i, j, k] for k in range(int(len(self.verfügbarkeit[i][j]) / 2), len(self.verfügbarkeit[i][j])))
 
-                    # Kann 0 oder 1 annehmen
-                    delta_2 = self.solver.BoolVar("delta_2")
-                    
-                    self.solver.Add(first_shift_hours - second_shift_hours - 1000 * delta_2 <= 0)         # 7 - 2 - 1000 * (0,1) <= 0       
-                    self.solver.Add(second_shift_hours - first_shift_hours - 1000 * (1 - delta_2) <= 0)   # 2 - 7 - 1000 * (1 - (0,1)) <= 0    
-                    
-                    for j in range(7, 14):
+                        # Kann 0 oder 1 annehmen
+                        delta_2 = self.solver.BoolVar("delta_2")
+                        
+                        self.solver.Add(first_shift_hours_second_week - second_shift_hours_second_week - 1000 * delta_2 <= 0)         # 7 - 2 - 1000 * (0,1) <= 0       
+                        self.solver.Add(second_shift_hours_second_week - first_shift_hours_second_week - 1000 * (1 - delta_2) <= 0)   # 2 - 7 - 1000 * (1 - (0,1)) <= 0    
+                        
                         # Hilfsvariable mit s2[i, j] verknüpfen
                         self.solver.Add(self.s2[i, j] == 1 - delta_2)
                         self.solver.Add(self.s2[i, j] == self.c[i, j])
+
 
 
 
