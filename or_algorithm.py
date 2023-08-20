@@ -26,12 +26,12 @@ Prio 1:
  - (erl.) Den Übergang auf harte und weiche NBs machen? 
  - (erl.) Die gesolvten Daten in der Datenbank speichern
  - (erl.) Daten für Solven in die Datenbank einpflegen (max. Zeit, min. Zeit, Solvingzeitraum, Toleranz für die Stundenverteilung, ...)
+ - (erl.) Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
 
 
  To-Do's 
  -------------------------------
  - "Gewünschte max. Zeit pro Woche" in Solver Req muss gelöscht werden
- - (100%) Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
 
 
  Fragen an die Runde:
@@ -1093,7 +1093,7 @@ class ORAlgorithm:
                     
                     for j in range(7, 14):
                         # Hilfsvariable mit s2[i, j] verknüpfen
-                        self.solver.Add(self.s2[i, j] == 1 - delta)
+                        self.solver.Add(self.s2[i, j] == 1 - delta_2)
                         self.solver.Add(self.s2[i, j] == self.c[i, j])
 
 
