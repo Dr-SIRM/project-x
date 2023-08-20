@@ -601,12 +601,11 @@ class ORAlgorithm:
                 self.s3[i, j] = self.solver.IntVar(0, 2, f's3[{i}, {j}]') # Variabeln können nur die Werte 0, 1 oder 2 annehmen
 
 
-
         # Gleiche Schichten innerhalb 2 und 4 Wochen  -- IN BEARBEITUNG 10.08.23 --
         self.c = {}
         for i in self.mitarbeiter:
-            for j in range(self.week_timeframe): # Woche 
-                self.c[i, j] = self.solver.BoolVar(f'c[{i}, {j}]')
+            for j in range(self.calc_time):  # Für jeden Tag der Woche
+                self.c[i, j] = self.solver.IntVar(0, 1, f'c[{i}, {j}]') # Variabeln können nur die Werte 0 oder 1 annehmen
 
         # Schichtwechsel-Variable
         self.c_next = {}
@@ -973,8 +972,8 @@ class ORAlgorithm:
                     # Kann 0 oder 1 annehmen
                     delta = self.solver.BoolVar("delta")
                     
-                    self.solver.Add(first_shift_hours - second_shift_hours - 1000 * delta <= 0)
-                    self.solver.Add(second_shift_hours - first_shift_hours - 1000 * (1 - delta) <= 0)
+                    self.solver.Add(first_shift_hours - second_shift_hours - 1000 * delta <= 0)         # 7 - 2 - 1000 * (0,1) <= 0       
+                    self.solver.Add(second_shift_hours - first_shift_hours - 1000 * (1 - delta) <= 0)   # 2 - 7 - 1000 * (1 - (0,1)) <= 0    
                     
                     # Hilfsvariable mit s2[i, j] verknüpfen
                     self.solver.Add(self.s2[i, j] == 1 - delta)
@@ -1059,6 +1058,8 @@ class ORAlgorithm:
         # NB 9 - Wechselnde Schichten innerhalb von 2 und 4 Wochen
         # ***** Weiche Nebenbedingung 8 *****
         # -------------------------------------------------------------------------------------------------------
+        
+        # Neu 20.08.2023
         if self.week_timeframe == 2:
             if self.company_shifts == 2:
                 for i in self.mitarbeiter:
@@ -1075,26 +1076,26 @@ class ORAlgorithm:
 
                     # Aktualisieren Sie c_next für die folgende Woche
                     self.solver.Add(self.c_next[i, 0] == 1 - first_week_shift)
+                    for j in range(7, 14):
+                        self.solver.Add(self.c[i, j] == 1 - first_week_shift)
 
                     # In der zweiten Woche muss der Mitarbeiter in der entgegengesetzten Schicht arbeiten
                     for j in range(7, 14):
                         # Summe der Stunden in der ersten Schicht in der zweiten Woche
                         first_shift_hours_second_week = self.solver.Sum(self.x[i, j, k] for k in range(0, int(len(self.verfügbarkeit[i][j]) / 2)))
-                        
-                        # Summe der Stunden in der zweiten Schicht in der zweiten Woche
                         second_shift_hours_second_week = self.solver.Sum(self.x[i, j, k] for k in range(int(len(self.verfügbarkeit[i][j]) / 2), len(self.verfügbarkeit[i][j])))
 
-                        # Abweichungsvariable für die Weichheit der Nebenbedingung
-                        shift_change_violation = self.solver.IntVar(0, 1, "shift_change_violation")
+                    # Kann 0 oder 1 annehmen
+                    delta_2 = self.solver.BoolVar("delta_2")
+                    
+                    self.solver.Add(first_shift_hours - second_shift_hours - 1000 * delta_2 <= 0)         # 7 - 2 - 1000 * (0,1) <= 0       
+                    self.solver.Add(second_shift_hours - first_shift_hours - 1000 * (1 - delta_2) <= 0)   # 2 - 7 - 1000 * (1 - (0,1)) <= 0    
+                    
+                    for j in range(7, 14):
+                        # Hilfsvariable mit s2[i, j] verknüpfen
+                        self.solver.Add(self.s2[i, j] == 1 - delta)
+                        self.solver.Add(self.s2[i, j] == self.c[i, j])
 
-                        # Wenn in der ersten Woche die erste Schicht gearbeitet wurde, muss in der zweiten Woche die zweite Schicht gearbeitet werden
-                        self.solver.Add((second_shift_hours_second_week - first_shift_hours_second_week) >= -1000 * shift_change_violation)
-
-                        # Wenn in der ersten Woche die zweite Schicht gearbeitet wurde, muss in der zweiten Woche die erste Schicht gearbeitet werden
-                        self.solver.Add((first_shift_hours_second_week - second_shift_hours_second_week) >= -1000 * shift_change_violation)
-
-                        # Fügen Sie die Abweichungsvariable zu nb7_violation hinzu
-                        self.solver.Add(self.nb7_violation[i, j] == shift_change_violation)
 
 
 
@@ -1150,6 +1151,12 @@ class ORAlgorithm:
             for j in range(self.calc_time):
                 # Drucken Sie den Wert von s3[i, j]
                 print(f"s2[{i}][{j}] =", self.s2[i, j].solution_value())
+
+        # Die Werte von c printen
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                # Drucken Sie den Wert von c[i, j]
+                print(f"c[{i}][{j}] =", self.c[i, j].solution_value())
         
         # Drucke die Werte der c_next Variablen
         for i in self.mitarbeiter:
