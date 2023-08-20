@@ -1004,6 +1004,8 @@ def get_required_workforce():
     return jsonify(calendar_dict)
 
 
+from flask import jsonify
+
 @app.route('/api/schichtplanung', methods=['POST','GET'])
 @jwt_required()
 def get_shift():
@@ -1027,26 +1029,21 @@ def get_shift():
         }
         user_list.append(user_dict)
 
-    return jsonify(user_list) 
+    # Query the opening hours for the current company
+    opening_hours_records = OpeningHours.query.filter_by(company_name=current_company_name).all()
 
-'''
-const GanttChart = () => {
-  const [view, setView] = useState('day');
-  const [workers, setWorkers] = useState([]);
-  const [shifts, setShifts] = useState([]); // You can update shifts using API calls as well
-  const token = localStorage.getItem('session_token'); 
-  
-  useEffect(() => {
-    const fetchWorkers = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/schichtplanung', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setWorkers(response.data);
-      } catch (error) {
-        console.error('Error fetching workers:', error);
-      }
-    };
-    fetchWorkers();
-  }, []);
-  '''
+    opening_hours_data = {}
+    for record in opening_hours_records:
+        opening_hours_data[record.weekday] = {
+            "start": record.start_time.strftime("%H:%M"),
+            "end": record.end_time.strftime("%H:%M")
+        }
+
+    response = {
+        'users': user_list,
+        'opening_hours': opening_hours_data
+    }
+
+    return jsonify(response)
+
+
