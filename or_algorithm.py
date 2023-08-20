@@ -960,7 +960,7 @@ class ORAlgorithm:
         if self.company_shifts <= 1:
             pass
 
-        # Neu 18.08.23
+
         elif self.company_shifts == 2:
             for i in self.mitarbeiter:
                 for j in range(7): # (7 * self.week_timeframe)
@@ -1059,22 +1059,80 @@ class ORAlgorithm:
         # NB 9 - Wechselnde Schichten innerhalb von 2 und 4 Wochen
         # ***** Weiche Nebenbedingung 8 *****
         # -------------------------------------------------------------------------------------------------------
+        if self.week_timeframe == 2:
+            if self.company_shifts == 2:
+                for i in self.mitarbeiter:
+                    # Anzahl der Tage in der ersten Woche, an denen in der ersten bzw. zweiten Schicht gearbeitet wurde
+                    first_week_first_shift_days = self.solver.Sum(self.s2[i, j] for j in range(7))
+                    first_week_second_shift_days = 7 - first_week_first_shift_days
+
+                    # Hilfsvariable, um die Schicht der ersten Woche festzulegen
+                    first_week_shift = self.solver.BoolVar("first_week_shift")
+
+                    # Wenn die Anzahl der Tage in der ersten Schicht größer ist, setzen Sie first_week_shift auf 1
+                    self.solver.Add(first_week_first_shift_days - first_week_second_shift_days - 1000 * first_week_shift <= 0)
+                    self.solver.Add(first_week_second_shift_days - first_week_first_shift_days - 1000 * (1 - first_week_shift) <= 0)
+
+                    # Aktualisieren Sie c_next für die folgende Woche
+                    self.solver.Add(self.c_next[i, 0] == 1 - first_week_shift)
+
+                    # In der zweiten Woche muss der Mitarbeiter in der entgegengesetzten Schicht arbeiten
+                    for j in range(7, 14):
+                        # Summe der Stunden in der ersten Schicht in der zweiten Woche
+                        first_shift_hours_second_week = self.solver.Sum(self.x[i, j, k] for k in range(0, int(len(self.verfügbarkeit[i][j]) / 2)))
+                        
+                        # Summe der Stunden in der zweiten Schicht in der zweiten Woche
+                        second_shift_hours_second_week = self.solver.Sum(self.x[i, j, k] for k in range(int(len(self.verfügbarkeit[i][j]) / 2), len(self.verfügbarkeit[i][j])))
+
+                        # Abweichungsvariable für die Weichheit der Nebenbedingung
+                        shift_change_violation = self.solver.IntVar(0, 1, "shift_change_violation")
+
+                        # Wenn in der ersten Woche die erste Schicht gearbeitet wurde, muss in der zweiten Woche die zweite Schicht gearbeitet werden
+                        self.solver.Add((second_shift_hours_second_week - first_shift_hours_second_week) >= -1000 * shift_change_violation)
+
+                        # Wenn in der ersten Woche die zweite Schicht gearbeitet wurde, muss in der zweiten Woche die erste Schicht gearbeitet werden
+                        self.solver.Add((first_shift_hours_second_week - second_shift_hours_second_week) >= -1000 * shift_change_violation)
+
+                        # Fügen Sie die Abweichungsvariable zu nb7_violation hinzu
+                        self.solver.Add(self.nb7_violation[i, j] == shift_change_violation)
+
+
+
+
         """
         if self.company_shifts == 2:
             for i in self.mitarbeiter:
-                for j in range(0, self.week_timeframe - 1):
-                    self.solver.Add(self.c_next[i, j] == 1 - self.s2[i, 7 * j + 6])
+                # Zählen Sie die Anzahl der Tage in der ersten Woche, an denen in der ersten bzw. zweiten Schicht gearbeitet wurde
+                first_week_first_shift_days = self.solver.Sum(self.s2[i, j] for j in range(7))
+                first_week_second_shift_days = 7 - first_week_first_shift_days
 
-                    for d in range(7):
-                        self.solver.Add(self.s2[i, 7 * (j + 1) + d] == 1 - self.c_next[i, j])
+                # Hilfsvariable, um die Schicht der ersten Woche festzulegen
+                first_week_shift = self.solver.BoolVar("first_week_shift")
 
-        elif self.company_shifts == 3:
+                # Wenn die Anzahl der Tage in der ersten Schicht größer ist, setzen Sie first_week_shift auf 1
+                self.solver.Add(first_week_first_shift_days - first_week_second_shift_days - 1000 * first_week_shift <= 0)
+                self.solver.Add(first_week_second_shift_days - first_week_first_shift_days - 1000 * (1 - first_week_shift) <= 0)
+
+                # Aktualisieren Sie c_next für die folgende Woche
+                self.solver.Add(self.c_next[i, 0] == 1 - first_week_shift)
+
+                # In der zweiten Woche sollte der MA in der anderen Schicht eingeteilt werden
+                for j in range(7, 14):
+                    # Wenn first_week_shift 1 ist (erste Schicht), dann sollte s2[i, j] 0 sein (zweite Schicht)
+                    # Wenn first_week_shift 0 ist (zweite Schicht), dann sollte s2[i, j] 1 sein (erste Schicht)
+                    self.solver.Add(self.s2[i, j] == 1 - first_week_shift)
+
+            # Bedingungen, um sicherzustellen, dass in der zweiten Woche immer die gleiche Schicht gearbeitet wird
             for i in self.mitarbeiter:
-                for j in range(0, self.week_timeframe - 1):
-                    self.solver.Add(self.c_next[i, j] == (self.s3[i, 7 * j + 6] + 1) % 3)
-
-                    for d in range(7):
-                        self.solver.Add(self.s3[i, 7 * (j + 1) + d] == self.c_next[i, j])
+                for j in range(8, 14):
+                    diff = self.solver.IntVar(-1, 1, "diff")
+                    
+                    # Setzen Sie diff gleich der Differenz
+                    self.solver.Add(diff == self.s2[i, j] - self.s2[i, j-1])
+            
+                    # Bedingungen für den "absoluten Wert"
+                    self.solver.Add(self.nb7_violation[i, j] >= diff)
+                    self.solver.Add(self.nb7_violation[i, j] >= -diff)
         """
 
 
