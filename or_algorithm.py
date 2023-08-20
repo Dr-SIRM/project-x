@@ -1095,6 +1095,7 @@ class ORAlgorithm:
                         self.solver.Add(self.s2[i, j] == 1 - delta_2)
                         self.solver.Add(self.s2[i, j] == self.c[i, j])
 
+                    
 
 
 

@@ -87,6 +87,7 @@ class DataProcessing:
         # self.start_date = "2023-07-31"
         # self.end_date = "2023-08-04"
 
+        # Alles voll availability 3-MA 2 Wochen
         self.start_date = "2023-07-10"
         self.end_date = "2023-07-23"
 
