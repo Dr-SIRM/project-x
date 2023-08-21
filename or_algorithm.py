@@ -600,18 +600,13 @@ class ORAlgorithm:
             for j in range(self.calc_time):  # Für jeden Tag der Woche
                 self.s3[i, j] = self.solver.IntVar(0, 2, f's3[{i}, {j}]') # Variabeln können nur die Werte 0, 1 oder 2 annehmen
 
-
-        # Gleiche Schichten innerhalb 2 und 4 Wochen  -- IN BEARBEITUNG 10.08.23 --
+        # Gleiche Schichten innerhalb 2 und 4 Wochen  -- IN BEARBEITUNG 21.08.23 --
         self.c = {}
         for i in self.mitarbeiter:
             for j in range(self.calc_time):  # Für jeden Tag der Woche
                 self.c[i, j] = self.solver.IntVar(0, 1, f'c[{i}, {j}]') # Variabeln können nur die Werte 0 oder 1 annehmen
 
-        # Schichtwechsel-Variable
-        self.c_next = {}
-        for i in self.mitarbeiter:
-            for j in range(self.week_timeframe - 1):
-                self.c_next[i, j] = self.solver.BoolVar(f'c_next[{i}, {j}]')
+
 
 
     def violation_variables(self):
@@ -1059,7 +1054,7 @@ class ORAlgorithm:
         # ***** Weiche Nebenbedingung 8 *****
         # -------------------------------------------------------------------------------------------------------
         
-        # Neu 20.08.2023
+        # 2 Wochen + 2-Schicht
         if self.week_timeframe == 2:
             if self.company_shifts == 2:
                 for i in self.mitarbeiter:
@@ -1074,8 +1069,6 @@ class ORAlgorithm:
                     self.solver.Add(first_week_first_shift_days - first_week_second_shift_days - 1000 * first_week_shift <= 0)
                     self.solver.Add(first_week_second_shift_days - first_week_first_shift_days - 1000 * (1 - first_week_shift) <= 0)
 
-                    # Aktualisieren Sie c_next für die folgende Woche
-                    self.solver.Add(self.c_next[i, 0] == 1 - first_week_shift)
                     for j in range(7, 14):
                         self.solver.Add(self.c[i, j] == 1 - first_week_shift)
 
@@ -1088,8 +1081,8 @@ class ORAlgorithm:
                         # Kann 0 oder 1 annehmen
                         delta_2 = self.solver.BoolVar("delta_2")
                         
-                        self.solver.Add(first_shift_hours_second_week - second_shift_hours_second_week - 1000 * delta_2 <= 0)         # 7 - 2 - 1000 * (0,1) <= 0       
-                        self.solver.Add(second_shift_hours_second_week - first_shift_hours_second_week - 1000 * (1 - delta_2) <= 0)   # 2 - 7 - 1000 * (1 - (0,1)) <= 0    
+                        self.solver.Add(first_shift_hours_second_week - second_shift_hours_second_week - 1000 * delta_2 <= 0)      
+                        self.solver.Add(second_shift_hours_second_week - first_shift_hours_second_week - 1000 * (1 - delta_2) <= 0)  
                         
                         # Hilfsvariable mit s2[i, j] verknüpfen
                         self.solver.Add(self.s2[i, j] == 1 - delta_2)
@@ -1159,12 +1152,6 @@ class ORAlgorithm:
                 # Drucken Sie den Wert von c[i, j]
                 print(f"c[{i}][{j}] =", self.c[i, j].solution_value())
         
-        # Drucke die Werte der c_next Variablen
-        for i in self.mitarbeiter:
-            for j in range(self.week_timeframe - 1):
-                # Drucken Sie den Wert von c_next[i, j]
-                print(f"c_next[{i}][{j}] =", self.c_next[i, j].solution_value())
-
 
         # Kosten für die Einstellung von Mitarbeitern
         hiring_costs = sum(self.kosten[i] * self.x[i, j, k].solution_value() for i in self.mitarbeiter for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[i][j])))
