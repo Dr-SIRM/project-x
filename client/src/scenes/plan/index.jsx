@@ -9,6 +9,8 @@ const GanttChart = () => {
   const [workers, setWorkers] = useState([]);
   const [shifts, setShifts] = useState([]);
   const token = localStorage.getItem('session_token');
+  const [openingHours, setOpeningHours] = useState({});
+
 
   useEffect(() => {
     const fetchWorkers = async () => {
@@ -25,6 +27,9 @@ const GanttChart = () => {
           }));
           setWorkers(responseData.users);
           setShifts(workerShifts);
+        }
+        if (responseData && responseData.opening_hours) {
+          setOpeningHours(responseData.opening_hours);
         } else {
           console.error('Invalid response format:', responseData);
         }
@@ -32,6 +37,7 @@ const GanttChart = () => {
         console.error('Error fetching workers:', error);
       }
     };
+    
     
     
     fetchWorkers();
@@ -66,28 +72,49 @@ const GanttChart = () => {
   };
 
   const getTimelineLabels = () => {
-    const maxDuration = view === 'day' ? 24 : view === 'week' ? 7 * 24 : 30 * 24;
-
-    switch (view) {
-      case 'day':
-        return Array.from({ length: 25 }).map((_, index) => formatTime(index % 24));
-      case 'week':
-        const today = new Date();
-        return Array.from({ length: 7 }).map((_, index) => {
-          const date = new Date(today);
-          date.setDate(today.getDate() - today.getDay() + index);
-          return formatDate(date);
-        });
-      case 'month':
-        const currentMonth = new Date();
-        return Array.from({ length: 30 }).map((_, index) => {
-          const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), index + 1);
-          return formatDate(date);
-        });
-      default:
-        return [];
+    const today = new Date();
+    const weekday = today.toLocaleDateString('en-US', { weekday: 'long' });
+    const hours = openingHours[weekday];
+  
+    console.log("Opening hours:", openingHours);
+    console.log("Weekday:", weekday);
+    console.log("Hours for weekday:", hours);
+  
+    if (!hours || view !== 'day') {
+      // handle 'week' and 'month' views as before
+      switch (view) {
+        case 'week':
+          return Array.from({ length: 7 }).map((_, index) => {
+            const date = new Date(today);
+            date.setDate(today.getDate() - today.getDay() + index);
+            return formatDate(date);
+          });
+        case 'month':
+          const currentMonth = new Date();
+          return Array.from({ length: 30 }).map((_, index) => {
+            const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), index + 1);
+            return formatDate(date);
+          });
+        default:
+          return [];
+      }
     }
+  
+    const startHour = parseInt(hours.start.split(":")[0], 10);
+    const endHour = parseInt(hours.end.split(":")[0], 10);
+    const hoursArray = Array.from({ length: endHour - startHour + 1 }).map((_, index) => startHour + index);
+  
+    console.log("Start hour:", startHour);
+    console.log("End hour:", endHour);
+    console.log("Hours array:", hoursArray);
+  
+    const timelineLabels = hoursArray.map(hour => formatTime(hour));
+    console.log("Timeline labels:", timelineLabels);
+    return timelineLabels;
   };
+  
+  
+  
 
   return (
     <Box m="20px">
