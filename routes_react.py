@@ -1004,17 +1004,16 @@ def get_required_workforce():
     return jsonify(calendar_dict)
 
 
-from flask import jsonify
 
 @app.route('/api/schichtplanung', methods=['POST','GET'])
 @jwt_required()
 def get_shift():
     react_user_email = get_jwt_identity()
     current_user = User.query.filter_by(email=react_user_email).first()
-    
+
     if current_user is None:
         return jsonify({"message": "User not found"}), 404
-    
+
     # Get the company name of the current logged-in user
     current_company_name = current_user.company_name
 
@@ -1034,7 +1033,7 @@ def get_shift():
 
     opening_hours_data = {}
     for record in opening_hours_records:
-        opening_hours_data[record.weekday] = {
+        opening_hours_data[record.weekday.lower()] = {
             "start": record.start_time.strftime("%H:%M"),
             "end": record.end_time.strftime("%H:%M")
         }
@@ -1043,7 +1042,5 @@ def get_shift():
         'users': user_list,
         'opening_hours': opening_hours_data
     }
-
+    print("Opening hours data:", opening_hours_data)
     return jsonify(response)
-
-
