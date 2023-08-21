@@ -16,19 +16,23 @@ const GanttChart = () => {
         const response = await axios.get('http://localhost:5000/api/schichtplanung', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        const responseData = Array.isArray(response.data) ? response.data : JSON.parse(response.data);
-        console.log(responseData);  // Add this line
-        const workerShifts = responseData.map((worker) => ({
-          worker: `${worker.first_name} ${worker.last_name}`,
-          start: new Date(2023, 7, 16, 8),
-          end: new Date(2023, 7, 16, 10)
-        }));
-        setWorkers(responseData);
-        setShifts(workerShifts);
+        const responseData = response.data;
+        if (responseData && responseData.users) {
+          const workerShifts = responseData.users.map((worker) => ({
+            worker: `${worker.first_name} ${worker.last_name}`,
+            start: new Date(2023, 7, 16, 8),
+            end: new Date(2023, 7, 16, 10)
+          }));
+          setWorkers(responseData.users);
+          setShifts(workerShifts);
+        } else {
+          console.error('Invalid response format:', responseData);
+        }
       } catch (error) {
         console.error('Error fetching workers:', error);
       }
     };
+    
     
     fetchWorkers();
   }, []);
