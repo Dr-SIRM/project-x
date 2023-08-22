@@ -31,6 +31,9 @@ Prio 1:
 
  To-Do's 
  -------------------------------
+ - NB9 mit 3 Schichten fertigbauen
+ - Stunden Teiler für 1/4, 1/2 und 1h einbauen
+ - Code ordnen
  - "Gewünschte max. Zeit pro Woche" in Solver Req muss gelöscht werden
 
 
@@ -967,6 +970,7 @@ class ORAlgorithm:
             pass
 
 
+
         elif self.company_shifts == 2:
             for i in self.mitarbeiter:
                 for j in range(7): # (7 * self.week_timeframe)
@@ -1066,7 +1070,7 @@ class ORAlgorithm:
         # ***** Weiche Nebenbedingung 8 *****
         # -------------------------------------------------------------------------------------------------------
         
-        # 2 Wochen + 2-Schicht
+        # 2 Wochen + 2-Schicht # --------------------------------------------------------------------------------
         if self.week_timeframe == 2:
             if self.company_shifts == 2:
                 for i in self.mitarbeiter:
@@ -1113,7 +1117,14 @@ class ORAlgorithm:
                         self.solver.Add(self.nb8_violation[i, j] >= -diff)
 
 
-        # 4 Wochen + 2-Schicht -----------------------------------------------------------------------------------------------------------------
+        # 2 Wochen + 3-Schicht # --------------------------------------------------------------------------------
+
+
+        # HIER DEN CODE EINFèGEN
+
+
+
+        # 4 Wochen + 2-Schicht ----------------------------------------------------------------------------------
         if self.week_timeframe == 4:
             if self.company_shifts == 2:
                 for i in self.mitarbeiter:
@@ -1164,6 +1175,12 @@ class ORAlgorithm:
                         self.solver.Add(self.nb8_violation[i, j] >= -diff)
                 
                 
+        # 4 Wochen + 3-Schicht ----------------------------------------------------------------------------------
+
+
+
+
+
 
                     
 
