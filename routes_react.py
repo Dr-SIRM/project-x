@@ -1004,15 +1004,16 @@ def get_required_workforce():
     return jsonify(calendar_dict)
 
 
+
 @app.route('/api/schichtplanung', methods=['POST','GET'])
 @jwt_required()
 def get_shift():
     react_user_email = get_jwt_identity()
     current_user = User.query.filter_by(email=react_user_email).first()
-    
+
     if current_user is None:
         return jsonify({"message": "User not found"}), 404
-    
+
     # Get the company name of the current logged-in user
     current_company_name = current_user.company_name
 
@@ -1027,8 +1028,56 @@ def get_shift():
         }
         user_list.append(user_dict)
 
-    return jsonify(user_list) 
+    # Query the opening hours for the current company
+    opening_hours_records = OpeningHours.query.filter_by(company_name=current_company_name).all()
 
+    opening_hours_data = {}
+    for record in opening_hours_records:
+        if record.start_time is not None and record.end_time is not None:
+            opening_hours_data[record.weekday.lower()] = {
+                "start": record.start_time.strftime("%H:%M"),
+                "end": record.end_time.strftime("%H:%M")
+            }
+
+    shift_records = Timetable.query.filter_by(company_name=current_company_name).all()
+
+    shift_data = []
+    for record in shift_records:
+        if record.date is not None:
+            date_str = record.date.strftime("%Y-%m-%d")
+        else:
+            date_str = None
+
+        shift_data.append({
+            'email': record.email,
+            'first_name': record.first_name,
+            'last_name': record.last_name,
+            'date': date_str,
+            'shifts': [
+                {
+                    'start_time': record.start_time.strftime("%H:%M") if record.start_time is not None else None,
+                    'end_time': record.end_time.strftime("%H:%M") if record.end_time is not None else None
+                },
+                {
+                    'start_time': record.start_time2.strftime("%H:%M") if record.start_time2 is not None else None,
+                    'end_time': record.end_time2.strftime("%H:%M") if record.end_time2 is not None else None
+                },
+                {
+                    'start_time': record.start_time3.strftime("%H:%M") if record.start_time3 is not None else None,
+                    'end_time': record.end_time3.strftime("%H:%M") if record.end_time3 is not None else None
+                }
+            ]
+        })
+
+    response = {
+        'users': user_list,
+        'opening_hours': opening_hours_data,
+        'shifts': shift_data
+    }
+
+    return jsonify(response)
+
+<<<<<<< HEAD
 '''
 const GanttChart = () => {
   const [view, setView] = useState('day');
@@ -1050,3 +1099,5 @@ const GanttChart = () => {
     fetchWorkers();
   }, []);
   '''
+=======
+>>>>>>> 960edf3dea5a126cad9ee162f9c65535e96a0389
