@@ -1099,7 +1099,7 @@ class ORAlgorithm:
                         
                         # Hilfsvariable mit s2[i, j] verknüpfen
                         self.solver.Add(self.s2[i, j] == 1 - delta_2)
-
+                        
                         # Harte Nebenbedingung
                         # self.solver.Add(self.s2[i, j] == self.c[i, j])
 
