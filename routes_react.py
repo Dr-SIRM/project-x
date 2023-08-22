@@ -999,8 +999,6 @@ def get_required_workforce():
         'minutes': minutes
     }
 
-
-
     return jsonify(calendar_dict)
 
 
@@ -1077,3 +1075,24 @@ def get_shift():
 
     return jsonify(response)
 
+'''
+const GanttChart = () => {
+  const [view, setView] = useState('day');
+  const [workers, setWorkers] = useState([]);
+  const [shifts, setShifts] = useState([]); // You can update shifts using API calls as well
+  const token = localStorage.getItem('session_token'); 
+  
+  useEffect(() => {
+    const fetchWorkers = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/schichtplanung', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setWorkers(response.data);
+      } catch (error) {
+        console.error('Error fetching workers:', error);
+      }
+    };
+    fetchWorkers();
+  }, []);
+  '''
