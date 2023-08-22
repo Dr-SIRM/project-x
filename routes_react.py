@@ -999,8 +999,6 @@ def get_required_workforce():
         'minutes': minutes
     }
 
-
-
     return jsonify(calendar_dict)
 
 
@@ -1077,7 +1075,6 @@ def get_shift():
 
     return jsonify(response)
 
-<<<<<<< HEAD
 '''
 const GanttChart = () => {
   const [view, setView] = useState('day');
@@ -1099,5 +1096,3 @@ const GanttChart = () => {
     fetchWorkers();
   }, []);
   '''
-=======
->>>>>>> 960edf3dea5a126cad9ee162f9c65535e96a0389

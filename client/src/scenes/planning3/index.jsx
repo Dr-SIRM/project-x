@@ -44,7 +44,7 @@ const TimeReq = ({ timereq }) => {
   const [closingHours, setClosingHours] = useState([]);
   const [weekAdjustment, setWeekAdjustment] = useState(0);
   const token = localStorage.getItem('session_token'); 
-  const [employeeCount, setEmployeeCount] = useState(0);
+  const [employeeCount, setEmployeeCount] = useState({});
   const [selectedButtons, setSelectedButtons] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
   const [slotEmployeeCounts, setSlotEmployeeCounts] = useState({});
@@ -72,21 +72,25 @@ const TimeReq = ({ timereq }) => {
     }
   }, [selectedButtons]);
 
-  const setEmployees = (e) => {
+  const setEmployees = (e, columnIndex) => {
     const value = parseInt(e.target.value);
-    setEmployeeCount(value);
+    setEmployeeCount({
+      ...employeeCount,
+      [columnIndex]: value,
+    });
   };
 
-  const applyEmployeeCountToSelectedSlots = () => {
-    // Update the slotEmployeeCounts state based on selectedButtons and employeeCount
-    const updatedCounts = {...slotEmployeeCounts};
+  const EnteredSlots = (columnIndex) => {
+    const updatedCounts = { ...slotEmployeeCounts };
     selectedButtons.forEach(slot => {
-      updatedCounts[slot] = employeeCount;
+      const [colIdx, btnIdx] = slot.split('-');
+      if (parseInt(colIdx) === columnIndex) {  // Only update for the correct column
+        updatedCounts[slot] = employeeCount[columnIndex];
+      }
     });
     setSlotEmployeeCounts(updatedCounts);
-    // Optionally, you can reset the selectedButtons and employeeCount here if needed
     setSelectedButtons([]);
-    setEmployeeCount(0);
+    setEmployeeCount({ ...employeeCount, [columnIndex]: 0 }); // Reset only the current column's count to 0
   };
   
   
@@ -135,6 +139,16 @@ const TimeReq = ({ timereq }) => {
   
   const handleFormSubmit = async (values) => {
     try {
+      const payload = {};
+    
+      Object.entries(slotEmployeeCounts).forEach(([key, count]) => {
+        const [columnIndex, btnIndex] = key.split('-');
+        const dayNum = columnIndex + 1; // Assuming columnIndex starts from 0
+        const currentTime = timereqData.slots_dict[parseInt(btnIndex)];
+        const newKey = `worker_${dayNum}_${currentTime}`;
+        payload[newKey] = count;
+      });
+
       // Send the updated form values to the server for database update
       await axios.post('http://localhost:5000/api/requirement/workforce?week_adjustment=' + weekAdjustment, values, {
     headers: {
@@ -182,118 +196,143 @@ const TimeReq = ({ timereq }) => {
                 <ChevronRight />
               </IconButton>
             </Box>
-            <Box sx={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(7, 1fr)', // 7 columns for each day
-                gap: theme.spacing(2),
-                marginBottom: '1rem'
-            }}>
-
-            {Array.from({ length: timereqData.day_num }).map((_, columnIndex) => (
-              <Box key={`column-${columnIndex}`} sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  width: 100, // Set a fixed width
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', overflowX: 'auto' }}>
+              <Box sx={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(7, 1fr)', // 7 columns for each day
+                  gap: theme.spacing(2),
+                  marginBottom: '1rem'
               }}>
-                <Typography variant="h4" gutterBottom component="div">
-                  {timereqData.weekdays[columnIndex]}
-                </Typography>
-                <TextField 
-                  type="number" 
-                  value={employeeCount} 
-                  onChange={setEmployees} 
-                  label="Enter employee count" 
-                  variant="outlined"
-                  fullWidth
-                  inputProps={{ min: 0 }}
-                />
-                <Button 
-                  variant="contained"
-                  color="primary"
-                  onClick={applyEmployeeCountToSelectedSlots}
-                >
-                  Enter
-                </Button>
-                <Box 
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        width: '100%', // Full width
-                        height: 500, // Set a fixed height
-                        overflowY: 'auto', // To allow scrolling if the content exceeds the fixed height
-                        border: '1px solid', // To visualize the box
-                      }}>
-                
-                {Array.from({ length: timereqData.daily_slots }).map((_, btnIndex) => {
-                  const currentTime = timereqData.slots_dict[btnIndex];
-                  const [currentHour, currentMinute] = currentTime.split(":");
-                  const currentTimeMinutes =
-                    parseInt(currentHour) * 60 + parseInt(currentMinute);
-                  
-                  // Find the index of the current day's opening and closing hours
-                  const currentDayIndex = btnIndex % timereqData.day_num;
-                  const openingHour = openingHours[currentDayIndex];
-                  const closingHour = closingHours[currentDayIndex];
-                  
-                  const [openingHourHour, openingHourMinute] = openingHour.split(":");
-                  const openingTimeMinutes =
-                    parseInt(openingHourHour) * 60 + parseInt(openingHourMinute);
-                  
-                  const [closingHourHour, closingHourMinute] = closingHour.split(":");
-                  const closingTimeMinutes =
-                    parseInt(closingHourHour) * 60 + parseInt(closingHourMinute);
-                  
-                  // Check if the current time is within the opening and closing hours
-                  if (
-                    currentTimeMinutes >= openingTimeMinutes &&
-                    currentTimeMinutes <= closingTimeMinutes
-                  ) 
-                  {
-                    const isSelected = selectedButtons.includes(`${columnIndex}-${btnIndex}`);
-                    return (
-                      <Button
-                        key={`btn-${btnIndex}`}
-                        variant={isSelected ? "contained" : "outlined"}
-                        color="inherit"
-                        onMouseDown={() => handleMouseDown(columnIndex, btnIndex)}
-                        onMouseOver={() => {
-                          if (isDragging) {
-                            toggleButtonSelection(columnIndex, btnIndex);
-                        }
-                      }}
-                        onMouseUp={() => {
-                            setIsDragging(false);
-                        }}
-                        sx={{
-                          borderColor: "white",
-                          "&.MuiButton-outlined": {
-                            borderColor: "white",
-                          },
-                          "&:hover": {
-                            borderColor: "white",
-                          },
-                          "&.MuiButton-text": {
-                            borderColor: "white",
-                            color: "white",
-                            backgroundColor: "#2e7c67",
-                            marginTop: theme.spacing(2), // spacing between buttons
-                          },
-                        }}
-                      >
-                        {timereqData.slots_dict && timereqData.slots_dict[btnIndex]}
-                      </Button>
-                    );
-                  }
-                  return null; // Return null if the current time is outside the opening and closing hours
-                })}
 
+              {Array.from({ length: timereqData.day_num }).map((_, columnIndex) => (
+                <Box key={`column-${columnIndex}`} sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    width: 100, // Set a fixed width
+                }}>
+                  <Typography variant="h4" gutterBottom component="div">
+                    {timereqData.weekdays[columnIndex]}
+                  </Typography>
+                  <TextField 
+                    type="number" 
+                    value={employeeCount[columnIndex] || ''} 
+                    onChange={(e) => setEmployees(e, columnIndex)} 
+                    label="Enter employee count" 
+                    variant="outlined"
+                    fullWidth
+                    inputProps={{ min: 0 }}
+                  />
+                  <Button 
+                    variant="contained"
+                    color="primary"
+                    onClick={() => EnteredSlots(columnIndex)}
+                  >
+                    Enter
+                  </Button>
+                  <Box 
+                      sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          width: '100%', // Full width
+                          height: 500, // Set a fixed height
+                          overflowY: 'auto', // To allow scrolling if the content exceeds the fixed height
+                          border: '1px solid', // To visualize the box
+                        }}>
+                  
+                  {Array.from({ length: timereqData.daily_slots }).map((_, btnIndex) => {
+                    const currentTime = timereqData.slots_dict[btnIndex];
+                    const [currentHour, currentMinute] = currentTime.split(":");
+                    const currentTimeMinutes =
+                      parseInt(currentHour) * 60 + parseInt(currentMinute);
+                    
+                    // Find the index of the current day's opening and closing hours
+                    const currentDayIndex = btnIndex % timereqData.day_num;
+                    const openingHour = openingHours[currentDayIndex];
+                    const closingHour = closingHours[currentDayIndex];
+                    
+                    const [openingHourHour, openingHourMinute] = openingHour.split(":");
+                    const openingTimeMinutes =
+                      parseInt(openingHourHour) * 60 + parseInt(openingHourMinute);
+                    
+                    const [closingHourHour, closingHourMinute] = closingHour.split(":");
+                    const closingTimeMinutes =
+                      parseInt(closingHourHour) * 60 + parseInt(closingHourMinute);
+                    
+                    // Check if the current time is within the opening and closing hours
+                    if (
+                      currentTimeMinutes >= openingTimeMinutes &&
+                      currentTimeMinutes <= closingTimeMinutes
+                    ) 
+                    {
+                      const isSelected = selectedButtons.includes(`${columnIndex}-${btnIndex}`);
+                      const employeeCountForThisSlot = slotEmployeeCounts[`${columnIndex}-${btnIndex}`] || '';
+                      const isEntered = slotEmployeeCounts[`${columnIndex}-${btnIndex}`] !== undefined;
+                      return (
+                        <Button
+                          key={`btn-${btnIndex}`}
+                          variant={(isEntered) ? 'text' : (isSelected ? 'contained' : 'outlined')}
+                          color={(isEntered) ? 'error' : (isSelected ? 'success' : 'inherit')}
+                          onMouseDown={() => handleMouseDown(columnIndex, btnIndex)}
+                          onMouseOver={() => {
+                            if (isDragging) {
+                              toggleButtonSelection(columnIndex, btnIndex);
+                          }
+                        }}
+                          onMouseUp={() => {
+                              setIsDragging(false);
+                          }}
+                          sx={{
+                            borderColor: "white",
+                            "&.MuiButton-outlined": {
+                              borderColor: "white",
+                            },
+                            "&:hover": {
+                              borderColor: "white",
+                            },
+                            "&.MuiButton-text": {
+                              borderColor: "white",
+                              color: "white",
+                              backgroundColor: "#2e7c67",
+                            },
+                          }}
+                        >
+                        {`${timereqData.slots_dict && timereqData.slots_dict[btnIndex]}`}
+                        <span>&nbsp;&nbsp;&nbsp;{employeeCountForThisSlot}</span>
+                        </Button>
+                      );
+                    }
+                    return null; // Return null if the current time is outside the opening and closing hours
+                  })}
+
+                  </Box>
                 </Box>
-              </Box>
-            ))}
-
-            </Box>
+              
+            ))}       
+            <Button 
+              variant="outlined"
+              color="inherit"
+              onClick={handleFormSubmit}
+              sx={{
+                borderColor: 'white',
+                '&.MuiButton-outlined': {
+                  borderColor: 'white',
+                },
+                '&:hover': {
+                  borderColor: 'white',
+                },
+                '&.MuiButton-text': {
+                  borderColor: 'white',
+                  color: 'white',
+                  backgroundColor: '#2e7c67',
+                }
+              }}
+            >
+              Submit
+            </Button>
+          </Box>
+          </Box>
          
       <Snackbar
         open={showSuccessNotification}
