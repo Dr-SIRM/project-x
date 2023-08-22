@@ -1370,6 +1370,7 @@ class ORAlgorithm:
                             email=user.email,
                             first_name=user.first_name,
                             last_name=user.last_name,
+                            company_name=user.company_name,
                             date=date,
                             start_time=datetime.datetime.combine(date, datetime.time(hour=start_time // 4, minute=(start_time % 4) * 15)),
                             end_time=datetime.datetime.combine(date, datetime.time(hour=end_time // 4, minute=(end_time % 4) * 15)),
