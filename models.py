@@ -152,6 +152,7 @@ class Timetable(db.Model, UserMixin):
     email = db.Column(db.String(200), index=True, unique=False)
     first_name = db.Column(db.String(100), index=True, unique=False)
     last_name = db.Column(db.String(100), index=True, unique=False)
+    company_name = db.Column(db.String(200), index=True, unique=False)
     date = db.Column(db.Date, index=True)
     start_time = db.Column(db.Time)
     end_time = db.Column(db.Time)
@@ -163,14 +164,16 @@ class Timetable(db.Model, UserMixin):
     changed_by = db.Column(db.Integer, index=True, unique=False)
     creation_timestamp = db.Column(db.DateTime)
     update_timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
+    
 
 
     def __init__(self, id, email, first_name, last_name, date, start_time, end_time, start_time2, end_time2,
-                 start_time3, end_time3, created_by, changed_by, creation_timestamp):
+                 start_time3, end_time3, created_by, changed_by, creation_timestamp, company_name):
         self.id = id
         self.email = email
         self.first_name = first_name
         self.last_name = last_name
+        self.company_name = company_name
         self.date = date
         self.start_time = start_time
         self.end_time = end_time
@@ -181,6 +184,7 @@ class Timetable(db.Model, UserMixin):
         self.created_by = created_by
         self.changed_by = changed_by
         self.creation_timestamp = creation_timestamp
+        
 
 
 

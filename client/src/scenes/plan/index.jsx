@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './plan.css';
-import { useTheme, Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import Header from "../../components/Header";
 
 const GanttChart = () => {
   const [view, setView] = useState('day');
-  const [workers, setWorkers] = useState([]);
   const [shifts, setShifts] = useState([]);
+  console.log("Shifts:", shifts);
   const token = localStorage.getItem('session_token');
   const [openingHours, setOpeningHours] = useState({});
-
 
   useEffect(() => {
     const fetchWorkers = async () => {
@@ -19,15 +18,29 @@ const GanttChart = () => {
           headers: { Authorization: `Bearer ${token}` }
         });
         const responseData = response.data;
-        if (responseData && responseData.users) {
-          const workerShifts = responseData.users.map((worker) => ({
-            worker: `${worker.first_name} ${worker.last_name}`,
-            start: new Date(2023, 7, 16, 8),
-            end: new Date(2023, 7, 16, 10)
-          }));
-          setWorkers(responseData.users);
-          setShifts(workerShifts);
+        console.log("API Response Data:", responseData);
+  
+        if (responseData && responseData.shifts) {
+          const workerMap = new Map();
+  
+          responseData.shifts.forEach(shift => {
+            const key = `${shift.first_name} ${shift.last_name}`;
+            const worker = workerMap.get(key);
+  
+            if (worker) {
+              worker.shifts.push(shift);
+            } else {
+              workerMap.set(key, {
+                first_name: shift.first_name,
+                last_name: shift.last_name,
+                shifts: [shift]
+              });
+            }
+          });
+  
+          setShifts([...workerMap.values()]);
         }
+  
         if (responseData && responseData.opening_hours) {
           setOpeningHours(responseData.opening_hours);
         } else {
@@ -37,51 +50,97 @@ const GanttChart = () => {
         console.error('Error fetching workers:', error);
       }
     };
-    
-    
-    
+  
     fetchWorkers();
   }, []);
-
+  
   const formatDate = (date) => {
-    return date.toLocaleDateString('de-DE', {
-      day: '2-digit',
-      month: 'short',
-    });
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+  
+    return `${day}.${month}.${year}`;
   };
-
+  
   const formatTime = (hour) => {
-    const date = new Date();
-    date.setHours(hour, 0, 0, 0);
-    return date.toLocaleTimeString('de-DE', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    return hour.toString().padStart(2, '0') + ":00";
   };
+  
 
   const getShiftPosition = (shift, maxDuration) => {
-    const startDate = new Date(shift.start.getFullYear(), shift.start.getMonth(), shift.start.getDate(), 0, 0, 0, 0);
-
-    const startDifference = (shift.start - startDate) / 1000 / 60 / 60;
-    const duration = (shift.end - shift.start) / 1000 / 60 / 60;
-
+    const startDate = new Date(shift.date + "T00:00:00");
+    const shiftStart = new Date(shift.date + "T" + shift.start_time);
+    const shiftEnd = new Date(shift.date + "T" + shift.end_time);
+  
+    if (isNaN(shiftStart) || isNaN(shiftEnd)) {
+      return { left: 0, width: 0 };
+    }
+  
+    const startDifference = (shiftStart - startDate) / 1000 / 60 / 60;
+    const duration = (shiftEnd - shiftStart) / 1000 / 60 / 60;
+  
     const left = (startDifference / maxDuration) * 100;
     const width = (duration / maxDuration) * 100;
+  
+    console.log(`Shift data: ${JSON.stringify(shift)}`);
+    console.log(`startDifference: ${startDifference}`);
+    console.log(`duration: ${duration}`);
+    console.log(`left: ${left}`);
+    console.log(`width: ${width}`);
+    console.log(`Position for shift ${JSON.stringify(shift)}: left = ${left}, width = ${width}`);
 
+  
     return { left, width };
   };
+  
+  const renderShifts = (worker) => {
+    console.log(`Raw shifts for worker ${worker.first_name} ${worker.last_name}:`, worker.shifts);
+  
+    const validShifts = [];
+  
+    worker.shifts.forEach(shiftData => {
+      const { shifts } = shiftData;
+      shifts.forEach(shift => {
+        console.log(`Start time for shift: ${shift.start_time}`);
+        console.log(`End time for shift: ${shift.end_time}`);
+  
+        if (shift.start_time && shift.end_time) {
+          validShifts.push({
+            ...shiftData,
+            start_time: shift.start_time,
+            end_time: shift.end_time,
+          });
+        }
+      });
+    });
+  
+    console.log(`Valid shifts for worker ${worker.first_name} ${worker.last_name}:`, validShifts);
+  
+    return (
+      <div className="gantt-bar-container">
+        {validShifts.map((shift, index) => (
+          <div
+            key={index}
+            className="gantt-bar"
+            style={getShiftPosition(shift, view === 'day' ? 24 : view === 'week' ? 7 * 24 : 30 * 24)}
+          ></div>
+        ))}
+      </div>
+    );
+  };
+  
+  
+  
+  
+  
 
   const getTimelineLabels = () => {
     const today = new Date();
     const weekday = today.toLocaleDateString('en-US', { weekday: 'long' });
-    const hours = openingHours[weekday];
-  
-    console.log("Opening hours:", openingHours);
-    console.log("Weekday:", weekday);
-    console.log("Hours for weekday:", hours);
-  
+    const hours = openingHours[weekday.toLowerCase()];
+
+
     if (!hours || view !== 'day') {
-      // handle 'week' and 'month' views as before
       switch (view) {
         case 'week':
           return Array.from({ length: 7 }).map((_, index) => {
@@ -99,22 +158,14 @@ const GanttChart = () => {
           return [];
       }
     }
-  
+
     const startHour = parseInt(hours.start.split(":")[0], 10);
     const endHour = parseInt(hours.end.split(":")[0], 10);
     const hoursArray = Array.from({ length: endHour - startHour + 1 }).map((_, index) => startHour + index);
-  
-    console.log("Start hour:", startHour);
-    console.log("End hour:", endHour);
-    console.log("Hours array:", hoursArray);
-  
+
     const timelineLabels = hoursArray.map(hour => formatTime(hour));
-    console.log("Timeline labels:", timelineLabels);
     return timelineLabels;
   };
-  
-  
-  
 
   return (
     <Box m="20px">
@@ -134,15 +185,10 @@ const GanttChart = () => {
             <span key={index}>{label}</span>
           ))}
         </div>
-        {shifts.map((shift, index) => (
+        {shifts.map((workerShift, index) => (
           <div key={index} className="gantt-row">
-            <div className="gantt-worker">{shift.worker}</div>
-            <div className="gantt-bar-container">
-              <div
-                className="gantt-bar"
-                style={getShiftPosition(shift, view === 'day' ? 24 : view === 'week' ? 7 * 24 : 30 * 24)}
-              ></div>
-            </div>
+            <div className="gantt-worker">{`${workerShift.first_name} ${workerShift.last_name}`}</div>
+            {renderShifts(workerShift)}
           </div>
         ))}
       </div>
