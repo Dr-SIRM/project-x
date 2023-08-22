@@ -47,6 +47,7 @@ const TimeReq = ({ timereq }) => {
   const [employeeCount, setEmployeeCount] = useState(0);
   const [selectedButtons, setSelectedButtons] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [slotEmployeeCounts, setSlotEmployeeCounts] = useState({});
 
   useEffect(() => {
     const endDrag = () => setIsDragging(false);
@@ -70,6 +71,23 @@ const TimeReq = ({ timereq }) => {
       setSelectedButtons([...selectedButtons, selectedKey]);
     }
   }, [selectedButtons]);
+
+  const setEmployees = (e) => {
+    const value = parseInt(e.target.value);
+    setEmployeeCount(value);
+  };
+
+  const applyEmployeeCountToSelectedSlots = () => {
+    // Update the slotEmployeeCounts state based on selectedButtons and employeeCount
+    const updatedCounts = {...slotEmployeeCounts};
+    selectedButtons.forEach(slot => {
+      updatedCounts[slot] = employeeCount;
+    });
+    setSlotEmployeeCounts(updatedCounts);
+    // Optionally, you can reset the selectedButtons and employeeCount here if needed
+    setSelectedButtons([]);
+    setEmployeeCount(0);
+  };
   
   
   useEffect(() => {
@@ -114,11 +132,6 @@ const TimeReq = ({ timereq }) => {
   const goToPreviousWeek = () => {
     setWeekAdjustment(weekAdjustment - 7);
   };
-
-  const setEmployees = (event) => {
-    setEmployeeCount(event.target.value);
-  };
-
   
   const handleFormSubmit = async (values) => {
     try {
@@ -195,6 +208,13 @@ const TimeReq = ({ timereq }) => {
                   fullWidth
                   inputProps={{ min: 0 }}
                 />
+                <Button 
+                  variant="contained"
+                  color="primary"
+                  onClick={applyEmployeeCountToSelectedSlots}
+                >
+                  Enter
+                </Button>
                 <Box 
                     sx={{
                         display: 'flex',
