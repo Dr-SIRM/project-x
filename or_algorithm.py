@@ -1127,37 +1127,36 @@ class ORAlgorithm:
                     self.solver.Add(first_week_first_shift_days - first_week_second_shift_days - 1000 * first_week_shift <= 0)
                     self.solver.Add(first_week_second_shift_days - first_week_first_shift_days - 1000 * (1 - first_week_shift) <= 0)
 
-                    for week in range(1, 5):
-                        for j in range((week-1)*7, week*7):
-                            # Setzen Sie self.c auf den Gegensatz von first_week_shift in der zweiten und vierten Woche, und auf den gleichen Wert von first_week_shift in der ersten und dritten Woche
+                    for week in range(2, 5): # Beginne bei Woche 2
+                        for j in range((week-1)*7, week*7): # Beginne bei Tag 0 der aktuellen Woche und gehe bis zum letzten Tag der Woche
                             if week % 2 == 0:
                                 self.solver.Add(self.c[i, j] == 1 - first_week_shift)
                             else:
                                 self.solver.Add(self.c[i, j] == first_week_shift)
 
-                    for j in range(7, self.calc_time):
-                        # Summe der Stunden in der ersten Schicht in der zweiten Woche
-                        first_shift_hours_second_week = self.solver.Sum(self.x[i, j, k] for k in range(0, int(len(self.verfügbarkeit[i][j]) / 2)))
-                        second_shift_hours_second_week = self.solver.Sum(self.x[i, j, k] for k in range(int(len(self.verfügbarkeit[i][j]) / 2), len(self.verfügbarkeit[i][j])))
+                    for j in range(7, 28):
+                        # Summe der Stunden in der ersten Schicht in der aktuellen Woche
+                        first_shift_hours_current_week = self.solver.Sum(self.x[i, j, k] for k in range(0, int(len(self.verfügbarkeit[i][j]) / 2)))
+                        second_shift_hours_current_week = self.solver.Sum(self.x[i, j, k] for k in range(int(len(self.verfügbarkeit[i][j]) / 2), len(self.verfügbarkeit[i][j])))
 
                         # Kann 0 oder 1 annehmen
-                        delta_2 = self.solver.BoolVar("delta_2")
+                        delta_2 = self.solver.BoolVar(f"delta_2_{i}_{j}")
 
-                        self.solver.Add(first_shift_hours_second_week - second_shift_hours_second_week - 1000 * delta_2 <= 0)
-                        self.solver.Add(second_shift_hours_second_week - first_shift_hours_second_week - 1000 * (1 - delta_2) <= 0)
+                        self.solver.Add(first_shift_hours_current_week - second_shift_hours_current_week - 1000 * delta_2 <= 0)
+                        self.solver.Add(second_shift_hours_current_week - first_shift_hours_current_week - 1000 * (1 - delta_2) <= 0)
 
                         # Hilfsvariable mit s2[i, j] verknüpfen
                         self.solver.Add(self.s2[i, j] == 1 - delta_2)
 
+                    # Verletzungsvariable erhöhen, wenn die Schicht in den Wochen 2, 3 und 4 nicht der entgegengesetzten Schicht entspricht
+                    for i in self.mitarbeiter:
+                        for j in range(7, 28):
+                            diff = self.solver.IntVar(-1, 1, f"diff_{i}_{j}")
+                            self.solver.Add(diff == self.s2[i, j] - self.c[i, j])
 
-                # Verletzungsvariable erhöhen, wenn die Schicht in den Wochen 2, 3 und 4 nicht der entgegengesetzten Schicht entspricht
-                for i in self.mitarbeiter:
-                    for j in range(8, 29):
-                        diff = self.solver.IntVar(-1, 1, f"diff_{i}_{j}")
-                        self.solver.Add(diff == self.s2[i, j] - self.c[i, j])
+                            self.solver.Add(self.nb8_violation[i, j] >= diff)
+                            self.solver.Add(self.nb8_violation[i, j] >= -diff)
 
-                        self.solver.Add(self.nb8_violation[i, j] >= diff)
-                        self.solver.Add(self.nb8_violation[i, j] >= -diff)
 
                     
 
