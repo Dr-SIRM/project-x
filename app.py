@@ -95,11 +95,12 @@ def load_user(jwt_header, jwt_data):
 # Change/Update content in the database
 @app.route('/upgrade_db')
 def set_db():
-    users = User.query.all()
-    for user in users:
-        user.employment = "Temp"
+    users = Timetable.query.all()
+    for i in users:
+        i.company_name = "TimeTab GmbH"
     db.session.commit()
-    return "Employment column updated successfully."
+    return "Company_name column updated successfully."
+
 
 
 

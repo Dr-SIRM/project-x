@@ -1033,14 +1033,47 @@ def get_shift():
 
     opening_hours_data = {}
     for record in opening_hours_records:
-        opening_hours_data[record.weekday.lower()] = {
-            "start": record.start_time.strftime("%H:%M"),
-            "end": record.end_time.strftime("%H:%M")
-        }
+        if record.start_time is not None and record.end_time is not None:
+            opening_hours_data[record.weekday.lower()] = {
+                "start": record.start_time.strftime("%H:%M"),
+                "end": record.end_time.strftime("%H:%M")
+            }
+
+    shift_records = Timetable.query.filter_by(company_name=current_company_name).all()
+
+    shift_data = []
+    for record in shift_records:
+        if record.date is not None:
+            date_str = record.date.strftime("%Y-%m-%d")
+        else:
+            date_str = None
+
+        shift_data.append({
+            'email': record.email,
+            'first_name': record.first_name,
+            'last_name': record.last_name,
+            'date': date_str,
+            'shifts': [
+                {
+                    'start_time': record.start_time.strftime("%H:%M") if record.start_time is not None else None,
+                    'end_time': record.end_time.strftime("%H:%M") if record.end_time is not None else None
+                },
+                {
+                    'start_time': record.start_time2.strftime("%H:%M") if record.start_time2 is not None else None,
+                    'end_time': record.end_time2.strftime("%H:%M") if record.end_time2 is not None else None
+                },
+                {
+                    'start_time': record.start_time3.strftime("%H:%M") if record.start_time3 is not None else None,
+                    'end_time': record.end_time3.strftime("%H:%M") if record.end_time3 is not None else None
+                }
+            ]
+        })
 
     response = {
         'users': user_list,
-        'opening_hours': opening_hours_data
+        'opening_hours': opening_hours_data,
+        'shifts': shift_data
     }
-    print("Opening hours data:", opening_hours_data)
+
     return jsonify(response)
+
