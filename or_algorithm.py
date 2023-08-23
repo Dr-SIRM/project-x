@@ -33,7 +33,9 @@ Prio 1:
  -------------------------------
  - NB9 mit 3 Schichten fertigbauen
  - Stunden Teiler für 1/4, 1/2 und 1h einbauen
+ - Opening Hour 2 einbauen
  - Code ordnen
+ - Testphase
  - "Gewünschte max. Zeit pro Woche" in Solver Req muss gelöscht werden
 
 
