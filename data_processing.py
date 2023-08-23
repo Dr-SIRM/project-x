@@ -95,7 +95,6 @@ class DataProcessing:
         self.start_date = "2023-07-03"
         self.end_date = "2023-07-30"
 
-
         print(self.start_date)
         print(self.end_date)
         print(self.week_timeframe)
