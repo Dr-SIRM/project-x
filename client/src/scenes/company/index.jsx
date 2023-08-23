@@ -81,8 +81,8 @@ const Company = ({ company }) => {
           ...Array.from({ length: companyData.day_num }).reduce((acc, _, rowIndex) => {
             acc[`day_${rowIndex}_0`] = companyData.temp_dict[`${rowIndex + 1}&0`];
             acc[`day_${rowIndex}_1`] = companyData.temp_dict[`${rowIndex + 1}&1`];
-            acc[`day_${rowIndex}_2`] = companyData.temp_dict[`${rowIndex + 1}&0`];
-            acc[`day_${rowIndex}_3`] = companyData.temp_dict[`${rowIndex + 1}&1`];
+            acc[`day_${rowIndex}_2`] = companyData.temp_dict[`${rowIndex + 1}&2`];
+            acc[`day_${rowIndex}_3`] = companyData.temp_dict[`${rowIndex + 1}&3`];
             return acc;
           }, {}),
         }}
@@ -351,40 +351,40 @@ const Company = ({ company }) => {
                     sx={{ gridColumn: "span 1" }}
                   />
                   <TextField
-                    key={`day_${rowIndex}_0`}
+                    key={`day_${rowIndex}_2`}
                     fullWidth
                     variant="filled"
                     type="time"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values[`day_${rowIndex}_0`]}
-                    name={`day_${rowIndex}_0`}
+                    value={values[`day_${rowIndex}_2`]}
+                    name={`day_${rowIndex}_2`}
                     error={
-                      !!touched[`day_${rowIndex}_0`] &&
-                      !!errors[`day_${rowIndex}_0`]
+                      !!touched[`day_${rowIndex}_2`] &&
+                      !!errors[`day_${rowIndex}_2`]
                     }
                     helperText={
-                      touched[`day_${rowIndex}_0`] &&
-                      errors[`day_${rowIndex}_0`]
+                      touched[`day_${rowIndex}_2`] &&
+                      errors[`day_${rowIndex}_2`]
                     }
                     sx={{ gridColumn: "span 1" }}
                   />
                   <TextField
-                    key={`day_${rowIndex}_1`}
+                    key={`day_${rowIndex}_3`}
                     fullWidth
                     variant="filled"
                     type="time"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values[`day_${rowIndex}_1`]}
-                    name={`day_${rowIndex}_1`}
+                    value={values[`day_${rowIndex}_3`]}
+                    name={`day_${rowIndex}_3`}
                     error={
-                      !!touched[`day_${rowIndex}_1`] &&
-                      !!errors[`day_${rowIndex}_1`]
+                      !!touched[`day_${rowIndex}_3`] &&
+                      !!errors[`day_${rowIndex}_3`]
                     }
                     helperText={
-                      touched[`day_${rowIndex}_1`] &&
-                      errors[`day_${rowIndex}_1`]
+                      touched[`day_${rowIndex}_3`] &&
+                      errors[`day_${rowIndex}_3`]
                     }
                     sx={{ gridColumn: "span 1" }}
                   />

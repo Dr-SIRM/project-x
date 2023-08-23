@@ -249,6 +249,8 @@ def get_company():
             new_i = i + 1
             temp_dict[str(new_i) + '&0'] = temp.start_time.strftime("%H:%M") if temp.start_time else None
             temp_dict[str(new_i) + '&1'] = temp.end_time.strftime("%H:%M") if temp.end_time else None
+            temp_dict[str(new_i) + '&2'] = temp.start_time2.strftime("%H:%M") if temp.start_time2 else None
+            temp_dict[str(new_i) + '&3'] = temp.end_time2.strftime("%H:%M") if temp.end_time2 else None
 
         if request.method == 'POST':
             company_data = request.get_json()
@@ -279,8 +281,9 @@ def get_company():
 
             for i in range(day_num):
                 entry1 = request.json.get(f'day_{i}_0')
-                print(entry1)
                 entry2 = request.json.get(f'day_{i}_1')
+                entry3 = request.json.get(f'day_{i}_2')
+                entry4 = request.json.get(f'day_{i}_3')
                 if entry1:
                     last = OpeningHours.query.order_by(OpeningHours.id.desc()).first()
                     if last is None:
@@ -297,6 +300,16 @@ def get_company():
                     except:
                         new_entry2 = datetime.datetime.strptime(entry2, '%H:%M').time()
 
+                    try:
+                        new_entry3 = datetime.datetime.strptime(entry3, '%H:%M:%S').time()
+                    except:
+                        new_entry3 = datetime.datetime.strptime(entry3, '%H:%M').time()
+
+                    try:
+                        new_entry4 = datetime.datetime.strptime(entry4, '%H:%M:%S').time()
+                    except:
+                        new_entry4 = datetime.datetime.strptime(entry4, '%H:%M').time()
+
                     new_weekday = weekdays[i]
 
                     opening = OpeningHours(
@@ -305,6 +318,8 @@ def get_company():
                     weekday=new_weekday,
                     start_time=new_entry1,
                     end_time=new_entry2,
+                    start_time2=new_entry3,
+                    end_time2=new_entry4,
                     created_by=company_id,
                     changed_by=company_id,
                     creation_timestamp=creation_date
@@ -312,6 +327,8 @@ def get_company():
 
                 db.session.add(opening)
                 db.session.commit()
+    
+    print(temp_dict)
 
 
     company_list = {
