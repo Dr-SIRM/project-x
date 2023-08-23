@@ -130,17 +130,21 @@ class OpeningHours(db.Model, UserMixin):
     weekday = db.Column(db.String(200), index=True, unique=False)
     start_time = db.Column(db.Time)
     end_time = db.Column(db.Time)
+    start_time2 = db.Column(db.Time)
+    end_time2 = db.Column(db.Time)
     created_by = db.Column(db.Integer, index=True, unique=False)
     changed_by = db.Column(db.Integer, index=True, unique=False)
     creation_timestamp = db.Column(db.DateTime)
     update_timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
 
-    def __init__(self, id, company_name, weekday, start_time, end_time, created_by, changed_by, creation_timestamp):
+    def __init__(self, id, company_name, weekday, start_time, end_time, start_time2, end_time2,created_by, changed_by, creation_timestamp):
         self.id = id
         self.company_name = company_name
         self.weekday = weekday
         self.start_time = start_time
         self.end_time = end_time
+        self.start_time2 = start_time2
+        self.end_time2 = end_time2
         self.created_by = created_by
         self.changed_by = changed_by
         self.creation_timestamp = creation_timestamp
