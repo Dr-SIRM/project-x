@@ -143,19 +143,23 @@ const TimeReq = ({ timereq }) => {
     
       Object.entries(slotEmployeeCounts).forEach(([key, count]) => {
         const [columnIndex, btnIndex] = key.split('-');
-        const dayNum = columnIndex + 1; // Assuming columnIndex starts from 0
+        const dayNum = columnIndex; // Assuming columnIndex starts from 0
         const currentTime = timereqData.slots_dict[parseInt(btnIndex)];
         const newKey = `worker_${dayNum}_${currentTime}`;
-        payload[newKey] = count;
+        payload[newKey] = count.toString();
       });
 
+      console.log("Posting the following payload to the server:", payload);
+
       // Send the updated form values to the server for database update
-      await axios.post('http://localhost:5000/api/requirement/workforce?week_adjustment=' + weekAdjustment, values, {
+      await axios.post('http://localhost:5000/api/requirement/workforce?week_adjustment=' + weekAdjustment, payload, {
     headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
         }
     });
       setShowSuccessNotification(true);
+      console.log(payload);
     } catch (error) {
       setShowErrorNotification(true);
     }

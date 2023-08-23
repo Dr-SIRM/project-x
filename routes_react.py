@@ -960,14 +960,19 @@ def get_required_workforce():
 
     #Submit the required FTE per hour
     if request.method =='POST':
+        print(request.json)
         workforce_data = request.get_json()
         week_adjustment = int(request.args.get('week_adjustment', 0))
         for i in range(day_num):
             for quarter in range(daily_slots): # There are 96 quarters in a day
                 quarter_hour = quarter / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
+                print(quarter_hour)
                 quarter_minute = (quarter % hour_divider) * minutes  # Remainder gives the quarter in the hour
+                print(quarter_minute)
                 formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+                print(formatted_time)
                 capacity = workforce_data.get(f'worker_{i}_{formatted_time}')
+                print(capacity)
                 if capacity:
                     last = TimeReq.query.order_by(TimeReq.id.desc()).first()
                     if last is None:
