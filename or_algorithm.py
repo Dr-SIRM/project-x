@@ -900,7 +900,7 @@ class ORAlgorithm:
                     for k in range(1, len(self.verfügbarkeit[i][j])):
                         self.solver.Add(self.y[i, j, k] >= self.x[i, j, k] - self.x[i, j, k-1])
                     # Die Summe der y[i, j, k] für einen bestimmten Tag j sollte nicht größer als 1 sein
-                    self.solver.Add(self.solver.Sum(self.y[i, j, k] for k in range(len(self.verfügbarkeit[i][j]))) <= 2)
+                    self.solver.Add(self.solver.Sum(self.y[i, j, k] for k in range(len(self.verfügbarkeit[i][j]))) <= 1)
         
 
         # -------------------------------------------------------------------------------------------------------
