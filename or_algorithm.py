@@ -90,6 +90,7 @@ class ORAlgorithm:
         self.max_zeit = None                                # 4
         self.min_zeit = None                                # 5
         self.max_time_week = None                           # 6   
+
         self.calc_time = None                               # 7
         self.employment_lvl_exact = []                      # 8
         self.employment = []                                # 9
@@ -217,14 +218,16 @@ class ORAlgorithm:
         if key in self.solver_requirements:
             self.max_time_week = self.solver_requirements[key]
 
-        self.max_time_week = self.max_time_week * self.hour_devider                  
-        self.weekly_hours = self.weekly_hours * self.hour_devider                    
+        self.max_time_week = self.max_time_week * self.hour_devider
 
         # -- 7 ------------------------------------------------------------------------------------------------------------
+        self.weekly_hours = self.weekly_hours * self.hour_devider                    
+
+        # -- 8 ------------------------------------------------------------------------------------------------------------
         # Berechnung der calc_time (Anzahl Tage an denen die MA eingeteilt werden)
         self.calc_time = 7 * self.week_timeframe
 
-        # -- 8 ------------------------------------------------------------------------------------------------------------
+        # -- 9 ------------------------------------------------------------------------------------------------------------
         # Empolyment_level aus dem employment_lvl dict in einer Liste speichern (nur MA die berücksichtigt werden)
         # Iterieren Sie über die Schlüssel in binary_availability
         for user_id in self.binary_availability.keys():
@@ -234,14 +237,14 @@ class ORAlgorithm:
                 self.employment_lvl_exact.append(self.employment_lvl[user_id])
         # self.employment_lvl_exact = [1, 0.8, 0.8, 0.6, 0.6] # Damit die Liste noch selbst manipuliert werden kann.
 
-        # -- 9 ------------------------------------------------------------------------------------------------------------
+        # -- 10 ------------------------------------------------------------------------------------------------------------
         # Iteration of the key within binary_availability
         for user_id in self.binary_availability.keys():
             if user_id in self.user_employment:
                 self.employment.append(self.user_employment[user_id])
         # self.employment = ["Perm", "Temp", "Temp", "Temp", "Temp"] # selbst manipuliert
 
-        # -- 10 ------------------------------------------------------------------------------------------------------------
+        # -- 11 ------------------------------------------------------------------------------------------------------------
         # verteilbare Stunden (Wieviele Mannstunden benötigt die Firma im definierten Zeitraum)
         self.verteilbare_stunden = 0
         for date in self.time_req:
@@ -249,17 +252,17 @@ class ORAlgorithm:
                 self.verteilbare_stunden += self.time_req[date][hour]
                 self.verteilbare_stunden = self.verteilbare_stunden
 
-        # -- 11 ------------------------------------------------------------------------------------------------------------
+        # -- 12 ------------------------------------------------------------------------------------------------------------
         for key in self.binary_availability:
             gesamt_stunden = sum(sum(day_data[1]) for day_data in self.binary_availability[key])
             self.gesamtstunden_verfügbarkeit.append(gesamt_stunden)
 
-        # -- 12 ------------------------------------------------------------------------------------------------------------
+        # -- 13 ------------------------------------------------------------------------------------------------------------
         # Eine Liste mit den min. anwesendheiten der MA wird erstellt
         for _, values in sorted(self.time_req.items()):
             self.min_anwesend.append(list(values.values()))
 
-        # -- 13 ------------------------------------------------------------------------------------------------------------
+        # -- 14 ------------------------------------------------------------------------------------------------------------
         # Eine Liste mit den Stunden wie sie gerecht verteilt werden
         list_gesamtstunden = []
         for i in range(len(self.mitarbeiter)):
@@ -306,7 +309,7 @@ class ORAlgorithm:
                 total_hours_assigned -= 1
         print("4. self.gerechte_verteilung: ", self.gerechte_verteilung)       
 
-        # -- 14 ------------------------------------------------------------------------------------------------------------
+        # -- 15 ------------------------------------------------------------------------------------------------------------
         # Toleranz der gerechten Verteilung
         key = "fair_distribution"
         if key in self.solver_requirements:
@@ -347,15 +350,15 @@ class ORAlgorithm:
         print("4. self.max_zeit: ", self.max_zeit)
         print("5. self.min_zeit: ", self.min_zeit)
         print("6. self.max_time_week: ", self.max_time_week)
-        print("6.1. self.weekly_hours: ", self.weekly_hours)
-        print("7. self.calc_time: ", self.calc_time)
-        print("8. self.empolyment_lvl_exact: ", self.employment_lvl_exact)
-        print("9. self.employment: ", self.employment)
-        print("10. self.verteilbare_stunden: ", self.verteilbare_stunden)
-        print("11. self.gesamtstunden_verfügbarkeit: ", self.gesamtstunden_verfügbarkeit)
-        print("12. self.min_anwesend: ", self.min_anwesend)
-        print("13. self.gerechte_verteilung: ", self.gerechte_verteilung)
-        print("14. self.fair_distribution: ", self.fair_distribution)
+        print("7. self.weekly_hours: ", self.weekly_hours)
+        print("8. self.calc_time: ", self.calc_time)
+        print("9. self.empolyment_lvl_exact: ", self.employment_lvl_exact)
+        print("10. self.employment: ", self.employment)
+        print("11. self.verteilbare_stunden: ", self.verteilbare_stunden)
+        print("12. self.gesamtstunden_verfügbarkeit: ", self.gesamtstunden_verfügbarkeit)
+        print("13. self.min_anwesend: ", self.min_anwesend)
+        print("14. self.gerechte_verteilung: ", self.gerechte_verteilung)
+        print("15. self.fair_distribution: ", self.fair_distribution)
 
 
 

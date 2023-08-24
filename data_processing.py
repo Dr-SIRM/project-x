@@ -193,6 +193,10 @@ class DataProcessing:
 
 
 
+
+    # end_time in dieser Methode auf end_time2 wechslen!!
+
+    
     def get_opening_hours(self):
         """ In dieser Funktion werden die Öffnungszeiten (7 Tage) der jeweiligen Company aus der Datenbank gezogen. """
         with app.app_context():
