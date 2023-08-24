@@ -36,9 +36,11 @@ Prio 1:
  - Opening Hour 2 einbauen
  - Code ordnen
  - Testphase
+
  - "Gewünschte max. Zeit pro Woche" in Solver Req muss gelöscht werden
+ - Der erstellte "divisor" in data_processing könnte als Attribut initialisiert werden, damit es nicht bei jeder Methode einzeln berechnet werden muss
 
-
+ 
  Fragen an die Runde:
  -------------------------------
  - MA mit verschiedenen Profilen - Department (Koch, Service, ..)? Wie genau lösen wir das?
@@ -72,12 +74,13 @@ class ORAlgorithm:
         self.laden_schliesst = dp.laden_schliesst           # 104
         self.binary_availability = dp.binary_availability   # 105
         self.company_shifts = dp.company_shifts             # 106
-        self.weekly_hours = dp.weekly_hours                 # 106.5
-        self.employment_lvl = dp.employment_lvl             # 107
-        self.time_req = dp.time_req                         # 108    
-        self.user_employment = dp.user_employment           # 109
-        self.solver_requirements = dp.solver_requirements   # 110
-        self.week_timeframe = dp.week_timeframe             # 111
+        self.weekly_hours = dp.weekly_hours                 # 107
+        self.employment_lvl = dp.employment_lvl             # 108
+        self.time_req = dp.time_req                         # 109    
+        self.user_employment = dp.user_employment           # 110
+        self.solver_requirements = dp.solver_requirements   # 111
+        self.week_timeframe = dp.week_timeframe             # 112
+        self.hour_devider = dp.hour_devider                 # 113
 
         # Attribute der Methode "create_variables"
         self.mitarbeiter = None                             # 1
@@ -90,11 +93,10 @@ class ORAlgorithm:
         self.employment_lvl_exact = []                      # 8
         self.employment = []                                # 9
         self.verteilbare_stunden = None                     # 10
-        self.stunden_pro_tag = None                         # 11
-        self.gesamtstunden_verfügbarkeit = []               # 12
-        self.min_anwesend = []                              # 13
-        self.gerechte_verteilung = []                       # 14
-        self.fair_distribution = None                       # 15
+        self.gesamtstunden_verfügbarkeit = []               # 11
+        self.min_anwesend = []                              # 12
+        self.gerechte_verteilung = []                       # 13
+        self.fair_distribution = None                       # 14
 
         self.desired_max_time_day = None
         self.max_time_day = None
@@ -184,12 +186,12 @@ class ORAlgorithm:
         key = "desired_max_time_day"
         if key in self.solver_requirements:
             self.desired_max_time_day = self.solver_requirements[key]
-        self.desired_max_time_day = self.desired_max_time_day * 4       # Diese 4 neu dann variabel machen
+        self.desired_max_time_day = self.desired_max_time_day * self.hour_devider
 
         key = "max_time_day"
         if key in self.solver_requirements:
             self.max_time_day = self.solver_requirements[key]
-        self.max_time_day = self.max_time_day * 4                       # Diese 4 neu dann variabel machen
+        self.max_time_day = self.max_time_day * self.hour_devider             
         
         # Es wird weiterhin ein dict generiert, falls in Zukunft die max_time pro MA verschieden wird
         self.max_zeit = {ma: self.desired_max_time_day for ma in self.mitarbeiter}  # Maximale Arbeitszeit pro Tag
@@ -198,12 +200,12 @@ class ORAlgorithm:
         key = "desired_min_time_day"
         if key in self.solver_requirements:
             self.desired_min_time_day = self.solver_requirements[key]
-        self.desired_min_time_day = self.desired_min_time_day * 4       # Diese 4 neu dann variabel machen
+        self.desired_min_time_day = self.desired_min_time_day * self.hour_devider      
 
         key = "min_time_day"
         if key in self.solver_requirements:
             self.min_time_day = self.solver_requirements[key]
-        self.min_time_day = self.min_time_day * 4                        # Diese 4 neu dann variabel machen
+        self.min_time_day = self.min_time_day * self.hour_devider                  
 
         # Es wird weiterhin ein dict generiert, falls in Zukunft die min_time pro MA verschieden wird
         self.min_zeit = {ma: self.desired_min_time_day for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
@@ -214,13 +216,12 @@ class ORAlgorithm:
         if key in self.solver_requirements:
             self.max_time_week = self.solver_requirements[key]
 
-        self.max_time_week = self.max_time_week * 4                  # Diese 4 neu dann variabel machen (für 1/4h)
-        self.weekly_hours = self.weekly_hours * 4                    # Diese 4 neu dann variabel machen (für 1/4h)
+        self.max_time_week = self.max_time_week * self.hour_devider                  
+        self.weekly_hours = self.weekly_hours * self.hour_devider                    
 
         # -- 7 ------------------------------------------------------------------------------------------------------------
         # Berechnung der calc_time (Anzahl Tage an denen die MA eingeteilt werden)
-        # Es werden nur die Tage des ersten MA berechnet, da jeder MA die gleiche Wochenlänge hat
-        self.calc_time = len(next(iter(self.binary_availability.values())))
+        self.calc_time = 7 * self.week_timeframe
 
         # -- 8 ------------------------------------------------------------------------------------------------------------
         # Empolyment_level aus dem employment_lvl dict in einer Liste speichern (nur MA die berücksichtigt werden)
@@ -248,20 +249,16 @@ class ORAlgorithm:
                 self.verteilbare_stunden = self.verteilbare_stunden
 
         # -- 11 ------------------------------------------------------------------------------------------------------------
-        # gesamtstunden Verfügbarkeit pro MA pro Woche
-        self.stunden_pro_tag = 1 # flexibler wenn einmal 1/4h eingebaut werden          !!!  -- EVTL KANN DAS GANZ RAUSGELÖSCHT WERDEN --  !!!
-
-        # -- 12 ------------------------------------------------------------------------------------------------------------
         for key in self.binary_availability:
-            gesamt_stunden = sum(sum(day_data[1]) * self.stunden_pro_tag for day_data in self.binary_availability[key])
+            gesamt_stunden = sum(sum(day_data[1]) for day_data in self.binary_availability[key])
             self.gesamtstunden_verfügbarkeit.append(gesamt_stunden)
 
-        # -- 13 ------------------------------------------------------------------------------------------------------------
+        # -- 12 ------------------------------------------------------------------------------------------------------------
         # Eine Liste mit den min. anwesendheiten der MA wird erstellt
         for _, values in sorted(self.time_req.items()):
             self.min_anwesend.append(list(values.values()))
 
-        # -- 14 ------------------------------------------------------------------------------------------------------------
+        # -- 13 ------------------------------------------------------------------------------------------------------------
         # Eine Liste mit den Stunden wie sie gerecht verteilt werden
         list_gesamtstunden = []
         for i in range(len(self.mitarbeiter)):
@@ -308,20 +305,19 @@ class ORAlgorithm:
                 total_hours_assigned -= 1
         print("4. self.gerechte_verteilung: ", self.gerechte_verteilung)       
 
-        # -- 15 ------------------------------------------------------------------------------------------------------------
+        # -- 14 ------------------------------------------------------------------------------------------------------------
         # Toleranz der gerechten Verteilung
         key = "fair_distribution"
         if key in self.solver_requirements:
             self.fair_distribution = self.solver_requirements[key]
         self.fair_distribution = self.fair_distribution / 100      # Prozentumrechnung
-        
+
 
 
     def show_variables(self):
         """
         Wenn die Methode aktiviert wird, werden alle Attribute geprintet
         """
-
         # Attribute aus DataProcessing
         print("100. self.current_user_id: ", self.current_user_id) 
         print("101. self.user_availability: ", self.user_availability) 
@@ -330,12 +326,13 @@ class ORAlgorithm:
         print("104. self.laden_schliesst: ", self.laden_schliesst) 
         print("105. self.binary_availability: ", self.binary_availability) 
         print("106. self.company_shifts: ", self.company_shifts) 
-        print("106.5 self.weekly_hours: ", self.weekly_hours)
-        print("107. self.employment_lvl: ", self.employment_lvl) 
-        print("108. self.time_req: ", self.time_req) 
-        print("109. user_employment: ", self.user_employment) 
-        print("110. solver_requirements: ", self.solver_requirements)
-        print("111. week_timeframe: ", self.week_timeframe)
+        print("107. self.weekly_hours: ", self.weekly_hours)
+        print("108. self.employment_lvl: ", self.employment_lvl) 
+        print("109. self.time_req: ", self.time_req) 
+        print("110. user_employment: ", self.user_employment) 
+        print("111. solver_requirements: ", self.solver_requirements)
+        print("112. week_timeframe: ", self.week_timeframe)
+        print("113. self.hour_devider: ", self.hour_devider)
         print()
         
         print("Attribute der Methode create_variables:")
@@ -354,11 +351,10 @@ class ORAlgorithm:
         print("8. self.empolyment_lvl_exact: ", self.employment_lvl_exact)
         print("9. self.employment: ", self.employment)
         print("10. self.verteilbare_stunden: ", self.verteilbare_stunden)
-        print("11. self.stunden_pro_tag: ", self.stunden_pro_tag)
-        print("12. self.gesamtstunden_verfügbarkeit: ", self.gesamtstunden_verfügbarkeit)
-        print("13. self.min_anwesend: ", self.min_anwesend)
-        print("14. self.gerechte_verteilung: ", self.gerechte_verteilung)
-        print("15. self.fair_distribution: ", self.fair_distribution)
+        print("11. self.gesamtstunden_verfügbarkeit: ", self.gesamtstunden_verfügbarkeit)
+        print("12. self.min_anwesend: ", self.min_anwesend)
+        print("13. self.gerechte_verteilung: ", self.gerechte_verteilung)
+        print("14. self.fair_distribution: ", self.fair_distribution)
 
 
 
@@ -407,13 +403,10 @@ class ORAlgorithm:
         assert isinstance(self.verteilbare_stunden, (int, float)), "self.verteilbare_stunden sollte eine Ganzzahl oder eine Gleitkommazahl sein"
 
         # -- 11 -- 
-        assert isinstance(self.stunden_pro_tag, (int, float)), "self.stunden_pro_tag sollte eine Ganzzahl oder eine Gleitkommazahl sein"
-
-        # -- 12 -- 
         assert isinstance(self.gesamtstunden_verfügbarkeit, list), "self.gesamtstunden_verfügbarkeit sollte eine Liste sein"
         assert all(isinstance(stunde, (int, float)) for stunde in self.gesamtstunden_verfügbarkeit), "Alle Elemente in self.gesamtstunden_verfügbarkeit sollten Ganzzahlen oder Gleitkommazahlen sein"
 
-        # -- 13 -- 
+        # -- 12 -- 
         assert isinstance(self.min_anwesend, list), "self.min_anwesend sollte eine Liste sein"
         assert all(isinstance(val, list) for val in self.min_anwesend), "Alle Elemente in self.min_anwesend sollten Listen sein"
 
@@ -506,8 +499,6 @@ class ORAlgorithm:
         7. Ist die Toleranz der gerechten Verteilung zu klein gewählt? --> Evtl. die Bedingung weich machen!
         ---------------------------------------------------------------------------------------------------------------
         """
-
-
 
 
 
@@ -975,7 +966,7 @@ class ORAlgorithm:
 
         elif self.company_shifts == 2:
             for i in self.mitarbeiter:
-                for j in range(7): # (7 * self.week_timeframe)
+                for j in range(7):
 
                     # Hier noch einbauen, das wenn die Stundenanzahl ungerade ist!!
 
@@ -1182,8 +1173,6 @@ class ORAlgorithm:
 
 
 
-
-
                     
 
     def solve_problem(self):
@@ -1377,11 +1366,14 @@ class ORAlgorithm:
 
                     print(f"Berechnete Schichten für Benutzer-ID {user_id}, Tag-Index {day_index}: {shifts}")
 
+                    # Divisor bestimmen
+                    divisor = 3600 / self.hour_devider
+
                     for shift_index, (start_time, end_time) in enumerate(shifts):
                         # Ladenöffnungszeit am aktuellen Tag hinzufügen
-                        opening_time_in_quarters = int(self.laden_oeffnet[day_index].total_seconds() / 900)
-                        start_time += opening_time_in_quarters
-                        end_time += opening_time_in_quarters
+                        opening_time_in_units = int(self.laden_oeffnet[day_index].total_seconds() * self.hour_devider / 3600)
+                        start_time += opening_time_in_units
+                        end_time += opening_time_in_units
 
                         # Neues Timetable-Objekt
                         new_entry = Timetable(
@@ -1391,8 +1383,8 @@ class ORAlgorithm:
                             last_name=user.last_name,
                             company_name=user.company_name,
                             date=date,
-                            start_time=datetime.datetime.combine(date, datetime.time(hour=start_time // 4, minute=(start_time % 4) * 15)),
-                            end_time=datetime.datetime.combine(date, datetime.time(hour=end_time // 4, minute=(end_time % 4) * 15)),
+                            start_time=datetime.datetime.combine(date, datetime.time(hour=int(start_time // self.hour_devider), minute=int((start_time % self.hour_devider) * 60 / self.hour_devider))),
+                            end_time=datetime.datetime.combine(date, datetime.time(hour=int(end_time // self.hour_devider), minute=int((end_time % self.hour_devider) * 60 / self.hour_devider))),
                             start_time2=None,
                             end_time2=None,
                             start_time3=None,
@@ -1401,6 +1393,7 @@ class ORAlgorithm:
                             changed_by=self.current_user_id,
                             creation_timestamp=datetime.datetime.now()
                         )
+
 
                         # new_entry der Datenbank hinzufügen
                         db.session.add(new_entry)
