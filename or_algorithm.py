@@ -10,7 +10,6 @@ from app import app, db
 from sqlalchemy import text
 from models import Timetable, User
 
-
 """
 To-Do Liste:
 
@@ -58,12 +57,10 @@ Prio 1:
  - Jeder MA muss vor dem Solven eingegeben haben, wann er arbeiten kann. Auch wenn es alles 0 sind.
 
 
-
 Prio 2:
  - start_time und end_time zwei und drei noch implementieren
  - der Admin kann auch die Kosten der MA, wenn er will, eintragen. 
-
-
+ 
 """
 
 class ORAlgorithm:
@@ -613,7 +610,6 @@ class ORAlgorithm:
             for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):
                 self.nb1_violation[j, k] = self.solver.NumVar(0, self.solver.infinity(), f'nb1_violation[{j}, {k}]')
 
-
         # NB2 violation variable - Max. Arbeitszeit pro Woche
         """
         Die diff's beschreiben die Differenz zwischen der gewünschten min und max Arbeitszeiten pro Woche und der maximalen min und max. Arbeitszeiten pro Woche.
@@ -621,8 +617,6 @@ class ORAlgorithm:
         """
         diff_1 = self.max_time_week - self.weekly_hours
         print("Differenz max Time Week:", diff_1)
-
-        # verschachtelte Dictionary initialisieren
         self.nb2_violation = {ma: {} for ma in self.mitarbeiter}
         # Das verschachtelte Dictionary mit Verletzungsvariablen für jede Woche füllen
         for ma in self.mitarbeiter:
@@ -643,60 +637,48 @@ class ORAlgorithm:
             for j in range(self.calc_time):
                 self.nb4_max_violation[i, j] = self.solver.NumVar(0, diff_3, 'nb4_max_violation[%i,%i]' % (i, j))
 
-
-        """
-        # NB5 Mindestarbeitszeit Verletzungsvariable
-        for i in self.mitarbeiter:
-            self.nb5_min_violation[i] = self.solver.NumVar(0, self.solver.infinity(), f'nb5_min_violation[{i}]')
-
-        # NB6 Höchstarbeitszeit Verletzungsvariable
-        for i in self.mitarbeiter:
-            self.nb6_max_violation[i] = self.solver.NumVar(0, self.solver.infinity(), f'nb6_max_violation[{i}]')
-        """
-
         # NB5 Mindestarbeitszeit Verletzungsvariable
         for i in self.mitarbeiter:
             self.nb5_min_violation[i] = [self.solver.NumVar(0, self.solver.infinity(), f'nb5_min_violation[{i}][{week}]') for week in range(1, self.week_timeframe + 1)] 
 
-
         # NB6 Höchstarbeitszeit Verletzungsvariable
         for i in self.mitarbeiter:
             self.nb6_max_violation[i] = [self.solver.NumVar(0, self.solver.infinity(), f'nb6_max_violation[{i}][{week}]') for week in range(1, self.week_timeframe + 1)]
-
 
         # NB7 Innerhalb einer Woche die gleiche Schicht - Verletzungsvariable
         for i in self.mitarbeiter:
             for j in range(7):
                 self.nb7_violation[i, j] = self.solver.NumVar(0, self.solver.infinity(), 'nb7_violation[%i,%i]' % (i, j))
         
-
         # NB8 Innerhalb der zweiten / vierten Woche die gleiche Schicht - Verletzungsvariable
         for i in self.mitarbeiter:
             for j in range(7, self.calc_time):
                 self.nb8_violation[i, j] = self.solver.NumVar(0, self.solver.infinity(), 'nb8_violation[%i,%i]' % (i, j))
         
 
-
-    
     def objective_function(self):
         """
         Zielfunktion
         """
         self.objective = self.solver.Objective()
 
-        # Kosten MA + Weiche NB1
+        # Kosten MA minimieren
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
                     # Die Kosten werden multipliziert
                     self.objective.SetCoefficient(self.x[i, j, k], self.kosten[i])
-                    self.objective.SetCoefficient(self.nb1_violation[j, k], self.penalty_cost_nb1)
+
+        # Kosten Weiche NB1
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                    for k in range(len(self.verfügbarkeit[i][j])):
+                        self.objective.SetCoefficient(self.nb1_violation[j, k], self.penalty_cost_nb1)
 
         # Kosten Weiche NB2
         for i in self.mitarbeiter:
             for week in range(1, self.week_timeframe + 1):
                 self.objective.SetCoefficient(self.nb2_violation[i][week], self.penalty_cost_nb2)
-
 
         # Kosten für Weiche NB3 Mindestarbeitszeit Verletzung
         for i in self.mitarbeiter:
@@ -708,16 +690,6 @@ class ORAlgorithm:
             for j in range(self.calc_time):
                 self.objective.SetCoefficient(self.nb4_max_violation[i, j], self.penalty_cost_nb4_max)
 
-        """
-        # Kosten für Weiche NB5 Mindestarbeitszeit Verletzung
-        for i in self.mitarbeiter:
-            self.objective.SetCoefficient(self.nb5_min_violation[i], self.penalty_cost_nb5_min)
-
-        # Kosten für Weiche NB6 Höchstarbeitszeit Verletzung
-        for i in self.mitarbeiter:
-            self.objective.SetCoefficient(self.nb6_max_violation[i], self.penalty_cost_nb6_max)
-        """
-
         # Kosten für Weiche NB5 Mindestarbeitszeit Verletzung
         for i in self.mitarbeiter:
             for week in range(1, self.week_timeframe + 1):
@@ -728,22 +700,18 @@ class ORAlgorithm:
             for week in range(1, self.week_timeframe + 1):
                 self.objective.SetCoefficient(self.nb6_max_violation[i][week-1], self.penalty_cost_nb6_max)
 
-
         # Kosten für Weiche NB7 "Innerhalb einer Woche immer gleiche Schichten"
         for i in self.mitarbeiter:
             for j in range(7):
                 self.objective.SetCoefficient(self.nb7_violation[i, j], self.penalty_cost_nb7)
-
 
         # Kosten für Weiche NB8 "Innerhalb der zweiten Woche immer gleiche Schichten"
         for i in self.mitarbeiter:
             for j in range(7, self.calc_time):
                 self.objective.SetCoefficient(self.nb8_violation[i, j], self.penalty_cost_nb8)
 
-
         # Es wird veruscht, eine Kombination von Werten für die x[i, j, k] zu finden, die die Summe kosten[i]*x[i, j, k] minimiert + weiche NBs            
         self.objective.SetMinimization()
-
 
 
     def constraints(self):
@@ -751,7 +719,6 @@ class ORAlgorithm:
         Beschränkungen / Nebenbedingungen
         # (Die solver.Add() Funktion nimmt eine Bedingung als Argument und fügt sie dem Optimierungsproblem hinzu.)
         """
-
         # -------------------------------------------------------------------------------------------------------
         # HARTE NB -- NEU 08.08.2023 --
         # NB 0 - Variable a ist 1, wenn der Mitarbeiter an einem Tag arbeitet, sonst 0
@@ -791,7 +758,6 @@ class ORAlgorithm:
                 self.solver.Add(self.solver.Sum([self.x[i, j, k] for i in self.mitarbeiter]) - self.min_anwesend[j][k] <= self.nb1_violation[j, k])
                 
 
-
         """
         # HARTE NB
         # NB 3 - Max. Arbeitszeit pro Woche 
@@ -799,7 +765,6 @@ class ORAlgorithm:
         for ma in self.mitarbeiter:
             self.solver.Add(total_hours[ma] <= self.weekly_hours)
         """
-
         # -------------------------------------------------------------------------------------------------------
         # WEICHE NB -- NEU 28.07.2023 -- --> Muss noch genauer überprüft werden ob es funktioniert!
         # NB 3 - Max. Arbeitszeit pro Woche
@@ -846,7 +811,6 @@ class ORAlgorithm:
                     # NB 4.1 - Die Arbeitszeit eines Mitarbeiters an einem Tag kann nicht mehr als die maximale Arbeitszeit pro Tag betragen
                     self.solver.Add(sum_hour <= self.max_zeit[i] * self.a[i, j])
         """
-
         # -------------------------------------------------------------------------------------------------------
         # WEICHE NB -- NEU 31.07.2023 --
         # NB 4 - Min. und Max. Arbeitszeit pro Tag
@@ -955,7 +919,6 @@ class ORAlgorithm:
             pass
 
 
-
         elif self.company_shifts == 2:
             for i in self.mitarbeiter:
                 for j in range(7):
@@ -992,7 +955,6 @@ class ORAlgorithm:
                     # Bedingungen für den "absoluten Wert"
                     self.solver.Add(self.nb7_violation[i, j] >= diff)
                     self.solver.Add(self.nb7_violation[i, j] >= -diff)
-
 
 
         elif self.company_shifts == 3:
@@ -1205,9 +1167,7 @@ class ORAlgorithm:
 
 
                     
-
-
-                    
+       
 
     def solve_problem(self):
         """
@@ -1216,7 +1176,8 @@ class ORAlgorithm:
         self.solver.EnableOutput()
         self.status = self.solver.Solve()
 
-        
+
+        # --------------------------------------------------------------------------------------
         # Die Werte von s2 printen
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
@@ -1228,7 +1189,7 @@ class ORAlgorithm:
             for j in range(7, self.calc_time):
                 # Drucken Sie den Wert von c[i, j]
                 print(f"c[{i}][{j}] =", self.c[i, j].solution_value())
-        
+        # --------------------------------------------------------------------------------------
 
 
         # Kosten für die Einstellung von Mitarbeitern
@@ -1244,7 +1205,6 @@ class ORAlgorithm:
         nb7_penalty_costs = sum(self.penalty_cost_nb7 * self.nb7_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(7))
         nb8_penalty_costs = sum(self.penalty_cost_nb8 * self.nb8_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(7, self.calc_time))
 
-
         # Kosten der einzelnen NBs ausgeben
         print('Kosten Einstellung von Mitarbeitern:', hiring_costs)
         print('Kosten Weiche NB1 (Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend):', nb1_penalty_costs)
@@ -1256,7 +1216,6 @@ class ORAlgorithm:
         print('Kosten Weiche NB7 (Immer die gleiche Schicht in einer Woche):', nb7_penalty_costs)
         print('Kosten Weiche NB8 (Immer die gleiche Schicht zweite Woche):', nb8_penalty_costs)
         print('Gesamtkosten:', self.objective.Value())
-
 
 
     def store_solved_data(self):
@@ -1285,7 +1244,6 @@ class ORAlgorithm:
             print("Solver hat das Problem nicht gelöst.")
         else:
             print("Unbekannter Status.")
-
 
 
     def output_result_excel(self):
@@ -1330,7 +1288,6 @@ class ORAlgorithm:
             ws.cell(row=idx, column=total_hours_col, value=f"=SUM(B{idx}:{get_column_letter(total_hours_col-1)}{idx})")
 
 
-
         # Farben auf Basis der Zellenwerte festlegen und Schriftgröße für den Rest des Dokuments
         for row in ws.iter_rows(min_row=2, values_only=False):
             for cell in row[1:]:
@@ -1357,7 +1314,6 @@ class ORAlgorithm:
 
         # Speichern Sie das Workbook
         wb.save("Einsatzplan.xlsx")
-
 
 
     def save_data_in_database(self):
@@ -1428,10 +1384,8 @@ class ORAlgorithm:
                             creation_timestamp=datetime.datetime.now()
                         )
 
-
                         # new_entry der Datenbank hinzufügen
                         db.session.add(new_entry)
 
             # Änderungen in der Datenbank speichern
             db.session.commit()
-

@@ -6,7 +6,6 @@ from collections import defaultdict
 from collections import OrderedDict
 from app import app, db, timedelta
 
-
 class DataProcessing:
     def __init__(self, current_user_id):
         # Attribute
@@ -38,7 +37,6 @@ class DataProcessing:
         self.get_employment()
         self.get_solver_requirement()
         self.pre_check_admin()
-
 
 
     def solving_period(self):
@@ -94,7 +92,6 @@ class DataProcessing:
         # self.start_date = "2023-07-31"
         # self.end_date = "2023-08-04"
 
-
         # Alles voll availability 3-MA 1 Woche
         # self.start_date = "2023-07-10"
         # self.end_date = "2023-07-16"
@@ -107,10 +104,6 @@ class DataProcessing:
         # self.start_date = "2023-07-03"
         # self.end_date = "2023-07-30"
 
-        print(self.start_date)
-        print(self.end_date)
-        print(self.week_timeframe)
-        
         return self.start_date, self.end_date
 
 
@@ -157,46 +150,29 @@ class DataProcessing:
             self.user_availability = user_availability
 
 
-    
+
     def time_to_int(self, t):
-        # Bestimme den Divisor basierend auf self.hour_devider
+        # Divisor basierend auf self.hour_devider erzeugen
         divisor = 3600 / self.hour_devider
 
+        # Typ "timedelta"
         if isinstance(t, timedelta):
-            total_seconds = t.total_seconds()
+            total_seconds = t.total_seconds()  # oder t.seconds, je nachdem, welches Verhalten Sie bevorzugen
+        # Typ "time"
         elif isinstance(t, time):
             total_seconds = t.hour * 3600 + t.minute * 60 + t.second
+        # Typ "int" oder "float" (z.B. zur direkten Eingabe von Sekunden)
+        elif isinstance(t, (int, float)):
+            total_seconds = t
         else:
-            raise ValueError("Invalid input type, must be datetime.timedelta or datetime.time")
+            raise ValueError("Invalid input type, must be datetime.timedelta, datetime.time, int or float")
         
         return int(total_seconds / divisor)
-
-
-    def time_to_int_1(self, t):
-        # Bestimme den Divisor basierend auf self.hour_devider
-        divisor = 3600 / self.hour_devider
-
-        if isinstance(t, timedelta):
-            total_seconds = t.seconds
-        else:
-            total_seconds = t.hour * 3600 + t.minute * 60 + t.second
-        
-        return int(total_seconds / divisor)
-
-
-    def time_to_int_2(self, t):
-        """ Die eingegebene Uhrzeit (second) wird basierend auf self.hour_devider umgerechnet """
-        # Bestimme den Divisor basierend auf self.hour_devider
-        divisor = 3600 / self.hour_devider
-
-        return int(t.seconds / divisor)
-
 
 
 
     # end_time in dieser Methode auf end_time2 wechslen!!
 
-    
     def get_opening_hours(self):
         """ In dieser Funktion werden die Öffnungszeiten (7 Tage) der jeweiligen Company aus der Datenbank gezogen. """
         with app.app_context():
@@ -246,6 +222,7 @@ class DataProcessing:
         self.laden_oeffnet = self.laden_oeffnet * self.week_timeframe
         self.laden_schliesst = self.laden_schliesst * self.week_timeframe
         self.opening_hours = self.opening_hours * self.week_timeframe
+
 
         
     def get_time_req(self):
@@ -341,6 +318,7 @@ class DataProcessing:
         self.employment_lvl = employment_lvl
 
 
+
     def binaere_liste(self):
         """ In dieser Funktion werden die zuvor erstellten user_availabilities in binäre Listen umgewandelt. """
 
@@ -405,6 +383,7 @@ class DataProcessing:
                     user_employment[user_id] = employment
 
                 self.user_employment = user_employment
+
 
 
     def get_solver_requirement(self):
