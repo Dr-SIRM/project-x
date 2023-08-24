@@ -60,7 +60,7 @@ Prio 1:
 Prio 2:
  - start_time und end_time zwei und drei noch implementieren
  - der Admin kann auch die Kosten der MA, wenn er will, eintragen. 
- 
+
 """
 
 class ORAlgorithm:
@@ -121,7 +121,7 @@ class ORAlgorithm:
         self.a = None
         self.s2 = None
         self.s3 = None
-        self.c = None # -- IN BEARBEITUNG 01.07.2023 --
+        self.c = None 
 
         # Attribute der Methode "violation_variables"
         self.nb1_violation = {}
