@@ -32,11 +32,12 @@ Prio 1:
  To-Do's 
  -------------------------------
  - NB9 mit 3 Schichten fertigbauen
- - Stunden Teiler für 1/4, 1/2 und 1h einbauen
+ - (erl.) Stunden Teiler für 1/4, 1/2 und 1h einbauen
  - Opening Hour 2 einbauen
  - Code ordnen
  - Testphase
 
+ - Bei Company Shifts darf es nur die Möglichkeit geben, 1,2 oder 3 Schichten anzuwählen
  - "Gewünschte max. Zeit pro Woche" in Solver Req muss gelöscht werden
  - Der erstellte "divisor" in data_processing könnte als Attribut initialisiert werden, damit es nicht bei jeder Methode einzeln berechnet werden muss
 
@@ -1111,9 +1112,13 @@ class ORAlgorithm:
 
 
         # 2 Wochen + 3-Schicht # --------------------------------------------------------------------------------
+        if self.week_timeframe == 2:
+            if self.company_shifts == 3:
+                for i in self.mitarbeiter:
+                    pass
 
 
-        # HIER DEN CODE EINFÜGEN
+        
 
 
 
@@ -1169,8 +1174,14 @@ class ORAlgorithm:
                 
                 
         # 4 Wochen + 3-Schicht ----------------------------------------------------------------------------------
+        if self.week_timeframe == 4:
+            if self.company_shifts == 3:
+                for i in self.mitarbeiter:
+                    pass
 
 
+
+                    
 
 
                     
