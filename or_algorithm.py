@@ -1112,6 +1112,7 @@ class ORAlgorithm:
 
 
         # 2 Wochen + 3-Schicht # --------------------------------------------------------------------------------
+        """
         if self.week_timeframe == 2:
             if self.company_shifts == 3:
                 for i in self.mitarbeiter:
@@ -1144,7 +1145,7 @@ class ORAlgorithm:
                         # Dritte Schicht wird in der nächsten Woche zur ersten Schicht
                         self.solver.Add(self.c[i, j] <= M*first_week_shift_binary_3)
                         self.solver.Add(self.c[i, j] >= -M*first_week_shift_binary_3)
-
+        """
 
 
 
