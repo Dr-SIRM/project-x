@@ -90,15 +90,15 @@ class ORAlgorithm:
         self.max_zeit = None                                # 4
         self.min_zeit = None                                # 5
         self.max_time_week = None                           # 6   
-
-        self.calc_time = None                               # 7
-        self.employment_lvl_exact = []                      # 8
-        self.employment = []                                # 9
-        self.verteilbare_stunden = None                     # 10
-        self.gesamtstunden_verfügbarkeit = []               # 11
-        self.min_anwesend = []                              # 12
-        self.gerechte_verteilung = []                       # 13
-        self.fair_distribution = None                       # 14
+        #self.weekly_hours (* self.hour_devider)            # 7
+        self.calc_time = None                               # 8
+        self.employment_lvl_exact = []                      # 9
+        self.employment = []                                # 10
+        self.verteilbare_stunden = None                     # 11
+        self.gesamtstunden_verfügbarkeit = []               # 12
+        self.min_anwesend = []                              # 13
+        self.gerechte_verteilung = []                       # 14
+        self.fair_distribution = None                       # 15
 
         self.desired_max_time_day = None
         self.max_time_day = None
@@ -167,7 +167,6 @@ class ORAlgorithm:
         """
         Allgemeine Variabeln
         """
-
         # -- 1 ------------------------------------------------------------------------------------------------------------
         # user_ids Liste, wird als Key in der Ausgabe verwendet
         self.mitarbeiter = [user_id for user_id in self.binary_availability]
@@ -317,7 +316,6 @@ class ORAlgorithm:
         self.fair_distribution = self.fair_distribution / 100      # Prozentumrechnung
 
 
-
     def show_variables(self):
         """
         Wenn die Methode aktiviert wird, werden alle Attribute geprintet
@@ -361,12 +359,10 @@ class ORAlgorithm:
         print("15. self.fair_distribution: ", self.fair_distribution)
 
 
-
     def pre_check_programmer(self):
         """ 
         Vorüberprüfungen für den Programmierer
         """
-
         # Attribute der Methode "create_variables"
         # -- 1 -- 
         assert isinstance(self.mitarbeiter, list), "self.mitarbeiter sollte eine Liste sein"
@@ -414,7 +410,6 @@ class ORAlgorithm:
         assert isinstance(self.min_anwesend, list), "self.min_anwesend sollte eine Liste sein"
         assert all(isinstance(val, list) for val in self.min_anwesend), "Alle Elemente in self.min_anwesend sollten Listen sein"
 
-        
 
     def pre_check_admin(self):
         # Wenn die einzelnen Überprüfungen nicht standhalten, wird ein ValueError ausgelöst und jeweils geprintet, woran das Problem liegt. 
@@ -505,7 +500,6 @@ class ORAlgorithm:
         """
 
 
-
     def solver_selection(self):
         """
         Anwahl des geeigneten Solvers
@@ -520,12 +514,10 @@ class ORAlgorithm:
         # self.solver.SetSolverSpecificParametersAsString("limits/gap=0.01") # Wenn der gap kleiner 1% ist, bricht der Solver ab
 
 
-
     def define_penalty_costs(self):
         """
         Definiere Strafkosten für weiche Nebenbedingungen
         """
-
         # Strafkosten für jede NB
         penalty_values = {
             "nb1": {0: 100, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
@@ -563,7 +555,6 @@ class ORAlgorithm:
                 print(f"{penalty_cost_names[key].upper()} nicht in solver_requirements gefunden")
 
 
-
     def decision_variables(self):
         """ 
         Entscheidungsvariabeln 
@@ -571,7 +562,6 @@ class ORAlgorithm:
         # solver.BoolVar() <-- boolesche Variabeln
         # solver.IntVar() <-- Int Variabeln
         """
-
         # Arbeitsvariable
         self.x = {}
         for i in self.mitarbeiter:
@@ -609,8 +599,6 @@ class ORAlgorithm:
         for i in self.mitarbeiter:
             for j in range(7, self.calc_time):  # Für jeden Tag ab der 2. Woche bis calc_time
                 self.c[i, j] = self.solver.IntVar(0, 1, f'c[{i}, {j}]') # Variabeln können nur die Werte 0 oder 1 annehmen
-
-
 
 
     def violation_variables(self):
