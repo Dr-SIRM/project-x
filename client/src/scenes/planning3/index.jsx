@@ -252,9 +252,9 @@ const TimeReq = ({ timereq }) => {
                       parseInt(currentHour) * 60 + parseInt(currentMinute);
                     
                     // Find the index of the current day's opening and closing hours
-                    const currentDayIndex = btnIndex % timereqData.day_num;
-                    const openingHour = openingHours[currentDayIndex];
-                    const closingHour = closingHours[currentDayIndex];
+                    const openingHour = openingHours[columnIndex];
+                    const closingHour = closingHours[columnIndex];
+
                     
                     const [openingHourHour, openingHourMinute] = openingHour.split(":");
                     const openingTimeMinutes =
@@ -263,7 +263,9 @@ const TimeReq = ({ timereq }) => {
                     const [closingHourHour, closingHourMinute] = closingHour.split(":");
                     const closingTimeMinutes =
                       parseInt(closingHourHour) * 60 + parseInt(closingHourMinute);
-                    
+
+                    console.log(openingHour, closingHour, openingTimeMinutes, closingTimeMinutes, currentTimeMinutes)
+
                     // Check if the current time is within the opening and closing hours
                     if (
                       currentTimeMinutes >= openingTimeMinutes &&
