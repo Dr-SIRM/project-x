@@ -92,17 +92,45 @@ const GanttChart = () => {
     return { left, width };
   };
   
+  const getWorkingHoursDuration = () => {
+    const today = new Date();
+    const weekday = today.toLocaleDateString('en-US', { weekday: 'long' });
+    const hours = openingHours[weekday.toLowerCase()];
+    
+    if (!hours) return 24; // Default to 24 hours if no hours are specified
+  
+    const startHour = parseInt(hours.start.split(":")[0], 10);
+    const endHour = parseInt(hours.end.split(":")[0], 10);
+    
+    return endHour - startHour; // Return difference in hours
+  };
+
   const renderShifts = (worker) => {
-    console.log(`Raw shifts for worker ${worker.first_name} ${worker.last_name}:`, worker.shifts);
+    let maxDuration;
+    const today = new Date();
+  
+    switch (view) {
+      case 'day':
+        maxDuration = getWorkingHoursDuration(today);
+        break;
+      case 'week':
+        maxDuration = 7 * getWorkingHoursDuration(today); // You can adjust this to sum up different hours of different days if necessary
+        break;
+      case 'month':
+        maxDuration = 30 * getWorkingHoursDuration(today); // Again, can adjust for varying days
+        break;
+      default:
+        maxDuration = 24; // default to 24 hours
+    }
   
     const validShifts = [];
-  
+    
     worker.shifts.forEach(shiftData => {
       const { shifts } = shiftData;
       shifts.forEach(shift => {
         console.log(`Start time for shift: ${shift.start_time}`);
         console.log(`End time for shift: ${shift.end_time}`);
-  
+    
         if (shift.start_time && shift.end_time) {
           validShifts.push({
             ...shiftData,
@@ -113,20 +141,19 @@ const GanttChart = () => {
       });
     });
   
-    console.log(`Valid shifts for worker ${worker.first_name} ${worker.last_name}:`, validShifts);
-  
     return (
       <div className="gantt-bar-container">
         {validShifts.map((shift, index) => (
           <div
             key={index}
             className="gantt-bar"
-            style={getShiftPosition(shift, view === 'day' ? 24 : view === 'week' ? 7 * 24 : 30 * 24)}
+            style={getShiftPosition(shift, maxDuration)}
           ></div>
         ))}
       </div>
     );
   };
+  
   
 
   const getTimelineLabels = () => {
