@@ -1065,7 +1065,7 @@ class ORAlgorithm:
 
         
         # 2 Wochen + 3-Schicht # --------------------------------------------------------------------------------
-        
+        """
         if self.week_timeframe == 2 and self.company_shifts == 3:
             for i in self.mitarbeiter:
                 first_week_first_shift_days_list = []
@@ -1125,7 +1125,7 @@ class ORAlgorithm:
                     # Harte Nebenbedingung
                     self.solver.Add(self.s3[i, j] == self.c[i, j])
 
-            """
+            
             # Bedingungen, um sicherzustellen, dass in der zweiten Woche die Schicht um eins verschoben wird
             for i in self.mitarbeiter:
                 for j in range(7, 14):  # Zweite Woche
