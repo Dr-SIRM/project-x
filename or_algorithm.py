@@ -1063,41 +1063,60 @@ class ORAlgorithm:
                         self.solver.Add(self.nb8_violation[i, j] >= diff)
                         self.solver.Add(self.nb8_violation[i, j] >= -diff)
 
-
+        
         # 2 Wochen + 3-Schicht # --------------------------------------------------------------------------------
         
-        if self.week_timeframe == 2:
-            if self.company_shifts == 3:
+        if self.week_timeframe == 2 and self.company_shifts == 3:
+            for i in self.mitarbeiter:
+                # Anzahl der Tage in der ersten Woche, in denen jeweils in der ersten, zweiten oder dritten Schicht gearbeitet wurde
+                first_week_first_shift_days = 2 # self.solver.Sum(self.s3[i, j] == 0 for j in range(7))
+                first_week_second_shift_days = 5 # self.solver.Sum(self.s3[i, j] == 1 for j in range(7))
+                first_week_third_shift_days = 0 # 7 - first_week_first_shift_days - first_week_second_shift_days
+
+                # Hilfsvariablen, um die Schicht der ersten Woche festzulegen
+                first_week_shift_0 = self.solver.BoolVar("first_week_shift_0")
+                first_week_shift_1 = self.solver.BoolVar("first_week_shift_1")
+                first_week_shift_2 = self.solver.BoolVar("first_week_shift_2")
+
+                # Logik für Schichtzuordnung
+                self.solver.Add(first_week_first_shift_days >= first_week_second_shift_days + first_week_third_shift_days - 1000 * first_week_shift_0)
+                self.solver.Add(first_week_second_shift_days >= first_week_first_shift_days + first_week_third_shift_days - 1000 * first_week_shift_1)
+                self.solver.Add(first_week_third_shift_days >= first_week_first_shift_days + first_week_second_shift_days - 1000 * first_week_shift_2)
+
+                self.solver.Add(first_week_shift_0 + first_week_shift_1 + first_week_shift_2 == 1)
+
+                for j in range(7, 14):  # zweite Woche
+                    self.solver.Add(self.c[i, j] == 3 * first_week_shift_0 + 1 * first_week_shift_1 + 2 * first_week_shift_2)
+
+                    # Festlegen der Arbeitsschichten für Woche 2 entsprechend den ausgewählten Schichten der ersten Woche
+                    first_shift_hours_second_week = self.solver.Sum(self.x[i, j, k] for k in range(0, total_len // 3))
+                    second_shift_hours_second_week = self.solver.Sum(self.x[i, j, k] for k in range(total_len // 3, 2 * total_len // 3))
+                    third_shift_hours_second_week = self.solver.Sum(self.x[i, j, k] for k in range(2 * total_len // 3, total_len))
+
+                    delta2_1 = self.solver.BoolVar(f"delta2_1_{i}_{j}")
+                    delta2_2 = self.solver.BoolVar(f"delta2_2_{i}_{j}")
+                    delta2_3 = self.solver.BoolVar(f"delta2_3_{i}_{j}")
+
+                    M = 1000  # Großes M für Lineare Ungleichungen
+
+                    self.solver.Add(first_shift_hours_second_week >= second_shift_hours_second_week + third_shift_hours_second_week - M * (1 - delta2_1))
+                    self.solver.Add(second_shift_hours_second_week >= first_shift_hours_second_week + third_shift_hours_second_week - M * (1 - delta2_2))
+                    self.solver.Add(third_shift_hours_second_week >= first_shift_hours_second_week + second_shift_hours_second_week - M * (1 - delta2_3))
+
+                    self.solver.Add(delta2_1 + delta2_2 + delta2_3 == 1)
+
+                    # Hilfsvariable mit s3[i, j] der zweiten Woche verknüpfen
+                    self.solver.Add(self.s3[i, j] == 0 * delta2_1 + 1 * delta2_2 + 2 * delta2_3)
+
+                # Verletzungsvariable erhöhen, wenn die Schicht in der zweiten Woche nicht der entgegengesetzten Schicht entspricht
                 for i in self.mitarbeiter:
-                    # Anzahl der Tage in der ersten Woche, an denen in jeder Schicht gearbeitet wurde
-                    first_week_first_shift_days = self.solver.Sum(self.s3[i, j] == 0 for j in range(7))
-                    first_week_second_shift_days = self.solver.Sum(self.s3[i, j] == 1 for j in range(7))
-                    first_week_third_shift_days = self.solver.Sum(self.s3[i, j] == 2 for j in range(7))
-
-                    # Hilfsvariablen für die Big-M Methode
-                    M = 1000
-                    first_week_shift_binary_1 = self.solver.BoolVar("first_week_shift_binary_1")
-                    first_week_shift_binary_2 = self.solver.BoolVar("first_week_shift_binary_2")
-                    first_week_shift_binary_3 = self.solver.BoolVar("first_week_shift_binary_3")
-
-                    # Bedingungen, um die dominante Schicht der ersten Woche festzulegen
-                    self.solver.Add(first_week_first_shift_days - M * first_week_shift_binary_1 >= first_week_second_shift_days + first_week_third_shift_days)
-                    self.solver.Add(first_week_second_shift_days - M * first_week_shift_binary_2 >= first_week_first_shift_days + first_week_third_shift_days)
-                    self.solver.Add(first_week_third_shift_days - M * first_week_shift_binary_3 >= first_week_first_shift_days + first_week_second_shift_days)
-
-                    # Schichtwechsel-Bedingungen für die zweite Woche (Tage 7 bis 13)
                     for j in range(7, 14):
-                        # Erste Schicht wird in der nächsten Woche zur zweiten Schicht
-                        self.solver.Add(self.c[i, j] <= 1 + M*(1 - first_week_shift_binary_1))
-                        self.solver.Add(self.c[i, j] >= 1 - M*(1 - first_week_shift_binary_1))
+                        diff = self.solver.IntVar(-2, 2, f"diff_{i}_{j}")
+                        self.solver.Add(diff == self.s3[i, j] - self.c[i, j])
 
-                        # Zweite Schicht wird in der nächsten Woche zur dritten Schicht
-                        self.solver.Add(self.c[i, j] <= 2 + M*(1 - first_week_shift_binary_2))
-                        self.solver.Add(self.c[i, j] >= 2 - M*(1 - first_week_shift_binary_2))
+                        self.solver.Add(self.nb8_violation[i, j] >= diff)
+                        self.solver.Add(self.nb8_violation[i, j] >= -diff)
 
-                        # Dritte Schicht wird in der nächsten Woche zur ersten Schicht
-                        self.solver.Add(self.c[i, j] <= M*first_week_shift_binary_3)
-                        self.solver.Add(self.c[i, j] >= -M*first_week_shift_binary_3)
         
 
 
@@ -1178,11 +1197,11 @@ class ORAlgorithm:
 
 
         # --------------------------------------------------------------------------------------
-        # Die Werte von s2 printen
+        # Die Werte von s3 printen
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 # Drucken Sie den Wert von s3[i, j]
-                print(f"s2[{i}][{j}] =", self.s2[i, j].solution_value())
+                print(f"s3[{i}][{j}] =", self.s3[i, j].solution_value())
 
         # Die Werte von c printen
         for i in self.mitarbeiter:
