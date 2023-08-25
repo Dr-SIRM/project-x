@@ -6,12 +6,12 @@ from collections import defaultdict
 from collections import OrderedDict
 from app import app, db, timedelta
 
-
 class DataProcessing:
     def __init__(self, current_user_id):
         # Attribute
         self.current_user_id = current_user_id
         self.week_timeframe = None
+        self.hour_devider = None
         self.start_date = None
         self.end_date = None
         self.opening_hours = None
@@ -39,8 +39,11 @@ class DataProcessing:
         self.pre_check_admin()
 
 
-
     def solving_period(self):
+        """
+        In dieser Methode wird das aktuelle Datum gezogen, anschliessend der nächste Montag gefunden.
+        Ebenfalls werden die zwei Werte "week_timeframe" und "hour_devider" aus der Datenbank gezogen.
+        """
         with app.app_context():
             # Hole den company_name des aktuellen Benutzers
             sql = text("""
@@ -53,13 +56,15 @@ class DataProcessing:
             
             # Hole die Solver-Anforderungen für das Unternehmen
             sql = text("""
-                SELECT week_timeframe
+                SELECT week_timeframe, hour_devider
                 FROM solver_requirement
                 WHERE company_name = :company_name
             """)
             result = db.session.execute(sql, {"company_name": company_name})
-            week_timeframe = result.fetchone()[0]
+            week_timeframe, hour_devider = result.fetchone()
+
             self.week_timeframe = week_timeframe
+            self.hour_devider = hour_devider
 
         # Holen Sie sich das heutige Datum
         today = datetime.today()
@@ -87,18 +92,18 @@ class DataProcessing:
         # self.start_date = "2023-07-31"
         # self.end_date = "2023-08-04"
 
-        # Alles voll availability 3-MA 2 Wochen
+        # Alles voll availability 3-MA 1 Woche
         # self.start_date = "2023-07-10"
-        # self.end_date = "2023-07-23"
+        # self.end_date = "2023-07-16"
+
+        # Alles voll availability 3-MA 2 Wochen
+        self.start_date = "2023-07-10"
+        self.end_date = "2023-07-23"
 
         # Alles voll availability 3-MA 4 Wochen
-        self.start_date = "2023-07-03"
-        self.end_date = "2023-07-30"
+        # self.start_date = "2023-07-03"
+        # self.end_date = "2023-07-30"
 
-        print(self.start_date)
-        print(self.end_date)
-        print(self.week_timeframe)
-        
         return self.start_date, self.end_date
 
 
@@ -145,28 +150,28 @@ class DataProcessing:
             self.user_availability = user_availability
 
 
-    
+
     def time_to_int(self, t):
+        # Divisor basierend auf self.hour_devider erzeugen
+        divisor = 3600 / self.hour_devider
+
+        # Typ "timedelta"
         if isinstance(t, timedelta):
-            total_seconds = t.total_seconds()
+            total_seconds = t.total_seconds()  # oder t.seconds, je nachdem, welches Verhalten Sie bevorzugen
+        # Typ "time"
         elif isinstance(t, time):
             total_seconds = t.hour * 3600 + t.minute * 60 + t.second
+        # Typ "int" oder "float" (z.B. zur direkten Eingabe von Sekunden)
+        elif isinstance(t, (int, float)):
+            total_seconds = t
         else:
-            raise ValueError("Invalid input type, must be datetime.timedelta or datetime.time")
-        return int(total_seconds / 900)
+            raise ValueError("Invalid input type, must be datetime.timedelta, datetime.time, int or float")
+        
+        return int(total_seconds / divisor)
 
 
-    def time_to_int_1(self, t):
-        if isinstance(t, timedelta):
-            return int((t.seconds) / 900)
-        else:
-            return int((t.hour * 3600 + t.minute * 60 + t.second) / 900)
 
-
-    def time_to_int_2(self, t):
-        """ Die eingegebene Uhrzeit (second) wird in Viertelstunden umgerechnet """
-        return int(t.seconds / 900)
-
+    # end_time in dieser Methode auf end_time2 wechslen!!
 
     def get_opening_hours(self):
         """ In dieser Funktion werden die Öffnungszeiten (7 Tage) der jeweiligen Company aus der Datenbank gezogen. """
@@ -218,6 +223,7 @@ class DataProcessing:
         self.laden_schliesst = self.laden_schliesst * self.week_timeframe
         self.opening_hours = self.opening_hours * self.week_timeframe
 
+
         
     def get_time_req(self):
         """ In dieser Funktion werden die benötigten Mitarbeiter für jede Stunde jedes Tages abgerufen """
@@ -241,12 +247,15 @@ class DataProcessing:
             result = db.session.execute(sql, {"company_name": company_name, "start_date": self.start_date, "end_date": self.end_date})
             time_reqs = result.fetchall()
 
+            # Bestimme den Divisor basierend auf self.hour_devider
+            divisor = 3600 / self.hour_devider
+
             # Erstellen eines Dictionaries mit Datum und Stunde als Schlüssel:
             time_req_dict_2 = defaultdict(dict)
             for date, start_time, worker in time_reqs:
                 weekday_index = date.weekday()
                 if (self.laden_oeffnet[weekday_index] <= start_time < self.laden_schliesst[weekday_index]):
-                    start_hour = int(start_time.total_seconds() // 900) - int(self.laden_oeffnet[weekday_index].total_seconds() // 900)
+                    start_hour = int(start_time.total_seconds() // divisor) - int(self.laden_oeffnet[weekday_index].total_seconds() // divisor)
                     if start_hour < 0:
                         start_hour = 0
                     time_req_dict_2[date][start_hour] = worker
@@ -309,6 +318,7 @@ class DataProcessing:
         self.employment_lvl = employment_lvl
 
 
+
     def binaere_liste(self):
         """ In dieser Funktion werden die zuvor erstellten user_availabilities in binäre Listen umgewandelt. """
 
@@ -326,10 +336,12 @@ class DataProcessing:
                 # Liste erstellen von Nullen mit der Länge der Anzahl der Stunden, in denen der Laden geöffnet ist
                 binary_list = [0] * num_hours
 
+                # Bestimme den Divisor basierend auf self.hour_devider
+                divisor = 3600 / self.hour_devider
+
                 # Werte werden auf 1 gesetzt, wenn der Mitarbeiter arbeiten kann.
-                # Die Start- und Endzeiten werden in Viertelstunden umgerechnet.
-                start_hour = int(start_time.total_seconds() / 900) - int(self.laden_oeffnet[weekday_index].total_seconds() / 900)
-                end_hour = int(end_time.total_seconds() / 900) - int(self.laden_oeffnet[weekday_index].total_seconds() / 900)
+                start_hour = int(start_time.total_seconds() / divisor) - int(self.laden_oeffnet[weekday_index].total_seconds() / divisor)
+                end_hour = int(end_time.total_seconds() / divisor) - int(self.laden_oeffnet[weekday_index].total_seconds() / divisor)
                 for i in range(start_hour, end_hour):
                     if 0 <= i < len(binary_list):
                         binary_list[i] = 1
@@ -371,6 +383,7 @@ class DataProcessing:
                     user_employment[user_id] = employment
 
                 self.user_employment = user_employment
+
 
 
     def get_solver_requirement(self):

@@ -955,7 +955,7 @@ def get_required_workforce():
         else:
             new_i = i + 1
             opening_dict[str(new_i) + '&0'] = opening.start_time.strftime("%H:%M") if opening.start_time else None
-            opening_dict[str(new_i) + '&1'] = opening.end_time.strftime("%H:%M") if opening.end_time else None
+            opening_dict[str(new_i) + '&1'] = opening.end_time2.strftime("%H:%M") if opening.end_time2 else None
 
     """
     # Set Template
