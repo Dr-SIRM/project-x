@@ -88,7 +88,6 @@ const GanttChart = () => {
     console.log(`left: ${left}`);
     console.log(`width: ${width}`);
     console.log(`Position for shift ${JSON.stringify(shift)}: left = ${left}, width = ${width}`);
-
   
     return { left, width };
   };
@@ -128,10 +127,6 @@ const GanttChart = () => {
       </div>
     );
   };
-  
-  
-  
-  
   
 
   const getTimelineLabels = () => {
