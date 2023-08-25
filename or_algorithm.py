@@ -1229,7 +1229,7 @@ class ORAlgorithm:
         """
         Problem lösen und Kosten ausgeben
         """
-        self.solver.EnableOutput()
+        self.solver.EnableOutput(False)
         self.status = self.solver.Solve()
 
 
