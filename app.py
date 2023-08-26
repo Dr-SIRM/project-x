@@ -65,7 +65,7 @@ password = 'Arsch_Und_Titten'
 #-------------------------------------------------------------------------
 
 from models import User, Availability, TimeReq, Company, OpeningHours, Timetable, \
-    TemplateAvailability, TemplateTimeRequirement, RegistrationToken, PasswordReset
+    TemplateAvailability, TemplateTimeRequirement, RegistrationToken, PasswordReset, SolverRequirement
 
 
 #Import of routes_html
@@ -95,13 +95,239 @@ def load_user(jwt_header, jwt_data):
 # Change/Update content in the database
 @app.route('/upgrade_db')
 def set_db():
-    users = Timetable.query.all()
-    for i in users:
-        i.company_name = "TimeTab GmbH"
-    db.session.commit()
+    #User
+    #Timereq
+    #Availability
+    #Company
+    #Opening Hours
+    #Solver Requirement
+    user = User.query.all()
+    
+    for i in range(26, 126):
+        for j in User.query.filter_by(id=i).first():
+            j.password = generate_password_hash("test")
+        db.session.commit()
     return "Company_name column updated successfully."
 
 
+# Change/Update content in the database
+@app.route('/testing_db')
+def set_db_test():
+    #User
+    #Timereq
+    #Availability
+    #Company
+    #Opening Hours
+    #Solver Requirement
+    users = User.query.all()
+
+    iteration = 9
+    """
+    for i in range(1, iteration):
+        data = User(
+            id = 125+i, 
+            company_id = 10000, 
+            first_name = "Test",
+            last_name = "2", 
+            employment = "Temp", 
+            employment_level = 1.0,
+            company_name = f'Use Case {i+1}', 
+            department = "Test",
+            access_level = "Admin", 
+            email = f'1@usecase{i+1}.com', 
+            password = generate_password_hash("test"),
+            created_by = 10000, 
+            changed_by = 10000, 
+            creation_timestamp = "26.08.2023"
+            )
+        db.session.add(data)
+    db.session.commit()
+    """
+
+    """
+    # Manually adding Availability
+    weekdays = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
+
+    for ma in range(2, 7):
+        for day in range(7):
+            avail = Availability(
+                id=622 + day + 7*ma-2,
+                user_id={ma},
+                email=f'{ma}@usecase8.ch',
+                date=datetime.datetime(2023, 8, 28, 0, 0, 0) + datetime.timedelta(days=day),
+                weekday=weekdays[day],
+                start_time=datetime.time(8, 0, 0),
+                end_time=datetime.time(17, 0, 0),
+                start_time2=datetime.time(0, 0, 0),
+                end_time2=datetime.time(0, 0, 0),
+                start_time3=datetime.time(0, 0, 0),
+                end_time3=datetime.time(0, 0, 0),
+                created_by=1,
+                changed_by=1,
+                creation_timestamp=datetime.datetime.now(),
+                )
+            day += 1
+            db. session.add(avail)
+    db.session.commit()
+    return "Company_name column updated successfully."
+    """
+    
+    """
+    # Manually adding TimeReq
+    db.session.add(TimeReq(
+        company_name='TechCorp',
+        date=date.today(),
+        start_time=time(9, 0, 0),
+        worker=1,
+        created_by=1,
+        changed_by=1,
+        creation_timestamp=datetime.now(),
+        update_timestamp=datetime.now()
+    ))
+    time_req = TimeReq(
+        company_name='TechCorp',
+        date=date.today(),
+        start_time=time(9, 0, 0),
+        worker=1,
+        created_by=1,
+        changed_by=1,
+        creation_timestamp=datetime.now(),
+        update_timestamp=datetime.now()
+    )
+    db.session.add(time_req)
+    db.session.commit()
+
+    # Manually adding Company
+    company = Company(
+        id=1,
+        company_name='TechCorp',
+        weekly_hours=40,
+        shifts=5,
+        created_by=1,
+        changed_by=1,
+        creation_timestamp=datetime.now(),
+        update_timestamp=datetime.now()
+    )
+    db.session.add(company)
+    db.session.commit()
+
+    # Manually adding OpeningHours
+    opening_hours = OpeningHours(
+        company_name='TechCorp',
+        weekday='Monday',
+        start_time=time(9, 0, 0),
+        end_time=time(17, 0, 0),
+        created_by=1,
+        changed_by=1,
+        creation_timestamp=datetime.now(),
+        update_timestamp=datetime.now()
+    )
+    db.session.add(opening_hours)
+    db.session.commit()
+
+    # Manually adding Timetable
+    timetable = Timetable(
+        email='john.doe@example.com',
+        first_name='John',
+        last_name='Doe',
+        company_name='TechCorp',
+        date=date.today(),
+        start_time=time(9, 0, 0),
+        end_time=time(17, 0, 0),
+        created_by=1,
+        changed_by=1,
+        creation_timestamp=datetime.now(),
+        update_timestamp=datetime.now()
+    )
+    db.session.add(timetable)
+    db.session.commit()
+
+    # Manually adding TemplateTimeRequirement
+    template_time_req = TemplateTimeRequirement(
+        template_name='Default',
+        date=date.today(),
+        weekday='Monday',
+        start_time=time(9, 0, 0),
+        worker=1,
+        created_by=1,
+        changed_by=1,
+        creation_timestamp=datetime.now(),
+        update_timestamp=datetime.now()
+    )
+    db.session.add(template_time_req)
+    db.session.commit()
+
+    # Manually adding TemplateAvailability
+    template_availability = TemplateAvailability(
+        template_name='Default',
+        email='john.doe@example.com',
+        date=date.today(),
+        weekday='Monday',
+        start_time=time(9, 0, 0),
+        end_time=time(17, 0, 0),
+        created_by=1,
+        changed_by=1,
+        creation_timestamp=datetime.now(),
+        update_timestamp=datetime.now()
+    )
+    db.session.add(template_availability)
+    db.session.commit()
+
+    # Manually adding RegistrationToken
+    registration_token = RegistrationToken(
+        email='john.doe@example.com',
+        token='123456',
+        company_name='TechCorp',
+        employment='Engineer',
+        employment_level=1.5,
+        department='Engineering',
+        access_level='Admin',
+        created_by=1,
+        creation_timestamp=datetime.now()
+    )
+    db.session.add(registration_token)
+    db.session.commit()
+
+    # Manually adding PasswordReset
+    password_reset = PasswordReset(
+        email='john.doe@example.com',
+        token='654321',
+        expiration=datetime.now() + timedelta(hours=24),
+        creation_timestamp=datetime.now()
+    )
+    db.session.add(password_reset)
+    db.session.commit()
+    """
+
+    """
+    # Manually adding SolverRequirement
+    solver_requirement = SolverRequirement(
+        id=17,
+        company_name='Use Case 8',
+        weekly_hours=42,
+        shifts=1,
+        desired_min_time_day=5,
+        desired_max_time_day=8,
+        min_time_day=3,
+        max_time_day=9,
+        desired_max_time_week=42,
+        max_time_week=45,
+        hour_devider=1,
+        fair_distribution=30,
+        week_timeframe=1,
+        nb1=5, nb2=5, nb3=5, nb4=5, nb5=5, nb6=5, nb7=5, nb8=0,
+        nb9=5, nb10=5, nb11=5, nb12=5, nb13=5, nb14=5, nb15=5,
+        nb16=5, nb17=5, nb18=5, nb19=5, nb20=5,
+        created_by=10000,
+        changed_by=10000,
+        creation_timestamp=datetime.datetime.now(),
+        update_timestamp=datetime.datetime.now()
+    )
+    db. session.add(solver_requirement)
+    db.session.commit()
+    return "Company_name column updated successfully."
+    """
+   
 
 
 if __name__ == "__main__":
