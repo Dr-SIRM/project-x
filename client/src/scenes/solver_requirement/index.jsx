@@ -222,7 +222,7 @@ const SolverReq = ({ solverreq }) => {
                 label= ""
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.desired_max_time_week}
+                value={values.desired_max_time_day}
                 name="desired_max_time_day"
                 error={!!touched.desired_max_time_day && !!errors.desired_max_time_day}
                 helperText={touched.desired_max_time_day && errors.desired_max_time_day}
