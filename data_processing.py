@@ -176,10 +176,20 @@ class DataProcessing:
 
 
 
-    # end_time in dieser Methode auf end_time2 wechslen!!
-
     def get_opening_hours(self):
         """ In dieser Funktion werden die Öffnungszeiten (7 Tage) der jeweiligen Company aus der Datenbank gezogen. """
+
+        # end_time in dieser Methode auf end_time2 wechslen!!
+        # key == 0 --> end_time
+        # key == 1 --> end_time2
+        end_time_value = ""
+        key = 0
+        if key == 0:
+            end_time_value = "end_time"
+        elif key == 1:
+            end_time_value = "end_time2"
+
+
         with app.app_context():
             # Abfrage, um den company_name des aktuellen Benutzers zu erhalten
             sql = text("""
@@ -193,7 +203,7 @@ class DataProcessing:
 
             # Abfrage, um die Öffnungszeiten der Firma basierend auf dem company_name abzurufen
             sql = text("""
-                SELECT weekday, start_time, end_time2
+                SELECT weekday, start_time, end_time_value
                 FROM opening_hours
                 WHERE company_name = :company_name
                 ORDER BY FIELD(weekday, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
@@ -216,10 +226,10 @@ class DataProcessing:
             'Sunday': 6
         }
 
-        for weekday, start_time, end_time2 in times:
+        for weekday, start_time, end_time_value in times:
             index = weekday_indices[weekday]
             self.laden_oeffnet[index] = start_time
-            self.laden_schliesst[index] = end_time2
+            self.laden_schliesst[index] = end_time_value
 
         # Berechne die Öffnungszeiten für jeden Wochentag und speichere sie in einer Liste
         self.opening_hours = [(self.time_to_int(self.laden_schliesst[i]) - self.time_to_int(self.laden_oeffnet[i])) for i in range(7)]
