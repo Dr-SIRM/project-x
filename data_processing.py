@@ -198,7 +198,7 @@ class DataProcessing:
 
             # Abfrage, um die Öffnungszeiten der Firma basierend auf dem company_name abzurufen
             sql = text("""
-                SELECT weekday, start_time, end_time2
+                SELECT weekday, start_time, end_time
                 FROM opening_hours
                 WHERE company_name = :company_name
                 ORDER BY FIELD(weekday, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
@@ -221,10 +221,10 @@ class DataProcessing:
             'Sunday': 6
         }
 
-        for weekday, start_time, end_time2 in times:
+        for weekday, start_time, end_time in times:
             index = weekday_indices[weekday]
             self.laden_oeffnet[index] = start_time
-            self.laden_schliesst[index] = end_time2
+            self.laden_schliesst[index] = end_time
 
         # Berechne die Öffnungszeiten für jeden Wochentag und speichere sie in einer Liste
         self.opening_hours = [(self.time_to_int(self.laden_schliesst[i]) - self.time_to_int(self.laden_oeffnet[i])) for i in range(7)]
