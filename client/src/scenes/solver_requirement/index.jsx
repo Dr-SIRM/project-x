@@ -143,51 +143,6 @@ const SolverReq = ({ solverreq }) => {
                 helperText={touched.desired_min_time_day && errors.desired_min_time_day}
                 sx={{ gridColumn: "span 1" }}
               />
-              <Typography
-                color={colors.greenAccent[500]}
-                variant=""
-                sx={{
-                  gridColumn: "span 1",
-                  display: "grid",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              ></Typography>
-              <Typography
-                color={colors.greenAccent[500]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "right",
-                  height: "100%",
-                }}
-              >
-                Gewünschte max. Zeit pro Tag
-              </Typography>
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.desired_max_time_day}
-                name="desired_max_time_day"
-                error={!!touched.desired_max_time_day && !!errors.desired_max_time_day}
-                helperText={touched.desired_max_time_day && errors.desired_max_time_day}
-                sx={{ gridColumn: "span 1" }}
-              />
-              <Typography
-                color={colors.greenAccent[500]}
-                variant=""
-                sx={{
-                  gridColumn: "span 1",
-                  display: "grid",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              ></Typography>
             <Typography
                 color={colors.greenAccent[500]}
                 variant="h6"
@@ -217,7 +172,7 @@ const SolverReq = ({ solverreq }) => {
                 color={colors.greenAccent[500]}
                 variant=""
                 sx={{
-                  gridColumn: "span 1",
+                  gridColumn: "span 2",
                   display: "grid",
                   alignItems: "center",
                   height: "100%",
@@ -250,16 +205,6 @@ const SolverReq = ({ solverreq }) => {
               />
               <Typography
                 color={colors.greenAccent[500]}
-                variant=""
-                sx={{
-                  gridColumn: "span 1",
-                  display: "grid",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              ></Typography>
-              <Typography
-                color={colors.greenAccent[500]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -287,7 +232,7 @@ const SolverReq = ({ solverreq }) => {
                 color={colors.greenAccent[500]}
                 variant=""
                 sx={{
-                  gridColumn: "span 1",
+                  gridColumn: "span 2",
                   display: "grid",
                   alignItems: "center",
                   height: "100%",
@@ -320,16 +265,6 @@ const SolverReq = ({ solverreq }) => {
               />
               <Typography
                 color={colors.greenAccent[500]}
-                variant=""
-                sx={{
-                  gridColumn: "span 1",
-                  display: "grid",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              ></Typography>
-              <Typography
-                color={colors.greenAccent[500]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -357,7 +292,7 @@ const SolverReq = ({ solverreq }) => {
                 color={colors.greenAccent[500]}
                 variant=""
                 sx={{
-                  gridColumn: "span 1",
+                  gridColumn: "span 2",
                   display: "grid",
                   alignItems: "center",
                   height: "100%",
@@ -394,16 +329,6 @@ const SolverReq = ({ solverreq }) => {
                 </Select>
                 <Typography
                 color={colors.greenAccent[500]}
-                variant=""
-                sx={{
-                  gridColumn: "span 1",
-                  display: "grid",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              ></Typography>
-                <Typography
-                color={colors.greenAccent[500]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -435,7 +360,7 @@ const SolverReq = ({ solverreq }) => {
                 color={colors.greenAccent[500]}
                 variant=""
                 sx={{
-                  gridColumn: "span 4",
+                  gridColumn: "span 2",
                   display: "grid",
                   alignItems: "center",
                   height: "100%",

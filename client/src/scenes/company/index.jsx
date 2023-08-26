@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTheme, Box, Button, TextField, Snackbar, Typography } from "@mui/material";
+import { Select, MenuItem } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -188,7 +189,7 @@ const Company = ({ company }) => {
               >
                 Schichten
               </Typography>
-              <TextField
+              <Select
                 fullWidth
                 variant="filled"
                 type="text"
@@ -200,7 +201,11 @@ const Company = ({ company }) => {
                 error={!!touched.shifts && !!errors.shifts}
                 helperText={touched.shifts && errors.shifts}
                 sx={{ gridColumn: "span 1" }}
-              />
+                >
+                <MenuItem value={ '1' }>1</MenuItem>
+                <MenuItem value={ '2' }>2</MenuItem>
+                <MenuItem value={ '4' }>4</MenuItem>
+                </Select>
               <Typography
                 color={colors.greenAccent[500]}
                 variant=""
