@@ -93,12 +93,12 @@ class DataProcessing:
         # self.end_date = "2023-08-04"
 
         # Alles voll availability 3-MA 1 Woche
-        # self.start_date = "2023-07-10"
-        # self.end_date = "2023-07-16"
+        self.start_date = "2023-07-10"
+        self.end_date = "2023-07-16"
 
         # Alles voll availability 3-MA 2 Wochen
-        self.start_date = "2023-07-10"
-        self.end_date = "2023-07-23"
+        # self.start_date = "2023-07-10"
+        # self.end_date = "2023-07-23"
 
         # Alles voll availability 3-MA 4 Wochen
         # self.start_date = "2023-07-03"
@@ -246,6 +246,7 @@ class DataProcessing:
             """)
             result = db.session.execute(sql, {"company_name": company_name, "start_date": self.start_date, "end_date": self.end_date})
             time_reqs = result.fetchall()
+            print(time_reqs)
 
             # Bestimme den Divisor basierend auf self.hour_devider
             divisor = 3600 / self.hour_devider
@@ -271,8 +272,61 @@ class DataProcessing:
 
             # Sortiere das Wörterbuch nach Datum
             self.time_req = OrderedDict(sorted(time_req_dict_2.items()))
+            print(self.time_req)
 
-    
+
+    # NEU 25.08.23
+    """
+    def get_time_req(self):
+        with app.app_context():
+            # Hole den company_name des aktuellen Benutzers
+            sql = text(
+                SELECT company_name
+                FROM user
+                WHERE id = :current_user_id
+            )
+            result = db.session.execute(sql, {"current_user_id": self.current_user_id})
+            company_name = result.fetchone()[0]
+
+            # Anforderungen für das Unternehmen mit demselben company_name abrufen
+            sql = text(
+                SELECT t.date, t.start_time, t.worker
+                FROM time_req t
+                WHERE t.company_name = :company_name
+                AND t.date BETWEEN :start_date AND :end_date
+            )
+            result = db.session.execute(sql, {"company_name": company_name, "start_date": self.start_date, "end_date": self.end_date})
+            time_reqs = result.fetchall()
+            print(time_reqs)
+
+            # Bestimme den Divisor basierend auf self.hour_devider
+            divisor = 3600 / self.hour_devider
+
+            # Erstellen eines Dictionaries mit Datum und Stunde als Schlüssel:
+            time_req_dict_2 = defaultdict(dict)
+
+            # Initialisiere für jeden Tag und jede Stunde einen Standardwert von 0
+            current_date = datetime.strptime(self.start_date, '%Y-%m-%d').date()
+            while current_date <= datetime.strptime(self.end_date, '%Y-%m-%d').date():
+                for hour in range(24):  # für jede Stunde des Tages
+                    time_req_dict_2[current_date][hour] = 0
+                current_date += timedelta(days=1)
+
+            # Jetzt setze die tatsächlichen Werte aus dem time_reqs-Datensatz darauf
+            for date, start_time, worker in time_reqs:
+                weekday_index = date.weekday()
+                if (self.laden_oeffnet[weekday_index] <= start_time < self.laden_schliesst[weekday_index]):
+                    start_hour = int(start_time.total_seconds() // divisor) - int(self.laden_oeffnet[weekday_index].total_seconds() // divisor)
+                    if start_hour < 0:
+                        start_hour = 0
+                    time_req_dict_2[date][start_hour] = worker
+
+            # Sortiere das Wörterbuch nach Datum
+            self.time_req = OrderedDict(sorted(time_req_dict_2.items()))
+            print(self.time_req)
+    """
+            
+
 
     def get_shift_weeklyhours_emp_lvl(self):
         """ In dieser Funktion wird als Key die user_id verwendet und die shift, employment_level und weekly_hours aus der Datenbank gezogen """
