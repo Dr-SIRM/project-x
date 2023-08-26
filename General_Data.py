@@ -22,7 +22,12 @@
     # curl ifconfig.me
     # mysql -h projectx3.cj6fxzhtmztu.eu-central-1.rds.amazonaws.com -u admin -p
 
-# NEUER USER
+# NEUER USER / NEUE COMPANY
 
     # http://127.0.0.1:3000/registration/admin
     # Ass&Titties
+
+    # 1. https://www.gmx.ch/
+    # 2. timetab@gmx.ch (pw: ProjectX2023.)
+    # 3. http://localhost:3000/token_registration
+    # 4. Token + Daten eingeben
