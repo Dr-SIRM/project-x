@@ -93,12 +93,12 @@ class DataProcessing:
         # self.end_date = "2023-08-04"
 
         # Alles voll availability 3-MA 1 Woche
-        # self.start_date = "2023-07-10"
-        # self.end_date = "2023-07-16"
+        self.start_date = "2023-07-10"
+        self.end_date = "2023-07-16"
 
         # Alles voll availability 3-MA 2 Wochen
-        self.start_date = "2023-07-10"
-        self.end_date = "2023-07-23"
+        # self.start_date = "2023-07-10"
+        # self.end_date = "2023-07-23"
 
         # Alles voll availability 3-MA 4 Wochen
         # self.start_date = "2023-07-03"
@@ -188,7 +188,7 @@ class DataProcessing:
 
             # Abfrage, um die Öffnungszeiten der Firma basierend auf dem company_name abzurufen
             sql = text("""
-                SELECT weekday, start_time, end_time
+                SELECT weekday, start_time, end_time2
                 FROM opening_hours
                 WHERE company_name = :company_name
                 ORDER BY FIELD(weekday, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
@@ -211,10 +211,10 @@ class DataProcessing:
             'Sunday': 6
         }
 
-        for weekday, start_time, end_time in times:
+        for weekday, start_time, end_time2 in times:
             index = weekday_indices[weekday]
             self.laden_oeffnet[index] = start_time
-            self.laden_schliesst[index] = end_time
+            self.laden_schliesst[index] = end_time2
 
         # Berechne die Öffnungszeiten für jeden Wochentag und speichere sie in einer Liste
         self.opening_hours = [(self.time_to_int(self.laden_schliesst[i]) - self.time_to_int(self.laden_oeffnet[i])) for i in range(7)]
