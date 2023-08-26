@@ -232,7 +232,7 @@ def get_company():
     creation_date = datetime.datetime.now()
 
     if company is None:
-        company_name = ''
+        company_name = user.company_name
         shift = ''
         weekly_hour = ''
     else:
