@@ -144,15 +144,14 @@ def set_db_test():
     db.session.commit()
     """
 
-    """
     # Manually adding Availability
     weekdays = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
 
     for ma in range(2, 7):
         for day in range(7):
             avail = Availability(
-                id=622 + day + 7*ma-2,
-                user_id={ma},
+                id=628 + day + 7*ma-2,
+                user_id=56 + ma -1,
                 email=f'{ma}@usecase8.ch',
                 date=datetime.datetime(2023, 8, 28, 0, 0, 0) + datetime.timedelta(days=day),
                 weekday=weekdays[day],
@@ -170,8 +169,7 @@ def set_db_test():
             db. session.add(avail)
     db.session.commit()
     return "Company_name column updated successfully."
-    """
-    
+
     """
     # Manually adding TimeReq
     db.session.add(TimeReq(
