@@ -93,12 +93,12 @@ class DataProcessing:
         # self.end_date = "2023-08-04"
 
         # Alles voll availability 3-MA 1 Woche
-        self.start_date = "2023-07-10"
-        self.end_date = "2023-07-16"
+        # self.start_date = "2023-07-10"
+        # self.end_date = "2023-07-16"
 
         # Alles voll availability 3-MA 2 Wochen
-        # self.start_date = "2023-07-10"
-        # self.end_date = "2023-07-23"
+        self.start_date = "2023-07-10"
+        self.end_date = "2023-07-23"
 
         # Alles voll availability 3-MA 4 Wochen
         # self.start_date = "2023-07-03"
