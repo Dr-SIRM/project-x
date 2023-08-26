@@ -93,8 +93,8 @@ class DataProcessing:
         # self.end_date = "2023-08-04"
 
         # Alles voll availability 3-MA 1 Woche
-        self.start_date = "2023-07-10"
-        self.end_date = "2023-07-16"
+        # self.start_date = "2023-07-10"
+        # self.end_date = "2023-07-16"
 
         # Alles voll availability 3-MA 2 Wochen
         # self.start_date = "2023-07-10"
@@ -103,6 +103,11 @@ class DataProcessing:
         # Alles voll availability 3-MA 4 Wochen
         # self.start_date = "2023-07-03"
         # self.end_date = "2023-07-30"
+
+        # usecase_1
+        self.start_date = "2023-08-28"
+        self.end_date = "2023-09-03"
+
 
         return self.start_date, self.end_date
 
