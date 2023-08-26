@@ -1017,6 +1017,29 @@ def get_required_workforce():
                              
                     db.session.add(req)
                     db.session.commit()
+                else:
+                    last = TimeReq.query.order_by(TimeReq.id.desc()).first()
+                    if last is None:
+                        new_id = 1
+                    else:
+                        new_id = last.id + 1
+
+                    new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+                    time = f'{formatted_time}:00'
+                    new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+
+                    req = TimeReq(id=new_id, 
+                                  company_name=user.company_name, 
+                                  date=new_date, 
+                                  start_time=new_time, 
+                                  worker=0, 
+                                  created_by=company_id,
+                                  changed_by=company_id, 
+                                  creation_timestamp = creation_date
+                                  )
+                             
+                    db.session.add(req)
+                    db.session.commit()
         
     calendar_dict={
         'weekdays': weekdays,
