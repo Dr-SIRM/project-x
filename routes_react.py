@@ -914,7 +914,6 @@ def get_required_workforce():
     
     day_num = 7
     
-    user = User.query.get(user.id)
     company_id = user.company_id
 
 
@@ -945,6 +944,7 @@ def get_required_workforce():
             else:
                 new_i = i + 1
                 timereq_dict[str(new_i) + str(hour)] = temp.worker
+    print(timereq_dict)
 
     
     opening_dict = {}
@@ -952,12 +952,15 @@ def get_required_workforce():
         opening = OpeningHours.query.filter_by(company_name=user.company_name, weekday=weekdays[i]).first()
         if opening is None:
             pass
+        elif opening.end_time2.strftime("%H:%M")=="00:00":
+            new_i = i + 1 
+            opening_dict[str(new_i) + '&0'] = opening.start_time.strftime("%H:%M") if opening.start_time else None
+            opening_dict[str(new_i) + '&1'] = opening.end_time.strftime("%H:%M") if opening.end_time else None
         else:
-            new_i = i + 1
+            new_i = i + 1 
             opening_dict[str(new_i) + '&0'] = opening.start_time.strftime("%H:%M") if opening.start_time else None
             opening_dict[str(new_i) + '&1'] = opening.end_time2.strftime("%H:%M") if opening.end_time2 else None
 
-    print(opening_dict)
     """
     # Set Template
     if time_form.template1.data:
@@ -984,29 +987,35 @@ def get_required_workforce():
         for i in range(day_num):
             for quarter in range(daily_slots): # There are 96 quarters in a day
                 quarter_hour = quarter / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
-                print(quarter_hour)
                 quarter_minute = (quarter % hour_divider) * minutes  # Remainder gives the quarter in the hour
-                print(quarter_minute)
                 formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
-                print(formatted_time)
                 capacity = workforce_data.get(f'worker_{i}_{formatted_time}')
-                print(capacity)
                 if capacity:
+                    print(capacity)
                     last = TimeReq.query.order_by(TimeReq.id.desc()).first()
                     if last is None:
                         new_id = 1
                     else:
                         new_id = last.id + 1
+
                     new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
                     time = f'{formatted_time}:00'
                     new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
 
-                    TimeReq.query.filter_by(company_name=user.company_name, date=new_date, start_time=new_time).delete()
+                    TimeReq.query.filter_by(company_name=user.company_name, date=new_date).delete()
                     db.session.commit()
 
-                    req = TimeReq(id=new_id, company_name=user.company_name, date=new_date, start_time=new_time, worker=capacity, created_by=company_id,
-                                  changed_by=company_id, creation_timestamp = creation_date)
 
+                    req = TimeReq(id=new_id, 
+                                  company_name=user.company_name, 
+                                  date=new_date, 
+                                  start_time=new_time, 
+                                  worker=capacity, 
+                                  created_by=company_id,
+                                  changed_by=company_id, 
+                                  creation_timestamp = creation_date
+                                  )
+                             
                     db.session.add(req)
                     db.session.commit()
         
