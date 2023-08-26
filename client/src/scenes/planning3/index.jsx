@@ -262,9 +262,7 @@ const TimeReq = ({ timereq }) => {
                     
                     const [closingHourHour, closingHourMinute] = closingHour.split(":");
                     const closingTimeMinutes =
-                      parseInt(closingHourHour) * 60 + parseInt(closingHourMinute);
-
-                    console.log(openingHour, closingHour, openingTimeMinutes, closingTimeMinutes, currentTimeMinutes)
+                      parseInt(closingHourHour) * 60 + parseInt(closingHourMinute) - 1;
 
                     // Check if the current time is within the opening and closing hours
                     if (

@@ -985,6 +985,9 @@ def get_required_workforce():
         workforce_data = request.get_json()
         week_adjustment = int(request.args.get('week_adjustment', 0))
         for i in range(day_num):
+            new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+            TimeReq.query.filter_by(company_name=user.company_name, date=new_date).delete()
+            db.session.commit()
             for quarter in range(daily_slots): # There are 96 quarters in a day
                 quarter_hour = quarter / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
                 quarter_minute = (quarter % hour_divider) * minutes  # Remainder gives the quarter in the hour
@@ -1001,10 +1004,6 @@ def get_required_workforce():
                     new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
                     time = f'{formatted_time}:00'
                     new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
-
-                    TimeReq.query.filter_by(company_name=user.company_name, date=new_date).delete()
-                    db.session.commit()
-
 
                     req = TimeReq(id=new_id, 
                                   company_name=user.company_name, 
