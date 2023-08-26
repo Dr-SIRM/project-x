@@ -213,7 +213,7 @@ const SolverReq = ({ solverreq }) => {
                   height: "100%",
                 }}
               >
-                Gewünschte max. Zeit pro Woche
+                Gewünschte max. Zeit pro Tag
               </Typography>
               <TextField
                 fullWidth
@@ -223,9 +223,9 @@ const SolverReq = ({ solverreq }) => {
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.desired_max_time_week}
-                name="desired_max_time_week"
-                error={!!touched.desired_max_time_week && !!errors.desired_max_time_week}
-                helperText={touched.desired_max_time_week && errors.desired_max_time_week}
+                name="desired_max_time_day"
+                error={!!touched.desired_max_time_day && !!errors.desired_max_time_day}
+                helperText={touched.desired_max_time_day && errors.desired_max_time_day}
                 sx={{ gridColumn: "span 1" }}
               />
               <Typography
