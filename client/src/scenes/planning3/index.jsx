@@ -32,6 +32,8 @@ const BUTTON_STYLE = {
   },
 };
 
+
+
 const TimeReq = ({ timereq }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -42,12 +44,28 @@ const TimeReq = ({ timereq }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [openingHours, setOpeningHours] = useState([]);
   const [closingHours, setClosingHours] = useState([]);
+  const [startBreak, setStartBreak] = useState([]);
+  const [endBreak, setEndBreak] = useState([]);
   const [weekAdjustment, setWeekAdjustment] = useState(0);
   const token = localStorage.getItem('session_token'); 
   const [employeeCount, setEmployeeCount] = useState({});
   const [selectedButtons, setSelectedButtons] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
   const [slotEmployeeCounts, setSlotEmployeeCounts] = useState({});
+
+  const convertTimeToMinutes = (timeStr) => {
+    if (!timeStr) return 0;
+    const [hour, minute] = timeStr.split(":");
+    return parseInt(hour) * 60 + parseInt(minute);
+  };
+  
+  // Helper function to check if the current time is within the operating hours and break time
+  const isTimeWithinRange = (current, opening, startBreak, endBreak, closing) => {
+    if (closing === 0 || closing === '') {
+      return current >= opening && current <= closing;
+    }
+      return (current >= opening && current < startBreak) || (current >= endBreak && current <= closing);
+  };
 
   useEffect(() => {
     const endDrag = () => setIsDragging(false);
@@ -110,14 +128,20 @@ const TimeReq = ({ timereq }) => {
           setTimeReqData(data);
 
           const openingHours = [];
+          const startBreak = [];
+          const endBreak = []
           const closingHours = [];
           
           for (let i = 0; i < data.day_num; i++) {
             openingHours.push(data.opening_dict[`${i+1}&0`]);
-            closingHours.push(data.opening_dict[`${i+1}&1`]);
+            startBreak.push(data.opening_dict[`${i+1}&1`]);
+            endBreak.push(data.opening_dict[`${i+1}&2`]);
+            closingHours.push(data.opening_dict[`${i+1}&3`]);
           }
 
           setOpeningHours(openingHours);
+          setStartBreak(startBreak);
+          setEndBreak(endBreak);
           setClosingHours(closingHours);
 
           setIsLoading(false);
@@ -248,30 +272,15 @@ const TimeReq = ({ timereq }) => {
                         }}>
                   
                   {Array.from({ length: timereqData.daily_slots }).map((_, btnIndex) => {
-                    const currentTime = timereqData.slots_dict[btnIndex];
-                    const [currentHour, currentMinute] = currentTime.split(":");
-                    const currentTimeMinutes =
-                      parseInt(currentHour) * 60 + parseInt(currentMinute);
-                    
-                    // Find the index of the current day's opening and closing hours
-                    const openingHour = openingHours[columnIndex];
-                    const closingHour = closingHours[columnIndex];
-
-                    
-                    const [openingHourHour, openingHourMinute] = openingHour.split(":");
-                    const openingTimeMinutes =
-                      parseInt(openingHourHour) * 60 + parseInt(openingHourMinute);
-                    
-                    const [closingHourHour, closingHourMinute] = closingHour.split(":");
-                    const closingTimeMinutes =
-                      parseInt(closingHourHour) * 60 + parseInt(closingHourMinute) - 1;
+                    const currentTimeMinutes = convertTimeToMinutes(timereqData.slots_dict[btnIndex]);
+    
+                    const openingTimeMinutes = convertTimeToMinutes(openingHours[columnIndex]);
+                    const startBreakTimeMinutes = convertTimeToMinutes(startBreak[columnIndex]) - 1;
+                    const endBreakTimeMinutes = convertTimeToMinutes(endBreak[columnIndex]);
+                    const closingTimeMinutes = convertTimeToMinutes(closingHours[columnIndex]) - 1;
 
                     // Check if the current time is within the opening and closing hours
-                    if (
-                      currentTimeMinutes >= openingTimeMinutes &&
-                      currentTimeMinutes <= closingTimeMinutes
-                    ) 
-                    {
+                    if (isTimeWithinRange(currentTimeMinutes, openingTimeMinutes, startBreakTimeMinutes, endBreakTimeMinutes, closingTimeMinutes)) {
                       const isSelected = selectedButtons.includes(`${columnIndex}-${btnIndex}`);
                       const employeeCountForThisSlot = slotEmployeeCounts[`${columnIndex}-${btnIndex}`] || '';
                       const isEntered = slotEmployeeCounts[`${columnIndex}-${btnIndex}`] !== undefined;
