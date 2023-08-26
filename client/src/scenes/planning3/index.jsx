@@ -63,14 +63,16 @@ const TimeReq = ({ timereq }) => {
     toggleButtonSelection(colIndex, btnIndex);
   }, []);
 
-  const toggleButtonSelection = useCallback((columnIndex, btnIndex) => {
+  const toggleButtonSelection = (columnIndex, btnIndex) => {
     const selectedKey = `${columnIndex}-${btnIndex}`;
-    if (selectedButtons.includes(selectedKey)) {
-      setSelectedButtons(selectedButtons.filter(key => key !== selectedKey));
-    } else {
-      setSelectedButtons([...selectedButtons, selectedKey]);
-    }
-  }, [selectedButtons]);
+    setSelectedButtons(prevSelectedButtons => {
+      if (prevSelectedButtons.includes(selectedKey)) {
+        return prevSelectedButtons.filter(key => key !== selectedKey);
+      } else {
+        return [...prevSelectedButtons, selectedKey];
+      }
+    });
+  };
 
   const setEmployees = (e, columnIndex) => {
     const value = parseInt(e.target.value);
