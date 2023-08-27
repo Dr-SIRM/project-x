@@ -140,6 +140,8 @@ class ORAlgorithm:
         self.status = None
         self.solving_time_seconds = None
 
+        self.violation_nb1 = None
+
         self.hiring_costs = None
         self.nb1_penalty_costs = None
         self.nb2_penalty_costs = None
@@ -1266,14 +1268,30 @@ class ORAlgorithm:
         self.hiring_costs = sum(self.kosten[i] * self.x[i, j, k].solution_value() for i in self.mitarbeiter for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[i][j])))
 
         # Strafen für die Verletzung der weichen Nebenbedingungen
-        self.nb1_penalty_costs = sum(self.penalty_cost_nb1 * self.nb1_violation[j, k].solution_value() for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])))
-        self.nb2_penalty_costs = sum(self.penalty_cost_nb2 * self.nb2_violation[i][week].solution_value() for i in self.mitarbeiter for week in range(1, self.week_timeframe + 1))
-        self.nb3_min_penalty_costs = sum(self.penalty_cost_nb3_min * self.nb3_min_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
-        self.nb4_max_penalty_costs = sum(self.penalty_cost_nb4_max * self.nb4_max_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
-        self.nb5_min_penalty_costs = sum(self.penalty_cost_nb5_min * self.nb5_min_violation[i][week - 1].solution_value() for i in self.mitarbeiter for week in range(1, self.week_timeframe + 1))
-        self.nb6_max_penalty_costs = sum(self.penalty_cost_nb6_max * self.nb6_max_violation[i][week - 1].solution_value() for i in self.mitarbeiter for week in range(1, self.week_timeframe + 1))
-        self.nb7_penalty_costs = sum(self.penalty_cost_nb7 * self.nb7_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(7))
-        self.nb8_penalty_costs = sum(self.penalty_cost_nb8 * self.nb8_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(7, self.calc_time))
+        # (Damit die Werte für das Testing in die Datenbank eingespeist werden können):
+        self.violation_nb1 = sum(self.nb1_violation[j, k].solution_value() for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])))
+        self.nb1_penalty_costs = self.penalty_cost_nb1 * self.violation_nb1
+
+        self.violation_nb2 = sum(self.nb2_violation[i][week].solution_value() for i in self.mitarbeiter for week in range(1, self.week_timeframe + 1))
+        self.nb2_penalty_costs = self.penalty_cost_nb2 * self.violation_nb2
+
+        self.violation_nb3 = sum(self.nb3_min_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
+        self.nb3_min_penalty_costs = self.penalty_cost_nb3_min * self.violation_nb3
+
+        self.violation_nb4 = sum(self.nb4_max_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
+        self.nb4_max_penalty_costs = self.penalty_cost_nb4_max * self.violation_nb4
+
+        self.violation_nb5 = sum(self.nb5_min_violation[i][week - 1].solution_value() for i in self.mitarbeiter for week in range(1, self.week_timeframe + 1))
+        self.nb5_min_penalty_costs = self.penalty_cost_nb5_min * self.violation_nb5
+        
+        self.violation_nb6 = sum(self.nb6_max_violation[i][week - 1].solution_value() for i in self.mitarbeiter for week in range(1, self.week_timeframe + 1))
+        self.nb6_max_penalty_costs = self.penalty_cost_nb6_max * self.violation_nb6
+
+        self.violation_nb7 = sum(self.nb7_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(7))
+        self.nb7_penalty_costs = self.penalty_cost_nb7 * self.violation_nb7
+
+        self.violation_nb8 = sum(self.nb8_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(7, self.calc_time))
+        self.nb8_penalty_costs = self.penalty_cost_nb8 * self.violation_nb8
 
         # Kosten der einzelnen NBs ausgeben
         print('Kosten Einstellung von Mitarbeitern:', self.hiring_costs)
@@ -1466,76 +1484,75 @@ class ORAlgorithm:
         """ 
         Diese Methode speichert verwendete Daten in der Datenbank für das testing
         """
-        with app.app_context():
-                new_entry = SolverAnalysis(
-                    id = None,
-                    usecase = None,
-                    self_current_user_id = 88,
-                    self_user_availability = None,
-                    self_opening_hours = None,
-                    self_laden_oeffnet = None,
-                    self_laden_schliesst = None,
-                    self_binary_availability = None,
-                    self_company_shifts = None,
-                    self_weekly_hours = None,
-                    self_employment_lvl = None,
-                    self_time_req = None,
-                    self_user_employment = None,
-                    self_solver_requirements = None,
-                    self_week_timeframe = None,
-                    self_hour_devider = None,
-                    self_mitarbeiter = None,
-                    self_verfügbarkeit = None,
-                    self_kosten = None,
-                    self_max_zeit = None,
-                    self_min_zeit = None,
-                    self_max_time_week = None,
-                    self_calc_time = None,
-                    self_employment_lvl_exact = None,
-                    self_employment = None,
-                    self_verteilbare_stunden = None,
-                    self_gesamtstunden_verfügbarkeit = None,
-                    self_min_anwesend = None,
-                    self_gerechte_verteilung = None,
-                    self_fair_distribution = None,
-                    solving_time = None,
-                    lp_iteration = None,
-                    violation_nb1 = None,
-                    violation_nb2 = None,
-                    violation_nb3 = None,
-                    violation_nb4 = None,
-                    violation_nb5 = None,
-                    violation_nb6 = None,
-                    violation_nb7 = None,
-                    violation_nb8 = None,
-                    violation_nb9 = None,
-                    violation_nb10 = None,
-                    violation_nb11 = None,
-                    violation_nb12 = None,
-                    violation_nb13 = None,
-                    violation_nb14 = None,
-                    violation_nb15 = None,
-                    violation_nb16 = None,
-                    violation_nb17 = None,
-                    violation_nb18 = None,
-                    violation_nb19 = None,
-                    violation_nb20 = None,
-                    possible_solution = None,
-                    gap_016 = None,
-                    gap_05 = None,
-                    gap_1 = None,
-                    gap_2 = None,
-                    gap_3 = None,
-                    gap_4 = None,
-                    gap_5 = None,
-                    gap_10 = None,
-                    gap_20 = None,
-                    gap_30 = None,
-                    memory = None
-                )
+        new_entry = SolverAnalysis(
+            id = None,
+            usecase = self.solver_requirements["company_name"],
+            self_current_user_id = self.current_user_id,
+            self_user_availability = str(self.user_availability),
+            self_opening_hours = str(self.opening_hours),
+            self_laden_oeffnet = str(self.laden_oeffnet),
+            self_laden_schliesst = str(self.laden_schliesst),
+            self_binary_availability = str(self.binary_availability),
+            self_company_shifts = self.company_shifts,
+            self_weekly_hours = self.weekly_hours,
+            self_employment_lvl = str(self.employment_lvl),
+            self_time_req = str(self.time_req),
+            self_user_employment = self.user_employment,
+            self_solver_requirements = str(self.solver_requirements),
+            self_week_timeframe = self.week_timeframe,
+            self_hour_devider = self.hour_devider,
+            self_mitarbeiter = str(self.mitarbeiter),
+            self_verfügbarkeit = str(self.verfügbarkeit),
+            self_kosten = str(self.kosten),
+            self_max_zeit = str(self.max_zeit),
+            self_min_zeit = str(self.min_zeit),
+            self_max_time_week = self.max_time_week,
+            self_calc_time = self.calc_time,
+            self_employment_lvl_exact = str(self.employment_lvl_exact),
+            self_employment = str(self.employment),
+            self_verteilbare_stunden = self.verteilbare_stunden,
+            self_gesamtstunden_verfügbarkeit = str(self.gesamtstunden_verfügbarkeit),
+            self_min_anwesend = str(self.min_anwesend),
+            self_gerechte_verteilung = str(self.gerechte_verteilung),
+            self_fair_distribution = self.fair_distribution,
+            solving_time = self.solving_time_seconds,
+            lp_iteration = None,
+            violation_nb1 = self.violation_nb1,
+            violation_nb2 = self.violation_nb2,
+            violation_nb3 = self.violation_nb3,
+            violation_nb4 = self.violation_nb4,
+            violation_nb5 = self.violation_nb5,
+            violation_nb6 = self.violation_nb6,
+            violation_nb7 = self.violation_nb7,
+            violation_nb8 = self.violation_nb8,
+            violation_nb9 = None,
+            violation_nb10 = None,
+            violation_nb11 = None,
+            violation_nb12 = None,
+            violation_nb13 = None,
+            violation_nb14 = None,
+            violation_nb15 = None,
+            violation_nb16 = None,
+            violation_nb17 = None,
+            violation_nb18 = None,
+            violation_nb19 = None,
+            violation_nb20 = None,
+            possible_solution = None,
+            gap_016 = None,
+            gap_05 = None,
+            gap_1 = None,
+            gap_2 = None,
+            gap_3 = None,
+            gap_4 = None,
+            gap_5 = None,
+            gap_10 = None,
+            gap_20 = None,
+            gap_30 = None,
+            memory = None
+        )
 
-                # new_entry der Datenbank hinzufügen
-                db.session.add(new_entry)
+        # new_entry der Datenbank hinzufügen
+        db.session.add(new_entry)
 
         # Änderungen in der Datenbank speichern
         db.session.commit()
