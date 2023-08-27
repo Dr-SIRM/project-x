@@ -1537,6 +1537,9 @@ class ORAlgorithm:
             violation_nb18 = None,
             violation_nb19 = None,
             violation_nb20 = None,
+
+
+            
             possible_solution = None,
             gap_016 = None,
             gap_05 = None,
