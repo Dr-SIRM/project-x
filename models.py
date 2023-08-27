@@ -448,7 +448,7 @@ class SolverAnalysis(db.Model, UserMixin):
 
 
 
-    def __init__(self_current_user_id, self_user_availability, self_opening_hours, self_laden_oeffnet, 
+    def __init__(self, id, usecase, self_current_user_id, self_user_availability, self_opening_hours, self_laden_oeffnet, 
                  self_laden_schliesst, self_binary_availability, self_company_shifts, self_weekly_hours, 
                  self_employment_lvl, self_time_req, self_user_employment, self_solver_requirements, 
                  self_week_timeframe, self_hour_devider, self_mitarbeiter, self_verfügbarkeit, self_kosten, 
@@ -461,8 +461,9 @@ class SolverAnalysis(db.Model, UserMixin):
                  violation_nb16, violation_nb17, violation_nb18, violation_nb19, violation_nb20, 
                  possible_solution, gap_016, gap_05, gap_1, gap_2, gap_3, gap_4, gap_5, gap_10, gap_20, gap_30, 
                  memory):
-
+        self.id = id
         self.self_current_user_id = self_current_user_id
+        self.usecase = usecase
         self.self_user_availability = self_user_availability
         self.self_opening_hours = self_opening_hours
         self.self_laden_oeffnet = self_laden_oeffnet

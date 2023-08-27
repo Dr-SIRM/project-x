@@ -171,7 +171,7 @@ class ORAlgorithm:
         self.store_solved_data()
         self.output_result_excel()
         self.save_data_in_database()
-        # self.save_data_in_database_testing()
+        self.save_data_in_database_testing()
 
 
     def create_variables(self):
@@ -1467,12 +1467,77 @@ class ORAlgorithm:
         Diese Methode speichert verwendete Daten in der Datenbank für das testing
         """
         with app.app_context():
-                new_entry = SolverAnalysis
+                new_entry = SolverAnalysis(
+                    id = None,
+                    usecase = None,
+                    self_current_user_id = 88,
+                    self_user_availability = None,
+                    self_opening_hours = None,
+                    self_laden_oeffnet = None,
+                    self_laden_schliesst = None,
+                    self_binary_availability = None,
+                    self_company_shifts = None,
+                    self_weekly_hours = None,
+                    self_employment_lvl = None,
+                    self_time_req = None,
+                    self_user_employment = None,
+                    self_solver_requirements = None,
+                    self_week_timeframe = None,
+                    self_hour_devider = None,
+                    self_mitarbeiter = None,
+                    self_verfügbarkeit = None,
+                    self_kosten = None,
+                    self_max_zeit = None,
+                    self_min_zeit = None,
+                    self_max_time_week = None,
+                    self_calc_time = None,
+                    self_employment_lvl_exact = None,
+                    self_employment = None,
+                    self_verteilbare_stunden = None,
+                    self_gesamtstunden_verfügbarkeit = None,
+                    self_min_anwesend = None,
+                    self_gerechte_verteilung = None,
+                    self_fair_distribution = None,
+                    solving_time = None,
+                    lp_iteration = None,
+                    violation_nb1 = None,
+                    violation_nb2 = None,
+                    violation_nb3 = None,
+                    violation_nb4 = None,
+                    violation_nb5 = None,
+                    violation_nb6 = None,
+                    violation_nb7 = None,
+                    violation_nb8 = None,
+                    violation_nb9 = None,
+                    violation_nb10 = None,
+                    violation_nb11 = None,
+                    violation_nb12 = None,
+                    violation_nb13 = None,
+                    violation_nb14 = None,
+                    violation_nb15 = None,
+                    violation_nb16 = None,
+                    violation_nb17 = None,
+                    violation_nb18 = None,
+                    violation_nb19 = None,
+                    violation_nb20 = None,
+                    possible_solution = None,
+                    gap_016 = None,
+                    gap_05 = None,
+                    gap_1 = None,
+                    gap_2 = None,
+                    gap_3 = None,
+                    gap_4 = None,
+                    gap_5 = None,
+                    gap_10 = None,
+                    gap_20 = None,
+                    gap_30 = None,
+                    memory = None
+                )
 
+                # new_entry der Datenbank hinzufügen
+                db.session.add(new_entry)
 
+        # Änderungen in der Datenbank speichern
+        db.session.commit()
+        print("end")
         
-                        # new_entry der Datenbank hinzufügen
-                        db.session.add(new_entry)
-
-            # Änderungen in der Datenbank speichern
-            db.session.commit()
