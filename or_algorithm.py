@@ -9,7 +9,7 @@ from ortools.linear_solver import pywraplp
 from data_processing import DataProcessing
 from app import app, db
 from sqlalchemy import text
-from models import Timetable, User
+from models import Timetable, User, SolverAnalysis
 
 """
 To-Do Liste:
@@ -1234,8 +1234,6 @@ class ORAlgorithm:
 
 
 
-       
-
     def solve_problem(self):
         """
         Problem lösen und Kosten ausgeben
@@ -1469,56 +1467,10 @@ class ORAlgorithm:
         Diese Methode speichert verwendete Daten in der Datenbank für das testing
         """
         with app.app_context():
-            for user_id, days in self.mitarbeiter_arbeitszeiten.items(): # Durch mitarbeiter_arbeitszeiten durchitterieren
-                print(f"Verarbeite Benutzer-ID: {user_id}")
+                new_entry = SolverAnalysis
 
-                # Benutzer aus der Datenbank abrufen
-                user = User.query.get(user_id)
-                print(user)
-                if not user:
-                    print(f"Kein Benutzer gefunden mit ID: {user_id}")
-                    continue
 
-                for day_index, day in enumerate(days):
-                    # Wir gehen davon aus, dass der erste Tag im 'self.user_availability' das Startdatum ist
-                    date = self.user_availability[user_id][0][0] + datetime.timedelta(days=day_index)
-                    print("DATE: ", date)
-
-                    # Löschen der jeweiligen Tage
-                    Timetable.query.filter_by(email=user.email, date=date).delete()
-                    db.session.commit()
-                    
-
-                    # Hier unterteilen wir den Tag in Schichten, basierend auf den Zeiten, zu denen der Mitarbeiter arbeitet
-                    shifts = []
-                    start_time_index = None
-                    for time_index in range(len(day)):
-                        if day[time_index] == 1 and start_time_index is None:
-                            start_time_index = time_index
-                        elif day[time_index] == 0 and start_time_index is not None:
-                            shifts.append((start_time_index, time_index))
-                            start_time_index = None
-                    
-                    if start_time_index is not None:
-                        shifts.append((start_time_index, len(day)))
-
-                    print(f"Berechnete Schichten für Benutzer-ID {user_id}, Tag-Index {day_index}: {shifts}")
-
-                    # Divisor bestimmen
-                    divisor = 3600 / self.hour_devider
-
-                    for shift_index, (start_time, end_time) in enumerate(shifts):
-                        # Ladenöffnungszeit am aktuellen Tag hinzufügen
-                        opening_time_in_units = int(self.laden_oeffnet[day_index].total_seconds() * self.hour_devider / 3600)
-                        start_time += opening_time_in_units
-                        end_time += opening_time_in_units
-
-                        # Neues XXX-Objekt
-                        new_entry = XXX(
-                            id=None  # ID wird automatisch generiert
-                            
-                        )
-
+        
                         # new_entry der Datenbank hinzufügen
                         db.session.add(new_entry)
 
