@@ -131,19 +131,28 @@ const TimeReq = ({ timereq }) => {
           const startBreak = [];
           const endBreak = []
           const closingHours = [];
+          const fetchedSlotEmployeeCounts = {};
           
           for (let i = 0; i < data.day_num; i++) {
             openingHours.push(data.opening_dict[`${i+1}&0`]);
             startBreak.push(data.opening_dict[`${i+1}&1`]);
             endBreak.push(data.opening_dict[`${i+1}&2`]);
             closingHours.push(data.opening_dict[`${i+1}&3`]);
+            
+            for (let j = 0; j < data.daily_slots; j++) {
+              const slotKey = `${i}-${j}`;
+              const fetchedCount = data.employee_counts[i][j];
+              if (fetchedCount !== undefined) {
+                fetchedSlotEmployeeCounts[slotKey] = fetchedCount;
+              }
+            }
           }
 
           setOpeningHours(openingHours);
           setStartBreak(startBreak);
           setEndBreak(endBreak);
           setClosingHours(closingHours);
-
+          setSlotEmployeeCounts(fetchedSlotEmployeeCounts);
           setIsLoading(false);
 
         } catch (error) {
