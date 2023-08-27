@@ -1,6 +1,7 @@
 import pandas as pd
 import datetime
 import pymysql
+import time
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font
 from openpyxl.utils import get_column_letter
@@ -8,7 +9,7 @@ from ortools.linear_solver import pywraplp
 from data_processing import DataProcessing
 from app import app, db
 from sqlalchemy import text
-from models import Timetable, User
+from models import Timetable, User, SolverAnalysis
 
 """
 To-Do Liste:
@@ -30,14 +31,13 @@ Prio 1:
 
  To-Do's 
  -------------------------------
- - NB9 mit 3 Schichten fertigbauen
+ - (*) NB9 mit 3 Schichten fertigbauen
  - (erl.) Stunden Teiler für 1/4, 1/2 und 1h einbauen
- - Opening Hour 2 einbauen
- - Code ordnen
- - Testphase
+ - (*) Opening Hour 2 einbauen
+ - (*) Testphase
 
- - Bei Company Shifts darf es nur die Möglichkeit geben, 1,2 oder 3 Schichten anzuwählen
- - "Gewünschte max. Zeit pro Woche" in Solver Req muss gelöscht werden
+
+
  - Der erstellte "divisor" in data_processing könnte als Attribut initialisiert werden, damit es nicht bei jeder Methode einzeln berechnet werden muss
 
  
@@ -138,9 +138,22 @@ class ORAlgorithm:
 
         # Attribute der Methode "solve_problem"
         self.status = None
+        self.solving_time_seconds = None
+
+        self.hiring_costs = None
+        self.nb1_penalty_costs = None
+        self.nb2_penalty_costs = None
+        self.nb3_min_penalty_costs = None
+        self.nb4_max_penalty_costs = None
+        self.nb5_min_penalty_costs = None
+        self.nb6_max_penalty_costs = None
+        self.nb7_penalty_costs = None
+        self.nb8_penalty_costs = None
 
         # Attribute der Methode "store_solved_data"
         self.mitarbeiter_arbeitszeiten = {}
+
+        # Attribute der Methode 
 
 
     def run(self):
@@ -158,6 +171,7 @@ class ORAlgorithm:
         self.store_solved_data()
         self.output_result_excel()
         self.save_data_in_database()
+        # self.save_data_in_database_testing()
 
 
     def create_variables(self):
@@ -1153,12 +1167,9 @@ class ORAlgorithm:
                     self.solver.Add(self.nb8_violation[i, j] >= diff)
                     self.solver.Add(self.nb8_violation[i, j] >= -diff)
                     self.solver.Add(self.nb8_violation[i, j] <= 1)  # Die Verletzung sollte maximal 1 betragen
-            """
-
+        """    
         
-
-
-
+        
 
 
 
@@ -1223,15 +1234,18 @@ class ORAlgorithm:
 
 
 
-       
-
     def solve_problem(self):
         """
         Problem lösen und Kosten ausgeben
         """
         self.solver.EnableOutput()
-        self.status = self.solver.Solve()
 
+        start_time = time.time()
+        self.status = self.solver.Solve()
+        end_time = time.time()
+
+        self.solving_time_seconds = end_time - start_time
+        
 
         # --------------------------------------------------------------------------------------
         # Die Werte von s3 printen
@@ -1249,28 +1263,28 @@ class ORAlgorithm:
 
 
         # Kosten für die Einstellung von Mitarbeitern
-        hiring_costs = sum(self.kosten[i] * self.x[i, j, k].solution_value() for i in self.mitarbeiter for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[i][j])))
+        self.hiring_costs = sum(self.kosten[i] * self.x[i, j, k].solution_value() for i in self.mitarbeiter for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[i][j])))
 
         # Strafen für die Verletzung der weichen Nebenbedingungen
-        nb1_penalty_costs = sum(self.penalty_cost_nb1 * self.nb1_violation[j, k].solution_value() for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])))
-        nb2_penalty_costs = sum(self.penalty_cost_nb2 * self.nb2_violation[i][week].solution_value() for i in self.mitarbeiter for week in range(1, self.week_timeframe + 1))
-        nb3_min_penalty_costs = sum(self.penalty_cost_nb3_min * self.nb3_min_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
-        nb4_max_penalty_costs = sum(self.penalty_cost_nb4_max * self.nb4_max_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
-        nb5_min_penalty_costs = sum(self.penalty_cost_nb5_min * self.nb5_min_violation[i][week - 1].solution_value() for i in self.mitarbeiter for week in range(1, self.week_timeframe + 1))
-        nb6_max_penalty_costs = sum(self.penalty_cost_nb6_max * self.nb6_max_violation[i][week - 1].solution_value() for i in self.mitarbeiter for week in range(1, self.week_timeframe + 1))
-        nb7_penalty_costs = sum(self.penalty_cost_nb7 * self.nb7_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(7))
-        nb8_penalty_costs = sum(self.penalty_cost_nb8 * self.nb8_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(7, self.calc_time))
+        self.nb1_penalty_costs = sum(self.penalty_cost_nb1 * self.nb1_violation[j, k].solution_value() for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])))
+        self.nb2_penalty_costs = sum(self.penalty_cost_nb2 * self.nb2_violation[i][week].solution_value() for i in self.mitarbeiter for week in range(1, self.week_timeframe + 1))
+        self.nb3_min_penalty_costs = sum(self.penalty_cost_nb3_min * self.nb3_min_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
+        self.nb4_max_penalty_costs = sum(self.penalty_cost_nb4_max * self.nb4_max_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
+        self.nb5_min_penalty_costs = sum(self.penalty_cost_nb5_min * self.nb5_min_violation[i][week - 1].solution_value() for i in self.mitarbeiter for week in range(1, self.week_timeframe + 1))
+        self.nb6_max_penalty_costs = sum(self.penalty_cost_nb6_max * self.nb6_max_violation[i][week - 1].solution_value() for i in self.mitarbeiter for week in range(1, self.week_timeframe + 1))
+        self.nb7_penalty_costs = sum(self.penalty_cost_nb7 * self.nb7_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(7))
+        self.nb8_penalty_costs = sum(self.penalty_cost_nb8 * self.nb8_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(7, self.calc_time))
 
         # Kosten der einzelnen NBs ausgeben
-        print('Kosten Einstellung von Mitarbeitern:', hiring_costs)
-        print('Kosten Weiche NB1 (Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend):', nb1_penalty_costs)
-        print('Kosten Weiche NB2 (Max. Arbeitszeit pro Woche "Temp" MA):', nb2_penalty_costs)
-        print('Kosten Weiche NB3 (Min. Arbeitszeit pro Tag):', nb3_min_penalty_costs)
-        print('Kosten Weiche NB4 (Max. Arbeitszeit pro Tag):', nb4_max_penalty_costs)
-        print('Kosten Weiche NB5 (Unterschreitung der festen Mitarbeiter zu employment_level):', nb5_min_penalty_costs)
-        print('Kosten Weiche NB6 (Überschreitung der festen Mitarbeiter zu employment_level):', nb6_max_penalty_costs)
-        print('Kosten Weiche NB7 (Immer die gleiche Schicht in einer Woche):', nb7_penalty_costs)
-        print('Kosten Weiche NB8 (Immer die gleiche Schicht zweite Woche):', nb8_penalty_costs)
+        print('Kosten Einstellung von Mitarbeitern:', self.hiring_costs)
+        print('Kosten Weiche NB1 (Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend):', self.nb1_penalty_costs)
+        print('Kosten Weiche NB2 (Max. Arbeitszeit pro Woche "Temp" MA):', self.nb2_penalty_costs)
+        print('Kosten Weiche NB3 (Min. Arbeitszeit pro Tag):', self.nb3_min_penalty_costs)
+        print('Kosten Weiche NB4 (Max. Arbeitszeit pro Tag):', self.nb4_max_penalty_costs)
+        print('Kosten Weiche NB5 (Unterschreitung der festen Mitarbeiter zu employment_level):', self.nb5_min_penalty_costs)
+        print('Kosten Weiche NB6 (Überschreitung der festen Mitarbeiter zu employment_level):', self.nb6_max_penalty_costs)
+        print('Kosten Weiche NB7 (Immer die gleiche Schicht in einer Woche):', self.nb7_penalty_costs)
+        print('Kosten Weiche NB8 (Immer die gleiche Schicht zweite Woche):', self.nb8_penalty_costs)
         print('Gesamtkosten:', self.objective.Value())
 
 
@@ -1440,6 +1454,23 @@ class ORAlgorithm:
                             creation_timestamp=datetime.datetime.now()
                         )
 
+                        # new_entry der Datenbank hinzufügen
+                        db.session.add(new_entry)
+
+            # Änderungen in der Datenbank speichern
+            db.session.commit()
+
+
+
+    def save_data_in_database_testing(self):
+        """ 
+        Diese Methode speichert verwendete Daten in der Datenbank für das testing
+        """
+        with app.app_context():
+                new_entry = SolverAnalysis
+
+
+        
                         # new_entry der Datenbank hinzufügen
                         db.session.add(new_entry)
 
