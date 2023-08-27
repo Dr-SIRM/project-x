@@ -378,3 +378,168 @@ class SolverRequirement(db.Model, UserMixin):
         self.changed_by = changed_by
         self.creation_timestamp = creation_timestamp
         self.update_timestamp = update_timestamp
+
+
+class SolverAnalysis(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    usecase = db.Column(db.String(30))
+    self_current_user_id = db.Column(db.Text)
+    self_user_availability = db.Column(db.Text)
+    self_opening_hours = db.Column(db.Text)
+    self_laden_oeffnet = db.Column(db.Text)
+    self_laden_schliesst = db.Column(db.Text)
+    self_binary_availability = db.Column(db.Text)
+    self_company_shifts = db.Column(db.Text)
+    self_weekly_hours = db.Column(db.Text)
+    self_employment_lvl = db.Column(db.Text)
+    self_time_req = db.Column(db.Text)
+    self_user_employment = db.Column(db.Text)
+    self_solver_requirements = db.Column(db.Text)
+    self_week_timeframe = db.Column(db.Text)
+    self_hour_devider = db.Column(db.Text)
+    self_mitarbeiter = db.Column(db.Text)
+    self_verfügbarkeit = db.Column(db.Text)
+    self_kosten = db.Column(db.Text)
+    self_max_zeit = db.Column(db.Text)
+    self_min_zeit = db.Column(db.Text)
+    self_max_time_week = db.Column(db.Text)
+    self_calc_time = db.Column(db.Text)
+    self_employment_lvl_exact = db.Column(db.Text)
+    self_employment = db.Column(db.Text)
+    self_verteilbare_stunden = db.Column(db.Text)
+    self_gesamtstunden_verfügbarkeit = db.Column(db.Text)
+    self_min_anwesend = db.Column(db.Text)
+    self_gerechte_verteilung = db.Column(db.Text)
+    self_fair_distribution = db.Column(db.Text)
+    solving_time = db.Column(db.Integer)
+    lp_iteration = db.Column(db.Integer)
+    violation_nb1 = db.Column(db.Integer)
+    violation_nb2 = db.Column(db.Integer)
+    violation_nb3 = db.Column(db.Integer)
+    violation_nb4 = db.Column(db.Integer)
+    violation_nb5 = db.Column(db.Integer)
+    violation_nb6 = db.Column(db.Integer)
+    violation_nb7 = db.Column(db.Integer)
+    violation_nb8 = db.Column(db.Integer)
+    violation_nb9 = db.Column(db.Integer)
+    violation_nb10 = db.Column(db.Integer)
+    violation_nb11 = db.Column(db.Integer)
+    violation_nb12 = db.Column(db.Integer)
+    violation_nb13 = db.Column(db.Integer)
+    violation_nb14 = db.Column(db.Integer)
+    violation_nb15 = db.Column(db.Integer)
+    violation_nb16 = db.Column(db.Integer)
+    violation_nb17 = db.Column(db.Integer)
+    violation_nb18 = db.Column(db.Integer)
+    violation_nb19 = db.Column(db.Integer)
+    violation_nb20 = db.Column(db.Integer)
+    possible_solution = db.Column(db.Integer)
+    gap_016 = db.Column(db.Integer)
+    gap_05 = db.Column(db.Integer)
+    gap_1 = db.Column(db.Integer)
+    gap_2 = db.Column(db.Integer)
+    gap_3 = db.Column(db.Integer)
+    gap_4 = db.Column(db.Integer)
+    gap_5 = db.Column(db.Integer)
+    gap_10 = db.Column(db.Integer)
+    gap_20 = db.Column(db.Integer)
+    gap_30 = db.Column(db.Integer)
+    memory = db.Column(db.String(15))
+
+
+
+    def __init__(self_current_user_id, self_user_availability, self_opening_hours, self_laden_oeffnet, 
+                 self_laden_schliesst, self_binary_availability, self_company_shifts, self_weekly_hours, 
+                 self_employment_lvl, self_time_req, self_user_employment, self_solver_requirements, 
+                 self_week_timeframe, self_hour_devider, self_mitarbeiter, self_verfügbarkeit, self_kosten, 
+                 self_max_zeit, self_min_zeit, self_max_time_week, self_calc_time, 
+                 self_employment_lvl_exact, self_employment, self_verteilbare_stunden, 
+                 self_gesamtstunden_verfügbarkeit, self_min_anwesend, self_gerechte_verteilung, 
+                 self_fair_distribution, solving_time, lp_iteration, violation_nb1, violation_nb2, violation_nb3, 
+                 violation_nb4, violation_nb5, violation_nb6, violation_nb7, violation_nb8, violation_nb9, 
+                 violation_nb10, violation_nb11, violation_nb12, violation_nb13, violation_nb14, violation_nb15, 
+                 violation_nb16, violation_nb17, violation_nb18, violation_nb19, violation_nb20, 
+                 possible_solution, gap_016, gap_05, gap_1, gap_2, gap_3, gap_4, gap_5, gap_10, gap_20, gap_30, 
+                 memory):
+
+        self.self_current_user_id = self_current_user_id
+        self.self_user_availability = self_user_availability
+        self.self_opening_hours = self_opening_hours
+        self.self_laden_oeffnet = self_laden_oeffnet
+        self.self_laden_schliesst = self_laden_schliesst
+        self.self_binary_availability = self_binary_availability
+        self.self_company_shifts = self_company_shifts
+        self.self_weekly_hours = self_weekly_hours
+        self.self_employment_lvl = self_employment_lvl
+        self.self_time_req = self_time_req
+        self.self_user_employment = self_user_employment
+        self.self_solver_requirements = self_solver_requirements
+        self.self_week_timeframe = self_week_timeframe
+        self.self_hour_devider = self_hour_devider
+        self.self_mitarbeiter = self_mitarbeiter
+        self.self_verfügbarkeit = self_verfügbarkeit
+        self.self_kosten = self_kosten
+        self.self_max_zeit = self_max_zeit
+        self.self_min_zeit = self_min_zeit
+        self.self_max_time_week = self_max_time_week
+        self.self_calc_time = self_calc_time
+        self.self_employment_lvl_exact = self_employment_lvl_exact
+        self.self_employment = self_employment
+        self.self_verteilbare_stunden = self_verteilbare_stunden
+        self.self_gesamtstunden_verfügbarkeit = self_gesamtstunden_verfügbarkeit
+        self.self_min_anwesend = self_min_anwesend
+        self.self_gerechte_verteilung = self_gerechte_verteilung
+        self.self_fair_distribution = self_fair_distribution
+        self.solving_time = solving_time
+        self.lp_iteration = lp_iteration
+        self.violation_nb1 = violation_nb1
+        self.violation_nb2 = violation_nb2
+        self.violation_nb3 = violation_nb3
+        self.violation_nb4 = violation_nb4
+        self.violation_nb5 = violation_nb5
+        self.violation_nb6 = violation_nb6
+        self.violation_nb7 = violation_nb7
+        self.violation_nb8 = violation_nb8
+        self.violation_nb9 = violation_nb9
+        self.violation_nb10 = violation_nb10
+        self.violation_nb11 = violation_nb11
+        self.violation_nb12 = violation_nb12
+        self.violation_nb13 = violation_nb13
+        self.violation_nb14 = violation_nb14
+        self.violation_nb15 = violation_nb15
+        self.violation_nb16 = violation_nb16
+        self.violation_nb17 = violation_nb17
+        self.violation_nb18 = violation_nb18
+        self.violation_nb19 = violation_nb19
+        self.violation_nb20 = violation_nb20
+        self.possible_solution = possible_solution
+        self.gap_016 = gap_016
+        self.gap_05 = gap_05
+        self.gap_1 = gap_1
+        self.gap_2 = gap_2
+        self.gap_3 = gap_3
+        self.gap_4 = gap_4
+        self.gap_5 = gap_5
+        self.gap_10 = gap_10
+        self.gap_20 = gap_20
+        self.gap_30 = gap_30
+        self.memory = memory
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
