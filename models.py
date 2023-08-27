@@ -433,6 +433,26 @@ class SolverAnalysis(db.Model, UserMixin):
     violation_nb18 = db.Column(db.Integer)
     violation_nb19 = db.Column(db.Integer)
     violation_nb20 = db.Column(db.Integer)
+    penalty_cost_nb1 = db.Column(db.Integer)
+    penalty_cost_nb2 = db.Column(db.Integer)
+    penalty_cost_nb3 = db.Column(db.Integer)
+    penalty_cost_nb4 = db.Column(db.Integer)
+    penalty_cost_nb5 = db.Column(db.Integer)
+    penalty_cost_nb6 = db.Column(db.Integer)
+    penalty_cost_nb7 = db.Column(db.Integer)
+    penalty_cost_nb8 = db.Column(db.Integer)
+    penalty_cost_nb9 = db.Column(db.Integer)
+    penalty_cost_nb10 = db.Column(db.Integer)
+    penalty_cost_nb11 = db.Column(db.Integer)
+    penalty_cost_nb12 = db.Column(db.Integer)
+    penalty_cost_nb13 = db.Column(db.Integer)
+    penalty_cost_nb14 = db.Column(db.Integer)
+    penalty_cost_nb15 = db.Column(db.Integer)
+    penalty_cost_nb16 = db.Column(db.Integer)
+    penalty_cost_nb17 = db.Column(db.Integer)
+    penalty_cost_nb18 = db.Column(db.Integer)
+    penalty_cost_nb19 = db.Column(db.Integer)
+    penalty_cost_nb20 = db.Column(db.Integer)
     possible_solution = db.Column(db.Integer)
     gap_016 = db.Column(db.Integer)
     gap_05 = db.Column(db.Integer)
@@ -447,23 +467,24 @@ class SolverAnalysis(db.Model, UserMixin):
     memory = db.Column(db.String(15))
 
 
-
-    def __init__(self, id, usecase, self_current_user_id, self_user_availability, self_opening_hours, self_laden_oeffnet, 
-                 self_laden_schliesst, self_binary_availability, self_company_shifts, self_weekly_hours, 
-                 self_employment_lvl, self_time_req, self_user_employment, self_solver_requirements, 
-                 self_week_timeframe, self_hour_devider, self_mitarbeiter, self_verfügbarkeit, self_kosten, 
-                 self_max_zeit, self_min_zeit, self_max_time_week, self_calc_time, 
-                 self_employment_lvl_exact, self_employment, self_verteilbare_stunden, 
-                 self_gesamtstunden_verfügbarkeit, self_min_anwesend, self_gerechte_verteilung, 
-                 self_fair_distribution, solving_time, lp_iteration, violation_nb1, violation_nb2, violation_nb3, 
-                 violation_nb4, violation_nb5, violation_nb6, violation_nb7, violation_nb8, violation_nb9, 
-                 violation_nb10, violation_nb11, violation_nb12, violation_nb13, violation_nb14, violation_nb15, 
-                 violation_nb16, violation_nb17, violation_nb18, violation_nb19, violation_nb20, 
-                 possible_solution, gap_016, gap_05, gap_1, gap_2, gap_3, gap_4, gap_5, gap_10, gap_20, gap_30, 
-                 memory):
-        self.id = id
+    def __init__(self, id, usecase, self_current_user_id, self_user_availability, self_opening_hours, 
+               self_laden_oeffnet, self_laden_schliesst, self_binary_availability, self_company_shifts, 
+               self_weekly_hours, self_employment_lvl, self_time_req, self_user_employment, 
+               self_solver_requirements, self_week_timeframe, self_hour_devider, self_mitarbeiter, 
+               self_verfügbarkeit, self_kosten, self_max_zeit, self_min_zeit, self_max_time_week, 
+               self_calc_time, self_employment_lvl_exact, self_employment, 
+               self_verteilbare_stunden, self_gesamtstunden_verfügbarkeit, self_min_anwesend, 
+               self_gerechte_verteilung, self_fair_distribution, solving_time, lp_iteration, violation_nb1, 
+               violation_nb2, violation_nb3, violation_nb4, violation_nb5, violation_nb6, violation_nb7, 
+               violation_nb8, violation_nb9, violation_nb10, violation_nb11, violation_nb12, violation_nb13, 
+               violation_nb14, violation_nb15, violation_nb16, violation_nb17, violation_nb18, 
+               violation_nb19, violation_nb20, penalty_cost_nb1, penalty_cost_nb2, penalty_cost_nb3, 
+               penalty_cost_nb4, penalty_cost_nb5, penalty_cost_nb6, penalty_cost_nb7, penalty_cost_nb8, 
+               penalty_cost_nb9, penalty_cost_nb10, penalty_cost_nb11, penalty_cost_nb12, penalty_cost_nb13, 
+               penalty_cost_nb14, penalty_cost_nb15, penalty_cost_nb16, penalty_cost_nb17, penalty_cost_nb18, 
+               penalty_cost_nb19, penalty_cost_nb20, possible_solution, gap_016, gap_05, gap_1, gap_2, 
+               gap_3, gap_4, gap_5, gap_10, gap_20, gap_30, memory):
         self.self_current_user_id = self_current_user_id
-        self.usecase = usecase
         self.self_user_availability = self_user_availability
         self.self_opening_hours = self_opening_hours
         self.self_laden_oeffnet = self_laden_oeffnet
@@ -513,6 +534,26 @@ class SolverAnalysis(db.Model, UserMixin):
         self.violation_nb18 = violation_nb18
         self.violation_nb19 = violation_nb19
         self.violation_nb20 = violation_nb20
+        self.penalty_cost_nb1 = penalty_cost_nb1
+        self.penalty_cost_nb2 = penalty_cost_nb2
+        self.penalty_cost_nb3 = penalty_cost_nb3
+        self.penalty_cost_nb4 = penalty_cost_nb4
+        self.penalty_cost_nb5 = penalty_cost_nb5
+        self.penalty_cost_nb6 = penalty_cost_nb6
+        self.penalty_cost_nb7 = penalty_cost_nb7
+        self.penalty_cost_nb8 = penalty_cost_nb8
+        self.penalty_cost_nb9 = penalty_cost_nb9
+        self.penalty_cost_nb10 = penalty_cost_nb10
+        self.penalty_cost_nb11 = penalty_cost_nb11
+        self.penalty_cost_nb12 = penalty_cost_nb12
+        self.penalty_cost_nb13 = penalty_cost_nb13
+        self.penalty_cost_nb14 = penalty_cost_nb14
+        self.penalty_cost_nb15 = penalty_cost_nb15
+        self.penalty_cost_nb16 = penalty_cost_nb16
+        self.penalty_cost_nb17 = penalty_cost_nb17
+        self.penalty_cost_nb18 = penalty_cost_nb18
+        self.penalty_cost_nb19 = penalty_cost_nb19
+        self.penalty_cost_nb20 = penalty_cost_nb20
         self.possible_solution = possible_solution
         self.gap_016 = gap_016
         self.gap_05 = gap_05
@@ -525,6 +566,11 @@ class SolverAnalysis(db.Model, UserMixin):
         self.gap_20 = gap_20
         self.gap_30 = gap_30
         self.memory = memory
+
+
+
+
+
 
 
 

@@ -13,7 +13,7 @@ from app import app, mail
 
 from models import User, Availability, TimeReq, Company, OpeningHours, Timetable, \
     TemplateAvailability, TemplateTimeRequirement, RegistrationToken, PasswordReset, \
-    SolverRequirement
+    SolverRequirement, SolverAnalysis
 
 
 
@@ -174,6 +174,7 @@ def new_user():
                 access_level=data['access_level'])
     db.session.add(user)
     db.session.commit()
+
     return {'success': True}
 
 @app.route('/api/update', methods=["GET", "POST"])
