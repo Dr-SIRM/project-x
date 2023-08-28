@@ -1260,11 +1260,33 @@ class ORAlgorithm:
 
 
         # -------------------------------------------------------------------------------------------------------
-        # HARTE NB
+        # WEICHE NB
         # NB 10 - Minimale Arbeitsstunden pro Arbeitsblock
         # ***** Weiche Nebenbedingung 9 *****
         # -------------------------------------------------------------------------------------------------------
         
+        # HARTE NB
+        """
+        self.min_working_hour_per_block = 3
+        
+        if self.working_blocks == 2:
+            for i in self.mitarbeiter:
+                for j in range(self.calc_time):
+                    for k in range(len(self.verfügbarkeit[i][j]) - self.min_working_hour_per_block + 1):
+                        # Wenn der MA in einem Block beginnt (y == 1), dann muss er für die nächsten min_working_hour_per_block-1 Stunden arbeiten (x == 1)
+                        self.solver.Add(self.y[i, j, k] <= self.x[i, j, k])
+                        for h in range(1, self.min_working_hour_per_block):
+                            if k + h < len(self.verfügbarkeit[i][j]):  # Überprüfen, um IndexOutOfBounds zu vermeiden
+                                self.solver.Add(self.y[i, j, k] <= self.x[i, j, k + h])
+
+                    # Verhindern, dass in den letzten min_working_hour_per_block-1 Stunden des Tages ein neuer Block beginnt
+                    if len(self.verfügbarkeit[i][j]) >= self.min_working_hour_per_block:
+                        for h in range(1, self.min_working_hour_per_block):
+                            last_hour = len(self.verfügbarkeit[i][j]) - h
+                            self.solver.Add(self.y[i, j, last_hour] == 0)
+        """
+
+        # WEICHE NB
         self.min_working_hour_per_block = 5
 
         if self.working_blocks == 2:
@@ -1286,9 +1308,9 @@ class ORAlgorithm:
                         if len(self.verfügbarkeit[i][j]) >= self.min_working_hour_per_block:
                             for h in range(1, self.min_working_hour_per_block):
                                 last_hour = len(self.verfügbarkeit[i][j]) - h
-                                self.solver.Add(self.y[i, j, last_hour] == 0)
-
-
+                                
+                                # Füge die Verletzungsvariable für die letzten Stunden des Tages hinzu
+                                self.solver.Add(self.y[i, j, last_hour] <= self.nb9_violation[i, j, last_hour])
 
 
             
