@@ -860,6 +860,9 @@ class ORAlgorithm:
         # HARTE NB
         # NB 5 - Anzahl Arbeitsblöcke
         # -------------------------------------------------------------------------------------------------------
+        
+        self.working_blocks = 2
+        
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 # Überprüfen, ob der Betrieb an diesem Tag geöffnet ist
@@ -870,7 +873,7 @@ class ORAlgorithm:
                     for k in range(1, len(self.verfügbarkeit[i][j])):
                         self.solver.Add(self.y[i, j, k] >= self.x[i, j, k] - self.x[i, j, k-1])
                     # Die Summe der y[i, j, k] für einen bestimmten Tag j sollte nicht größer als 1 sein
-                    self.solver.Add(self.solver.Sum(self.y[i, j, k] for k in range(len(self.verfügbarkeit[i][j]))) <= 1)
+                    self.solver.Add(self.solver.Sum(self.y[i, j, k] for k in range(len(self.verfügbarkeit[i][j]))) <= self.working_blocks)
         
 
         # -------------------------------------------------------------------------------------------------------
@@ -1238,6 +1241,28 @@ class ORAlgorithm:
             if self.company_shifts == 3:
                 for i in self.mitarbeiter:
                     pass
+
+
+
+        # -------------------------------------------------------------------------------------------------------
+        # HARTE NB
+        # NB 10 - Aneinanderfolgende Arbeitsstunden bei 2 Tageseinsätzen
+        # -------------------------------------------------------------------------------------------------------
+
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                # Überprüfen Sie, ob die Anzahl der Arbeitsblöcke 2 beträgt
+                if self.working_blocks == 2:
+                    for k in range(len(self.verfügbarkeit[i][j]) - 2):  # -2, um Indexfehler zu vermeiden
+                        # Wenn ein Mitarbeiter zu einer bestimmten Zeit arbeitet, muss er auch in den nächsten 2 Stunden arbeiten
+                        self.solver.Add(3*self.x[i, j, k] <= sum([self.x[i, j, k], self.x[i, j, k+1], self.x[i, j, k+2]]))
+
+
+
+                        
+                        
+
+
 
 
 
