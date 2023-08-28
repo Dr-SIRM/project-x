@@ -32,6 +32,7 @@ Prio 1:
  To-Do's 
  -------------------------------
  - (*) NB9 mit 3 Schichten fertigbauen
+ - (*) NB10 die weiche fertigbauen
  - (*) Opening Hour 2 einbauen
  - (*) Während des Solvings Daten ziehen --> Fragen gestellt
 
@@ -180,7 +181,7 @@ class ORAlgorithm:
         self.store_solved_data()
         self.output_result_excel()
         self.save_data_in_database()
-        # self.save_data_in_database_testing()
+        self.save_data_in_database_testing()
 
 
     def create_variables(self):
@@ -1264,8 +1265,7 @@ class ORAlgorithm:
         # -------------------------------------------------------------------------------------------------------
         
         # HARTE NB
-        """
-        self.min_working_hour_per_block = 3
+        self.min_working_hour_per_block = 4
         
         if self.working_blocks == 2:
             for i in self.mitarbeiter:
@@ -1282,8 +1282,8 @@ class ORAlgorithm:
                         for h in range(1, self.min_working_hour_per_block):
                             last_hour = len(self.verfügbarkeit[i][j]) - h
                             self.solver.Add(self.y[i, j, last_hour] == 0)
-        """
 
+        """
         # WEICHE NB
         self.min_working_hour_per_block = 4
 
@@ -1309,7 +1309,7 @@ class ORAlgorithm:
                                 
                                 # Füge die Verletzungsvariable für die letzten Stunden des Tages hinzu
                                 self.solver.Add(self.y[i, j, last_hour] <= self.nb9_violation[i, j, last_hour])
-        
+        """
 
             
     def solve_problem(self):
