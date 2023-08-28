@@ -33,10 +33,12 @@ Prio 1:
  -------------------------------
  - (*) NB9 mit 3 Schichten fertigbauen
  - (*) Opening Hour 2 einbauen
- - (*) 
+ - (*) Während des Solvings Daten ziehen --> Fragen gestellt
+
  - gerechte_verteilung funktioniert noch nicht richtig, wenn ein MA fast keine Stunden availability eingibt. Das muss noch geändert werden.
-
-
+ - self.min_working_hour_per_block in Solver Req einbauen und ziehen
+ - self.working_blocks in Solver Req einbauen und ziehen
+ - start_time und end_time zwei und drei noch implementieren
 
  - Der erstellte "divisor" in data_processing könnte als Attribut initialisiert werden, damit es nicht bei jeder Methode einzeln berechnet werden muss
 
@@ -56,10 +58,6 @@ Prio 1:
 
  - Jeder MA muss vor dem Solven eingegeben haben, wann er arbeiten kann. Auch wenn es alles 0 sind.
 
-
-Prio 2:
- - start_time und end_time zwei und drei noch implementieren
- - der Admin kann auch die Kosten der MA, wenn er will, eintragen. 
 
 """
 
@@ -1287,7 +1285,7 @@ class ORAlgorithm:
         """
 
         # WEICHE NB
-        self.min_working_hour_per_block = 5
+        self.min_working_hour_per_block = 4
 
         if self.working_blocks == 2:
             for i in self.mitarbeiter:
@@ -1311,7 +1309,7 @@ class ORAlgorithm:
                                 
                                 # Füge die Verletzungsvariable für die letzten Stunden des Tages hinzu
                                 self.solver.Add(self.y[i, j, last_hour] <= self.nb9_violation[i, j, last_hour])
-
+        
 
             
     def solve_problem(self):
