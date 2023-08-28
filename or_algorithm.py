@@ -141,6 +141,13 @@ class ORAlgorithm:
         self.solving_time_seconds = None
 
         self.violation_nb1 = None
+        self.violation_nb2 = None
+        self.violation_nb3 = None
+        self.violation_nb4 = None
+        self.violation_nb5 = None
+        self.violation_nb6 = None
+        self.violation_nb7 = None
+        self.violation_nb8 = None
 
         self.hiring_costs = None
         self.nb1_penalty_costs = None
@@ -154,8 +161,6 @@ class ORAlgorithm:
 
         # Attribute der Methode "store_solved_data"
         self.mitarbeiter_arbeitszeiten = {}
-
-        # Attribute der Methode 
 
 
     def run(self):
@@ -173,7 +178,7 @@ class ORAlgorithm:
         self.store_solved_data()
         self.output_result_excel()
         self.save_data_in_database()
-        self.save_data_in_database_testing()
+        # self.save_data_in_database_testing()
 
 
     def create_variables(self):

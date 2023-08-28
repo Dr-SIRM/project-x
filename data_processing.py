@@ -97,16 +97,16 @@ class DataProcessing:
         # self.end_date = "2023-07-16"
 
         # Alles voll availability 3-MA 2 Wochen
-        # self.start_date = "2023-07-10"
-        # self.end_date = "2023-07-23"
+        self.start_date = "2023-07-17"
+        self.end_date = "2023-07-30"
 
         # Alles voll availability 3-MA 4 Wochen
         # self.start_date = "2023-07-03"
         # self.end_date = "2023-07-30"
 
         # usecase_1
-        self.start_date = "2023-08-28"
-        self.end_date = "2023-09-03"
+        # self.start_date = "2023-08-28"
+        # self.end_date = "2023-09-03"
 
 
         return self.start_date, self.end_date
@@ -181,8 +181,9 @@ class DataProcessing:
 
 
         # end_time in dieser Methode auf end_time2 wechslen!!
-        # Hier muss noch mit einer if Anweisung zwischen end_time und end_time2 gesprungen werden
- 
+        # end_time == 0 / end_time2 == 1
+        self.end_time_choice = 1
+        end_time_field = "end_time2" if self.end_time_choice == 1 else "end_time"
 
 
         with app.app_context():
@@ -197,8 +198,8 @@ class DataProcessing:
             company_name = result.fetchone()[0]
 
             # Abfrage, um die Öffnungszeiten der Firma basierend auf dem company_name abzurufen
-            sql = text("""
-                SELECT weekday, start_time, end_time
+            sql = text(f"""
+                SELECT weekday, start_time, {end_time_field}
                 FROM opening_hours
                 WHERE company_name = :company_name
                 ORDER BY FIELD(weekday, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
@@ -256,7 +257,6 @@ class DataProcessing:
             """)
             result = db.session.execute(sql, {"company_name": company_name, "start_date": self.start_date, "end_date": self.end_date})
             time_reqs = result.fetchall()
-            print(time_reqs)
 
             # Bestimme den Divisor basierend auf self.hour_devider
             divisor = 3600 / self.hour_devider
@@ -282,7 +282,6 @@ class DataProcessing:
 
             # Sortiere das Wörterbuch nach Datum
             self.time_req = OrderedDict(sorted(time_req_dict_2.items()))
-            print(self.time_req)
 
 
 
