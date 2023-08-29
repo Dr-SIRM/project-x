@@ -32,11 +32,14 @@ Prio 1:
  To-Do's 
  -------------------------------
  - (*) NB9 mit 3 Schichten fertigbauen
+ - (*) NB10 die weiche fertigbauen
  - (*) Opening Hour 2 einbauen
- - (*) 
+ - (*) Während des Solvings Daten ziehen --> Fragen gestellt
+
  - gerechte_verteilung funktioniert noch nicht richtig, wenn ein MA fast keine Stunden availability eingibt. Das muss noch geändert werden.
-
-
+ - self.min_working_hour_per_block in Solver Req einbauen und ziehen
+ - self.working_blocks in Solver Req einbauen und ziehen
+ - start_time und end_time zwei und drei noch implementieren
 
  - Der erstellte "divisor" in data_processing könnte als Attribut initialisiert werden, damit es nicht bei jeder Methode einzeln berechnet werden muss
 
@@ -56,10 +59,6 @@ Prio 1:
 
  - Jeder MA muss vor dem Solven eingegeben haben, wann er arbeiten kann. Auch wenn es alles 0 sind.
 
-
-Prio 2:
- - start_time und end_time zwei und drei noch implementieren
- - der Admin kann auch die Kosten der MA, wenn er will, eintragen. 
 
 """
 
@@ -1260,36 +1259,58 @@ class ORAlgorithm:
 
 
         # -------------------------------------------------------------------------------------------------------
-        # HARTE NB
+        # WEICHE NB
         # NB 10 - Minimale Arbeitsstunden pro Arbeitsblock
         # ***** Weiche Nebenbedingung 9 *****
         # -------------------------------------------------------------------------------------------------------
         
-        self.min_working_hour_per_block = 5
-
+        """
+        # HARTE NB
+        self.min_working_hour_per_block = 4
+        
         if self.working_blocks == 2:
             for i in self.mitarbeiter:
                 for j in range(self.calc_time):
                     for k in range(len(self.verfügbarkeit[i][j]) - self.min_working_hour_per_block + 1):
-                        # Setzen Sie eine temporäre Liste von Arbeitsbedingungen für die min_working_hour_per_block
-                        working_conditions = [self.y[i, j, k] - self.x[i, j, k]]
-
-                        # Gehe durch die nächsten Stunden nach dem Startzeitpunkt
+                        # Wenn der MA in einem Block beginnt (y == 1), dann muss er für die nächsten min_working_hour_per_block-1 Stunden arbeiten (x == 1)
+                        self.solver.Add(self.y[i, j, k] <= self.x[i, j, k])
                         for h in range(1, self.min_working_hour_per_block):
                             if k + h < len(self.verfügbarkeit[i][j]):  # Überprüfen, um IndexOutOfBounds zu vermeiden
-                                working_conditions.append(self.y[i, j, k] - self.x[i, j, k + h])
+                                self.solver.Add(self.y[i, j, k] <= self.x[i, j, k + h])
 
-                        # Erstellen Sie die Bedingung für die Verletzung
-                        self.solver.Add(sum(working_conditions) <= self.nb9_violation[i, j, k])
+                    # Verhindern, dass in den letzten min_working_hour_per_block-1 Stunden des Tages ein neuer Block beginnt
+                    if len(self.verfügbarkeit[i][j]) >= self.min_working_hour_per_block:
+                        for h in range(1, self.min_working_hour_per_block):
+                            last_hour = len(self.verfügbarkeit[i][j]) - h
+                            self.solver.Add(self.y[i, j, last_hour] == 0)
+        """
 
-                        # Verhindern, dass in den letzten min_working_hour_per_block-1 Stunden des Tages ein neuer Block beginnt
-                        if len(self.verfügbarkeit[i][j]) >= self.min_working_hour_per_block:
+        # WEICHE NB
+        self.min_working_hour_per_block = 4
+
+
+        if self.working_blocks == 2:
+            for i in self.mitarbeiter:
+                for j in range(self.calc_time):
+                    for k in range(len(self.verfügbarkeit[i][j])):
+                        if k < len(self.verfügbarkeit[i][j]) - self.min_working_hour_per_block + 1:
+                            working_conditions = [self.y[i, j, k] - self.x[i, j, k]]
                             for h in range(1, self.min_working_hour_per_block):
-                                last_hour = len(self.verfügbarkeit[i][j]) - h
-                                self.solver.Add(self.y[i, j, last_hour] == 0)
+                                if k + h < len(self.verfügbarkeit[i][j]):
+                                    working_conditions.append(self.y[i, j, k] - self.x[i, j, k + h])
+                            self.solver.Add(sum(working_conditions) <= self.nb9_violation[i, j, k])
 
+                        # Für die letzten Stunden des Tages
+                        else:
+                            # Verbleibende Stunden des Tages ermitteln
+                            remaining_hours = len(self.verfügbarkeit[i][j]) - k
+                            # Anzahl der Stunden ermitteln, die fehlen, um min_working_hour_per_block zu erreichen
+                            missing_hours = self.min_working_hour_per_block - remaining_hours
 
+                            # Anzahl der Verstöße ist gleich der Anzahl der fehlenden Stunden
+                            self.solver.Add(self.y[i, j, k] * missing_hours == self.nb9_violation[i, j, k])
 
+       
 
             
     def solve_problem(self):
@@ -1508,29 +1529,34 @@ class ORAlgorithm:
                     divisor = 3600 / self.hour_devider
 
                     for shift_index, (start_time, end_time) in enumerate(shifts):
-                        # Ladenöffnungszeit am aktuellen Tag hinzufügen
                         opening_time_in_units = int(self.laden_oeffnet[day_index].total_seconds() * self.hour_devider / 3600)
                         start_time += opening_time_in_units
                         end_time += opening_time_in_units
 
                         # Neues Timetable-Objekt
-                        new_entry = Timetable(
-                            id=None,  # ID wird automatisch generiert
-                            email=user.email,
-                            first_name=user.first_name,
-                            last_name=user.last_name,
-                            company_name=user.company_name,
-                            date=date,
-                            start_time=datetime.datetime.combine(date, datetime.time(hour=int(start_time // self.hour_devider), minute=int((start_time % self.hour_devider) * 60 / self.hour_devider))),
-                            end_time=datetime.datetime.combine(date, datetime.time(hour=int(end_time // self.hour_devider), minute=int((end_time % self.hour_devider) * 60 / self.hour_devider))),
-                            start_time2=None,
-                            end_time2=None,
-                            start_time3=None,
-                            end_time3=None,
-                            created_by=self.current_user_id,
-                            changed_by=self.current_user_id,
-                            creation_timestamp=datetime.datetime.now()
-                        )
+                        if shift_index == 0:
+                            new_entry = Timetable(
+                                id=None,
+                                email=user.email,
+                                first_name=user.first_name,
+                                last_name=user.last_name,
+                                company_name=user.company_name,
+                                date=date,
+                                start_time=datetime.datetime.combine(date, datetime.time(hour=int(start_time // self.hour_devider), minute=int((start_time % self.hour_devider) * 60 / self.hour_devider))),
+                                end_time=datetime.datetime.combine(date, datetime.time(hour=int(end_time // self.hour_devider), minute=int((end_time % self.hour_devider) * 60 / self.hour_devider))),
+                                start_time2=None,
+                                end_time2=None,
+                                start_time3=None,
+                                end_time3=None,
+                                created_by=self.current_user_id,
+                                changed_by=self.current_user_id,
+                                creation_timestamp=datetime.datetime.now()
+                            )
+                            db.session.add(new_entry)
+
+                        elif shift_index == 1:
+                            new_entry.start_time2 = datetime.datetime.combine(date, datetime.time(hour=int(start_time // self.hour_devider), minute=int((start_time % self.hour_devider) * 60 / self.hour_devider)))
+                            new_entry.end_time2 = datetime.datetime.combine(date, datetime.time(hour=int(end_time // self.hour_devider), minute=int((end_time % self.hour_devider) * 60 / self.hour_devider)))
 
                         # new_entry der Datenbank hinzufügen
                         db.session.add(new_entry)
