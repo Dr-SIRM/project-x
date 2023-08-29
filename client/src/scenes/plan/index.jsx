@@ -86,33 +86,39 @@ const GanttChart = () => {
     const hours = openingHours[weekday.toLowerCase()];
 
     if (!hours) {
-      return { left: 0, width: 0 }; // Default values if no hours are specified
+        return { left: 0, width: 0 }; // Default values if no hours are specified
     }
 
     const startHour = parseInt(hours.start.split(":")[0], 10);
     const endHour = parseInt(hours.end.split(":")[0], 10);
-    const maxDuration = endHour - startHour; // Maximum working hours
-
+    
     const shiftStartHour = parseInt(shift.start_time.split(":")[0], 10);
     const shiftEndHour = parseInt(shift.end_time.split(":")[0], 10);
 
-    const startDifference = shiftStartHour - startHour;
-    const duration = shiftEndHour - shiftStartHour;
+    let maxDuration, left, width;
+    switch (view) {
+        case 'day':
+            maxDuration = endHour - startHour; 
+            left = (shiftStartHour - startHour) / maxDuration * 100;
+            width = (shiftEndHour - shiftStartHour) / maxDuration * 100;
+            break;
+        case 'week':
+            maxDuration = 7 * 24; // 7 days * 24 hours
+            left = ((today.getDay() * 24) + shiftStartHour) / maxDuration * 100;
+            width = (shiftEndHour - shiftStartHour) / maxDuration * 100;
+            break;
+        case 'month':
+            maxDuration = 30 * 24; // 30 days * 24 hours
+            left = ((today.getDate() - 1) * 24 + shiftStartHour) / maxDuration * 100;
+            width = (shiftEndHour - shiftStartHour) / maxDuration * 100;
+            break;
+        default:
+            return { left: 0, width: 0 }; 
+    }
 
-    const left = (startDifference / maxDuration) * 100;
-    const width = (duration / maxDuration) * 100;
-
-  
-    console.log(`Shift data: ${JSON.stringify(shift)}`);
-    console.log(`startDifference: ${startDifference}`);
-    console.log(`duration: ${duration}`);
-    console.log(`left: ${left}`);
-    console.log(`width: ${width}`);
-    console.log(`Position for shift ${JSON.stringify(shift)}: left = ${left}, width = ${width}`);
-  
     return { left: `${left}%`, width: `${width}%` };
-  };
-  
+};
+
 
   const renderShifts = (worker) => {
     let maxDuration;
