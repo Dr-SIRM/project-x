@@ -67,10 +67,14 @@ const GanttChart = () => {
     return `${day}.${month}.${year}`;
   };
   
-  
   const formatTime = (hour) => {
     return hour.toString().padStart(2, '0') + ":00";
   };
+
+  const getDaysInMonth = (year, month) => {
+    return new Date(year, month + 1, 0).getDate();
+  };
+  
   
   const getWorkingHoursDuration = () => {
     const today = new Date();
@@ -178,8 +182,6 @@ const GanttChart = () => {
     );
     
   };
-  
-  
 
   const getTimelineLabels = () => {
     const today = new Date();
@@ -197,10 +199,12 @@ const GanttChart = () => {
           });
         case 'month':
           const currentMonth = new Date();
-          return Array.from({ length: 30 }).map((_, index) => {
+          const daysInMonth = getDaysInMonth(currentMonth.getFullYear(), currentMonth.getMonth());
+          return Array.from({ length: daysInMonth }).map((_, index) => {
             const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), index + 1);
             return formatDate(date, true);
           });
+          
         default:
           return [];
       }
