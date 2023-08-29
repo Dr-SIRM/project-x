@@ -31,7 +31,7 @@
   .gantt-timeline {
     display: flex;
     justify-content: space-between;
-    width: calc(100% - 120px);
+    width: calc(100% - 60px);
     padding: 0 10px;
     margin-left: 130px;
   }

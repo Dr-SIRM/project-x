@@ -15,7 +15,8 @@ const GanttChart = () => {
     const fetchWorkers = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/schichtplanung', {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
+          params: { view: view }
         });
         const responseData = response.data;
         console.log("API Response Data:", responseData);
@@ -52,7 +53,7 @@ const GanttChart = () => {
     };
   
     fetchWorkers();
-  }, []);
+  }, [view]);
   
   const formatDate = (date) => {
     const day = date.getDate().toString().padStart(2, '0');
@@ -64,32 +65,6 @@ const GanttChart = () => {
   
   const formatTime = (hour) => {
     return hour.toString().padStart(2, '0') + ":00";
-  };
-  
-
-  const getShiftPosition = (shift, maxDuration) => {
-    const startDate = new Date(shift.date + "T00:00:00");
-    const shiftStart = new Date(shift.date + "T" + shift.start_time);
-    const shiftEnd = new Date(shift.date + "T" + shift.end_time);
-  
-    if (isNaN(shiftStart) || isNaN(shiftEnd)) {
-      return { left: 0, width: 0 };
-    }
-  
-    const startDifference = (shiftStart - startDate) / 1000 / 60 / 60;
-    const duration = (shiftEnd - shiftStart) / 1000 / 60 / 60;
-  
-    const left = (startDifference / maxDuration) * 100;
-    const width = (duration / maxDuration) * 100;
-  
-    console.log(`Shift data: ${JSON.stringify(shift)}`);
-    console.log(`startDifference: ${startDifference}`);
-    console.log(`duration: ${duration}`);
-    console.log(`left: ${left}`);
-    console.log(`width: ${width}`);
-    console.log(`Position for shift ${JSON.stringify(shift)}: left = ${left}, width = ${width}`);
-  
-    return { left, width };
   };
   
   const getWorkingHoursDuration = () => {
@@ -104,6 +79,40 @@ const GanttChart = () => {
     
     return endHour - startHour; // Return difference in hours
   };
+
+  const getShiftPosition = (shift) => {
+    const today = new Date();
+    const weekday = today.toLocaleDateString('en-US', { weekday: 'long' });
+    const hours = openingHours[weekday.toLowerCase()];
+
+    if (!hours) {
+      return { left: 0, width: 0 }; // Default values if no hours are specified
+    }
+
+    const startHour = parseInt(hours.start.split(":")[0], 10);
+    const endHour = parseInt(hours.end.split(":")[0], 10);
+    const maxDuration = endHour - startHour; // Maximum working hours
+
+    const shiftStartHour = parseInt(shift.start_time.split(":")[0], 10);
+    const shiftEndHour = parseInt(shift.end_time.split(":")[0], 10);
+
+    const startDifference = shiftStartHour - startHour;
+    const duration = shiftEndHour - shiftStartHour;
+
+    const left = (startDifference / maxDuration) * 100;
+    const width = (duration / maxDuration) * 100;
+
+  
+    console.log(`Shift data: ${JSON.stringify(shift)}`);
+    console.log(`startDifference: ${startDifference}`);
+    console.log(`duration: ${duration}`);
+    console.log(`left: ${left}`);
+    console.log(`width: ${width}`);
+    console.log(`Position for shift ${JSON.stringify(shift)}: left = ${left}, width = ${width}`);
+  
+    return { left: `${left}%`, width: `${width}%` };
+  };
+  
 
   const renderShifts = (worker) => {
     let maxDuration;
@@ -147,7 +156,7 @@ const GanttChart = () => {
           <div
             key={index}
             className="gantt-bar"
-            style={getShiftPosition(shift, maxDuration)}
+            style={getShiftPosition(shift)}
           ></div>
         ))}
       </div>

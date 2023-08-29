@@ -1060,7 +1060,11 @@ def get_required_workforce():
 
 
 
-@app.route('/api/schichtplanung', methods=['POST','GET'])
+from datetime import date, timedelta
+import calendar
+from functools import wraps
+
+@app.route('/api/schichtplanung', methods=['POST', 'GET'])
 @jwt_required()
 def get_shift():
     react_user_email = get_jwt_identity()
@@ -1069,8 +1073,22 @@ def get_shift():
     if current_user is None:
         return jsonify({"message": "User not found"}), 404
 
-    # Get the company name of the current logged-in user
     current_company_name = current_user.company_name
+
+    view = request.args.get('view')
+    today = date.today()
+
+    if view == 'day':
+        start_date, end_date = today, today
+    elif view == 'week':
+        start_date = today - timedelta(days=today.weekday())  # start of the week (Monday)
+        end_date = start_date + timedelta(days=6)  # end of the week (Sunday)
+    elif view == 'month':
+        start_date = today.replace(day=1)  # first day of the month
+        last_day = calendar.monthrange(today.year, today.month)[1]  # get the last day of the month
+        end_date = today.replace(day=last_day)
+    else:
+        start_date, end_date = None, None  # default to getting all shifts
 
     # Query users who are members of the same company
     users = User.query.filter_by(company_name=current_company_name).all()
@@ -1091,10 +1109,17 @@ def get_shift():
         if record.start_time is not None and record.end_time is not None:
             opening_hours_data[record.weekday.lower()] = {
                 "start": record.start_time.strftime("%H:%M"),
-                "end": record.end_time.strftime("%H:%M")
+                "end": record.end_time2.strftime("%H:%M")
             }
 
-    shift_records = Timetable.query.filter_by(company_name=current_company_name).all()
+    if start_date and end_date:
+        shift_records = Timetable.query.filter(
+            Timetable.company_name == current_company_name, 
+            Timetable.date >= start_date, 
+            Timetable.date <= end_date
+        ).all()
+    else:
+        shift_records = Timetable.query.filter_by(company_name=current_company_name).all()
 
     shift_data = []
     for record in shift_records:
@@ -1131,25 +1156,3 @@ def get_shift():
     }
 
     return jsonify(response)
-
-'''
-const GanttChart = () => {
-  const [view, setView] = useState('day');
-  const [workers, setWorkers] = useState([]);
-  const [shifts, setShifts] = useState([]); // You can update shifts using API calls as well
-  const token = localStorage.getItem('session_token'); 
-  
-  useEffect(() => {
-    const fetchWorkers = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/schichtplanung', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setWorkers(response.data);
-      } catch (error) {
-        console.error('Error fetching workers:', error);
-      }
-    };
-    fetchWorkers();
-  }, []);
-  '''
