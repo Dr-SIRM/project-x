@@ -55,13 +55,18 @@ const GanttChart = () => {
     fetchWorkers();
   }, [view]);
   
-  const formatDate = (date) => {
+  const formatDate = (date, omitYear = false) => {
     const day = date.getDate().toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    
+    if (omitYear) {
+      return `${day}.${month}`;
+    }
+    
     const year = date.getFullYear();
-  
     return `${day}.${month}.${year}`;
   };
+  
   
   const formatTime = (hour) => {
     return hour.toString().padStart(2, '0') + ":00";
@@ -194,7 +199,7 @@ const GanttChart = () => {
           const currentMonth = new Date();
           return Array.from({ length: 30 }).map((_, index) => {
             const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), index + 1);
-            return formatDate(date);
+            return formatDate(date, true);
           });
         default:
           return [];
