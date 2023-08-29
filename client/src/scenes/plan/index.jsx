@@ -163,10 +163,15 @@ const GanttChart = () => {
             key={index}
             className="gantt-bar"
             style={getShiftPosition(shift)}
-          ></div>
+          >
+            <div className="tooltip">
+              Start: {shift.start_time} - Ende: {shift.end_time}
+            </div>
+          </div>
         ))}
       </div>
     );
+    
   };
   
   
