@@ -117,10 +117,11 @@ const GanttChart = () => {
             width = (shiftEndHour - shiftStartHour) / maxDuration * 100;
             break;
         case 'month':
-            maxDuration = 30 * 24; // 30 days * 24 hours
-            left = ((today.getDate() - 1) * 24 + shiftStartHour) / maxDuration * 100;
-            width = (shiftEndHour - shiftStartHour) / maxDuration * 100;
-            break;
+          const daysInCurrentMonth = getDaysInMonth(today.getFullYear(), today.getMonth());
+          maxDuration = daysInCurrentMonth * 24;
+          left = ((today.getDate() - 1) * 24 + shiftStartHour) / maxDuration * 100;
+          width = (shiftEndHour - shiftStartHour) / maxDuration * 100;
+          break;
         default:
             return { left: 0, width: 0 }; 
     }
