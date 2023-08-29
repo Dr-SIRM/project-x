@@ -28,32 +28,26 @@ Prio 1:
  - (erl.) Daten für Solven in die Datenbank einpflegen (max. Zeit, min. Zeit, Solvingzeitraum, Toleranz für die Stundenverteilung, ...)
  - (erl.) Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
  - (erl.) Stunden Teiler für 1/4, 1/2 und 1h einbauen
+ - (erl.) NB10 die weiche fertigbauen
+ - (erl.) Opening Hour 2 einbauen
 
  To-Do's 
  -------------------------------
  - (*) NB9 mit 3 Schichten fertigbauen
- - (*) NB10 die weiche fertigbauen
- - (*) Opening Hour 2 einbauen
  - (*) Während des Solvings Daten ziehen --> Fragen gestellt
 
  - gerechte_verteilung funktioniert noch nicht richtig, wenn ein MA fast keine Stunden availability eingibt. Das muss noch geändert werden.
  - self.min_working_hour_per_block in Solver Req einbauen und ziehen
  - self.working_blocks in Solver Req einbauen und ziehen
- - start_time und end_time zwei und drei noch implementieren
+ - start_time und end_time zwei und drei noch implementieren (noch warten bis über 00:00 Zeiten eingegeben werden können!)
 
  - Der erstellte "divisor" in data_processing könnte als Attribut initialisiert werden, damit es nicht bei jeder Methode einzeln berechnet werden muss
 
  
- Fragen an die Runde:
+ Fragen an die Runde (Juli 2023):
  -------------------------------
  - MA mit verschiedenen Profilen - Department (Koch, Service, ..)? Wie genau lösen wir das?
- - Was machen wenn nicht genug Stunden von MA eingegeben wurden? Einen virtuellen MA der anzeigt, an welchen Stunden noch MA eingeteilt werden müssen?
-   Andere Vorschläge?
- - Sobald gesolvt wird, kann die Webseite nicht mehr bedient werden. Wie können wir das lösen?
-   "Eine Möglichkeit, dies zu umgehen, wäre, die Berechnung in einen Hintergrundprozess oder einen separaten Thread zu verschieben."
-   "Sie könnten einen Hintergrund-Worker wie Celery verwenden, um die Optimierungsaufgabe zu verwalten."
  - Wie oft darf gesolvt werden? zb. max 2x pro Woche?
-
  - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden?
  -------------------------------
 
@@ -170,7 +164,7 @@ class ORAlgorithm:
         self.create_variables()
         self.show_variables()
         self.pre_check_programmer()
-        # self.pre_check_admin()
+        self.pre_check_admin()
         self.solver_selection()
         self.define_penalty_costs()
         self.decision_variables()
@@ -327,7 +321,7 @@ class ORAlgorithm:
                     break
                 self.gerechte_verteilung[i] -= 1
                 total_hours_assigned -= 1
-        print("4. self.gerechte_verteilung: ", self.gerechte_verteilung)       
+        print("4. self.gerechte_verteilung: ", self.gerechte_verteilung)   
 
         # -- 15 ------------------------------------------------------------------------------------------------------------
         # Toleranz der gerechten Verteilung
@@ -1197,7 +1191,7 @@ class ORAlgorithm:
                     self.solver.Add(self.nb8_violation[i, j] >= -diff)
                     self.solver.Add(self.nb8_violation[i, j] <= 1)  # Die Verletzung sollte maximal 1 betragen
         """    
-        
+
         
         # 4 Wochen + 2-Schicht ----------------------------------------------------------------------------------
         if self.week_timeframe == 4:
@@ -1266,7 +1260,7 @@ class ORAlgorithm:
         
         """
         # HARTE NB
-        self.min_working_hour_per_block = 4
+        self.min_working_hour_per_block = 4 * self.hour_devider
         
         if self.working_blocks == 2:
             for i in self.mitarbeiter:
@@ -1284,9 +1278,9 @@ class ORAlgorithm:
                             last_hour = len(self.verfügbarkeit[i][j]) - h
                             self.solver.Add(self.y[i, j, last_hour] == 0)
         """
-
+        
         # WEICHE NB
-        self.min_working_hour_per_block = 4
+        self.min_working_hour_per_block = 2 * self.hour_devider
 
 
         if self.working_blocks == 2:
@@ -1310,7 +1304,7 @@ class ORAlgorithm:
                             # Anzahl der Verstöße ist gleich der Anzahl der fehlenden Stunden
                             self.solver.Add(self.y[i, j, k] * missing_hours == self.nb9_violation[i, j, k])
 
-       
+        
 
             
     def solve_problem(self):
