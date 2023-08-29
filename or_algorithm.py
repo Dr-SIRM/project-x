@@ -181,7 +181,7 @@ class ORAlgorithm:
         self.store_solved_data()
         self.output_result_excel()
         self.save_data_in_database()
-        self.save_data_in_database_testing()
+        # self.save_data_in_database_testing()
 
 
     def create_variables(self):
@@ -1264,6 +1264,7 @@ class ORAlgorithm:
         # ***** Weiche Nebenbedingung 9 *****
         # -------------------------------------------------------------------------------------------------------
         
+        """
         # HARTE NB
         self.min_working_hour_per_block = 4
         
@@ -1282,34 +1283,34 @@ class ORAlgorithm:
                         for h in range(1, self.min_working_hour_per_block):
                             last_hour = len(self.verfügbarkeit[i][j]) - h
                             self.solver.Add(self.y[i, j, last_hour] == 0)
-
         """
+
         # WEICHE NB
         self.min_working_hour_per_block = 4
+
 
         if self.working_blocks == 2:
             for i in self.mitarbeiter:
                 for j in range(self.calc_time):
-                    for k in range(len(self.verfügbarkeit[i][j]) - self.min_working_hour_per_block + 1):
-                        # Setzen Sie eine temporäre Liste von Arbeitsbedingungen für die min_working_hour_per_block
-                        working_conditions = [self.y[i, j, k] - self.x[i, j, k]]
-
-                        # Gehe durch die nächsten Stunden nach dem Startzeitpunkt
-                        for h in range(1, self.min_working_hour_per_block):
-                            if k + h < len(self.verfügbarkeit[i][j]):  # Überprüfen, um IndexOutOfBounds zu vermeiden
-                                working_conditions.append(self.y[i, j, k] - self.x[i, j, k + h])
-
-                        # Erstellen Sie die Bedingung für die Verletzung
-                        self.solver.Add(sum(working_conditions) <= self.nb9_violation[i, j, k])
-
-                        # Verhindern, dass in den letzten min_working_hour_per_block-1 Stunden des Tages ein neuer Block beginnt
-                        if len(self.verfügbarkeit[i][j]) >= self.min_working_hour_per_block:
+                    for k in range(len(self.verfügbarkeit[i][j])):
+                        if k < len(self.verfügbarkeit[i][j]) - self.min_working_hour_per_block + 1:
+                            working_conditions = [self.y[i, j, k] - self.x[i, j, k]]
                             for h in range(1, self.min_working_hour_per_block):
-                                last_hour = len(self.verfügbarkeit[i][j]) - h
-                                
-                                # Füge die Verletzungsvariable für die letzten Stunden des Tages hinzu
-                                self.solver.Add(self.y[i, j, last_hour] <= self.nb9_violation[i, j, last_hour])
-        """
+                                if k + h < len(self.verfügbarkeit[i][j]):
+                                    working_conditions.append(self.y[i, j, k] - self.x[i, j, k + h])
+                            self.solver.Add(sum(working_conditions) <= self.nb9_violation[i, j, k])
+
+                        # Für die letzten Stunden des Tages
+                        else:
+                            # Verbleibende Stunden des Tages ermitteln
+                            remaining_hours = len(self.verfügbarkeit[i][j]) - k
+                            # Anzahl der Stunden ermitteln, die fehlen, um min_working_hour_per_block zu erreichen
+                            missing_hours = self.min_working_hour_per_block - remaining_hours
+
+                            # Anzahl der Verstöße ist gleich der Anzahl der fehlenden Stunden
+                            self.solver.Add(self.y[i, j, k] * missing_hours == self.nb9_violation[i, j, k])
+
+       
 
             
     def solve_problem(self):
@@ -1552,7 +1553,7 @@ class ORAlgorithm:
                                 creation_timestamp=datetime.datetime.now()
                             )
                             db.session.add(new_entry)
-                            
+
                         elif shift_index == 1:
                             new_entry.start_time2 = datetime.datetime.combine(date, datetime.time(hour=int(start_time // self.hour_devider), minute=int((start_time % self.hour_devider) * 60 / self.hour_devider)))
                             new_entry.end_time2 = datetime.datetime.combine(date, datetime.time(hour=int(end_time // self.hour_devider), minute=int((end_time % self.hour_devider) * 60 / self.hour_devider)))
