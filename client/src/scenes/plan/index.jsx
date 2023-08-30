@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './plan.css';
-import { Box } from "@mui/material";
+import { Box, IconButton } from "@mui/material";
 import Header from "../../components/Header";
+import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 
 const GanttChart = () => {
   const [view, setView] = useState('day');
@@ -10,6 +11,22 @@ const GanttChart = () => {
   console.log("Shifts:", shifts);
   const token = localStorage.getItem('session_token');
   const [openingHours, setOpeningHours] = useState({});
+  const [currentDay, setCurrentDay] = useState(new Date());
+  const BUTTON_STYLE = {
+    borderColor: "white",
+    "&.MuiButton-outlined": {
+      borderColor: "white",
+    },
+    "&:hover": {
+      borderColor: "white",
+    },
+    "&.MuiButton-text": {
+      borderColor: "white",
+      color: "white",
+      backgroundColor: "#2e7c67",
+    },
+  };
+  
 
   useEffect(() => {
     const fetchWorkers = async () => {
@@ -53,7 +70,7 @@ const GanttChart = () => {
     };
   
     fetchWorkers();
-  }, [view]);
+  }, [view, currentDay]);
   
   const formatDate = (date, omitYear = false) => {
     const day = date.getDate().toString().padStart(2, '0');
@@ -219,6 +236,27 @@ const GanttChart = () => {
     return timelineLabels;
   };
 
+  const goToNextDay = () => {
+    setCurrentDay(prevDay => {
+      const nextDay = new Date(prevDay);
+      nextDay.setDate(prevDay.getDate() + 1);
+      return nextDay;
+    });
+  };
+  
+  const goToPrevDay = () => {
+    setCurrentDay(prevDay => {
+      const previousDay = new Date(prevDay);
+      previousDay.setDate(prevDay.getDate() - 1);
+      return previousDay;
+    });
+  };
+  
+  const formatDateDisplay = (date) => {
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  };
+  
+
   return (
     <Box m="20px">
       <Header
@@ -227,11 +265,35 @@ const GanttChart = () => {
       />
       <h2>Übersicht über die eingeplanten Schichten</h2>
       <div className="gantt-container">
-        <div className="gantt-controls">
-          <button onClick={() => setView('day')}>Day</button>
-          <button onClick={() => setView('week')}>Week</button>
-          <button onClick={() => setView('month')}>Month</button>
+      <div >
+          {view === 'day' && (
+            <div className="date-navigation">
+                <IconButton 
+                onClick={goToPrevDay} 
+                style={BUTTON_STYLE}>
+                <ChevronLeft />
+              </IconButton>
+                
+                <span className="date-display">{formatDateDisplay(currentDay)}</span>
+                
+                <IconButton 
+                onClick={goToNextDay} 
+                style={BUTTON_STYLE}>
+                <ChevronRight />
+              </IconButton>
+            </div>
+          )}
+   
         </div>
+        <div className="gantt-controls">
+          <div className="view-controls">
+              <button onClick={() => setView('day')}>Tag</button>
+              <button onClick={() => setView('week')}>Woche</button>
+              <button onClick={() => setView('month')}>Monat</button>
+          </div>
+        </div>
+
+
         <div className="gantt-timeline">
           {getTimelineLabels().map((label, index) => (
             <span key={index}>{label}</span>
