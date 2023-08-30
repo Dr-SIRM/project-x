@@ -140,7 +140,7 @@ const Day = ({ day, dayIndex, slotCounts = {}, setSlotCounts, openingHour, closi
                 '&:hover': {
                   borderColor: 'white',
                 },
-                '&.MuiButton-text': {
+                '&.MuiButtonText': {
                   borderColor: 'white', // add border color to text buttons
                   color: 'white', // change text color
                   backgroundColor: '#2e7c67', // change background color
@@ -278,7 +278,7 @@ const Week = () => {
           '&:hover': {
             borderColor: 'white',
           },
-          '&.MuiButton-text': {
+          '&.MuiButtonText': {
             borderColor: 'white',
             color: 'white',
             backgroundColor: '#2e7c67',
@@ -305,7 +305,7 @@ const Week = () => {
           '&:hover': {
             borderColor: 'white',
           },
-          '&.MuiButton-text': {
+          '&.MuiButtonText': {
             borderColor: 'white',
             color: 'white',
             backgroundColor: '#2e7c67',
@@ -340,7 +340,7 @@ const Week = () => {
           '&:hover': {
             borderColor: 'white',
           },
-          '&.MuiButton-text': {
+          '&.MuiButtonText': {
             borderColor: 'white',
             color: 'white',
             backgroundColor: '#2e7c67',

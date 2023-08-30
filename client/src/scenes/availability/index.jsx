@@ -116,7 +116,7 @@ const Availability = ({ availability }) => {
                 '&:hover': {
                   borderColor: 'white',
                 },
-                '&.MuiButton-text': {
+                '&.MuiButtonText': {
                   borderColor: 'white',
                   color: 'white',
                   backgroundColor: '#2e7c67',
@@ -143,7 +143,7 @@ const Availability = ({ availability }) => {
                 '&:hover': {
                   borderColor: 'white',
                 },
-                '&.MuiButton-text': {
+                '&.MuiButtonText': {
                   borderColor: 'white',
                   color: 'white',
                   backgroundColor: '#2e7c67',

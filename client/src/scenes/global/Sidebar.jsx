@@ -151,7 +151,7 @@ const Sidebar = () => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                  {user.firstName}
+                  {user.firstName} {user.lastName}
                 </Typography>
                 <Typography variant="h5" color={colors.greenAccent[500]}>
                   {user.accessLevel}
@@ -261,13 +261,6 @@ const Sidebar = () => {
             <Item
               title="Planung"
               to="/planning"
-              icon={<CalendarTodayOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Planung2"
-              to="/planning2"
               icon={<CalendarTodayOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}

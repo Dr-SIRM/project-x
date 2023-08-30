@@ -9,14 +9,6 @@ import { tokens } from "../../theme";
 import { ThreeDots } from "react-loader-spinner"; 
 import axios from 'axios';
 
-const LOADER_BOX_STYLE = {
-  m: "20px",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  height: "100vh"
-};
-
 const BUTTON_STYLE = {
   borderColor: "white",
   "&.MuiButton-outlined": {
@@ -25,14 +17,12 @@ const BUTTON_STYLE = {
   "&:hover": {
     borderColor: "white",
   },
-  "&.MuiButton-text": {
+  "&.MuiButtonText": {
     borderColor: "white",
     color: "white",
     backgroundColor: "#2e7c67",
   },
 };
-
-
 
 const TimeReq = ({ timereq }) => {
   const theme = useTheme();
@@ -126,12 +116,13 @@ const TimeReq = ({ timereq }) => {
           
           const data = response.data;
           setTimeReqData(data);
+          setSlotEmployeeCounts(data.timereq_dict)
+          console.log(data.timereq)
 
           const openingHours = [];
           const startBreak = [];
           const endBreak = []
           const closingHours = [];
-          const fetchedSlotEmployeeCounts = {};
           
           for (let i = 0; i < data.day_num; i++) {
             openingHours.push(data.opening_dict[`${i+1}&0`]);
@@ -226,7 +217,6 @@ const TimeReq = ({ timereq }) => {
                 <ChevronRight />
               </IconButton>
             </Box>
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', overflowX: 'auto' }}>
               <Box sx={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(7, 1fr)', // 7 columns for each day
@@ -306,7 +296,7 @@ const TimeReq = ({ timereq }) => {
                             "&:hover": {
                               borderColor: "white",
                             },
-                            "&.MuiButton-text": {
+                            "&.MuiButtonText": {
                               borderColor: "white",
                               color: "white",
                               backgroundColor: "#2e7c67",
@@ -337,7 +327,7 @@ const TimeReq = ({ timereq }) => {
                 '&:hover': {
                   borderColor: 'white',
                 },
-                '&.MuiButton-text': {
+                '&.MuiButtonText': {
                   borderColor: 'white',
                   color: 'white',
                   backgroundColor: '#2e7c67',
@@ -346,7 +336,6 @@ const TimeReq = ({ timereq }) => {
             >
               Submit
             </Button>
-          </Box>
           </Box>
          
       <Snackbar
