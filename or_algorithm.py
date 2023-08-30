@@ -28,32 +28,27 @@ Prio 1:
  - (erl.) Daten für Solven in die Datenbank einpflegen (max. Zeit, min. Zeit, Solvingzeitraum, Toleranz für die Stundenverteilung, ...)
  - (erl.) Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
  - (erl.) Stunden Teiler für 1/4, 1/2 und 1h einbauen
+ - (erl.) NB10 die weiche fertigbauen
+ - (erl.) Opening Hour 2 einbauen
 
  To-Do's 
  -------------------------------
  - (*) NB9 mit 3 Schichten fertigbauen
- - (*) NB10 die weiche fertigbauen
- - (*) Opening Hour 2 einbauen
  - (*) Während des Solvings Daten ziehen --> Fragen gestellt
 
  - gerechte_verteilung funktioniert noch nicht richtig, wenn ein MA fast keine Stunden availability eingibt. Das muss noch geändert werden.
  - self.min_working_hour_per_block in Solver Req einbauen und ziehen
  - self.working_blocks in Solver Req einbauen und ziehen
- - start_time und end_time zwei und drei noch implementieren
+ - self.max_consecutive_days in Solver Req einbauen und ziehen
+ - start_time und end_time zwei und drei noch implementieren (noch warten bis über 00:00 Zeiten eingegeben werden können!)
 
  - Der erstellte "divisor" in data_processing könnte als Attribut initialisiert werden, damit es nicht bei jeder Methode einzeln berechnet werden muss
 
  
- Fragen an die Runde:
+ Fragen an die Runde (Juli 2023):
  -------------------------------
  - MA mit verschiedenen Profilen - Department (Koch, Service, ..)? Wie genau lösen wir das?
- - Was machen wenn nicht genug Stunden von MA eingegeben wurden? Einen virtuellen MA der anzeigt, an welchen Stunden noch MA eingeteilt werden müssen?
-   Andere Vorschläge?
- - Sobald gesolvt wird, kann die Webseite nicht mehr bedient werden. Wie können wir das lösen?
-   "Eine Möglichkeit, dies zu umgehen, wäre, die Berechnung in einen Hintergrundprozess oder einen separaten Thread zu verschieben."
-   "Sie könnten einen Hintergrund-Worker wie Celery verwenden, um die Optimierungsaufgabe zu verwalten."
  - Wie oft darf gesolvt werden? zb. max 2x pro Woche?
-
  - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden?
  -------------------------------
 
@@ -114,6 +109,7 @@ class ORAlgorithm:
         self.penalty_cost_nb7 = None
         self.penalty_cost_nb8 = None
         self.penalty_cost_nb9 = None
+        self.penalty_cost_nb10 = None
 
         # Attribute der Methode "decision_variables"
         self.x = None
@@ -133,6 +129,7 @@ class ORAlgorithm:
         self.nb7_violation = {}
         self.nb8_violation = {}
         self.nb9_violation = {}
+        self.nb10_violation = {}
 
         # Attribute der Methode "objective_function"
         self.objective = None
@@ -150,6 +147,7 @@ class ORAlgorithm:
         self.violation_nb7 = None
         self.violation_nb8 = None
         self.violation_nb9 = None
+        self.violation_nb10 = None
 
         self.hiring_costs = None
         self.nb1_penalty_costs = None
@@ -161,6 +159,7 @@ class ORAlgorithm:
         self.nb7_penalty_costs = None
         self.nb8_penalty_costs = None
         self.nb9_penalty_costs = None
+        self.nb10_penalty_costs = None
 
         # Attribute der Methode "store_solved_data"
         self.mitarbeiter_arbeitszeiten = {}
@@ -170,7 +169,7 @@ class ORAlgorithm:
         self.create_variables()
         self.show_variables()
         self.pre_check_programmer()
-        # self.pre_check_admin()
+        self.pre_check_admin()
         self.solver_selection()
         self.define_penalty_costs()
         self.decision_variables()
@@ -181,7 +180,7 @@ class ORAlgorithm:
         self.store_solved_data()
         self.output_result_excel()
         self.save_data_in_database()
-        # self.save_data_in_database_testing()
+        self.save_data_in_database_testing()
 
 
     def create_variables(self):
@@ -327,7 +326,7 @@ class ORAlgorithm:
                     break
                 self.gerechte_verteilung[i] -= 1
                 total_hours_assigned -= 1
-        print("4. self.gerechte_verteilung: ", self.gerechte_verteilung)       
+        print("4. self.gerechte_verteilung: ", self.gerechte_verteilung)   
 
         # -- 15 ------------------------------------------------------------------------------------------------------------
         # Toleranz der gerechten Verteilung
@@ -549,7 +548,8 @@ class ORAlgorithm:
             "nb6": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
             "nb7": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
             "nb8": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
-            "nb9": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000}
+            "nb9": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb10": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000}
         }
 
         # Mapping für die entsprechenden Namen der Klassenattribute
@@ -562,7 +562,8 @@ class ORAlgorithm:
             "nb6": "penalty_cost_nb6_max",
             "nb7": "penalty_cost_nb7",
             "nb8": "penalty_cost_nb8",
-            "nb9": "penalty_cost_nb9"
+            "nb9": "penalty_cost_nb9",
+            "nb10": "penalty_cost_nb10"
         }
 
         # Setze die Strafkosten für jede NB basierend auf dem Dictionary
@@ -687,7 +688,12 @@ class ORAlgorithm:
                 for k in range(len(self.verfügbarkeit[i][j])):
                     self.nb9_violation[i, j, k] = self.solver.NumVar(0, self.solver.infinity(), 'nb9_violation[%i,%i,%i]' % (i, j, k))
 
-        
+        # NB10 Max. Anzahl an Arbeitstagen in Folge
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                self.nb10_violation[i, j] = self.solver.NumVar(0, self.solver.infinity(), 'nb10_violation[%i,%i]' % (i, j))
+
+
 
     def objective_function(self):
         """
@@ -700,13 +706,13 @@ class ORAlgorithm:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
                     # Die Kosten werden multipliziert
-                    self.objective.SetCoefficient(self.x[i, j, k], self.kosten[i])
+                    self.objective.SetCoefficient(self.x[i, j, k], self.kosten[i] / self.hour_devider)
 
         # Kosten Weiche NB1
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                     for k in range(len(self.verfügbarkeit[i][j])):
-                        self.objective.SetCoefficient(self.nb1_violation[j, k], self.penalty_cost_nb1)
+                        self.objective.SetCoefficient(self.nb1_violation[j, k], self.penalty_cost_nb1 / self.hour_devider)
 
         # Kosten Weiche NB2
         for i in self.mitarbeiter:
@@ -747,8 +753,12 @@ class ORAlgorithm:
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
-                    self.objective.SetCoefficient(self.nb9_violation[i, j, k], self.penalty_cost_nb9)
+                    self.objective.SetCoefficient(self.nb9_violation[i, j, k], self.penalty_cost_nb9 / self.hour_devider)
 
+        # Kosten für Weiche NB10 "Max. Anzahl an Arbeitstagen in Folge"
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                self.objective.SetCoefficient(self.nb10_violation[i, j], self.penalty_cost_nb10)
 
         # Es wird veruscht, eine Kombination von Werten für die x[i, j, k] zu finden, die die Summe kosten[i]*x[i, j, k] minimiert + weiche NBs            
         self.objective.SetMinimization()
@@ -1197,7 +1207,7 @@ class ORAlgorithm:
                     self.solver.Add(self.nb8_violation[i, j] >= -diff)
                     self.solver.Add(self.nb8_violation[i, j] <= 1)  # Die Verletzung sollte maximal 1 betragen
         """    
-        
+
         
         # 4 Wochen + 2-Schicht ----------------------------------------------------------------------------------
         if self.week_timeframe == 4:
@@ -1259,14 +1269,14 @@ class ORAlgorithm:
 
 
         # -------------------------------------------------------------------------------------------------------
-        # WEICHE NB
+        # WEICHE NB (28.08.2023)
         # NB 10 - Minimale Arbeitsstunden pro Arbeitsblock
         # ***** Weiche Nebenbedingung 9 *****
         # -------------------------------------------------------------------------------------------------------
         
         """
         # HARTE NB
-        self.min_working_hour_per_block = 4
+        self.min_working_hour_per_block = 4 * self.hour_devider
         
         if self.working_blocks == 2:
             for i in self.mitarbeiter:
@@ -1284,10 +1294,9 @@ class ORAlgorithm:
                             last_hour = len(self.verfügbarkeit[i][j]) - h
                             self.solver.Add(self.y[i, j, last_hour] == 0)
         """
-
+        
         # WEICHE NB
-        self.min_working_hour_per_block = 4
-
+        self.min_working_hour_per_block = 2 * self.hour_devider
 
         if self.working_blocks == 2:
             for i in self.mitarbeiter:
@@ -1310,7 +1319,27 @@ class ORAlgorithm:
                             # Anzahl der Verstöße ist gleich der Anzahl der fehlenden Stunden
                             self.solver.Add(self.y[i, j, k] * missing_hours == self.nb9_violation[i, j, k])
 
-       
+        
+        # -------------------------------------------------------------------------------------------------------
+        # WEICHE NB (30.08.2023)
+        # NB 11 - Max. Anzahl an Arbeitstagen in Folge
+        # ***** Weiche Nebenbedingung 10 *****
+        # -------------------------------------------------------------------------------------------------------
+
+        self.max_consecutive_days = 5
+
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time - self.max_consecutive_days):
+                # Rollfenster-Technik:
+                consecutive_days = [self.a[i, j + k] for k in range(self.max_consecutive_days + 1)]
+                
+                # Summe der Arbeitstage soll nicht größer als self.max_consecutive_days sein
+                self.solver.Add(sum(consecutive_days) <= self.max_consecutive_days + self.nb10_violation[i, j])
+                # nb10_violation wird nur erhöht, wenn die Anzahl der aufeinanderfolgenden Arbeitstage das Limit überschreitet
+                self.solver.Add(self.nb10_violation[i, j] >= sum(consecutive_days) - self.max_consecutive_days)
+                self.solver.Add(self.nb10_violation[i, j] >= 0)
+
+                   
 
             
     def solve_problem(self):
@@ -1325,7 +1354,6 @@ class ORAlgorithm:
 
         self.solving_time_seconds = end_time - start_time
         
-
         # --------------------------------------------------------------------------------------
         # Die Werte von s3 printen
         for i in self.mitarbeiter:
@@ -1338,16 +1366,23 @@ class ORAlgorithm:
             for j in range(7, self.calc_time):
                 # Drucken Sie den Wert von c[i, j]
                 print(f"c[{i}][{j}] =", self.c[i, j].solution_value())
+
+        # Die Werte von a printen
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                # Drucken Sie den Wert von a[i, j]
+                print(f"a[{i}][{j}] =", self.a[i, j].solution_value())
+
         # --------------------------------------------------------------------------------------
 
 
         # Kosten für die Einstellung von Mitarbeitern
-        self.hiring_costs = sum(self.kosten[i] * self.x[i, j, k].solution_value() for i in self.mitarbeiter for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[i][j])))
+        self.hiring_costs = sum((self.kosten[i] / self.hour_devider) * self.x[i, j, k].solution_value() for i in self.mitarbeiter for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[i][j])))
 
         # Strafen für die Verletzung der weichen Nebenbedingungen
         # (Damit die Werte für das Testing in die Datenbank eingespeist werden können):
         self.violation_nb1 = sum(self.nb1_violation[j, k].solution_value() for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])))
-        self.nb1_penalty_costs = self.penalty_cost_nb1 * self.violation_nb1
+        self.nb1_penalty_costs = (self.penalty_cost_nb1 / self.hour_devider) * self.violation_nb1
 
         self.violation_nb2 = sum(self.nb2_violation[i][week].solution_value() for i in self.mitarbeiter for week in range(1, self.week_timeframe + 1))
         self.nb2_penalty_costs = self.penalty_cost_nb2 * self.violation_nb2
@@ -1371,7 +1406,11 @@ class ORAlgorithm:
         self.nb8_penalty_costs = self.penalty_cost_nb8 * self.violation_nb8
 
         self.violation_nb9 = sum(self.nb9_violation[i, j, k].solution_value() for i in self.mitarbeiter for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[i][j])))
-        self.nb9_penalty_costs = self.penalty_cost_nb9 * self.violation_nb9
+        self.nb9_penalty_costs = (self.penalty_cost_nb9 / self.hour_devider) * self.violation_nb9
+
+        self.violation_nb10 = sum(self.nb10_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
+        self.nb10_penalty_costs = self.penalty_cost_nb10 * self.violation_nb10
+
 
         # Kosten der einzelnen NBs ausgeben
         print('Kosten Einstellung von Mitarbeitern:', self.hiring_costs)
@@ -1384,6 +1423,7 @@ class ORAlgorithm:
         print('Kosten Weiche NB7 (Immer die gleiche Schicht in einer Woche):', self.nb7_penalty_costs)
         print('Kosten Weiche NB8 (Immer die gleiche Schicht zweite Woche):', self.nb8_penalty_costs)
         print('Kosten Weiche NB9 (Minimale Arbeitsstunden pro Block):', self.nb9_penalty_costs)
+        print('Kosten Weiche NB10 (Max. Anzahl an Arbeitstagen in Folge):', self.nb10_penalty_costs)
         print('Gesamtkosten:', self.objective.Value())
 
 
@@ -1611,8 +1651,8 @@ class ORAlgorithm:
             violation_nb6 = self.violation_nb6,
             violation_nb7 = self.violation_nb7,
             violation_nb8 = self.violation_nb8,
-            violation_nb9 = None,
-            violation_nb10 = None,
+            violation_nb9 = self.violation_nb9,
+            violation_nb10 = self.violation_nb10,
             violation_nb11 = None,
             violation_nb12 = None,
             violation_nb13 = None,
@@ -1631,8 +1671,8 @@ class ORAlgorithm:
             penalty_cost_nb6 = self.penalty_cost_nb6_max,
             penalty_cost_nb7 = self.penalty_cost_nb7,
             penalty_cost_nb8 = self.penalty_cost_nb8,
-            penalty_cost_nb9 = None,
-            penalty_cost_nb10 = None,
+            penalty_cost_nb9 = self.penalty_cost_nb9,
+            penalty_cost_nb10 = self.penalty_cost_nb10,
             penalty_cost_nb11 = None,
             penalty_cost_nb12 = None,
             penalty_cost_nb13 = None,
