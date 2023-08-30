@@ -39,6 +39,7 @@ Prio 1:
  - gerechte_verteilung funktioniert noch nicht richtig, wenn ein MA fast keine Stunden availability eingibt. Das muss noch geändert werden.
  - self.min_working_hour_per_block in Solver Req einbauen und ziehen
  - self.working_blocks in Solver Req einbauen und ziehen
+ - self.max_consecutive_days in Solver Req einbauen und ziehen
  - start_time und end_time zwei und drei noch implementieren (noch warten bis über 00:00 Zeiten eingegeben werden können!)
 
  - Der erstellte "divisor" in data_processing könnte als Attribut initialisiert werden, damit es nicht bei jeder Methode einzeln berechnet werden muss
@@ -108,6 +109,7 @@ class ORAlgorithm:
         self.penalty_cost_nb7 = None
         self.penalty_cost_nb8 = None
         self.penalty_cost_nb9 = None
+        self.penalty_cost_nb10 = None
 
         # Attribute der Methode "decision_variables"
         self.x = None
@@ -127,6 +129,7 @@ class ORAlgorithm:
         self.nb7_violation = {}
         self.nb8_violation = {}
         self.nb9_violation = {}
+        self.nb10_violation = {}
 
         # Attribute der Methode "objective_function"
         self.objective = None
@@ -144,6 +147,7 @@ class ORAlgorithm:
         self.violation_nb7 = None
         self.violation_nb8 = None
         self.violation_nb9 = None
+        self.violation_nb10 = None
 
         self.hiring_costs = None
         self.nb1_penalty_costs = None
@@ -155,6 +159,7 @@ class ORAlgorithm:
         self.nb7_penalty_costs = None
         self.nb8_penalty_costs = None
         self.nb9_penalty_costs = None
+        self.nb10_penalty_costs = None
 
         # Attribute der Methode "store_solved_data"
         self.mitarbeiter_arbeitszeiten = {}
@@ -543,7 +548,8 @@ class ORAlgorithm:
             "nb6": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
             "nb7": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
             "nb8": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
-            "nb9": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000}
+            "nb9": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb10": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000}
         }
 
         # Mapping für die entsprechenden Namen der Klassenattribute
@@ -556,7 +562,8 @@ class ORAlgorithm:
             "nb6": "penalty_cost_nb6_max",
             "nb7": "penalty_cost_nb7",
             "nb8": "penalty_cost_nb8",
-            "nb9": "penalty_cost_nb9"
+            "nb9": "penalty_cost_nb9",
+            "nb10": "penalty_cost_nb10"
         }
 
         # Setze die Strafkosten für jede NB basierend auf dem Dictionary
@@ -681,7 +688,12 @@ class ORAlgorithm:
                 for k in range(len(self.verfügbarkeit[i][j])):
                     self.nb9_violation[i, j, k] = self.solver.NumVar(0, self.solver.infinity(), 'nb9_violation[%i,%i,%i]' % (i, j, k))
 
-        
+        # NB10 Max. Anzahl an Arbeitstagen in Folge
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                self.nb10_violation[i, j] = self.solver.NumVar(0, self.solver.infinity(), 'nb10_violation[%i,%i]' % (i, j))
+
+
 
     def objective_function(self):
         """
@@ -743,6 +755,10 @@ class ORAlgorithm:
                 for k in range(len(self.verfügbarkeit[i][j])):
                     self.objective.SetCoefficient(self.nb9_violation[i, j, k], self.penalty_cost_nb9)
 
+        # Kosten für Weiche NB10 "Max. Anzahl an Arbeitstagen in Folge"
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                self.objective.SetCoefficient(self.nb10_violation[i, j], self.penalty_cost_nb10)
 
         # Es wird veruscht, eine Kombination von Werten für die x[i, j, k] zu finden, die die Summe kosten[i]*x[i, j, k] minimiert + weiche NBs            
         self.objective.SetMinimization()
@@ -1253,7 +1269,7 @@ class ORAlgorithm:
 
 
         # -------------------------------------------------------------------------------------------------------
-        # WEICHE NB
+        # WEICHE NB (28.08.2023)
         # NB 10 - Minimale Arbeitsstunden pro Arbeitsblock
         # ***** Weiche Nebenbedingung 9 *****
         # -------------------------------------------------------------------------------------------------------
@@ -1282,7 +1298,6 @@ class ORAlgorithm:
         # WEICHE NB
         self.min_working_hour_per_block = 2 * self.hour_devider
 
-
         if self.working_blocks == 2:
             for i in self.mitarbeiter:
                 for j in range(self.calc_time):
@@ -1305,6 +1320,26 @@ class ORAlgorithm:
                             self.solver.Add(self.y[i, j, k] * missing_hours == self.nb9_violation[i, j, k])
 
         
+        # -------------------------------------------------------------------------------------------------------
+        # WEICHE NB (30.08.2023)
+        # NB 11 - Max. Anzahl an Arbeitstagen in Folge
+        # ***** Weiche Nebenbedingung 10 *****
+        # -------------------------------------------------------------------------------------------------------
+
+        self.max_consecutive_days = 5
+
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time - self.max_consecutive_days):
+                # Rollfenster-Technik:
+                consecutive_days = [self.a[i, j + k] for k in range(self.max_consecutive_days + 1)]
+                
+                # Summe der Arbeitstage soll nicht größer als self.max_consecutive_days sein
+                self.solver.Add(sum(consecutive_days) <= self.max_consecutive_days + self.nb10_violation[i, j])
+                # nb10_violation wird nur erhöht, wenn die Anzahl der aufeinanderfolgenden Arbeitstage das Limit überschreitet
+                self.solver.Add(self.nb10_violation[i, j] >= sum(consecutive_days) - self.max_consecutive_days)
+                self.solver.Add(self.nb10_violation[i, j] >= 0)
+
+                   
 
             
     def solve_problem(self):
@@ -1332,6 +1367,13 @@ class ORAlgorithm:
             for j in range(7, self.calc_time):
                 # Drucken Sie den Wert von c[i, j]
                 print(f"c[{i}][{j}] =", self.c[i, j].solution_value())
+
+        # Die Werte von a printen
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                # Drucken Sie den Wert von a[i, j]
+                print(f"a[{i}][{j}] =", self.a[i, j].solution_value())
+
         # --------------------------------------------------------------------------------------
 
 
@@ -1367,6 +1409,10 @@ class ORAlgorithm:
         self.violation_nb9 = sum(self.nb9_violation[i, j, k].solution_value() for i in self.mitarbeiter for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[i][j])))
         self.nb9_penalty_costs = self.penalty_cost_nb9 * self.violation_nb9
 
+        self.violation_nb10 = sum(self.nb10_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
+        self.nb10_penalty_costs = self.penalty_cost_nb10 * self.violation_nb10
+
+
         # Kosten der einzelnen NBs ausgeben
         print('Kosten Einstellung von Mitarbeitern:', self.hiring_costs)
         print('Kosten Weiche NB1 (Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend):', self.nb1_penalty_costs)
@@ -1378,6 +1424,7 @@ class ORAlgorithm:
         print('Kosten Weiche NB7 (Immer die gleiche Schicht in einer Woche):', self.nb7_penalty_costs)
         print('Kosten Weiche NB8 (Immer die gleiche Schicht zweite Woche):', self.nb8_penalty_costs)
         print('Kosten Weiche NB9 (Minimale Arbeitsstunden pro Block):', self.nb9_penalty_costs)
+        print('Kosten Weiche NB10 (Max. Anzahl an Arbeitstagen in Folge):', self.nb10_penalty_costs)
         print('Gesamtkosten:', self.objective.Value())
 
 
