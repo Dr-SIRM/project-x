@@ -180,7 +180,7 @@ class ORAlgorithm:
         self.store_solved_data()
         self.output_result_excel()
         self.save_data_in_database()
-        # self.save_data_in_database_testing()
+        self.save_data_in_database_testing()
 
 
     def create_variables(self):
@@ -706,13 +706,13 @@ class ORAlgorithm:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
                     # Die Kosten werden multipliziert
-                    self.objective.SetCoefficient(self.x[i, j, k], self.kosten[i])
+                    self.objective.SetCoefficient(self.x[i, j, k], self.kosten[i] / self.hour_devider)
 
         # Kosten Weiche NB1
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                     for k in range(len(self.verfügbarkeit[i][j])):
-                        self.objective.SetCoefficient(self.nb1_violation[j, k], self.penalty_cost_nb1)
+                        self.objective.SetCoefficient(self.nb1_violation[j, k], self.penalty_cost_nb1 / self.hour_devider)
 
         # Kosten Weiche NB2
         for i in self.mitarbeiter:
@@ -753,7 +753,7 @@ class ORAlgorithm:
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
-                    self.objective.SetCoefficient(self.nb9_violation[i, j, k], self.penalty_cost_nb9)
+                    self.objective.SetCoefficient(self.nb9_violation[i, j, k], self.penalty_cost_nb9 / self.hour_devider)
 
         # Kosten für Weiche NB10 "Max. Anzahl an Arbeitstagen in Folge"
         for i in self.mitarbeiter:
@@ -1354,7 +1354,6 @@ class ORAlgorithm:
 
         self.solving_time_seconds = end_time - start_time
         
-
         # --------------------------------------------------------------------------------------
         # Die Werte von s3 printen
         for i in self.mitarbeiter:
@@ -1378,12 +1377,12 @@ class ORAlgorithm:
 
 
         # Kosten für die Einstellung von Mitarbeitern
-        self.hiring_costs = sum(self.kosten[i] * self.x[i, j, k].solution_value() for i in self.mitarbeiter for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[i][j])))
+        self.hiring_costs = sum((self.kosten[i] / self.hour_devider) * self.x[i, j, k].solution_value() for i in self.mitarbeiter for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[i][j])))
 
         # Strafen für die Verletzung der weichen Nebenbedingungen
         # (Damit die Werte für das Testing in die Datenbank eingespeist werden können):
         self.violation_nb1 = sum(self.nb1_violation[j, k].solution_value() for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])))
-        self.nb1_penalty_costs = self.penalty_cost_nb1 * self.violation_nb1
+        self.nb1_penalty_costs = (self.penalty_cost_nb1 / self.hour_devider) * self.violation_nb1
 
         self.violation_nb2 = sum(self.nb2_violation[i][week].solution_value() for i in self.mitarbeiter for week in range(1, self.week_timeframe + 1))
         self.nb2_penalty_costs = self.penalty_cost_nb2 * self.violation_nb2
@@ -1407,7 +1406,7 @@ class ORAlgorithm:
         self.nb8_penalty_costs = self.penalty_cost_nb8 * self.violation_nb8
 
         self.violation_nb9 = sum(self.nb9_violation[i, j, k].solution_value() for i in self.mitarbeiter for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[i][j])))
-        self.nb9_penalty_costs = self.penalty_cost_nb9 * self.violation_nb9
+        self.nb9_penalty_costs = (self.penalty_cost_nb9 / self.hour_devider) * self.violation_nb9
 
         self.violation_nb10 = sum(self.nb10_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
         self.nb10_penalty_costs = self.penalty_cost_nb10 * self.violation_nb10
@@ -1652,8 +1651,8 @@ class ORAlgorithm:
             violation_nb6 = self.violation_nb6,
             violation_nb7 = self.violation_nb7,
             violation_nb8 = self.violation_nb8,
-            violation_nb9 = None,
-            violation_nb10 = None,
+            violation_nb9 = self.violation_nb9,
+            violation_nb10 = self.violation_nb10,
             violation_nb11 = None,
             violation_nb12 = None,
             violation_nb13 = None,
@@ -1672,8 +1671,8 @@ class ORAlgorithm:
             penalty_cost_nb6 = self.penalty_cost_nb6_max,
             penalty_cost_nb7 = self.penalty_cost_nb7,
             penalty_cost_nb8 = self.penalty_cost_nb8,
-            penalty_cost_nb9 = None,
-            penalty_cost_nb10 = None,
+            penalty_cost_nb9 = self.penalty_cost_nb9,
+            penalty_cost_nb10 = self.penalty_cost_nb10,
             penalty_cost_nb11 = None,
             penalty_cost_nb12 = None,
             penalty_cost_nb13 = None,
