@@ -602,14 +602,17 @@ def run_solver():
     if request.method == 'POST':
         from data_processing import DataProcessing
         from or_algorithm import ORAlgorithm
+        from or_algorithm_cp import ORAlgorithm_cp
 
         solver_data = request.get_json()
         if 'solverButtonClicked' in solver_data and solver_data['solverButtonClicked']:
             # Damit der Code threadsafe ist, wird jedesmal eine neue Instanz erstellt pro Anfrage!
             dp = DataProcessing(user.id)
             dp.run()
-            or_algo = ORAlgorithm(dp)
-            or_algo.run()
+            # or_algo = ORAlgorithm(dp)
+            # or_algo.run()
+            or_algo_cp = ORAlgorithm_cp(dp)
+            or_algo_cp.run()
             
             return jsonify({'message': 'Solver successfully started'}), 200
         else:
