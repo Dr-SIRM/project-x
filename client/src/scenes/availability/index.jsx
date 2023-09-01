@@ -110,13 +110,13 @@ const Availability = ({ availability }) => {
               <IconButton onClick={goToPreviousWeek} 
               sx={{
                 borderColor: 'white',
-                '&.MuiButton-outlined': {
+                '&.MuiButtonOutlined': {
                   borderColor: 'white',
                 },
                 '&:hover': {
                   borderColor: 'white',
                 },
-                '&.MuiButton-text': {
+                '&.MuiButtonText': {
                   borderColor: 'white',
                   color: 'white',
                   backgroundColor: '#2e7c67',
@@ -137,13 +137,13 @@ const Availability = ({ availability }) => {
               <IconButton onClick={goToNextWeek} 
               sx={{
                 borderColor: 'white',
-                '&.MuiButton-outlined': {
+                '&.MuiButtonOutlined': {
                   borderColor: 'white',
                 },
                 '&:hover': {
                   borderColor: 'white',
                 },
-                '&.MuiButton-text': {
+                '&.MuiButtonText': {
                   borderColor: 'white',
                   color: 'white',
                   backgroundColor: '#2e7c67',

@@ -134,13 +134,13 @@ const Day = ({ day, dayIndex, slotCounts = {}, setSlotCounts, openingHour, closi
               key={filteredSlots.id}
               sx={{
                 borderColor: 'white', 
-                '&.MuiButton-outlined': {
+                '&.MuiButtonOutlined': {
                   borderColor: 'white',
                 },
                 '&:hover': {
                   borderColor: 'white',
                 },
-                '&.MuiButton-text': {
+                '&.MuiButtonText': {
                   borderColor: 'white', // add border color to text buttons
                   color: 'white', // change text color
                   backgroundColor: '#2e7c67', // change background color
@@ -272,13 +272,13 @@ const Week = () => {
         <IconButton onClick={goToPreviousWeek} 
         sx={{
           borderColor: 'white',
-          '&.MuiButton-outlined': {
+          '&.MuiButtonOutlined': {
             borderColor: 'white',
           },
           '&:hover': {
             borderColor: 'white',
           },
-          '&.MuiButton-text': {
+          '&.MuiButtonText': {
             borderColor: 'white',
             color: 'white',
             backgroundColor: '#2e7c67',
@@ -299,13 +299,13 @@ const Week = () => {
         <IconButton onClick={goToNextWeek} 
         sx={{
           borderColor: 'white',
-          '&.MuiButton-outlined': {
+          '&.MuiButtonOutlined': {
             borderColor: 'white',
           },
           '&:hover': {
             borderColor: 'white',
           },
-          '&.MuiButton-text': {
+          '&.MuiButtonText': {
             borderColor: 'white',
             color: 'white',
             backgroundColor: '#2e7c67',
@@ -334,13 +334,13 @@ const Week = () => {
         onClick={submit}
         sx={{
           borderColor: 'white',
-          '&.MuiButton-outlined': {
+          '&.MuiButtonOutlined': {
             borderColor: 'white',
           },
           '&:hover': {
             borderColor: 'white',
           },
-          '&.MuiButton-text': {
+          '&.MuiButtonText': {
             borderColor: 'white',
             color: 'white',
             backgroundColor: '#2e7c67',

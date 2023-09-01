@@ -19,13 +19,13 @@ const LOADER_BOX_STYLE = {
 
 const BUTTON_STYLE = {
   borderColor: "white",
-  "&.MuiButton-outlined": {
+  "&.MuiButtonOutlined": {
     borderColor: "white",
   },
   "&:hover": {
     borderColor: "white",
   },
-  "&.MuiButton-text": {
+  "&.MuiButtonText": {
     borderColor: "white",
     color: "white",
     backgroundColor: "#2e7c67",
@@ -101,16 +101,29 @@ const TimeReq = ({ timereq }) => {
   };
 
   const EnteredSlots = (columnIndex) => {
+    // Clone the current state
     const updatedCounts = { ...slotEmployeeCounts };
+    
+    // Update only the slots that are selected for this columnIndex
     selectedButtons.forEach(slot => {
       const [colIdx, btnIdx] = slot.split('-');
-      if (parseInt(colIdx) === columnIndex) {  // Only update for the correct column
+      if (parseInt(colIdx) === columnIndex) {
         updatedCounts[slot] = employeeCount[columnIndex];
       }
     });
+  
+    // Update state
     setSlotEmployeeCounts(updatedCounts);
     setSelectedButtons([]);
-    setEmployeeCount({ ...employeeCount, [columnIndex]: 0 }); // Reset only the current column's count to 0
+  
+    // Create a new object for employeeCount while keeping all the old values
+    const newEmployeeCount = { ...employeeCount };
+  
+    // Update only the value for the given columnIndex
+    newEmployeeCount[columnIndex] = 0;
+  
+    // Update state
+    setEmployeeCount(newEmployeeCount);
   };
   
   
@@ -126,12 +139,17 @@ const TimeReq = ({ timereq }) => {
           
           const data = response.data;
           setTimeReqData(data);
+          setSlotEmployeeCounts(prevState => {
+            return {
+              ...prevState,
+              ...data.timereq_dict  // Merging existing employee counts with the fetched default values
+            };
+          });
 
           const openingHours = [];
           const startBreak = [];
           const endBreak = []
           const closingHours = [];
-          const fetchedSlotEmployeeCounts = {};
           
           for (let i = 0; i < data.day_num; i++) {
             openingHours.push(data.opening_dict[`${i+1}&0`]);
@@ -175,8 +193,6 @@ const TimeReq = ({ timereq }) => {
         payload[newKey] = count.toString();
       });
 
-      console.log("Posting the following payload to the server:", payload);
-
       // Send the updated form values to the server for database update
       await axios.post('http://localhost:5000/api/requirement/workforce?week_adjustment=' + weekAdjustment, payload, {
     headers: {
@@ -185,7 +201,7 @@ const TimeReq = ({ timereq }) => {
         }
     });
       setShowSuccessNotification(true);
-      console.log(payload);
+      console.log("Sending this data to server:", payload);
     } catch (error) {
       setShowErrorNotification(true);
     }
@@ -205,149 +221,192 @@ const TimeReq = ({ timereq }) => {
         subtitle="Plan your workforce on weekly base and ensure minimal costs!"
       />
       <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: '1rem' }}>
-              <IconButton 
-                onClick={goToPreviousWeek} 
-                style={BUTTON_STYLE}>
-                <ChevronLeft />
-              </IconButton>
-              <Typography variant="h5" sx={{margin: '0 1rem'}}>
-                {
-                  new Intl.DateTimeFormat('de', { 
-                    weekday: 'short', 
-                    day: '2-digit', 
-                    month: 'long', 
-                    year: 'numeric'
-                  }).format(new Date(timereqData.week_start))
-                }
-              </Typography>
-              <IconButton 
-                onClick={goToNextWeek} 
-                style={BUTTON_STYLE}>
-                <ChevronRight />
-              </IconButton>
-            </Box>
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', overflowX: 'auto' }}>
-              <Box sx={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(7, 1fr)', // 7 columns for each day
-                  gap: theme.spacing(2),
-                  marginBottom: '1rem'
-              }}>
-
-              {Array.from({ length: timereqData.day_num }).map((_, columnIndex) => (
-                <Box key={`column-${columnIndex}`} sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    width: 100, // Set a fixed width
-                }}>
-                  <Typography variant="h4" gutterBottom component="div">
-                    {timereqData.weekdays[columnIndex]}
-                  </Typography>
-                  <TextField 
-                    type="number" 
-                    value={employeeCount[columnIndex] || ''} 
-                    onChange={(e) => setEmployees(e, columnIndex)} 
-                    label="Enter employee count" 
-                    variant="outlined"
-                    fullWidth
-                    inputProps={{ min: 0 }}
-                  />
-                  <Button 
-                    variant="contained"
-                    color="primary"
-                    onClick={() => EnteredSlots(columnIndex)}
-                  >
-                    Enter
-                  </Button>
-                  <Box 
-                      sx={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          width: '100%', // Full width
-                          height: 500, // Set a fixed height
-                          overflowY: 'auto', // To allow scrolling if the content exceeds the fixed height
-                          border: '1px solid', // To visualize the box
-                        }}>
-                  
-                  {Array.from({ length: timereqData.daily_slots }).map((_, btnIndex) => {
-                    const currentTimeMinutes = convertTimeToMinutes(timereqData.slots_dict[btnIndex]);
-    
-                    const openingTimeMinutes = convertTimeToMinutes(openingHours[columnIndex]);
-                    const startBreakTimeMinutes = convertTimeToMinutes(startBreak[columnIndex]) - 1;
-                    const endBreakTimeMinutes = convertTimeToMinutes(endBreak[columnIndex]);
-                    const closingTimeMinutes = convertTimeToMinutes(closingHours[columnIndex]) - 1;
-
-                    // Check if the current time is within the opening and closing hours
-                    if (isTimeWithinRange(currentTimeMinutes, openingTimeMinutes, startBreakTimeMinutes, endBreakTimeMinutes, closingTimeMinutes)) {
-                      const isSelected = selectedButtons.includes(`${columnIndex}-${btnIndex}`);
-                      const employeeCountForThisSlot = slotEmployeeCounts[`${columnIndex}-${btnIndex}`] || '';
-                      const isEntered = slotEmployeeCounts[`${columnIndex}-${btnIndex}`] !== undefined;
-                      return (
-                        <Button
-                          key={`btn-${btnIndex}`}
-                          variant={(isEntered) ? 'text' : (isSelected ? 'contained' : 'outlined')}
-                          color={(isEntered) ? 'error' : (isSelected ? 'success' : 'inherit')}
-                          onMouseDown={() => handleMouseDown(columnIndex, btnIndex)}
-                          onMouseOver={() => {
-                            if (isDragging) {
-                              toggleButtonSelection(columnIndex, btnIndex);
-                          }
-                        }}
-                          onMouseUp={() => {
-                              setIsDragging(false);
-                          }}
-                          sx={{
-                            borderColor: "white",
-                            "&.MuiButton-outlined": {
-                              borderColor: "white",
-                            },
-                            "&:hover": {
-                              borderColor: "white",
-                            },
-                            "&.MuiButton-text": {
-                              borderColor: "white",
-                              color: "white",
-                              backgroundColor: "#2e7c67",
-                            },
-                          }}
-                        >
-                        {`${timereqData.slots_dict && timereqData.slots_dict[btnIndex]}`}
-                        <span>&nbsp;&nbsp;&nbsp;{employeeCountForThisSlot}</span>
-                        </Button>
-                      );
-                    }
-                    return null; // Return null if the current time is outside the opening and closing hours
-                  })}
-
-                  </Box>
-                </Box>
-              
-            ))}       
-            <Button 
+        <IconButton 
+          onClick={goToPreviousWeek} 
+          style={BUTTON_STYLE}>
+          <ChevronLeft />
+        </IconButton>
+        <Typography variant="h5" sx={{margin: '0 1rem'}}>
+          {
+            new Intl.DateTimeFormat('de', { 
+              weekday: 'short', 
+              day: '2-digit', 
+              month: 'long', 
+              year: 'numeric'
+            }).format(new Date(timereqData.week_start))
+          }
+        </Typography>
+        <IconButton 
+          onClick={goToNextWeek} 
+          style={BUTTON_STYLE}>
+          <ChevronRight />
+        </IconButton>
+        </Box>
+        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', marginBottom: '1rem' }}>
+        <Button 
               variant="outlined"
               color="inherit"
+              size="small"
               onClick={handleFormSubmit}
               sx={{
                 borderColor: 'white',
-                '&.MuiButton-outlined': {
+                height: '20px',
+                minHeight: '20px',
+                fontSize: '10px',
+                '&.MuiButtonOutlined': {
                   borderColor: 'white',
                 },
                 '&:hover': {
                   borderColor: 'white',
                 },
-                '&.MuiButton-text': {
+                '&.MuiButtonText': {
                   borderColor: 'white',
                   color: 'white',
                   backgroundColor: '#2e7c67',
                 }
               }}
             >
-              Submit
+              Save Template
             </Button>
-          </Box>
-          </Box>
+            <TextField 
+                type="text"
+                size="small"
+                name="template_name"
+                inputProps={{ maxLength: 15 }}
+                sx={{
+                  height: '20px', // explicitly set height
+                  '.MuiInputBase-root': {
+                    height: '20px', // explicitly set input field height
+                    fontSize: '10px' // explicitly set font size
+                  }
+                }}
+              />
+        </Box>
+        <span></span>
+        <Box sx={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(7, 1fr)', // 7 columns for each day
+                  gap: theme.spacing(2),
+                  marginBottom: '1rem'
+              }}>
+
+          {Array.from({ length: timereqData.day_num }).map((_, columnIndex) => (
+            <Box key={`column-${columnIndex}`} sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    width: 100, // Set a fixed width
+                    }}>
+              <Typography variant="h4" gutterBottom component="div">
+                {timereqData.weekdays[columnIndex]}
+              </Typography>
+              <TextField 
+                type="number" 
+                value={employeeCount[columnIndex] || ''} 
+                onChange={(e) => setEmployees(e, columnIndex)} 
+                label="Enter employee count" 
+                variant="outlined"
+                fullWidth
+                inputProps={{ min: 0 }}
+              />
+              <Button 
+                variant="contained"
+                color="primary"
+                onClick={() => EnteredSlots(columnIndex)}
+              >
+                Enter
+              </Button>
+              <Box sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    width: '100%', // Full width
+                    height: 500, // Set a fixed height
+                    overflowY: 'auto', // To allow scrolling if the content exceeds the fixed height
+                    border: '1px solid', // To visualize the box
+                  }}>
+                  
+                {Array.from({ length: timereqData.daily_slots }).map((_, btnIndex) => {
+                    
+                  const timereqKey = `${columnIndex + 1}${btnIndex}`;
+                  const timereqValue = slotEmployeeCounts[timereqKey] || '';
+                  const currentTimeMinutes = convertTimeToMinutes(timereqData.slots_dict[btnIndex]);
+                  const openingTimeMinutes = convertTimeToMinutes(openingHours[columnIndex]);
+                  const startBreakTimeMinutes = convertTimeToMinutes(startBreak[columnIndex]) - 1;
+                  const endBreakTimeMinutes = convertTimeToMinutes(endBreak[columnIndex]);
+                  const closingTimeMinutes = convertTimeToMinutes(closingHours[columnIndex]) - 1;
+
+                  // Check if the current time is within the opening and closing hours
+                  if (isTimeWithinRange(currentTimeMinutes, openingTimeMinutes, startBreakTimeMinutes, endBreakTimeMinutes, closingTimeMinutes)) {
+                    const isSelected = selectedButtons.includes(`${columnIndex}-${btnIndex}`);
+                    const employeeCountForThisSlot = slotEmployeeCounts[`${columnIndex}-${btnIndex}`] || '';
+                    const isEntered = slotEmployeeCounts[`${columnIndex}-${btnIndex}`] !== undefined;
+                    return (
+                      <Button
+                        key={`btn-${btnIndex}`}
+                        variant={(isEntered) ? 'text' : (isSelected ? 'contained' : 'outlined')}
+                        color={(isEntered) ? 'error' : (isSelected ? 'success' : 'inherit')}
+                        onMouseDown={() => handleMouseDown(columnIndex, btnIndex)}
+                        onMouseOver={() => {
+                          if (isDragging) {
+                            toggleButtonSelection(columnIndex, btnIndex);
+                        }
+                      }}
+                        onMouseUp={() => {
+                            setIsDragging(false);
+                        }}
+                        sx={{
+                          borderColor: "white",
+                          "&.MuiButtonOutlined": {
+                            borderColor: "white",
+                          },
+                          "&:hover": {
+                            borderColor: "white",
+                          },
+                          "&.MuiButtonText": {
+                            borderColor: "white",
+                            color: "white",
+                            backgroundColor: "#2e7c67",
+                          },
+                        }}
+                      >
+                      {`${timereqData.slots_dict && timereqData.slots_dict[btnIndex]}`}
+                      {!isEntered && <span>&nbsp;&nbsp;&nbsp;{timereqValue}</span>}
+                      {isEntered && <span>&nbsp;&nbsp;&nbsp;{employeeCountForThisSlot}</span>}
+                      </Button>
+                    ); 
+                  }
+                    return null; // Return null if the current time is outside the opening and closing hours
+                  })}
+
+                </Box>
+            </Box>
+              
+            ))}
+        </Box>
+        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: '1rem' }}>
+          <Button 
+            variant="outlined"
+            color="inherit"
+            onClick={handleFormSubmit}
+            sx={{
+              borderColor: 'white',
+              '&.MuiButtonOutlined': {
+                borderColor: 'white',
+              },
+              '&:hover': {
+                borderColor: 'white',
+              },
+              '&.MuiButtonText': {
+                borderColor: 'white',
+                color: 'white',
+                backgroundColor: '#2e7c67',
+              }
+            }}
+          >
+            Submit
+          </Button>
+        </Box>
          
       <Snackbar
         open={showSuccessNotification}
