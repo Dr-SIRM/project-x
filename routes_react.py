@@ -965,7 +965,7 @@ def get_required_workforce():
             opening_dict[str(new_i) + '&3'] = opening.end_time2.strftime("%H:%M") if opening.end_time2 else None
 
     """
-    # Set Template
+    Set Template
     if time_form.template1.data:
         temp_dict = {}
         for i in range(day_num):
@@ -997,18 +997,11 @@ def get_required_workforce():
                 formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
                 capacity = workforce_data.get(f'worker_{i}_{formatted_time}')
                 if capacity:
-                    print(capacity)
-                    last = TimeReq.query.order_by(TimeReq.id.desc()).first()
-                    if last is None:
-                        new_id = 1
-                    else:
-                        new_id = last.id + 1
-
                     new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
                     time = f'{formatted_time}:00'
                     new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
 
-                    req = TimeReq(id=new_id, 
+                    req = TimeReq(id=None, 
                                   company_name=user.company_name, 
                                   date=new_date, 
                                   start_time=new_time, 
@@ -1021,17 +1014,11 @@ def get_required_workforce():
                     db.session.add(req)
                     db.session.commit()
                 else:
-                    last = TimeReq.query.order_by(TimeReq.id.desc()).first()
-                    if last is None:
-                        new_id = 1
-                    else:
-                        new_id = last.id + 1
-
                     new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
                     time = f'{formatted_time}:00'
                     new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
 
-                    req = TimeReq(id=new_id, 
+                    req = TimeReq(id=None, 
                                   company_name=user.company_name, 
                                   date=new_date, 
                                   start_time=new_time, 
@@ -1079,7 +1066,9 @@ def get_shift():
     today = date.today()
 
     if view == 'day':
-        start_date, end_date = today, today
+        specific_day = request.args.get('specific_day') # or another appropriate name
+        start_date, end_date = specific_day, specific_day
+
     elif view == 'week':
         start_date = today - timedelta(days=today.weekday())  # start of the week (Monday)
         end_date = start_date + timedelta(days=6)  # end of the week (Sunday)

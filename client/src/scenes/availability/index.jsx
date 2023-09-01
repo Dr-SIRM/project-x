@@ -110,7 +110,7 @@ const Availability = ({ availability }) => {
               <IconButton onClick={goToPreviousWeek} 
               sx={{
                 borderColor: 'white',
-                '&.MuiButton-outlined': {
+                '&.MuiButtonOutlined': {
                   borderColor: 'white',
                 },
                 '&:hover': {
@@ -137,7 +137,7 @@ const Availability = ({ availability }) => {
               <IconButton onClick={goToNextWeek} 
               sx={{
                 borderColor: 'white',
-                '&.MuiButton-outlined': {
+                '&.MuiButtonOutlined': {
                   borderColor: 'white',
                 },
                 '&:hover': {
