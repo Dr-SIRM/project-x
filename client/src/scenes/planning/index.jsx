@@ -134,7 +134,7 @@ const Day = ({ day, dayIndex, slotCounts = {}, setSlotCounts, openingHour, closi
               key={filteredSlots.id}
               sx={{
                 borderColor: 'white', 
-                '&.MuiButton-outlined': {
+                '&.MuiButtonOutlined': {
                   borderColor: 'white',
                 },
                 '&:hover': {
@@ -272,7 +272,7 @@ const Week = () => {
         <IconButton onClick={goToPreviousWeek} 
         sx={{
           borderColor: 'white',
-          '&.MuiButton-outlined': {
+          '&.MuiButtonOutlined': {
             borderColor: 'white',
           },
           '&:hover': {
@@ -299,7 +299,7 @@ const Week = () => {
         <IconButton onClick={goToNextWeek} 
         sx={{
           borderColor: 'white',
-          '&.MuiButton-outlined': {
+          '&.MuiButtonOutlined': {
             borderColor: 'white',
           },
           '&:hover': {
@@ -334,7 +334,7 @@ const Week = () => {
         onClick={submit}
         sx={{
           borderColor: 'white',
-          '&.MuiButton-outlined': {
+          '&.MuiButtonOutlined': {
             borderColor: 'white',
           },
           '&:hover': {
