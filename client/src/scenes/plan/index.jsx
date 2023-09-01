@@ -14,13 +14,13 @@ const GanttChart = () => {
   const [currentDay, setCurrentDay] = useState(new Date());
   const BUTTON_STYLE = {
     borderColor: "white",
-    "&.MuiButton-outlined": {
+    "&.MuiButtonOutlined": {
       borderColor: "white",
     },
     "&:hover": {
       borderColor: "white",
     },
-    "&.MuiButton-text": {
+    "&.MuiButtonText": {
       borderColor: "white",
       color: "white",
       backgroundColor: "#2e7c67",
