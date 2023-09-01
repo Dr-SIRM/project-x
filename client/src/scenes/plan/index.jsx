@@ -27,13 +27,18 @@ const GanttChart = () => {
     },
   };
   
-
   useEffect(() => {
     const fetchWorkers = async () => {
+      console.log('Making request with view:', view);
+      console.log('Making request with currentDate:', currentDay.toISOString().split('T')[0]);
+
       try {
         const response = await axios.get('http://localhost:5000/api/schichtplanung', {
           headers: { Authorization: `Bearer ${token}` },
-          params: { view: view }
+          params: { 
+            view: view,
+            ...(view === 'day' && { specific_day: currentDay.toISOString().split('T')[0] })
+          }
         });
         const responseData = response.data;
         console.log("API Response Data:", responseData);
@@ -251,7 +256,7 @@ const GanttChart = () => {
       return previousDay;
     });
   };
-  
+  console.log(currentDay)
   const formatDateDisplay = (date) => {
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   };
@@ -283,7 +288,7 @@ const GanttChart = () => {
               </IconButton>
             </div>
           )}
-   
+        
         </div>
         <div className="gantt-controls">
           <div className="view-controls">

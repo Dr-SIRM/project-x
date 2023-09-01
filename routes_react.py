@@ -1079,7 +1079,9 @@ def get_shift():
     today = date.today()
 
     if view == 'day':
-        start_date, end_date = today, today
+        specific_day = request.args.get('specific_day') # or another appropriate name
+        start_date, end_date = specific_day, specific_day
+
     elif view == 'week':
         start_date = today - timedelta(days=today.weekday())  # start of the week (Monday)
         end_date = start_date + timedelta(days=6)  # end of the week (Sunday)
