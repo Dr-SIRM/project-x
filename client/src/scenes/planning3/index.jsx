@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTheme, Box, Button, TextField, Snackbar, Typography, ButtonGroup, IconButton } from "@mui/material";
+import { Select, MenuItem } from "@mui/material";
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -8,14 +9,6 @@ import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import { ThreeDots } from "react-loader-spinner"; 
 import axios from 'axios';
-
-const LOADER_BOX_STYLE = {
-  m: "20px",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  height: "100vh"
-};
 
 const BUTTON_STYLE = {
   borderColor: "white",
@@ -33,11 +26,8 @@ const BUTTON_STYLE = {
 };
 
 
-
 const TimeReq = ({ timereq }) => {
   const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-  const isNonMobile = useMediaQuery("(min-width:600px)");
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [timereqData, setTimeReqData] = useState({});
@@ -51,7 +41,7 @@ const TimeReq = ({ timereq }) => {
   const [employeeCount, setEmployeeCount] = useState({});
   const [selectedButtons, setSelectedButtons] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
-  const [slotEmployeeCounts, setSlotEmployeeCounts] = useState({});
+  const [slotEmployeeCounts, setSlotEmployeeCounts] = useState(null);
 
   const convertTimeToMinutes = (timeStr) => {
     if (!timeStr) return 0;
@@ -67,6 +57,7 @@ const TimeReq = ({ timereq }) => {
       return (current >= opening && current < startBreak) || (current >= endBreak && current <= closing);
   };
 
+  /// Define Click and Drag Function
   useEffect(() => {
     const endDrag = () => setIsDragging(false);
     window.addEventListener('mouseup', endDrag);
@@ -139,6 +130,7 @@ const TimeReq = ({ timereq }) => {
           
           const data = response.data;
           setTimeReqData(data);
+          setSlotEmployeeCounts({});
           setSlotEmployeeCounts(prevState => {
             return {
               ...prevState,
@@ -180,11 +172,31 @@ const TimeReq = ({ timereq }) => {
   const goToPreviousWeek = () => {
     setWeekAdjustment(weekAdjustment - 7);
   };
+  const applyTemplate1 = () => {
+    const updatedCounts = { ...slotEmployeeCounts };
+  
+    Array.from({ length: timereqData.day_num }).forEach((_, columnIndex) => {
+      Array.from({ length: timereqData.daily_slots }).forEach((_, btnIndex) => {
+        const currentTimeMinutes = convertTimeToMinutes(timereqData.slots_dict[btnIndex]);
+        const openingTimeMinutes = convertTimeToMinutes(openingHours[columnIndex]);
+        const startBreakTimeMinutes = convertTimeToMinutes(startBreak[columnIndex]) - 1;
+        const endBreakTimeMinutes = convertTimeToMinutes(endBreak[columnIndex]);
+        const closingTimeMinutes = convertTimeToMinutes(closingHours[columnIndex]) - 1;
+  
+        if (isTimeWithinRange(currentTimeMinutes, openingTimeMinutes, startBreakTimeMinutes, endBreakTimeMinutes, closingTimeMinutes)) {
+          const key = `${columnIndex}-${btnIndex}`;
+          updatedCounts[key] = 1;
+        }
+      });
+    });
+  
+    setSlotEmployeeCounts(updatedCounts);
+  };
   
   const handleFormSubmit = async (values) => {
     try {
       const payload = {};
-    
+      console.log("Existing List:", slotEmployeeCounts);
       Object.entries(slotEmployeeCounts).forEach(([key, count]) => {
         const [columnIndex, btnIndex] = key.split('-');
         const dayNum = columnIndex; // Assuming columnIndex starts from 0
@@ -244,6 +256,83 @@ const TimeReq = ({ timereq }) => {
         </Box>
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', marginBottom: '1rem' }}>
         <Button 
+          variant="outlined"
+          color="inherit"
+          size="small"
+          onClick={applyTemplate1}
+          sx={{
+            borderColor: 'white',
+            height: '20px',
+            minHeight: '20px',
+            fontSize: '10px',
+            '&.MuiButtonOutlined': {
+              borderColor: 'white',
+            },
+            '&:hover': {
+              borderColor: 'white',
+            },
+            '&.MuiButtonText': {
+              borderColor: 'white',
+              color: 'white',
+              backgroundColor: '#2e7c67',
+            }
+          }}
+        >
+          Template 1
+        </Button>
+        <Button 
+          variant="outlined"
+          color="inherit"
+          size="small"
+          onClick={handleFormSubmit}
+          sx={{
+            borderColor: 'white',
+            height: '20px',
+            minHeight: '20px',
+            fontSize: '10px',
+            '&.MuiButtonOutlined': {
+              borderColor: 'white',
+            },
+            '&:hover': {
+              borderColor: 'white',
+            },
+            '&.MuiButtonText': {
+              borderColor: 'white',
+              color: 'white',
+              backgroundColor: '#2e7c67',
+            }
+          }}
+        >
+          Template 2
+        </Button>
+        <Button 
+          variant="outlined"
+          color="inherit"
+          size="small"
+          onClick={handleFormSubmit}
+          sx={{
+            borderColor: 'white',
+            height: '20px',
+            minHeight: '20px',
+            fontSize: '10px',
+            '&.MuiButtonOutlined': {
+              borderColor: 'white',
+            },
+            '&:hover': {
+              borderColor: 'white',
+            },
+            '&.MuiButtonText': {
+              borderColor: 'white',
+              color: 'white',
+              backgroundColor: '#2e7c67',
+            }
+          }}
+        >
+          Template 3
+        </Button>
+        </Box>
+        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', marginBottom: '1rem' }}>
+        <Button 
               variant="outlined"
               color="inherit"
               size="small"
@@ -268,10 +357,11 @@ const TimeReq = ({ timereq }) => {
             >
               Save Template
             </Button>
-            <TextField 
+            <Select 
                 type="text"
                 size="small"
                 name="template_name"
+                value=""
                 inputProps={{ maxLength: 15 }}
                 sx={{
                   height: '20px', // explicitly set height
@@ -280,7 +370,11 @@ const TimeReq = ({ timereq }) => {
                     fontSize: '10px' // explicitly set font size
                   }
                 }}
-              />
+              >
+                <MenuItem value={ 'Template 1' }>Template 1</MenuItem>
+                <MenuItem value={ 'Template 2' }>Template 2</MenuItem>
+                <MenuItem value={ 'Template 3' }>Template 3</MenuItem>
+                </Select>
         </Box>
         <span></span>
         <Box sx={{
@@ -328,7 +422,7 @@ const TimeReq = ({ timereq }) => {
                   
                 {Array.from({ length: timereqData.daily_slots }).map((_, btnIndex) => {
                     
-                  const timereqKey = `${columnIndex + 1}${btnIndex}`;
+                  const timereqKey = `${columnIndex}-${btnIndex}`;
                   const timereqValue = slotEmployeeCounts[timereqKey] || '';
                   const currentTimeMinutes = convertTimeToMinutes(timereqData.slots_dict[btnIndex]);
                   const openingTimeMinutes = convertTimeToMinutes(openingHours[columnIndex]);
@@ -341,11 +435,37 @@ const TimeReq = ({ timereq }) => {
                     const isSelected = selectedButtons.includes(`${columnIndex}-${btnIndex}`);
                     const employeeCountForThisSlot = slotEmployeeCounts[`${columnIndex}-${btnIndex}`] || '';
                     const isEntered = slotEmployeeCounts[`${columnIndex}-${btnIndex}`] !== undefined;
+
+                    const buttonStyle = () => {
+                      if (isEntered && isSelected) {
+                        return {
+                          variant: "contained",
+                          color: "secondary"  // Or any other color that indicates both states
+                        };
+                      }
+                      if (isEntered) {
+                        return {
+                          variant: "success",
+                          color: "success"
+                        };
+                      }
+                      if (isSelected) {
+                        return {
+                          variant: "contained",
+                          color: "success"
+                        };
+                      }
+                      return {
+                        variant: "outlined",
+                        color: "inherit"
+                      };
+                    };
+                    
                     return (
                       <Button
                         key={`btn-${btnIndex}`}
-                        variant={(isEntered) ? 'text' : (isSelected ? 'contained' : 'outlined')}
-                        color={(isEntered) ? 'error' : (isSelected ? 'success' : 'inherit')}
+                        variant={buttonStyle().variant}
+                        color={buttonStyle().color}
                         onMouseDown={() => handleMouseDown(columnIndex, btnIndex)}
                         onMouseOver={() => {
                           if (isDragging) {

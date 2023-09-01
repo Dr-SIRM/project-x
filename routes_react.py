@@ -944,7 +944,7 @@ def get_required_workforce():
                 pass
             else:
                 new_i = i + 1
-                timereq_dict[str(new_i) + str(hour)] = temp.worker
+                timereq_dict["{}-{}".format(i, hour)] = temp.worker
     print(timereq_dict)
 
     
