@@ -2,6 +2,7 @@ import pandas as pd
 import datetime
 import pymysql
 import time
+import math
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font
 from openpyxl.utils import get_column_letter
@@ -12,6 +13,7 @@ from models import Timetable, User, SolverAnalysis
 
 # New 
 from ortools.sat.python import cp_model
+
 
 class ORAlgorithm_cp:
     def __init__(self, dp: DataProcessing):
@@ -53,7 +55,8 @@ class ORAlgorithm_cp:
         self.min_time_day = None
 
         # Attribute der Methode "solver_selection"
-        self.solver = None               
+        self.model = None
+        self.solver = None              
 
         # Attribute der Methode "define_penalty_costs"
         self.penalty_cost_nb1 = None
@@ -122,18 +125,18 @@ class ORAlgorithm_cp:
 
     def run(self):
         self.create_variables()
-        # self.show_variables()
+        self.show_variables()
         # self.pre_check_programmer()
         # self.pre_check_admin()
-        # self.solver_selection()
-        # self.define_penalty_costs()
-        # self.decision_variables()
-        # self.violation_variables()
-        # self.objective_function()
-        # self.constraints()
-        # self.solve_problem()
-        # self.store_solved_data()
-        # self.output_result_excel()
+        self.solver_selection()
+        self.define_penalty_costs()
+        self.decision_variables()
+        self.violation_variables()
+        self.objective_function()
+        self.constraints()
+        self.solve_problem()
+        self.store_solved_data()
+        self.output_result_excel()
         # self.save_data_in_database()
         # self.save_data_in_database_testing()
 
@@ -473,3 +476,492 @@ class ORAlgorithm_cp:
         7. Ist die Toleranz der gerechten Verteilung zu klein gewählt? --> Evtl. die Bedingung weich machen!
         ---------------------------------------------------------------------------------------------------------------
         """
+
+
+    def solver_selection(self):
+        """
+        Auswahl des geeigneten Solvers für Constraint Programmierung.
+        """
+        self.model = cp_model.CpModel()
+        self.solver = cp_model.CpSolver()
+        
+        # Optionale Parameter für den Solver (wie z.B. Zeitlimit)
+        self.solver.parameters.max_time_in_seconds = 120
+
+
+
+
+    def define_penalty_costs(self):
+        """
+        Definiere Strafkosten für weiche Nebenbedingungen
+        """
+        # Strafkosten für jede NB
+        penalty_values = {
+            "nb1": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb2": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb3": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb4": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb5": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb6": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb7": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb8": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb9": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb10": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000}
+        }
+
+        # Mapping für die entsprechenden Namen der Klassenattribute
+        penalty_cost_names = {
+            "nb1": "penalty_cost_nb1",
+            "nb2": "penalty_cost_nb2",
+            "nb3": "penalty_cost_nb3_min",
+            "nb4": "penalty_cost_nb4_max",
+            "nb5": "penalty_cost_nb5_min",
+            "nb6": "penalty_cost_nb6_max",
+            "nb7": "penalty_cost_nb7",
+            "nb8": "penalty_cost_nb8",
+            "nb9": "penalty_cost_nb9",
+            "nb10": "penalty_cost_nb10"
+        }
+
+        # Setze die Strafkosten für jede NB basierend auf dem Dictionary
+        for key, values in penalty_values.items():
+            if key in self.solver_requirements:
+                nb_value = self.solver_requirements[key]
+                if nb_value in values:
+                    setattr(self, penalty_cost_names[key], values[nb_value])
+                    print(f"{penalty_cost_names[key].upper()}: {getattr(self, penalty_cost_names[key])}")
+                else:
+                    print(f"Zahl für {penalty_cost_names[key].upper()} wurde nicht gefunden")
+            else:
+                print(f"{penalty_cost_names[key].upper()} nicht in solver_requirements gefunden")
+
+
+
+    def decision_variables(self):
+        """
+        Entscheidungsvariabeln für den CP-Solver
+        """
+
+        # Arbeitsvariable
+        self.x = {}
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                for k in range(len(self.verfügbarkeit[i][j])):
+                    self.x[i, j, k] = self.model.NewIntVar(0, 1, f'x[{i}, {j}, {k}]')
+
+        # Arbeitsblockvariable
+        self.y = {}
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                for k in range(len(self.verfügbarkeit[i][j])):
+                    self.y[i, j, k] = self.model.NewIntVar(0, 1, f'y[{i}, {j}, {k}]')
+
+        # Arbeitstagvariable
+        self.a = {}
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                self.a[i, j] = self.model.NewBoolVar(f'a[{i}, {j}]')
+
+        # Schichtvariable Woche (2-Schicht)
+        self.s2 = {}
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                self.s2[i, j] = self.model.NewIntVar(0, 1, f's2[{i}, {j}]')
+
+        # Schichtvariable Woche (3-Schicht)
+        self.s3 = {}
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                self.s3[i, j] = self.model.NewIntVar(0, 2, f's3[{i}, {j}]')
+
+        # Gleiche Schichten innerhalb 2 und 4 Wochen
+        self.c = {}
+        for i in self.mitarbeiter:
+            for j in range(7, self.calc_time):
+                self.c[i, j] = self.model.NewIntVar(0, 1, f'c[{i}, {j}]')
+
+
+    def violation_variables(self):
+        """ 
+        Verletzungsvariabeln für den CP-Solver
+        """
+        
+        # Unendlichkeitssimulation
+        INF = int(1e6)
+        
+        # NB1 violation variable
+        for j in range(self.calc_time):
+            for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):
+                self.nb1_violation[j, k] = self.model.NewIntVar(0, INF, f'nb1_violation[{j}, {k}]')
+
+        # NB2 violation variable
+        diff_1 = self.max_time_week - self.weekly_hours
+        self.nb2_violation = {ma: {} for ma in self.mitarbeiter}
+        for ma in self.mitarbeiter:
+            for week in range(1, self.week_timeframe + 1):
+                self.nb2_violation[ma][week] = self.model.NewIntVar(0, diff_1, f'nb2_violation[{ma}][{week}]')
+
+        # NB3 Mindestarbeitszeit Verletzungsvariable
+        diff_2 = self.desired_min_time_day - self.min_time_day
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                self.nb3_min_violation[i, j] = self.model.NewIntVar(0, diff_2, f'nb3_min_violation[{i}, {j}]')
+
+        # NB4 Höchstarbeitszeit Verletzungsvariable
+        diff_3 = self.max_time_day - self.desired_max_time_day
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                self.nb4_max_violation[i, j] = self.model.NewIntVar(0, diff_3, f'nb4_max_violation[{i}, {j}]')
+
+        # NB5 Mindestarbeitszeit Verletzungsvariable
+        for i in self.mitarbeiter:
+            self.nb5_min_violation[i] = [self.model.NewIntVar(0, INF, f'nb5_min_violation[{i}][{week}]') for week in range(1, self.week_timeframe + 1)]
+
+        # NB6 Höchstarbeitszeit Verletzungsvariable
+        for i in self.mitarbeiter:
+            self.nb6_max_violation[i] = [self.model.NewIntVar(0, INF, f'nb6_max_violation[{i}][{week}]') for week in range(1, self.week_timeframe + 1)]
+
+        # NB7 Innerhalb einer Woche die gleiche Schicht - Verletzungsvariable
+        for i in self.mitarbeiter:
+            for j in range(7):
+                self.nb7_violation[i, j] = self.model.NewIntVar(0, INF, f'nb7_violation[{i}, {j}]')
+
+        # NB8 Innerhalb der zweiten / vierten Woche die gleiche Schicht - Verletzungsvariable
+        for i in self.mitarbeiter:
+            for j in range(7, self.calc_time):
+                self.nb8_violation[i, j] = self.model.NewIntVar(0, INF, f'nb8_violation[{i}, {j}]')
+
+        # NB9 Minimale Arbeitsstunden pro Block - Verletzungsvariable
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                for k in range(len(self.verfügbarkeit[i][j])):
+                    self.nb9_violation[i, j, k] = self.model.NewIntVar(0, INF, f'nb9_violation[{i}, {j}, {k}]')
+
+        # NB10 Max. Anzahl an Arbeitstagen in Folge
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                self.nb10_violation[i, j] = self.model.NewIntVar(0, INF, f'nb10_violation[{i}, {j}]')
+
+    def objective_function(self):
+        """
+        Zielfunktion
+        """
+
+        # Liste von Kosten-Ausdrücken
+        cost_expressions = []
+
+        # Kosten MA minimieren
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                for k in range(len(self.verfügbarkeit[i][j])):
+                    cost_expressions.append(self.x[i, j, k] * int(self.kosten[i] / self.hour_devider))
+
+        
+        # Kosten Weiche NB1
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                for k in range(len(self.verfügbarkeit[i][j])):
+                    cost_expressions.append(self.nb1_violation[j, k] * int(self.penalty_cost_nb1 / self.hour_devider))
+
+        """
+        # Kosten Weiche NB2
+        for i in self.mitarbeiter:
+            for week in range(1, self.week_timeframe + 1):
+                cost_expressions.append(self.nb2_violation[i][week] * self.penalty_cost_nb2)
+        """
+
+        # Kosten für Weiche NB3 Mindestarbeitszeit Verletzung
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                cost_expressions.append(self.nb3_min_violation[i, j] * self.penalty_cost_nb3_min)
+
+        # Kosten für Weiche NB4 Höchstarbeitszeit Verletzung
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                cost_expressions.append(self.nb4_max_violation[i, j] * self.penalty_cost_nb4_max)
+
+        # Kosten für Weiche NB5 Mindestarbeitszeit Verletzung
+        for i in self.mitarbeiter:
+            for week in range(1, self.week_timeframe + 1):
+                cost_expressions.append(self.nb5_min_violation[i][week-1] * self.penalty_cost_nb5_min)
+
+        # Kosten für Weiche NB6 Höchstarbeitszeit Verletzung
+        for i in self.mitarbeiter:
+            for week in range(1, self.week_timeframe + 1):
+                cost_expressions.append(self.nb6_max_violation[i][week-1] * self.penalty_cost_nb6_max)
+
+        """
+        # Kosten für Weiche NB7 "Innerhalb einer Woche immer gleiche Schichten"
+        for i in self.mitarbeiter:
+            for j in range(7):
+                cost_expressions.append(self.nb7_violation[i, j] * self.penalty_cost_nb7)
+
+        # Kosten für Weiche NB8 "Innerhalb der zweiten Woche immer gleiche Schichten"
+        for i in self.mitarbeiter:
+            for j in range(7, self.calc_time):
+                cost_expressions.append(self.nb8_violation[i, j] * self.penalty_cost_nb8)
+
+        # Kosten für Weiche NB9 "Minimale Arbeitsstunden pro Block"
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                for k in range(len(self.verfügbarkeit[i][j])):
+                    cost_expressions.append(self.nb9_violation[i, j, k] * int(self.penalty_cost_nb9 / self.hour_devider))
+
+        # Kosten für Weiche NB10 "Max. Anzahl an Arbeitstagen in Folge"
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                cost_expressions.append(self.nb10_violation[i, j] * self.penalty_cost_nb10)
+        """
+                
+        # Addiere alle Kosten-Ausdrücke und setze das Ziel der Minimierung
+        total_cost = sum(cost_expressions)
+        self.model.Minimize(total_cost)
+
+
+    def constraints(self):
+        """
+        Beschränkungen / Nebenbedingungen
+        """
+
+        # -------------------------------------------------------------------------------------------------------
+        # HARTE NB -- NEU 08.08.2023 --
+        # NB 0 - Variable a ist 1, wenn der Mitarbeiter an einem Tag arbeitet, sonst 0
+        # -------------------------------------------------------------------------------------------------------
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                # sum_x ist die Summe an der ein MA am Tag arbeiten kann
+                sum_x = sum(self.x[i, j, k] for k in range(len(self.verfügbarkeit[i][j])))
+                
+                self.model.Add(self.a[i, j] * (len(self.verfügbarkeit[i][j]) + 1) >= sum_x)
+                self.model.Add(self.a[i, j] <= sum_x)
+        
+        # -------------------------------------------------------------------------------------------------------
+        # HARTE NB
+        # NB 1 - MA nur einteilen, wenn er verfügbar ist. 
+        # -------------------------------------------------------------------------------------------------------
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                for k in range(len(self.verfügbarkeit[i][j])):
+                    self.model.Add(self.x[i, j, k] <= self.verfügbarkeit[i][j][k])
+
+        # -------------------------------------------------------------------------------------------------------
+        # HARTE NB
+        # NB 2 - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend
+        # -------------------------------------------------------------------------------------------------------
+        for j in range(self.calc_time):
+            for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
+                self.model.Add(sum(self.x[i, j, k] for i in self.mitarbeiter) >= self.min_anwesend[j][k])
+        # -------------------------------------------------------------------------------------------------------
+        # WEICHE NB -- NEU 26.07.2023 --
+        # NB 2 - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend 
+        # ***** Weiche Nebenbedingung 1 *****
+        # -------------------------------------------------------------------------------------------------------
+        for j in range(self.calc_time):
+            for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
+                self.model.Add(sum(self.x[i, j, k] for i in self.mitarbeiter) - self.min_anwesend[j][k] <= self.nb1_violation[j, k])
+
+
+
+
+
+        # -------------------------------------------------------------------------------------------------------
+        # WEICHE NB -- NEU 31.07.2023 --
+        # NB 4 - Min. und Max. Arbeitszeit pro Tag
+        # ***** Weiche Nebenbedingung 3 und 4 *****
+        # -------------------------------------------------------------------------------------------------------
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+
+                # Wenn die if Bedingung auskommentiert wird, dann wird die min und max Zeit im gleichen Masse verteilt, funktioniert aber noch nicht!
+                # if sum(self.verfügbarkeit[i][j]) >= self.min_zeit[i]:
+
+                sum_hour = sum(self.x[i, j, k] for k in range(len(self.verfügbarkeit[i][j])))
+
+                # Prüfen, ob die Summe der Arbeitsstunden kleiner als die Mindestarbeitszeit ist
+                self.model.Add(sum_hour - self.min_zeit[i] * self.a[i, j] >= -self.nb3_min_violation[i, j])
+                self.model.Add(self.nb3_min_violation[i, j] >= 0)
+
+                # Prüfen, ob die Summe der Arbeitsstunden größer als die maximale Arbeitszeit ist
+                self.model.Add(sum_hour - self.max_zeit[i] * self.a[i, j] <= self.nb4_max_violation[i, j])
+                self.model.Add(self.nb4_max_violation[i, j] >= 0)
+
+        # -------------------------------------------------------------------------------------------------------
+        # HARTE NB
+        # NB 5 - Anzahl Arbeitsblöcke
+        # -------------------------------------------------------------------------------------------------------
+
+        self.working_blocks = 1
+                
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                # Überprüfen, ob der Betrieb an diesem Tag geöffnet ist
+                if self.opening_hours[j] > 0:
+                    # Für die erste Stunde des Tages
+                    self.model.Add(self.y[i, j, 0] >= self.x[i, j, 0])
+                    
+                    # Für die restlichen Stunden des Tages
+                    for k in range(1, len(self.verfügbarkeit[i][j])):
+                        self.model.Add(self.y[i, j, k] >= self.x[i, j, k] - self.x[i, j, k-1])
+
+                    # Die Summe der y[i, j, k] für einen bestimmten Tag j sollte nicht größer als 1 sein
+                    self.model.Add(sum(self.y[i, j, k] for k in range(len(self.verfügbarkeit[i][j]))) <= self.working_blocks)
+
+        
+        # -------------------------------------------------------------------------------------------------------
+        # HARTE NB
+        # NB 6 - Verteilungsgrad MA
+        # -------------------------------------------------------------------------------------------------------
+        verteilungsstunden = {ma: sum(self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))) for ma in self.mitarbeiter}
+
+        for i, ma in enumerate(self.mitarbeiter):
+            lower_bound = math.floor(self.gerechte_verteilung[i] * (1 - self.fair_distribution))
+            upper_bound = math.ceil(self.gerechte_verteilung[i] * (1 + self.fair_distribution))
+            
+            self.model.Add(verteilungsstunden[ma] <= upper_bound)
+            self.model.Add(verteilungsstunden[ma] >= lower_bound)
+        
+
+        # -------------------------------------------------------------------------------------------------------
+        # WEICHE NB -- NEU 08.08.23 --
+        # NB 7 - "Perm" Mitarbeiter zu employement_level fest einplanen
+        # ***** Weiche Nebenbedingung 5 und 6 *****
+        # -------------------------------------------------------------------------------------------------------
+
+        for i, ma in enumerate(self.mitarbeiter):
+            if self.employment[i] == "Perm":
+                for week in range(1, self.week_timeframe + 1):
+                    week_start = (week - 1) * (self.calc_time // self.week_timeframe)
+                    week_end = week * (self.calc_time // self.week_timeframe)
+                    print(f'Week start for employee {ma} in week {week}: {week_start}')
+                    print(f'Week end for employee {ma} in week {week}: {week_end}')
+
+                    total_hours_week = sum(self.x[ma, j, k] for j in range(week_start, week_end) for k in range(len(self.verfügbarkeit[ma][j])))
+                    print(f'Total hours for employee {ma} in week {week}: {total_hours_week}')
+
+                    # Prüfen, ob die Gesamtstunden kleiner als die vorgegebenen Arbeitsstunden sind (Unterschreitung)
+                    self.model.Add(total_hours_week - self.weekly_hours <= self.nb5_min_violation[ma][week - 1])
+                    self.model.Add(self.nb5_min_violation[ma][week - 1] >= 0)
+
+                    # Prüfen, ob die Gesamtstunden größer als die vorgegebenen Arbeitsstunden sind (Überschreitung)
+                    self.model.Add(self.weekly_hours - total_hours_week <= -self.nb6_max_violation[ma][week - 1])
+                    self.model.Add(self.nb6_max_violation[ma][week - 1] >= 0)
+
+
+
+
+    def solve_problem(self):
+        """
+        Problem lösen und Kosten ausgeben
+        """
+
+        self.solver.parameters.log_search_progress = True
+        self.status = self.solver.Solve(self.model)
+
+
+
+        # Die Werte von a printen
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                # Drucken Sie den Wert von a[i, j]
+                print(f"a[{i}][{j}] =", self.solver.Value(self.a[i, j]))
+
+
+
+    def store_solved_data(self):
+        """
+        mitarbeiter_arbeitszeiten Attribut befüllen
+        """
+
+        if self.status is None:
+            print("Das Problem wurde noch nicht gelöst.")
+            return
+
+        if self.status == cp_model.OPTIMAL or self.status == cp_model.FEASIBLE:
+            self.mitarbeiter_arbeitszeiten = {}
+            for i in self.mitarbeiter:
+                self.mitarbeiter_arbeitszeiten[i] = [
+                    [self.solver.Value(self.x[i, j, k]) for k in range(len(self.verfügbarkeit[i][j]))] 
+                    for j in range(self.calc_time)
+                ]
+            print(self.mitarbeiter_arbeitszeiten)
+
+        if self.status == cp_model.OPTIMAL:
+            print("Optimale Lösung gefunden.")
+        elif self.status == cp_model.FEASIBLE:
+            print("Mögliche Lösung gefunden.")
+        elif self.status == cp_model.INFEASIBLE:
+            print("Problem ist unlösbar.")
+        elif self.status == cp_model.NOT_SOLVED:
+            print("Solver hat das Problem nicht gelöst.")
+        else:
+            print("Unbekannter Status.")
+
+
+    def output_result_excel(self):
+        """
+        Excel ausgabe
+        """
+        data = self.mitarbeiter_arbeitszeiten
+
+        # Legen Sie die Füllungen fest
+        green_fill = PatternFill(start_color="00FF00", end_color="00FF00", fill_type="solid")
+        red_fill = PatternFill(start_color="FF0000", end_color="FF0000", fill_type="solid")
+
+        # Festlegen der Schriftgröße
+        font = Font(size=10)
+        header_font = Font(size=5)  # Schriftgröße für die Spaltentitel
+
+        # Erstellen Sie ein Workbook
+        wb = Workbook()
+        ws = wb.active
+
+        # Schreiben Sie die Überschriften
+        headers = ["user_id"]
+        for i in range(1, len(data[list(data.keys())[0]]) + 1):
+            headers.extend(["T{}, {}:{}".format(i, j+8, k*15) for j in range(10) for k in range(4)])
+            headers.append(' ')
+        headers.append("Total Hours") 
+        ws.append(headers)
+
+        # Ändern der Schriftgröße der Spaltentitel
+        for cell in ws[1]:
+            cell.font = header_font
+
+        # Schreiben Sie die Daten
+        for idx, (ma, days) in enumerate(data.items(), start=2):
+            row = [ma]
+            for day in days:
+                quarter_hours = [h for h in day]
+                row.extend(quarter_hours)
+                row.append(' ')  # Fügt eine leere Spalte nach jedem Tag hinzu
+            ws.append(row)
+            total_hours_col = len(headers)  # Wir verwenden die Anzahl der Überschriften, um die richtige Spalte zu erhalten
+            ws.cell(row=idx, column=total_hours_col, value=f"=SUM(B{idx}:{get_column_letter(total_hours_col-1)}{idx})")
+
+
+        # Farben auf Basis der Zellenwerte festlegen und Schriftgröße für den Rest des Dokuments
+        for row in ws.iter_rows(min_row=2, values_only=False):
+            for cell in row[1:]:
+                if cell.value == 1:
+                    cell.fill = green_fill
+                elif cell.value == 0:
+                    cell.fill = red_fill
+                cell.font = font
+
+        # Ändern der Spaltenbreite
+        for column in ws.columns:
+            max_length = 0
+            column = [cell for cell in column]
+            for cell in column:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(cell.value)
+                except:
+                    pass
+            adjusted_width = (max_length + 2)
+            if adjusted_width > 3:
+                adjusted_width = 3
+            ws.column_dimensions[get_column_letter(column[0].column)].width = adjusted_width
+
+        # Speichern Sie das Workbook
+        wb.save("Einsatzplan.xlsx")
