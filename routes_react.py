@@ -907,7 +907,6 @@ def get_admin_registration():
 def get_required_workforce():
     react_user = get_jwt_identity()
     user = User.query.filter_by(email=react_user).first()
-    Time = TimeReq.query.all()
     creation_date = datetime.datetime.now()
     weekdays = {0: 'Monday', 1: 'Tuesday', 2: 'Wednesday', 3: 'Thursday', 4: 'Friday', 5: 'Saturday', 6: 'Sunday'}
     today = datetime.date.today()
@@ -948,7 +947,6 @@ def get_required_workforce():
             else:
                 new_i = i + 1
                 timereq_dict["{}-{}".format(i, hour)] = temp.worker
-    print(timereq_dict)
 
     
     opening_dict = {}
@@ -967,29 +965,16 @@ def get_required_workforce():
             opening_dict[str(new_i) + '&2'] = opening.start_time2.strftime("%H:%M") if opening.start_time2 else None
             opening_dict[str(new_i) + '&3'] = opening.end_time2.strftime("%H:%M") if opening.end_time2 else None
 
-    """
-    Set Template
-    if time_form.template1.data:
-        temp_dict = {}
-        for i in range(day_num):
-            for hour in range(24):
-                time_num = hour * 100
-                time = f'{time_num:04d}'
-                new_time = datetime.datetime.strptime(time, '%H%M').time()
-                temp = TemplateTimeRequirement.query.filter_by(weekday=weekdays[i], start_time=new_time).first()
-                if temp is None:
-                    pass
-                else:
-                    new_i = i + 1
-                    temp_dict[str(new_i) + '&' + str(hour)] = temp.worker
 
-   """     
+    buttons = request.get_json()
+    action = buttons.get('action')
+    print("Received payload:", buttons)
 
     #Submit the required FTE per hour
     if request.method =='POST':
-        print(request.json)
         workforce_data = request.get_json()
         week_adjustment = int(request.args.get('week_adjustment', 0))
+        buttons.pop('action', None)
         for i in range(day_num):
             new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
             TimeReq.query.filter_by(company_name=user.company_name, date=new_date).delete()

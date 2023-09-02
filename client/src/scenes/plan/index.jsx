@@ -112,7 +112,7 @@ const GanttChart = () => {
   };
 
   const getShiftPosition = (shift) => {
-    const today = new Date();
+    const today = currentDay;
     const weekday = today.toLocaleDateString('en-US', { weekday: 'long' });
     const hours = openingHours[weekday.toLowerCase()];
 
@@ -154,7 +154,7 @@ const GanttChart = () => {
 
   const renderShifts = (worker) => {
     let maxDuration;
-    const today = new Date();
+    const today = currentDay;
   
     switch (view) {
       case 'day':
@@ -207,7 +207,7 @@ const GanttChart = () => {
   };
 
   const getTimelineLabels = () => {
-    const today = new Date();
+    const today = currentDay;
     const weekday = today.toLocaleDateString('en-US', { weekday: 'long' });
     const hours = openingHours[weekday.toLowerCase()];
 
