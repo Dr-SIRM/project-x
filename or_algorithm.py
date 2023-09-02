@@ -37,9 +37,11 @@ Prio 1:
  - (*) Während des Solvings Daten ziehen --> Fragen gestellt
 
  - gerechte_verteilung funktioniert noch nicht richtig, wenn ein MA fast keine Stunden availability eingibt. Das muss noch geändert werden.
+ 
  - self.min_working_hour_per_block in Solver Req einbauen und ziehen
  - self.working_blocks in Solver Req einbauen und ziehen
  - self.max_consecutive_days in Solver Req einbauen und ziehen
+
  - start_time und end_time zwei und drei noch implementieren (noch warten bis über 00:00 Zeiten eingegeben werden können!)
 
  - Der erstellte "divisor" in data_processing könnte als Attribut initialisiert werden, damit es nicht bei jeder Methode einzeln berechnet werden muss
