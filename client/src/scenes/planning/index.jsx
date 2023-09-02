@@ -48,7 +48,7 @@ const TimeReq = ({ timereq }) => {
     const [hour, minute] = timeStr.split(":");
     return parseInt(hour) * 60 + parseInt(minute);
   };
-  
+
   // Helper function to check if the current time is within the operating hours and break time
   const isTimeWithinRange = (current, opening, startBreak, endBreak, closing) => {
     if (closing === 0 || closing === '') {
@@ -61,7 +61,7 @@ const TimeReq = ({ timereq }) => {
   useEffect(() => {
     const endDrag = () => setIsDragging(false);
     window.addEventListener('mouseup', endDrag);
-    
+
     return () => {
         window.removeEventListener('mouseup', endDrag);
     }
@@ -94,7 +94,7 @@ const TimeReq = ({ timereq }) => {
   const EnteredSlots = (columnIndex) => {
     // Clone the current state
     const updatedCounts = { ...slotEmployeeCounts };
-    
+
     // Update only the slots that are selected for this columnIndex
     selectedButtons.forEach(slot => {
       const [colIdx, btnIdx] = slot.split('-');
@@ -102,22 +102,22 @@ const TimeReq = ({ timereq }) => {
         updatedCounts[slot] = employeeCount[columnIndex];
       }
     });
-  
+
     // Update state
     setSlotEmployeeCounts(updatedCounts);
     setSelectedButtons([]);
-  
+
     // Create a new object for employeeCount while keeping all the old values
     const newEmployeeCount = { ...employeeCount };
-  
+
     // Update only the value for the given columnIndex
     newEmployeeCount[columnIndex] = 0;
-  
+
     // Update state
     setEmployeeCount(newEmployeeCount);
   };
-  
-  
+
+
   useEffect(() => {
     const fetchTimeReqData = async () => {
       setIsLoading(true);
@@ -127,7 +127,7 @@ const TimeReq = ({ timereq }) => {
                   'Authorization': `Bearer ${token}`
               }
           });
-          
+
           const data = response.data;
           setTimeReqData(data);
           setSlotEmployeeCounts({});
@@ -142,7 +142,7 @@ const TimeReq = ({ timereq }) => {
           const startBreak = [];
           const endBreak = []
           const closingHours = [];
-          
+
           for (let i = 0; i < data.day_num; i++) {
             openingHours.push(data.opening_dict[`${i+1}&0`]);
             startBreak.push(data.opening_dict[`${i+1}&1`]);
@@ -174,7 +174,7 @@ const TimeReq = ({ timereq }) => {
   };
   const applyTemplate1 = () => {
     const updatedCounts = { ...slotEmployeeCounts };
-  
+
     Array.from({ length: timereqData.day_num }).forEach((_, columnIndex) => {
       Array.from({ length: timereqData.daily_slots }).forEach((_, btnIndex) => {
         const currentTimeMinutes = convertTimeToMinutes(timereqData.slots_dict[btnIndex]);
@@ -182,21 +182,20 @@ const TimeReq = ({ timereq }) => {
         const startBreakTimeMinutes = convertTimeToMinutes(startBreak[columnIndex]) - 1;
         const endBreakTimeMinutes = convertTimeToMinutes(endBreak[columnIndex]);
         const closingTimeMinutes = convertTimeToMinutes(closingHours[columnIndex]) - 1;
-  
+
         if (isTimeWithinRange(currentTimeMinutes, openingTimeMinutes, startBreakTimeMinutes, endBreakTimeMinutes, closingTimeMinutes)) {
           const key = `${columnIndex}-${btnIndex}`;
           updatedCounts[key] = 1;
         }
       });
     });
-  
+
     setSlotEmployeeCounts(updatedCounts);
   };
-  
+
   const handleFormSubmit = async (values) => {
     try {
       const payload = {};
-      console.log("Existing List:", slotEmployeeCounts);
       Object.entries(slotEmployeeCounts).forEach(([key, count]) => {
         const [columnIndex, btnIndex] = key.split('-');
         const dayNum = columnIndex; // Assuming columnIndex starts from 0
@@ -419,9 +418,9 @@ const TimeReq = ({ timereq }) => {
                     overflowY: 'auto', // To allow scrolling if the content exceeds the fixed height
                     border: '1px solid', // To visualize the box
                   }}>
-                  
+
                 {Array.from({ length: timereqData.daily_slots }).map((_, btnIndex) => {
-                    
+
                   const timereqKey = `${columnIndex}-${btnIndex}`;
                   const timereqValue = slotEmployeeCounts[timereqKey] || '';
                   const currentTimeMinutes = convertTimeToMinutes(timereqData.slots_dict[btnIndex]);
@@ -501,7 +500,7 @@ const TimeReq = ({ timereq }) => {
 
                 </Box>
             </Box>
-              
+
             ))}
         </Box>
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: '1rem' }}>
@@ -527,7 +526,7 @@ const TimeReq = ({ timereq }) => {
             Submit
           </Button>
         </Box>
-         
+
       <Snackbar
         open={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
