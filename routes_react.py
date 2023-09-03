@@ -918,8 +918,6 @@ def get_required_workforce():
     day_num = 7
     
     company_id = user.company_id
-
-
     # Week with adjustments
     monday = today - datetime.timedelta(days=today.weekday())
     week_adjustment = int(request.args.get('week_adjustment', 0))
@@ -931,7 +929,7 @@ def get_required_workforce():
         quarter_minute = (i % hour_divider) * minutes  # Remainder gives the quarter in the hour
         formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
         slot_dict[i] = formatted_time
-
+    
     timereq_dict = {}
     for i in range(day_num):
         for hour in range(daily_slots):
@@ -948,7 +946,6 @@ def get_required_workforce():
                 new_i = i + 1
                 timereq_dict["{}-{}".format(i, hour)] = temp.worker
 
-    
     opening_dict = {}
     for i in range(day_num):
         opening = OpeningHours.query.filter_by(company_name=user.company_name, weekday=weekdays[i]).first()
@@ -964,12 +961,7 @@ def get_required_workforce():
             opening_dict[str(new_i) + '&1'] = opening.end_time.strftime("%H:%M") if opening.end_time else None
             opening_dict[str(new_i) + '&2'] = opening.start_time2.strftime("%H:%M") if opening.start_time2 else None
             opening_dict[str(new_i) + '&3'] = opening.end_time2.strftime("%H:%M") if opening.end_time2 else None
-
-
-    buttons = request.get_json()
-    action = buttons.get('action')
-    print("Received payload:", buttons)
-
+   
     #Submit the required FTE per hour
     if request.method =='POST':
         workforce_data = request.get_json()
