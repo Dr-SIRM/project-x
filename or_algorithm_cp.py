@@ -479,14 +479,14 @@ class ORAlgorithm_cp:
 
 
     def solver_selection(self):
-        """x
+        """
         Auswahl des geeigneten Solvers für Constraint Programmierung.
         """
         self.model = cp_model.CpModel()
         self.solver = cp_model.CpSolver()
         
         # Optionale Parameter für den Solver (wie z.B. Zeitlimit)
-        # self.solver.parameters.max_time_in_seconds = 120
+        self.solver.parameters.max_time_in_seconds = 120
 
 
 
@@ -917,7 +917,7 @@ class ORAlgorithm_cp:
         """
         Problem lösen und Kosten ausgeben
         """
-
+        self.model.ExportToFile('slow_model.pb.txt')
         self.solver.parameters.log_search_progress = True
         self.status = self.solver.Solve(self.model)
 
@@ -1076,4 +1076,5 @@ class ORAlgorithm_cp:
             ws.column_dimensions[get_column_letter(column[0].column)].width = adjusted_width
 
         # Speichern Sie das Workbook
+        
         wb.save("Einsatzplan.xlsx")
