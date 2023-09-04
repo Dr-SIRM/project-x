@@ -118,6 +118,8 @@
     display: flex;
     align-items: center;
     margin-bottom: 10px; /* Adjusts the space between the date navigation and the view controls */
+    font-size: 16px;  /* Or whatever size you prefer */
+    font-weight: bold; 
 }
 
 .date-navigation button {
@@ -129,3 +131,51 @@
     gap: 5px; /* Adjusts the space between the view buttons */
 }
 
+
+/*WEEK VIEW */
+
+.week-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.weekdays {
+  display: flex;
+  flex-direction: row; /* this ensures columns */
+  justify-content: space-between;
+  width: 100%;
+}
+
+.weekday-box {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+.week-view-header {
+  margin-bottom: 10px;
+}
+
+.weekday-box {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.weekday-title {
+  margin-bottom: 5px;
+  font-size: 16px;  /* Or whatever size you prefer */
+  font-weight: bold;  /* Optionally, to make it stand out more */
+}
+
+
+.weekday-date {
+  margin-bottom: 5px;
+}

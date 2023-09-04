@@ -31,13 +31,20 @@ const GanttChart = () => {
     const fetchWorkers = async () => {
       console.log('Making request with view:', view);
       console.log('Making request with currentDate:', currentDay.toISOString().split('T')[0]);
+      const dayString = currentDay.toISOString().split('T')[0];
+
+      // Use the existing "currentDay" as per your request
+      const startDate = getStartOfWeek(currentDay).toISOString().split('T')[0];
+      const endDate = getEndOfWeek(currentDay).toISOString().split('T')[0];
 
       try {
         const response = await axios.get('http://localhost:5000/api/schichtplanung', {
           headers: { Authorization: `Bearer ${token}` },
           params: { 
             view: view,
-            ...(view === 'day' && { specific_day: currentDay.toISOString().split('T')[0] })
+            ...(view === 'day' && { specific_day: currentDay.toISOString().split('T')[0] }),
+            ...(view === 'week' && { start_date: startDate, end_date: endDate })
+
           }
         });
         const responseData = response.data;
@@ -93,10 +100,6 @@ const GanttChart = () => {
     return hour.toString().padStart(2, '0') + ":00";
   };
 
-  const getDaysInMonth = (year, month) => {
-    return new Date(year, month + 1, 0).getDate();
-  };
-  
   
   const getWorkingHoursDuration = () => {
     const today = new Date();
@@ -133,17 +136,6 @@ const GanttChart = () => {
             left = (shiftStartHour - startHour) / maxDuration * 100;
             width = (shiftEndHour - shiftStartHour) / maxDuration * 100;
             break;
-        case 'week':
-            maxDuration = 7 * 24; // 7 days * 24 hours
-            left = ((today.getDay() * 24) + shiftStartHour) / maxDuration * 100;
-            width = (shiftEndHour - shiftStartHour) / maxDuration * 100;
-            break;
-        case 'month':
-          const daysInCurrentMonth = getDaysInMonth(today.getFullYear(), today.getMonth());
-          maxDuration = daysInCurrentMonth * 24;
-          left = ((today.getDate() - 1) * 24 + shiftStartHour) / maxDuration * 100;
-          width = (shiftEndHour - shiftStartHour) / maxDuration * 100;
-          break;
         default:
             return { left: 0, width: 0 }; 
     }
@@ -160,14 +152,6 @@ const GanttChart = () => {
       case 'day':
         maxDuration = getWorkingHoursDuration(today);
         break;
-      case 'week':
-        maxDuration = 7 * getWorkingHoursDuration(today); // You can adjust this to sum up different hours of different days if necessary
-        break;
-      case 'month':
-        maxDuration = 30 * getWorkingHoursDuration(today); // Again, can adjust for varying days
-        break;
-      default:
-        maxDuration = 24; // default to 24 hours
     }
   
     const validShifts = [];
@@ -213,24 +197,7 @@ const GanttChart = () => {
 
 
     if (!hours || view !== 'day') {
-      switch (view) {
-        case 'week':
-          return Array.from({ length: 7 }).map((_, index) => {
-            const date = new Date(today);
-            date.setDate(today.getDate() - today.getDay() + index);
-            return formatDate(date);
-          });
-        case 'month':
-          const currentMonth = new Date();
-          const daysInMonth = getDaysInMonth(currentMonth.getFullYear(), currentMonth.getMonth());
-          return Array.from({ length: daysInMonth }).map((_, index) => {
-            const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), index + 1);
-            return formatDate(date, true);
-          });
-          
-        default:
-          return [];
-      }
+          return [];     
     }
 
     const startHour = parseInt(hours.start.split(":")[0], 10);
@@ -262,6 +229,102 @@ const GanttChart = () => {
   };
   
 
+
+//Week VIEW
+  const getStartOfWeek = (currentDay) => {
+    const date = new Date(currentDay);  // Copy to avoid mutating the original date
+    date.setDate(currentDay.getDate() - currentDay.getDay() + 1);  // Assuming week starts on Monday
+    return date;
+  };
+
+  const getEndOfWeek = (currentDay) => {
+    const date = new Date(currentDay);  // Copy to avoid mutating the original date
+    date.setDate(currentDay.getDate() + (7 - currentDay.getDay()));  // Assuming week ends on Sunday
+    return date;
+  };
+
+  const getWeekNumber = (currentDay) => {
+    const date = new Date(currentDay);  // Copy to ensure we don't mutate the original date
+    const startOfYear = new Date(date.getFullYear(), 0, 1);
+    const millisecondsInWeek = 604800000; // Number of milliseconds in one week
+    const dstOffsetStart = startOfYear.getTimezoneOffset();
+    const dstOffsetDate = date.getTimezoneOffset();
+    const offset = dstOffsetDate - dstOffsetStart;
+    const sinceStartOfYear = date - startOfYear - offset * 60 * 1000;
+    const weekNumber = Math.floor(sinceStartOfYear / millisecondsInWeek);
+    return weekNumber;
+  };
+
+  const daysOfWeek = (startDate, endDate) => {
+    const dates = [];
+    let currentDate = new Date(startDate);  // Copy to ensure we don't mutate the original date
+    while (currentDate <= endDate) {
+      dates.push(new Date(currentDate));
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    return dates;
+  };
+
+  const getShiftsForDay = (day) => {
+    //this part only to debug
+    const formattedDate = day.toISOString().split('T')[0];
+    const shiftsForDay = shifts.filter(shift => shift.date === formattedDate);
+    
+    // Log the shifts for the given day
+    console.log("Shifts for day " + formattedDate + ":", shiftsForDay);
+    //until here---------
+    if (!(day instanceof Date)) {
+      console.error('day is not a Date instance:', day);
+      return [];
+    }
+
+    const dateString = day.toISOString().split('T')[0];
+    return shifts.filter(worker => 
+        worker.shifts.some(shift => 
+          (shift.start_time && shift.start_time.includes(dateString)) || 
+          (shift.end_time && shift.end_time.includes(dateString))
+        )
+    );
+};
+
+  
+const renderWeekShifts = (day) => {
+  const shiftsForDay = getShiftsForDay(day);
+  //this part only to debug
+  const dayShifts = getShiftsForDay(day);
+  console.log("Rendering shifts for:", day, dayShifts);
+  // until here----
+  
+  return (
+    <div key={day.toISOString()}>
+      {shiftsForDay.map(worker => (
+        <div key={`${worker.first_name}-${worker.last_name}`}>
+          <div>{`${worker.first_name} ${worker.last_name}`}</div>
+          {worker.shifts.map((shift, index) => (
+            <div key={index}>
+              Start: {shift.start_time.split('T')[1]} - Ende: {shift.end_time.split('T')[1]}
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+  
+  
+  
+  const startOfWeek = getStartOfWeek(currentDay);
+  const endOfWeek = getEndOfWeek(currentDay);
+
+  console.log('Start of Week:', startOfWeek);
+  console.log('End of Week:', endOfWeek);
+
+  const days = daysOfWeek(startOfWeek, endOfWeek);
+  console.log('Days of Week:', days);
+
+
+
   return (
     <Box m="20px">
       <Header
@@ -270,49 +333,62 @@ const GanttChart = () => {
       />
       <h2>Übersicht über die eingeplanten Schichten</h2>
       <div className="gantt-container">
-      <div >
+        <div>
+          <div className="gantt-controls">
+            <div className="view-controls">
+              <button onClick={() => setView('day')}>Tag</button>
+              <button onClick={() => setView('week')}>Woche</button>
+            </div>
+          </div>
           {view === 'day' && (
             <div className="date-navigation">
-                <IconButton 
-                onClick={goToPrevDay} 
-                style={BUTTON_STYLE}>
+              <IconButton onClick={goToPrevDay} style={BUTTON_STYLE}>
                 <ChevronLeft />
               </IconButton>
-                
-                <span className="date-display">{formatDateDisplay(currentDay)}</span>
-                
-                <IconButton 
-                onClick={goToNextDay} 
-                style={BUTTON_STYLE}>
+              <span className="date-display">{formatDateDisplay(currentDay)}</span>
+              <IconButton onClick={goToNextDay} style={BUTTON_STYLE}>
                 <ChevronRight />
               </IconButton>
             </div>
           )}
-        
         </div>
-        <div className="gantt-controls">
-          <div className="view-controls">
-              <button onClick={() => setView('day')}>Tag</button>
-              <button onClick={() => setView('week')}>Woche</button>
-              <button onClick={() => setView('month')}>Monat</button>
-          </div>
-        </div>
-
-
-        <div className="gantt-timeline">
-          {getTimelineLabels().map((label, index) => (
-            <span key={index}>{label}</span>
-          ))}
-        </div>
-        {shifts.map((workerShift, index) => (
-          <div key={index} className="gantt-row">
-            <div className="gantt-worker">{`${workerShift.first_name} ${workerShift.last_name}`}</div>
-            {renderShifts(workerShift)}
-          </div>
-        ))}
+        {view === 'day' && ( // This line ensures timeline is only shown for 'day' view
+          <>
+            <div className="gantt-timeline">
+              {getTimelineLabels().map((label, index) => (
+                <span key={index}>{label}</span>
+              ))}
+            </div>
+            {shifts.map((workerShift, index) => (
+              <div key={index} className="gantt-row">
+                <div className="gantt-worker">{`${workerShift.first_name} ${workerShift.last_name}`}</div>
+                {renderShifts(workerShift)}
+              </div>
+            ))}
+          </>
+        )}
       </div>
+      {view === 'week' && (
+        <div className="week-view">
+          <h3 className="week-view-header">Woche {getWeekNumber(currentDay)}</h3>
+          <div className="weekdays">
+            {daysOfWeek(getStartOfWeek(currentDay), getEndOfWeek(currentDay)).map((day, index) => {
+              const shiftsForDay = getShiftsForDay(day);
+              return (
+                <div className="weekday-box" key={index}>
+                  <div className="weekday-title">{day.toLocaleDateString('en-US', { weekday: 'long' })}</div>
+                  <div className="weekday-date">{day.toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}</div>
+                  
+                  {/* Displaying the shifts for the day here */}
+                  {renderWeekShifts(day)}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
     </Box>
   );
-};
-
+}  
 export default GanttChart;

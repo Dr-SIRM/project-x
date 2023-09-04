@@ -1035,7 +1035,7 @@ def get_required_workforce():
 
 
 
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import calendar
 from functools import wraps
 
@@ -1058,12 +1058,18 @@ def get_shift():
         start_date, end_date = specific_day, specific_day
 
     elif view == 'week':
-        start_date = today - timedelta(days=today.weekday())  # start of the week (Monday)
-        end_date = start_date + timedelta(days=6)  # end of the week (Sunday)
-    elif view == 'month':
-        start_date = today.replace(day=1)  # first day of the month
-        last_day = calendar.monthrange(today.year, today.month)[1]  # get the last day of the month
-        end_date = today.replace(day=last_day)
+        # Retrieve the start_date and end_date from query parameters
+        start_date_str = request.args.get('start_date')
+        end_date_str = request.args.get('end_date')
+
+        # Convert the date strings to date objects
+        if start_date_str and end_date_str:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+        else:
+            # If no dates are provided, default to the current week
+            start_date = today - timedelta(days=today.weekday())
+            end_date = start_date + timedelta(days=6)
     else:
         start_date, end_date = None, None  # default to getting all shifts
 
