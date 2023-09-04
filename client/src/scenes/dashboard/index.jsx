@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
 import { mockTransactions } from "../../data/mockData";
@@ -12,15 +13,37 @@ import GeographyChart from "../../components/GeographyChart";
 import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
 import ProgressCircle from "../../components/ProgressCircle";
-import React, { useContext } from 'react';
 import { AuthContext } from "../../AuthContext";
+import axios from 'axios';
+
 
 
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [mitarbeiterCount, setMitarbeiterCount] = useState();
+  const [StartTimeCount, setStartTimeCount] = useState();
+  const token = localStorage.getItem('session_token'); 
   
+  useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/api/dashboard',
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+            
+            setMitarbeiterCount(response.data.worker_count);
+            setStartTimeCount(response.data.start_time_count);  
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    }
 
+    fetchData();
+}, []);
 
   return (
     <Box m="20px">
@@ -98,9 +121,9 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title="69"
+            title={mitarbeiterCount ? mitarbeiterCount.toString() : 'Loading...'}
             subtitle="Mitarbeiter"
-            progress="0.30"
+            progress="0.50"
             increase="+5%"
             icon={
               <PersonAddIcon
@@ -117,8 +140,8 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title="1,325,134"
-            subtitle="Traffic Received"
+            title={StartTimeCount}
+            subtitle="Eingeplante Schichten"
             progress="0.80"
             increase="+43%"
             icon={

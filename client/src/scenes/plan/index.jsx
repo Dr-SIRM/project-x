@@ -294,7 +294,7 @@ const renderWeekShifts = (day) => {
   const dayShifts = getShiftsForDay(day);
   console.log("Rendering shifts for:", day, dayShifts);
   // until here----
-  
+
   return (
     <div key={day.toISOString()}>
       {shiftsForDay.map(worker => (

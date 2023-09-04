@@ -1130,4 +1130,23 @@ def get_shift():
         'shifts': shift_data
     }
 
-    return jsonify(response)
+
+
+@app.route('/api/dashboard', methods=['POST', 'GET'])
+@jwt_required()
+def get_worker_count():
+    current_user_id = get_jwt_identity()
+    
+    current_user = User.query.filter_by(email=current_user_id).first()
+    if not current_user:
+        return jsonify({'error': 'User not found'}), 404
+
+    worker_count = User.query.filter_by(company_id=current_user.company_id).count()
+    
+    start_time_count = Timetable.query.filter(
+        (Timetable.company_name == current_user.company_name) & 
+        (Timetable.start_time != None)  # assuming start_time can be NULL, change this condition accordingly if it can't be
+    ).count()
+
+    return jsonify({'worker_count': worker_count, 'start_time_count': start_time_count})
+
