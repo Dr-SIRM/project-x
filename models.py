@@ -194,8 +194,8 @@ class Timetable(db.Model, UserMixin):
 
 class TemplateTimeRequirement(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
+    company_name = db.Column(db.String(200), index=True, unique=False)
     template_name = db.Column(db.String(200), index=True, unique=False)
-    date = db.Column(db.Date, index=True)
     weekday = db.Column(db.String(200), index=True, unique=False)
     start_time = db.Column(db.Time)
     worker = db.Column(db.Integer)
@@ -204,10 +204,10 @@ class TemplateTimeRequirement(db.Model, UserMixin):
     creation_timestamp = db.Column(db.DateTime)
     update_timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
 
-    def __init__(self, id, template_name, date, weekday, start_time, worker, created_by, changed_by, creation_timestamp):
+    def __init__(self, id, company_name, template_name, weekday, start_time, worker, created_by, changed_by, creation_timestamp):
         self.id = id
+        self.company_name = company_name
         self.template_name = template_name
-        self.date = date
         self.weekday = weekday
         self.start_time = start_time
         self.worker = worker
