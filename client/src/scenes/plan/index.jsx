@@ -36,7 +36,7 @@ const GanttChart = () => {
       // Use the existing "currentDay" as per your request
       const startDate = getStartOfWeek(currentDay).toISOString().split('T')[0];
       const endDate = getEndOfWeek(currentDay).toISOString().split('T')[0];
-
+      
       try {
         const response = await axios.get('http://localhost:5000/api/schichtplanung', {
           headers: { Authorization: `Bearer ${token}` },
@@ -70,7 +70,7 @@ const GanttChart = () => {
   
           setShifts([...workerMap.values()]);
         }
-  
+        
         if (responseData && responseData.opening_hours) {
           setOpeningHours(responseData.opening_hours);
         } else {
@@ -266,53 +266,129 @@ const GanttChart = () => {
   };
 
   const getShiftsForDay = (day) => {
-    //this part only to debug
-    const formattedDate = day.toISOString().split('T')[0];
-    const shiftsForDay = shifts.filter(shift => shift.date === formattedDate);
-    
-    // Log the shifts for the given day
-    console.log("Shifts for day " + formattedDate + ":", shiftsForDay);
-    //until here---------
-    if (!(day instanceof Date)) {
-      console.error('day is not a Date instance:', day);
+
+    if (typeof day.toISOString() !== 'string') {
+      console.error('The ISO string is not of type string:', day.toISOString());
       return [];
     }
+    
 
-    const dateString = day.toISOString().split('T')[0];
-    return shifts.filter(worker => 
-        worker.shifts.some(shift => 
-          (shift.start_time && shift.start_time.includes(dateString)) || 
-          (shift.end_time && shift.end_time.includes(dateString))
-        )
-    );
+    const isoString = day.toISOString();
+    console.log("ISO String:", isoString);
+    const formattedDate = isoString.split('T')[0];
+
+
+    console.log("Checking date:", formattedDate);
+    console.log("All shifts:", shifts);
+
+    console.log("Sample worker data:", shifts[0].shifts);
+
+    shifts.forEach(worker => {
+        worker.shifts.forEach(shiftDetail => {
+            if (shiftDetail.date === formattedDate) {
+                console.log("Found worker with matching date:", worker);
+                
+                shiftDetail.shifts.forEach(shift => {
+                    if (shift.start_time || shift.end_time) {
+                        console.log("Shift for matched worker:", shift);
+                    }
+                });
+            }
+        });
+    });
+    
+    // Filter shifts for the given day
+    const workersWithShiftsForDay = shifts.filter(worker => 
+      worker.shifts.some(shift => shift.date === formattedDate)
+  );
+  
+
+
+
+    
+    // Log the workers and their shifts for the given day
+    console.log("Shifts for day " + formattedDate + ":");
+    console.log("Number of workers found:", workersWithShiftsForDay.length);
+
+        workersWithShiftsForDay.forEach(worker => {
+          console.log("Checking worker:", worker.first_name);
+          
+          if (worker.date === formattedDate) {
+              console.log("Found matching date for worker", worker.first_name, ":", worker.date);
+      
+              worker.shifts.forEach(shift => {
+                  if (shift.start_time) { // I've removed the condition to check formattedDate in start_time or end_time since it wasn't in the provided data structure. Adjust if necessary.
+                      console.log("Start_time for worker", worker.first_name, ":", shift.start_time);
+                  }
+                  if (shift.end_time) {
+                      console.log("End_time for worker", worker.first_name, ":", shift.end_time);
+                  }
+              });
+          } else {
+              console.log("Date not matching for worker", worker.first_name, ":", worker.date);
+          }
+      });
+
+    
+    
+
+    return workersWithShiftsForDay;
 };
+
+
 
   
 const renderWeekShifts = (day) => {
+  const formattedDate = day.toISOString().split('T')[0];
   const shiftsForDay = getShiftsForDay(day);
-  //this part only to debug
-  const dayShifts = getShiftsForDay(day);
-  console.log("Rendering shifts for:", day, dayShifts);
-  // until here----
+  
+  // Debug logs
+  console.log("Rendering shifts for:", day, shiftsForDay);
 
   return (
     <div key={day.toISOString()}>
       {shiftsForDay.map(worker => (
         <div key={`${worker.first_name}-${worker.last_name}`}>
           <div>{`${worker.first_name} ${worker.last_name}`}</div>
-          {worker.shifts.map((shift, index) => (
-            <div key={index}>
-              Start: {shift.start_time.split('T')[1]} - Ende: {shift.end_time.split('T')[1]}
-            </div>
-          ))}
+          {worker.shifts.map(shiftDetail => {
+            if (shiftDetail.date !== formattedDate) {
+              return null; // Skip rendering shifts for other days
+            }
+
+            return shiftDetail.shifts.map((shift, index) => {
+              // Debug log to check each shift
+              console.log("Checking shift:", shift);
+
+              // Directly assigning the start and end times
+              const startTime = shift.start_time && typeof shift.start_time === 'string' 
+                ? shift.start_time 
+                : 'N/A';
+              const endTime = shift.end_time && typeof shift.end_time === 'string' 
+                ? shift.end_time 
+                : 'N/A';
+
+              // If both times are 'N/A', don't render this shift
+              if (startTime === 'N/A' && endTime === 'N/A') {
+                return null;
+              }
+
+              return (
+                <div key={index}>
+                  Start: {startTime} - Ende: {endTime}
+                </div>
+              );
+            });
+          })}
         </div>
       ))}
     </div>
   );
 };
 
-  
-  
+
+
+
+
   
   const startOfWeek = getStartOfWeek(currentDay);
   const endOfWeek = getEndOfWeek(currentDay);

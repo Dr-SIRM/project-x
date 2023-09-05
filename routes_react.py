@@ -132,7 +132,7 @@ def get_data():
 
     return jsonify(user_list) 
 
-@app.route('/api/users/update', methods=['POST'])
+@app.route('/api/users/update/<int:user_id>', methods=['PUT'])
 @jwt_required()
 def update_user(user_id):
     data = request.get_json()
@@ -1096,6 +1096,7 @@ def get_shift():
     else:
         shift_records = Timetable.query.filter_by(company_name=current_company_name).all()
 
+
     shift_data = []
     for record in shift_records:
         if record.date is not None:
@@ -1130,6 +1131,7 @@ def get_shift():
         'shifts': shift_data
     }
 
+    return jsonify(response)
 
 
 @app.route('/api/dashboard', methods=['POST', 'GET'])
