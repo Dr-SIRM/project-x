@@ -132,7 +132,7 @@ def get_data():
 
     return jsonify(user_list) 
 
-@app.route('/api/users/update', methods=['POST'])
+@app.route('/api/users/update/<int:user_id>', methods=['PUT'])
 @jwt_required()
 def update_user(user_id):
     data = request.get_json()
@@ -1027,7 +1027,7 @@ def get_required_workforce():
 
 
 
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import calendar
 from functools import wraps
 
@@ -1050,12 +1050,18 @@ def get_shift():
         start_date, end_date = specific_day, specific_day
 
     elif view == 'week':
-        start_date = today - timedelta(days=today.weekday())  # start of the week (Monday)
-        end_date = start_date + timedelta(days=6)  # end of the week (Sunday)
-    elif view == 'month':
-        start_date = today.replace(day=1)  # first day of the month
-        last_day = calendar.monthrange(today.year, today.month)[1]  # get the last day of the month
-        end_date = today.replace(day=last_day)
+        # Retrieve the start_date and end_date from query parameters
+        start_date_str = request.args.get('start_date')
+        end_date_str = request.args.get('end_date')
+
+        # Convert the date strings to date objects
+        if start_date_str and end_date_str:
+            start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+            end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+        else:
+            # If no dates are provided, default to the current week
+            start_date = today - timedelta(days=today.weekday())
+            end_date = start_date + timedelta(days=6)
     else:
         start_date, end_date = None, None  # default to getting all shifts
 
@@ -1089,6 +1095,7 @@ def get_shift():
         ).all()
     else:
         shift_records = Timetable.query.filter_by(company_name=current_company_name).all()
+
 
     shift_data = []
     for record in shift_records:
@@ -1125,3 +1132,23 @@ def get_shift():
     }
 
     return jsonify(response)
+
+
+@app.route('/api/dashboard', methods=['POST', 'GET'])
+@jwt_required()
+def get_worker_count():
+    current_user_id = get_jwt_identity()
+    
+    current_user = User.query.filter_by(email=current_user_id).first()
+    if not current_user:
+        return jsonify({'error': 'User not found'}), 404
+
+    worker_count = User.query.filter_by(company_id=current_user.company_id).count()
+    
+    start_time_count = Timetable.query.filter(
+        (Timetable.company_name == current_user.company_name) & 
+        (Timetable.start_time != None)  # assuming start_time can be NULL, change this condition accordingly if it can't be
+    ).count()
+
+    return jsonify({'worker_count': worker_count, 'start_time_count': start_time_count})
+
