@@ -50,7 +50,7 @@ const Team = () => {
     const newValue = props.value;
 
     try {
-        await axios.put(`http://localhost:5000/api/users/${id}`, {
+        await axios.put(`http://localhost:5000/api/users/update/${id}`, {
             [field]: newValue
         }, {
             headers: {
