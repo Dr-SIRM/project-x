@@ -274,14 +274,7 @@ const GanttChart = () => {
     
 
     const isoString = day.toISOString();
-    console.log("ISO String:", isoString);
     const formattedDate = isoString.split('T')[0];
-
-
-    console.log("Checking date:", formattedDate);
-    console.log("All shifts:", shifts);
-
-    console.log("Sample worker data:", shifts[0].shifts);
 
     shifts.forEach(worker => {
         worker.shifts.forEach(shiftDetail => {
@@ -301,27 +294,13 @@ const GanttChart = () => {
     const workersWithShiftsForDay = shifts.filter(worker => 
       worker.shifts.some(shift => shift.date === formattedDate)
   );
-  
-
-
-
-    
-    // Log the workers and their shifts for the given day
-    console.log("Shifts for day " + formattedDate + ":");
-    console.log("Number of workers found:", workersWithShiftsForDay.length);
-
         workersWithShiftsForDay.forEach(worker => {
-          console.log("Checking worker:", worker.first_name);
           
-          if (worker.date === formattedDate) {
-              console.log("Found matching date for worker", worker.first_name, ":", worker.date);
-      
+          if (worker.date === formattedDate) {    
               worker.shifts.forEach(shift => {
                   if (shift.start_time) { // I've removed the condition to check formattedDate in start_time or end_time since it wasn't in the provided data structure. Adjust if necessary.
-                      console.log("Start_time for worker", worker.first_name, ":", shift.start_time);
                   }
                   if (shift.end_time) {
-                      console.log("End_time for worker", worker.first_name, ":", shift.end_time);
                   }
               });
           } else {
@@ -342,22 +321,17 @@ const renderWeekShifts = (day) => {
   const formattedDate = day.toISOString().split('T')[0];
   const shiftsForDay = getShiftsForDay(day);
   
-  // Debug logs
-  console.log("Rendering shifts for:", day, shiftsForDay);
-
   return (
     <div key={day.toISOString()}>
       {shiftsForDay.map(worker => (
         <div key={`${worker.first_name}-${worker.last_name}`}>
-          <div>{`${worker.first_name} ${worker.last_name}`}</div>
+          <div className="worker-name">{`${worker.first_name} ${worker.last_name}`}</div>
           {worker.shifts.map(shiftDetail => {
             if (shiftDetail.date !== formattedDate) {
               return null; // Skip rendering shifts for other days
             }
 
             return shiftDetail.shifts.map((shift, index) => {
-              // Debug log to check each shift
-              console.log("Checking shift:", shift);
 
               // Directly assigning the start and end times
               const startTime = shift.start_time && typeof shift.start_time === 'string' 
@@ -384,10 +358,6 @@ const renderWeekShifts = (day) => {
     </div>
   );
 };
-
-
-
-
 
   
   const startOfWeek = getStartOfWeek(currentDay);
@@ -448,13 +418,12 @@ const renderWeekShifts = (day) => {
         <div className="week-view">
           <h3 className="week-view-header">Woche {getWeekNumber(currentDay)}</h3>
           <div className="weekdays">
-            {daysOfWeek(getStartOfWeek(currentDay), getEndOfWeek(currentDay)).map((day, index) => {
-              const shiftsForDay = getShiftsForDay(day);
+            {daysOfWeek(getStartOfWeek(currentDay), getEndOfWeek(currentDay)).map((day, index) => {    
               return (
                 <div className="weekday-box" key={index}>
                   <div className="weekday-title">{day.toLocaleDateString('en-US', { weekday: 'long' })}</div>
                   <div className="weekday-date">{day.toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}</div>
-                  
+                  <div className="weekday-separator"></div>
                   {/* Displaying the shifts for the day here */}
                   {renderWeekShifts(day)}
                 </div>
@@ -463,6 +432,7 @@ const renderWeekShifts = (day) => {
           </div>
         </div>
       )}
+
 
     </Box>
   );
