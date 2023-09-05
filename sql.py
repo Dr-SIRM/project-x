@@ -12,7 +12,7 @@ mydb = mysql.connector.connect(
 mycursor = mydb.cursor()
 
 
-delete_table = 'DROP TABLE solver_analysis'
+delete_table = 'DROP TABLE template_time_requirement'
 #delete_db = 'DROP DATABASE projectx'
 #delete_table_entries = 'TRUNCATE TABLE opening_hours'
 #create_db = 'CREATE DATABASE IF NOT EXISTS projectx'

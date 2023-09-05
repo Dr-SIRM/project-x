@@ -163,7 +163,7 @@ const TimeReq = ({ timereq }) => {
     };
 
     fetchTimeReqData();
-  }, [weekAdjustment]);
+  }, [weekAdjustment, token]);
 
   const goToNextWeek = () => {
     setWeekAdjustment(weekAdjustment + 7);
@@ -193,7 +193,7 @@ const TimeReq = ({ timereq }) => {
     setSlotEmployeeCounts(updatedCounts);
   };
 
-  const handleFormSubmit = async (values) => {
+  const handleFormSubmit = async (buttonName) => {
     try {
       const payload = {};
       Object.entries(slotEmployeeCounts).forEach(([key, count]) => {
@@ -203,8 +203,9 @@ const TimeReq = ({ timereq }) => {
         const newKey = `worker_${dayNum}_${currentTime}`;
         payload[newKey] = count.toString();
       });
-
+      payload["button"] = buttonName;
       // Send the updated form values to the server for database update
+      console.log("Final payload before sending to server:", payload);
       await axios.post('http://localhost:5000/api/requirement/workforce?week_adjustment=' + weekAdjustment, payload, {
     headers: {
         'Authorization': `Bearer ${token}`,
@@ -335,7 +336,7 @@ const TimeReq = ({ timereq }) => {
               variant="outlined"
               color="inherit"
               size="small"
-              onClick={handleFormSubmit}
+              onClick={() => handleFormSubmit("Save Template")}
               sx={{
                 borderColor: 'white',
                 height: '20px',
@@ -361,7 +362,7 @@ const TimeReq = ({ timereq }) => {
                 size="small"
                 name="template_name"
                 value=""
-                inputProps={{ maxLength: 15 }}
+                inputProps={{ maxLength: 30 }}
                 sx={{
                   height: '20px', // explicitly set height
                   '.MuiInputBase-root': {
@@ -507,7 +508,7 @@ const TimeReq = ({ timereq }) => {
           <Button 
             variant="outlined"
             color="inherit"
-            onClick={handleFormSubmit}
+            onClick={() => handleFormSubmit("Submit")}
             sx={{
               borderColor: 'white',
               '&.MuiButtonOutlined': {
