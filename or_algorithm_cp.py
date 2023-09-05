@@ -486,7 +486,7 @@ class ORAlgorithm_cp:
         self.solver = cp_model.CpSolver()
         
         # Optionale Parameter für den Solver (wie z.B. Zeitlimit)
-        self.solver.parameters.max_time_in_seconds = 120
+        # self.solver.parameters.max_time_in_seconds = 120
 
 
 
@@ -917,7 +917,7 @@ class ORAlgorithm_cp:
         """
         Problem lösen und Kosten ausgeben
         """
-        self.model.ExportToFile('slow_model.pb.txt')
+        # self.model.ExportToFile('slow_model.pb.txt')
         self.solver.parameters.log_search_progress = True
         self.status = self.solver.Solve(self.model)
 
