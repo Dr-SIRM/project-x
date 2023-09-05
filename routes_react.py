@@ -1060,10 +1060,6 @@ def get_required_workforce():
 
 
 
-from datetime import date, timedelta, datetime
-import calendar
-from functools import wraps
-
 @app.route('/api/schichtplanung', methods=['POST', 'GET'])
 @jwt_required()
 def get_shift():
