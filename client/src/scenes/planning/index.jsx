@@ -42,6 +42,7 @@ const TimeReq = ({ timereq }) => {
   const [selectedButtons, setSelectedButtons] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
   const [slotEmployeeCounts, setSlotEmployeeCounts] = useState(null);
+  const [selectedTemplate, setSelectedTemplate] = useState('');
 
   const convertTimeToMinutes = (timeStr) => {
     if (!timeStr) return 0;
@@ -185,7 +186,7 @@ const TimeReq = ({ timereq }) => {
 
         if (isTimeWithinRange(currentTimeMinutes, openingTimeMinutes, startBreakTimeMinutes, endBreakTimeMinutes, closingTimeMinutes)) {
           const key = `${columnIndex}-${btnIndex}`;
-          updatedCounts[key] = 1;
+          updatedCounts[key] = timereqData.template1_dict[key];
         }
       });
     });
@@ -204,6 +205,7 @@ const TimeReq = ({ timereq }) => {
         payload[newKey] = count.toString();
       });
       payload["button"] = buttonName;
+      payload["template_name"] = selectedTemplate;
       // Send the updated form values to the server for database update
       console.log("Final payload before sending to server:", payload);
       await axios.post('http://localhost:5000/api/requirement/workforce?week_adjustment=' + weekAdjustment, payload, {
@@ -361,7 +363,8 @@ const TimeReq = ({ timereq }) => {
                 type="text"
                 size="small"
                 name="template_name"
-                value=""
+                value={selectedTemplate}
+                onChange={(e) => setSelectedTemplate(e.target.value)}
                 inputProps={{ maxLength: 30 }}
                 sx={{
                   height: '20px', // explicitly set height
