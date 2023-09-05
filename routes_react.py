@@ -914,7 +914,6 @@ def get_required_workforce():
     hour_divider = solverreq.hour_devider
     daily_slots = 24 * hour_divider
     minutes = 60 / hour_divider
-    
     day_num = 7
     
     company_id = user.company_id
@@ -963,53 +962,87 @@ def get_required_workforce():
             opening_dict[str(new_i) + '&3'] = opening.end_time2.strftime("%H:%M") if opening.end_time2 else None
    
     #Submit the required FTE per hour
-    if request.method =='POST':
-        workforce_data = request.get_json()
-        week_adjustment = int(request.args.get('week_adjustment', 0))
-        buttons.pop('action', None)
-        for i in range(day_num):
-            new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
-            TimeReq.query.filter_by(company_name=user.company_name, date=new_date).delete()
-            db.session.commit()
-            for quarter in range(daily_slots): # There are 96 quarters in a day
-                quarter_hour = quarter / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
-                quarter_minute = (quarter % hour_divider) * minutes  # Remainder gives the quarter in the hour
-                formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
-                capacity = workforce_data.get(f'worker_{i}_{formatted_time}')
-                if capacity:
-                    new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
-                    time = f'{formatted_time}:00'
-                    new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+    if request.method == 'POST':
+        button = request.json.get("button", None)
+        if button == "Submit":
+            workforce_data = request.get_json()
+            week_adjustment = int(request.args.get('week_adjustment', 0))
+            for i in range(day_num):
+                new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+                TimeReq.query.filter_by(company_name=user.company_name, date=new_date).delete()
+                db.session.commit()
+                for quarter in range(daily_slots): # There are 96 quarters in a day
+                    quarter_hour = quarter / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
+                    quarter_minute = (quarter % hour_divider) * minutes  # Remainder gives the quarter in the hour
+                    formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+                    capacity = workforce_data.get(f'worker_{i}_{formatted_time}')
+                    if capacity:
+                        new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+                        time = f'{formatted_time}:00'
+                        new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
 
-                    req = TimeReq(id=None, 
-                                  company_name=user.company_name, 
-                                  date=new_date, 
-                                  start_time=new_time, 
-                                  worker=capacity, 
-                                  created_by=company_id,
-                                  changed_by=company_id, 
-                                  creation_timestamp = creation_date
-                                  )
-                             
-                    db.session.add(req)
-                    db.session.commit()
-                else:
-                    new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
-                    time = f'{formatted_time}:00'
-                    new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+                        req = TimeReq(id=None, 
+                                    company_name=user.company_name, 
+                                    date=new_date, 
+                                    start_time=new_time, 
+                                    worker=capacity, 
+                                    created_by=company_id,
+                                    changed_by=company_id, 
+                                    creation_timestamp = creation_date
+                                    )
+                                
+                        db.session.add(req)
+                        db.session.commit()
+                    else:
+                        new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+                        time = f'{formatted_time}:00'
+                        new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
 
-                    req = TimeReq(id=None, 
-                                  company_name=user.company_name, 
-                                  date=new_date, 
-                                  start_time=new_time, 
-                                  worker=0, 
-                                  created_by=company_id,
-                                  changed_by=company_id, 
-                                  creation_timestamp = creation_date
-                                  )
-                             
-                    db.session.add(req)
+                        req = TimeReq(id=None, 
+                                    company_name=user.company_name, 
+                                    date=new_date, 
+                                    start_time=new_time, 
+                                    worker=0, 
+                                    created_by=company_id,
+                                    changed_by=company_id, 
+                                    creation_timestamp = creation_date
+                                    )
+                        print(req)
+                        db.session.add(req)
+                        db.session.commit()
+
+    #Save Templates
+    if request.method == 'POST':
+        button = request.json.get("button", None)
+        if button == "Save Template":
+            workforce_data = request.get_json()
+            for i in range(day_num):
+                delete_entry = TemplateTimeRequirement.query.filter_by(company_name=user.company_name, template_name=workforce_data['template_name'])
+                if delete_entry:
+                    delete_entry.delete()
                     db.session.commit()
+                for quarter in range(daily_slots): # There are 96 quarters in a day
+                    quarter_hour = quarter / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
+                    quarter_minute = (quarter % hour_divider) * minutes  # Remainder gives the quarter in the hour
+                    formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+                    capacity = workforce_data.get(f'worker_{i}_{formatted_time}')
+                    if capacity:
+                        time = f'{formatted_time}:00'
+                        new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+
+                        temp_req = TemplateTimeRequirement(
+                            id=None, 
+                            company_name = user.company_name,
+                            template_name = workforce_data['template_name'],
+                            weekday = {i},
+                            start_time = new_time,
+                            worker = capacity,
+                            created_by = user.company_id,
+                            changed_by = user.company_id,
+                            creation_timestamp = creation_date
+                            )
+                        db.session.add(temp_req)
+                        db.session.commit()
         
     calendar_dict={
         'weekdays': weekdays,
