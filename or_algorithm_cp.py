@@ -91,7 +91,7 @@ class ORAlgorithm_cp:
         self.nb10_violation = {}
 
         # Attribute der Methode "objective_function"
-        self.objective = None
+        self.cost_expressions = []
 
         # Attribute der Methode "solve_problem"
         self.status = None
@@ -126,8 +126,8 @@ class ORAlgorithm_cp:
     def run(self):
         self.create_variables()
         self.show_variables()
-        # self.pre_check_programmer()
-        # self.pre_check_admin()
+        self.pre_check_programmer()
+        self.pre_check_admin()
         self.solver_selection()
         self.define_penalty_costs()
         self.decision_variables()
@@ -137,8 +137,8 @@ class ORAlgorithm_cp:
         self.solve_problem()
         self.store_solved_data()
         self.output_result_excel()
-        # self.save_data_in_database()
-        # self.save_data_in_database_testing()
+        self.save_data_in_database()
+        self.save_data_in_database_testing()
 
 
     def create_variables(self):
@@ -485,7 +485,6 @@ class ORAlgorithm_cp:
         self.model = cp_model.CpModel()
         self.solver = cp_model.CpSolver()
         
-        # Optionale Parameter für den Solver (wie z.B. Zeitlimit)
         # self.solver.parameters.max_time_in_seconds = 120
 
 
@@ -647,59 +646,55 @@ class ORAlgorithm_cp:
         Zielfunktion
         """
 
-        # Liste von Kosten-Ausdrücken
-        cost_expressions = []
-
         # Kosten MA minimieren
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
-                    cost_expressions.append(self.x[i, j, k] * int(self.kosten[i] / self.hour_devider))
+                    self.cost_expressions.append(self.x[i, j, k] * int(self.kosten[i] / self.hour_devider))
 
-        
         # Kosten Weiche NB1
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
-                    cost_expressions.append(self.nb1_violation[j, k] * int(self.penalty_cost_nb1 / self.hour_devider))
+                    self.cost_expressions.append(self.nb1_violation[j, k] * int(self.penalty_cost_nb1 / self.hour_devider))
 
         
         # Kosten Weiche NB2
         for i in self.mitarbeiter:
             for week in range(1, self.week_timeframe + 1):
-                cost_expressions.append(self.nb2_violation[i][week] * self.penalty_cost_nb2)
+                self.cost_expressions.append(self.nb2_violation[i][week] * self.penalty_cost_nb2)
         
 
         # Kosten für Weiche NB3 Mindestarbeitszeit Verletzung
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
-                cost_expressions.append(self.nb3_min_violation[i, j] * self.penalty_cost_nb3_min)
+                self.cost_expressions.append(self.nb3_min_violation[i, j] * self.penalty_cost_nb3_min)
 
         # Kosten für Weiche NB4 Höchstarbeitszeit Verletzung
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
-                cost_expressions.append(self.nb4_max_violation[i, j] * self.penalty_cost_nb4_max)
+                self.cost_expressions.append(self.nb4_max_violation[i, j] * self.penalty_cost_nb4_max)
 
         # Kosten für Weiche NB5 Mindestarbeitszeit Verletzung
         for i in self.mitarbeiter:
             for week in range(1, self.week_timeframe + 1):
-                cost_expressions.append(self.nb5_min_violation[i][week-1] * self.penalty_cost_nb5_min)
+                self.cost_expressions.append(self.nb5_min_violation[i][week-1] * self.penalty_cost_nb5_min)
 
         # Kosten für Weiche NB6 Höchstarbeitszeit Verletzung
         for i in self.mitarbeiter:
             for week in range(1, self.week_timeframe + 1):
-                cost_expressions.append(self.nb6_max_violation[i][week-1] * self.penalty_cost_nb6_max)
+                self.cost_expressions.append(self.nb6_max_violation[i][week-1] * self.penalty_cost_nb6_max)
 
-        """
         # Kosten für Weiche NB7 "Innerhalb einer Woche immer gleiche Schichten"
         for i in self.mitarbeiter:
             for j in range(7):
-                cost_expressions.append(self.nb7_violation[i, j] * self.penalty_cost_nb7)
+                self.cost_expressions.append(self.nb7_violation[i, j] * self.penalty_cost_nb7)
 
+        """
         # Kosten für Weiche NB8 "Innerhalb der zweiten Woche immer gleiche Schichten"
         for i in self.mitarbeiter:
             for j in range(7, self.calc_time):
-                cost_expressions.append(self.nb8_violation[i, j] * self.penalty_cost_nb8)
+                self.cost_expressions.append(self.nb8_violation[i, j] * self.penalty_cost_nb8)
 
         """
 
@@ -707,17 +702,16 @@ class ORAlgorithm_cp:
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
-                    cost_expressions.append(self.nb9_violation[i, j, k] * int(self.penalty_cost_nb9 / self.hour_devider))
+                    self.cost_expressions.append(self.nb9_violation[i, j, k] * int(self.penalty_cost_nb9 / self.hour_devider))
 
-        """
         # Kosten für Weiche NB10 "Max. Anzahl an Arbeitstagen in Folge"
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
-                cost_expressions.append(self.nb10_violation[i, j] * self.penalty_cost_nb10)
-        """
+                self.cost_expressions.append(self.nb10_violation[i, j] * self.penalty_cost_nb10)
+        
                 
         # Addiere alle Kosten-Ausdrücke und setze das Ziel der Minimierung
-        total_cost = sum(cost_expressions)
+        total_cost = sum(self.cost_expressions)
         self.model.Minimize(total_cost)
 
 
@@ -877,12 +871,239 @@ class ORAlgorithm_cp:
                     self.model.Add(self.weekly_hours - total_hours_week <= -self.nb6_max_violation[ma][week - 1])
                     self.model.Add(self.nb6_max_violation[ma][week - 1] >= 0)
 
+        # -------------------------------------------------------------------------------------------------------
+        # WEICHE NB
+        # NB 8 - Innerhalb einer Woche immer gleiche Schichten
+        # ***** Weiche Nebenbedingung 7 *****
+        # -------------------------------------------------------------------------------------------------------
+        if self.company_shifts <= 1:
+            pass
+
+        elif self.company_shifts == 2:
+            for i in self.mitarbeiter:
+                for j in range(7):
+
+                    # Hier noch einbauen, das wenn die Stundenanzahl ungerade ist!!
+
+                    first_shift_hours = sum(self.x[i, j, k] for k in range(0, int(len(self.verfügbarkeit[i][j]) / 2))) 
+                    second_shift_hours = sum(self.x[i, j, k] for k in range(int(len(self.verfügbarkeit[i][j]) / 2), len(self.verfügbarkeit[i][j]))) 
+                    
+                    delta = self.model.NewBoolVar("delta")
+                    
+                    self.model.Add(first_shift_hours - second_shift_hours - 1000 * delta <= 0)         
+                    self.model.Add(second_shift_hours - first_shift_hours - 1000 * (1 - delta) <= 0)   
+                    
+                    self.model.Add(self.s2[i, j] == 1 - delta)
+
+            """
+            # Harte nb Option zum testen
+            for i in self.mitarbeiter:
+                for j in range(1, self.calc_time):
+                    self.model.Add(self.s2[i, j] - self.s2[i, j-1] == 0)
+            """ 
+
+            # Bedingungen, um sicherzustellen, dass innerhalb einer Woche immer die gleiche Schicht gearbeitet wird
+            for i in self.mitarbeiter:
+                for j in range(1, 7):
+                    diff = self.model.NewIntVar(-1, 1, "diff")
+                    
+                    self.model.Add(diff == self.s2[i, j] - self.s2[i, j-1])
+            
+                    # Bedingungen für den "absoluten Wert"
+                    self.model.Add(self.nb7_violation[i, j] >= diff)
+                    self.model.Add(self.nb7_violation[i, j] >= -diff)
+
+        elif self.company_shifts == 3:
+            for i in self.mitarbeiter:
+                for j in range(7):
+                    total_len = len(self.verfügbarkeit[i][j])
+                    third_shift_len = total_len // 3
+                    first_shift_len = third_shift_len + (total_len % 3) // 2
+                    second_shift_len = third_shift_len + (total_len % 3) - (total_len % 3) // 2
+
+                    first_shift_hours = sum(self.x[i, j, k] for k in range(0, first_shift_len))
+                    second_shift_hours = sum(self.x[i, j, k] for k in range(first_shift_len, first_shift_len + second_shift_len))
+                    third_shift_hours = sum(self.x[i, j, k] for k in range(first_shift_len + second_shift_len, total_len))
+
+                    delta1 = self.model.NewBoolVar(f"delta1_{i}_{j}")
+                    delta2 = self.model.NewBoolVar(f"delta2_{i}_{j}")
+                    delta3 = self.model.NewBoolVar(f"delta3_{i}_{j}")
+
+                    M = 1000
+
+                    self.model.Add(first_shift_hours >= second_shift_hours - M * (1 - delta1))
+                    self.model.Add(first_shift_hours >= third_shift_hours - M * (1 - delta1))
+
+                    self.model.Add(second_shift_hours >= first_shift_hours - M * (1 - delta2))
+                    self.model.Add(second_shift_hours >= third_shift_hours - M * (1 - delta2))
+
+                    self.model.Add(third_shift_hours >= first_shift_hours - M * (1 - delta3))
+                    self.model.Add(third_shift_hours >= second_shift_hours - M * (1 - delta3))
+
+                    self.model.Add(delta1 + delta2 + delta3 == 1)
+
+                    self.model.Add(self.s3[i, j] == 0 * delta1 + 1 * delta2 + 2 * delta3)
+
+            """
+            # Harte Bedingung, dass innerhalb einer Woche immer die gleiche Schicht gearbeitet wird
+            for i in self.mitarbeiter:
+                for j in range(1, self.calc_time):
+                    self.model.Add(self.s3[i, j] - self.s3[i, j-1] == 0)
+            """
+
+            # Bedingungen, um sicherzustellen, dass innerhalb einer Woche immer die gleiche Schicht gearbeitet wird
+            for i in self.mitarbeiter:
+                for j in range(1, 7):
+                    diff = self.model.NewIntVar(-2, 2, "diff") # Unterschied kann -2, -1, 0, 1 oder 2 sein
+                    self.model.Add(diff == self.s3[i, j] - self.s3[i, j-1])
+
+                    self.model.Add(self.nb7_violation[i, j] >= diff)
+                    self.model.Add(self.nb7_violation[i, j] >= -diff)
+                    self.model.Add(self.nb7_violation[i, j] <= 1) # Die Verletzung sollte maximal 1 betragen
+
+        # -------------------------------------------------------------------------------------------------------
+        # WEICHE NB
+        # NB 9 - Wechselnde Schichten innerhalb von 2 und 4 Wochen
+        # ***** Weiche Nebenbedingung 8 *****
+        # -------------------------------------------------------------------------------------------------------
+
+        # 2 Wochen + 2-Schicht # --------------------------------------------------------------------------------
+        if self.week_timeframe == 2:
+            if self.company_shifts == 2:
+                for i in self.mitarbeiter:
+                    # Anzahl der Tage in der ersten Woche, an denen in der ersten bzw. zweiten Schicht gearbeitet wurde
+                    first_week_first_shift_days = sum(self.s2[i, j] for j in range(7))
+                    first_week_second_shift_days = 7 - first_week_first_shift_days
+
+                    # Hilfsvariable, um die Schicht der ersten Woche festzulegen
+                    first_week_shift = self.model.NewBoolVar("first_week_shift")
+
+                    # Wenn die Anzahl der Tage in der ersten Schicht größer ist, setzen Sie first_week_shift auf 1
+                    self.model.Add(first_week_first_shift_days - first_week_second_shift_days - 1000 * first_week_shift <= 0)
+                    self.model.Add(first_week_second_shift_days - first_week_first_shift_days - 1000 * (1 - first_week_shift) <= 0)
+
+                    for j in range(7, 14):
+                        self.model.Add(self.c[i, j] == 1 - first_week_shift)
+
+                    # In der zweiten Woche muss der Mitarbeiter in der entgegengesetzten Schicht arbeiten
+                    for j in range(7, 14):
+                        # Summe der Stunden in der ersten Schicht in der zweiten Woche
+                        first_shift_hours_second_week = sum(self.x[i, j, k] for k in range(0, int(len(self.verfügbarkeit[i][j]) / 2)))
+                        second_shift_hours_second_week = sum(self.x[i, j, k] for k in range(int(len(self.verfügbarkeit[i][j]) / 2), len(self.verfügbarkeit[i][j])))
+
+                        # Kann 0 oder 1 annehmen
+                        delta_2 = self.model.NewBoolVar("delta_2")
+                        
+                        self.model.Add(first_shift_hours_second_week - second_shift_hours_second_week - 1000 * delta_2 <= 0)      
+                        self.model.Add(second_shift_hours_second_week - first_shift_hours_second_week - 1000 * (1 - delta_2) <= 0)  
+                        
+                        # Hilfsvariable mit s2[i, j] verknüpfen
+                        self.model.Add(self.s2[i, j] == 1 - delta_2)
+                        
+                        # Harte Nebenbedingung
+                        # self.model.Add(self.s2[i, j] == self.c[i, j])
+
+                # Verletzungsvariable erhöhen, wenn die Schicht in der zweiten Woche nicht der entgegengesetzten Schicht entspricht
+                for i in self.mitarbeiter:
+                    for j in range(7, 14):
+                        diff = self.model.NewIntVar(-1, 1, f"diff_{i}_{j}")
+                        self.model.Add(diff == self.s2[i, j] - self.c[i, j])
+
+                        self.model.Add(self.nb8_violation[i, j] >= diff)
+                        self.model.Add(self.nb8_violation[i, j] >= -diff)
+
+
+        # 2 Wochen + 3-Schicht # --------------------------------------------------------------------------------
+
+        """
+        Der Code muss neu erstellt werden, viel zu gross in or_algorithm und funktionierte auch noch nicht richtig
+        """
+
+        # 4 Wochen + 2-Schicht ----------------------------------------------------------------------------------
+        if self.week_timeframe == 4:
+            if self.company_shifts == 2:
+                for i in self.mitarbeiter:
+                    # Anzahl der Tage in der ersten Woche, an denen in der ersten bzw. zweiten Schicht gearbeitet wurde
+                    first_week_first_shift_days = sum(self.s2[i, j] for j in range(7))
+                    first_week_second_shift_days = 7 - first_week_first_shift_days
+
+                    # Hilfsvariable, um die Schicht der ersten Woche festzulegen
+                    first_week_shift = self.model.NewBoolVar("first_week_shift")
+
+                    # Wenn die Anzahl der Tage in der ersten Schicht größer ist, setzen Sie first_week_shift auf 1
+                    self.model.Add(first_week_first_shift_days - first_week_second_shift_days - 1000 * first_week_shift <= 0)
+                    self.model.Add(first_week_second_shift_days - first_week_first_shift_days - 1000 * (1 - first_week_shift) <= 0)
+
+                    for week in range(2, 5): # Beginne bei Woche 2
+                        for j in range((week-1)*7, week*7): # Beginne bei Tag 0 der aktuellen Woche und gehe bis zum letzten Tag der Woche
+                            if week % 2 == 0:
+                                self.model.Add(self.c[i, j] == 1 - first_week_shift)
+                            else:
+                                self.model.Add(self.c[i, j] == first_week_shift)
+
+                    for week in range(2, 5): # Wochen 2 bis 4
+                        for j in range((week-1)*7, week*7):
+                            # Summe der Stunden in der ersten Schicht in der aktuellen Woche
+                            first_shift_hours_current_week = sum(self.x[i, j, k] for k in range(0, int(len(self.verfügbarkeit[i][j]) / 2)))
+                            second_shift_hours_current_week = sum(self.x[i, j, k] for k in range(int(len(self.verfügbarkeit[i][j]) / 2), len(self.verfügbarkeit[i][j])))
+
+                            # Kann 0 oder 1 annehmen
+                            delta_2 = self.model.NewBoolVar("delta_2")
+                            
+                            self.model.Add(first_shift_hours_current_week - second_shift_hours_current_week - 1000 * delta_2 <= 0)      
+                            self.model.Add(second_shift_hours_current_week - first_shift_hours_current_week - 1000 * (1 - delta_2) <= 0)  
+                            
+                            # Hilfsvariable mit s2[i, j] verknüpfen
+                            self.model.Add(self.s2[i, j] == 1 - delta_2)
+                            
+                            # Harte Nebenbedingung
+                            # self.model.Add(self.s2[i, j] == self.c[i, j])
+
+                # Verletzungsvariable erhöhen, wenn die Schicht in den Wochen 2, 3 und 4 nicht der entgegengesetzten Schicht entspricht
+                for i in self.mitarbeiter:
+                    for j in range(7, 28):
+                        diff = self.model.NewIntVar(-1, 1, f"diff_{i}_{j}")
+                        self.model.Add(diff == self.s2[i, j] - self.c[i, j])
+
+                        self.model.Add(self.nb8_violation[i, j] >= diff)
+                        self.model.Add(self.nb8_violation[i, j] >= -diff)
+
+
+        # 4 Wochen + 3-Schicht ----------------------------------------------------------------------------------
+        if self.week_timeframe == 4:
+            if self.company_shifts == 3:
+                for i in self.mitarbeiter:
+                    pass
+
+
+
 
         # -------------------------------------------------------------------------------------------------------
         # WEICHE NB (28.08.2023)
         # NB 10 - Minimale Arbeitsstunden pro Arbeitsblock
         # ***** Weiche Nebenbedingung 9 *****
         # -------------------------------------------------------------------------------------------------------
+
+        """
+        # HARTE NB
+        self.min_working_hour_per_block = 4 * self.hour_devider
+
+        if self.working_blocks == 2:
+            for i in self.mitarbeiter:
+                for j in range(self.calc_time):
+                    for k in range(len(self.verfügbarkeit[i][j]) - self.min_working_hour_per_block + 1):
+                        # Wenn der MA in einem Block beginnt (y == 1), dann muss er für die nächsten min_working_hour_per_block-1 Stunden arbeiten (x == 1)
+                        self.model.Add(self.y[i, j, k] <= self.x[i, j, k])
+                        for h in range(1, self.min_working_hour_per_block):
+                            if k + h < len(self.verfügbarkeit[i][j]):  # Überprüfen, um IndexOutOfBounds zu vermeiden
+                                self.model.Add(self.y[i, j, k] <= self.x[i, j, k + h])
+
+                        # Verhindern, dass in den letzten min_working_hour_per_block-1 Stunden des Tages ein neuer Block beginnt
+                        if len(self.verfügbarkeit[i][j]) >= self.min_working_hour_per_block:
+                            for h in range(1, self.min_working_hour_per_block):
+                                last_hour = len(self.verfügbarkeit[i][j]) - h
+                                self.model.Add(self.y[i, j, last_hour] == 0)
+        """
 
         # WEICHE NB
         self.min_working_hour_per_block = 2 * self.hour_devider
@@ -910,6 +1131,27 @@ class ORAlgorithm_cp:
                             ct = self.y[i, j, k] * missing_hours == self.nb9_violation[i, j, k]
                             self.model.Add(ct)
 
+        # -------------------------------------------------------------------------------------------------------
+        # WEICHE NB (30.08.2023)
+        # NB 11 - Max. Anzahl an Arbeitstagen in Folge
+        # ***** Weiche Nebenbedingung 10 *****
+        # -------------------------------------------------------------------------------------------------------
+        
+        self.max_consecutive_days = 4
+
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time - self.max_consecutive_days):
+                # Rollfenster-Technik:
+                consecutive_days = [self.a[i, j + k] for k in range(self.max_consecutive_days + 1)]
+                
+                # Erstellen Sie ein lineares Ausdruck-Objekt für die Summe der aufeinanderfolgenden Tage
+                sum_consecutive_days = sum(consecutive_days)
+                
+                # Summe der Arbeitstage soll nicht größer als self.max_consecutive_days sein
+                self.model.Add(sum_consecutive_days <= self.max_consecutive_days + self.nb10_violation[i, j])
+                # nb10_violation wird nur erhöht, wenn die Anzahl der aufeinanderfolgenden Arbeitstage das Limit überschreitet
+                self.model.Add(self.nb10_violation[i, j] >= sum_consecutive_days - self.max_consecutive_days)
+                self.model.Add(self.nb10_violation[i, j] >= 0)
 
 
 
@@ -1078,3 +1320,182 @@ class ORAlgorithm_cp:
         # Speichern Sie das Workbook
         
         wb.save("Einsatzplan.xlsx")
+
+
+    def save_data_in_database(self):
+        """ 
+        Diese Methode speichert die berechneten Arbeitszeiten in der Datenbank 
+        """
+        with app.app_context():
+            for user_id, days in self.mitarbeiter_arbeitszeiten.items(): # Durch mitarbeiter_arbeitszeiten durchitterieren
+                print(f"Verarbeite Benutzer-ID: {user_id}")
+
+                # Benutzer aus der Datenbank abrufen
+                user = User.query.get(user_id)
+                print(user)
+                if not user:
+                    print(f"Kein Benutzer gefunden mit ID: {user_id}")
+                    continue
+
+                for day_index, day in enumerate(days):
+                    # Wir gehen davon aus, dass der erste Tag im 'self.user_availability' das Startdatum ist
+                    date = self.user_availability[user_id][0][0] + datetime.timedelta(days=day_index)
+                    print("DATE: ", date)
+
+                    # Löschen der jeweiligen Tage
+                    Timetable.query.filter_by(email=user.email, date=date).delete()
+                    db.session.commit()
+                    
+
+                    # Hier unterteilen wir den Tag in Schichten, basierend auf den Zeiten, zu denen der Mitarbeiter arbeitet
+                    shifts = []
+                    start_time_index = None
+                    for time_index in range(len(day)):
+                        if day[time_index] == 1 and start_time_index is None:
+                            start_time_index = time_index
+                        elif day[time_index] == 0 and start_time_index is not None:
+                            shifts.append((start_time_index, time_index))
+                            start_time_index = None
+                    
+                    if start_time_index is not None:
+                        shifts.append((start_time_index, len(day)))
+
+                    print(f"Berechnete Schichten für Benutzer-ID {user_id}, Tag-Index {day_index}: {shifts}")
+
+                    # Divisor bestimmen
+                    divisor = 3600 / self.hour_devider
+
+                    for shift_index, (start_time, end_time) in enumerate(shifts):
+                        opening_time_in_units = int(self.laden_oeffnet[day_index].total_seconds() * self.hour_devider / 3600)
+                        start_time += opening_time_in_units
+                        end_time += opening_time_in_units
+
+                        # Neues Timetable-Objekt
+                        if shift_index == 0:
+                            new_entry = Timetable(
+                                id=None,
+                                email=user.email,
+                                first_name=user.first_name,
+                                last_name=user.last_name,
+                                company_name=user.company_name,
+                                date=date,
+                                start_time=datetime.datetime.combine(date, datetime.time(hour=int(start_time // self.hour_devider), minute=int((start_time % self.hour_devider) * 60 / self.hour_devider))),
+                                end_time=datetime.datetime.combine(date, datetime.time(hour=int(end_time // self.hour_devider), minute=int((end_time % self.hour_devider) * 60 / self.hour_devider))),
+                                start_time2=None,
+                                end_time2=None,
+                                start_time3=None,
+                                end_time3=None,
+                                created_by=self.current_user_id,
+                                changed_by=self.current_user_id,
+                                creation_timestamp=datetime.datetime.now()
+                            )
+                            db.session.add(new_entry)
+
+                        elif shift_index == 1:
+                            new_entry.start_time2 = datetime.datetime.combine(date, datetime.time(hour=int(start_time // self.hour_devider), minute=int((start_time % self.hour_devider) * 60 / self.hour_devider)))
+                            new_entry.end_time2 = datetime.datetime.combine(date, datetime.time(hour=int(end_time // self.hour_devider), minute=int((end_time % self.hour_devider) * 60 / self.hour_devider)))
+
+                        # new_entry der Datenbank hinzufügen
+                        db.session.add(new_entry)
+
+            # Änderungen in der Datenbank speichern
+            db.session.commit()
+
+
+    def save_data_in_database_testing(self):
+        """ 
+        Diese Methode speichert verwendete Daten in der Datenbank für das testing
+        """
+        new_entry = SolverAnalysis(
+            id = None,
+            usecase = self.solver_requirements["company_name"],
+            self_current_user_id = self.current_user_id,
+            self_user_availability = str(self.user_availability),
+            self_opening_hours = str(self.opening_hours),
+            self_laden_oeffnet = str(self.laden_oeffnet),
+            self_laden_schliesst = str(self.laden_schliesst),
+            self_binary_availability = str(self.binary_availability),
+            self_company_shifts = self.company_shifts,
+            self_weekly_hours = self.weekly_hours,
+            self_employment_lvl = str(self.employment_lvl),
+            self_time_req = str(self.time_req),
+            self_user_employment = self.user_employment,
+            self_solver_requirements = str(self.solver_requirements),
+            self_week_timeframe = self.week_timeframe,
+            self_hour_devider = self.hour_devider,
+            self_mitarbeiter = str(self.mitarbeiter),
+            self_verfügbarkeit = str(self.verfügbarkeit),
+            self_kosten = str(self.kosten),
+            self_max_zeit = str(self.max_zeit),
+            self_min_zeit = str(self.min_zeit),
+            self_max_time_week = self.max_time_week,
+            self_calc_time = self.calc_time,
+            self_employment_lvl_exact = str(self.employment_lvl_exact),
+            self_employment = str(self.employment),
+            self_verteilbare_stunden = self.verteilbare_stunden,
+            self_gesamtstunden_verfügbarkeit = str(self.gesamtstunden_verfügbarkeit),
+            self_min_anwesend = str(self.min_anwesend),
+            self_gerechte_verteilung = str(self.gerechte_verteilung),
+            self_fair_distribution = self.fair_distribution,
+            solving_time = self.solving_time_seconds,
+            lp_iteration = None,
+            violation_nb1 = self.violation_nb1,
+            violation_nb2 = self.violation_nb2,
+            violation_nb3 = self.violation_nb3,
+            violation_nb4 = self.violation_nb4,
+            violation_nb5 = self.violation_nb5,
+            violation_nb6 = self.violation_nb6,
+            violation_nb7 = self.violation_nb7,
+            violation_nb8 = self.violation_nb8,
+            violation_nb9 = self.violation_nb9,
+            violation_nb10 = self.violation_nb10,
+            violation_nb11 = None,
+            violation_nb12 = None,
+            violation_nb13 = None,
+            violation_nb14 = None,
+            violation_nb15 = None,
+            violation_nb16 = None,
+            violation_nb17 = None,
+            violation_nb18 = None,
+            violation_nb19 = None,
+            violation_nb20 = None,
+            penalty_cost_nb1 = self.penalty_cost_nb1,
+            penalty_cost_nb2 = self.penalty_cost_nb2,
+            penalty_cost_nb3 = self.penalty_cost_nb3_min,
+            penalty_cost_nb4 = self.penalty_cost_nb4_max,
+            penalty_cost_nb5 = self.penalty_cost_nb5_min,
+            penalty_cost_nb6 = self.penalty_cost_nb6_max,
+            penalty_cost_nb7 = self.penalty_cost_nb7,
+            penalty_cost_nb8 = self.penalty_cost_nb8,
+            penalty_cost_nb9 = self.penalty_cost_nb9,
+            penalty_cost_nb10 = self.penalty_cost_nb10,
+            penalty_cost_nb11 = None,
+            penalty_cost_nb12 = None,
+            penalty_cost_nb13 = None,
+            penalty_cost_nb14 = None,
+            penalty_cost_nb15 = None,
+            penalty_cost_nb16 = None,
+            penalty_cost_nb17 = None,
+            penalty_cost_nb18 = None,
+            penalty_cost_nb19 = None,
+            penalty_cost_nb20 = None,
+            possible_solution = None,
+            gap_016 = None,
+            gap_05 = None,
+            gap_1 = None,
+            gap_2 = None,
+            gap_3 = None,
+            gap_4 = None,
+            gap_5 = None,
+            gap_10 = None,
+            gap_20 = None,
+            gap_30 = None,
+            memory = None
+        )
+
+        # new_entry der Datenbank hinzufügen
+        db.session.add(new_entry)
+
+        # Änderungen in der Datenbank speichern
+        db.session.commit()
+        print("end")
