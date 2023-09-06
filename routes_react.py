@@ -258,8 +258,13 @@ def get_company():
             company_data = request.get_json()
 
             # Company Data 
-            OpeningHours.query.filter_by(company_name=user.company_name).delete()
-            db.session.commit()
+            data_deletion = OpeningHours.query.filter_by(company_name=user.company_name)
+            if data_deletion:
+                data_deletion.delete()
+                db.session.commit()
+            else:
+                pass
+            
             company_no = Company.query.order_by(Company.id.desc()).first()
             if company_no is None:
                 new_company_no = 1
@@ -384,8 +389,13 @@ def get_availability():
         availability_data = request.get_json()
         for i in range(day_num):
             new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
-            Availability.query.filter_by(user_id=user.id, date=new_date).delete()
-            db.session.commit()
+            data_deletion = Availability.query.filter_by(user_id=user.id, date=new_date)
+            
+            if data_deletion:
+                data_deletion.delete()
+                db.session.commit()
+            else:
+                pass
 
             entry1 = request.json.get(f'day_{i}_0')
             entry2 = request.json.get(f'day_{i}_1')
@@ -935,8 +945,13 @@ def get_required_workforce():
             week_adjustment = int(request.args.get('week_adjustment', 0))
             for i in range(day_num):
                 new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
-                TimeReq.query.filter_by(company_name=user.company_name, date=new_date).delete()
-                db.session.commit()
+                data_deletion = TimeReq.query.filter_by(company_name=user.company_name, date=new_date)
+                if data_deletion:
+                    data_deletion.delete()
+                    db.session.commit()
+                else:
+                    pass
+                
                 for quarter in range(daily_slots): # There are 96 quarters in a day
                     quarter_hour = quarter / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
                     quarter_minute = (quarter % hour_divider) * minutes  # Remainder gives the quarter in the hour
@@ -981,9 +996,9 @@ def get_required_workforce():
         button = request.json.get("button", None)
         if button == "Save Template":
             workforce_data = request.get_json()
-            delete_entry = TemplateTimeRequirement.query.filter_by(company_name=user.company_name, template_name=workforce_data['template_name'])
-            if delete_entry:
-                delete_entry.delete()
+            data_deletion = TemplateTimeRequirement.query.filter_by(company_name=user.company_name, template_name=workforce_data['template_name'])
+            if data_deletion:
+                data_deletion.delete()
                 db.session.commit()
             for i in range(day_num):
                 for quarter in range(daily_slots): # There are 96 quarters in a day
