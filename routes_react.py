@@ -1,6 +1,7 @@
 from flask import request, url_for, session, jsonify, send_from_directory, make_response
 from flask_mail import Message
 import datetime
+from datetime import date, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 import random
 from models import db
@@ -1085,12 +1086,12 @@ def get_shift():
 
         # Convert the date strings to date objects
         if start_date_str and end_date_str:
-            start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
-            end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+            start_date = datetime.datetime.strptime(start_date_str, '%Y-%m-%d').date()
+            end_date = datetime.datetime.strptime(end_date_str, '%Y-%m-%d').date()
         else:
             # If no dates are provided, default to the current week
-            start_date = today - timedelta(days=today.weekday())
-            end_date = start_date + timedelta(days=6)
+            start_date = today - datetime.timedelta(days=today.weekday())
+            end_date = start_date + datetime.timedelta(days=6)
     else:
         start_date, end_date = None, None  # default to getting all shifts
 

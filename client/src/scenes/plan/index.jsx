@@ -100,7 +100,7 @@ const GanttChart = () => {
     return hour.toString().padStart(2, '0') + ":00";
   };
 
-  
+  //DAY VIEW
   const getWorkingHoursDuration = () => {
     const today = new Date();
     const weekday = today.toLocaleDateString('en-US', { weekday: 'long' });
@@ -308,14 +308,8 @@ const GanttChart = () => {
           }
       });
 
-    
-    
-
     return workersWithShiftsForDay;
 };
-
-
-
   
 const renderWeekShifts = (day) => {
   const formattedDate = day.toISOString().split('T')[0];
@@ -359,15 +353,22 @@ const renderWeekShifts = (day) => {
   );
 };
 
-  
-  const startOfWeek = getStartOfWeek(currentDay);
-  const endOfWeek = getEndOfWeek(currentDay);
+const goToNextWeek = () => {
+  setCurrentDay(prevDay => {
+    const nextWeekStart = new Date(prevDay);
+    nextWeekStart.setDate(prevDay.getDate() + 7);
+    return nextWeekStart;
+  });
+};
 
-  console.log('Start of Week:', startOfWeek);
-  console.log('End of Week:', endOfWeek);
+const goToPrevWeek = () => {
+  setCurrentDay(prevDay => {
+    const prevWeekStart = new Date(prevDay);
+    prevWeekStart.setDate(prevDay.getDate() - 7);
+    return prevWeekStart;
+  });
+};
 
-  const days = daysOfWeek(startOfWeek, endOfWeek);
-  console.log('Days of Week:', days);
 
 
 
