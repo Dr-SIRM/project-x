@@ -32,6 +32,14 @@ const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    const storedToken = localStorage.getItem('session_token');
+    const storedUser = localStorage.getItem('user');
+    if (storedToken && storedUser) {
+      setUser(JSON.parse(storedUser));  // Initialize the user state
+    }
+  }, []);
+
+  useEffect(() => {
     if (user) {
       console.log('User after login:', user);
       console.log('Session token after login:', localStorage.getItem('session_token'));

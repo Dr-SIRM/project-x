@@ -898,7 +898,7 @@ def get_required_workforce():
             time = f'{formatted_time}:00'
             new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
             temp = TimeReq.query.filter_by(company_name=user.company_name, date=new_date, start_time=new_time).first()
-            if temp is None or temp.worker > 0:
+            if temp is None or temp.worker == 0:
                 pass
             else:
                 new_i = i + 1
@@ -929,13 +929,42 @@ def get_required_workforce():
             formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
             time = f'{formatted_time}:00'
             new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
-            temp = TemplateTimeRequirement.query.filter_by(company_name=user.company_name, start_time=new_time, template_name="Template 1").first()
-            if temp is None or temp.worker > 0:
+            temp = TemplateTimeRequirement.query.filter_by(company_name=user.company_name, weekday={i}, start_time=new_time, template_name="Template 1").first()
+            if temp is None or temp.worker == 0:
                 pass
             else:
-                new_i = i + 1
                 template1_dict["{}-{}".format(i, hour)] = temp.worker
-    print(template1_dict)
+
+    template1_dict = {}
+    for i in range(day_num):
+        for hour in range(daily_slots):
+            new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+            quarter_hour = hour / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
+            quarter_minute = (hour % hour_divider) * minutes  # Remainder gives the quarter in the hour
+            formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+            time = f'{formatted_time}:00'
+            new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+            temp = TemplateTimeRequirement.query.filter_by(company_name=user.company_name, weekday={i}, start_time=new_time, template_name="Template 2").first()
+            if temp is None or temp.worker == 0:
+                pass
+            else:
+                template1_dict["{}-{}".format(i, hour)] = temp.worker
+
+    template1_dict = {}
+    for i in range(day_num):
+        for hour in range(daily_slots):
+            new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+            quarter_hour = hour / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
+            quarter_minute = (hour % hour_divider) * minutes  # Remainder gives the quarter in the hour
+            formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+            time = f'{formatted_time}:00'
+            new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+            temp = TemplateTimeRequirement.query.filter_by(company_name=user.company_name, weekday={i}, start_time=new_time, template_name="Template 3").first()
+            if temp is None or temp.worker == 0:
+                pass
+            else:
+                template1_dict["{}-{}".format(i, hour)] = temp.worker
+
    
     #Submit the required FTE per hour
     if request.method == 'POST':
