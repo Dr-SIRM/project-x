@@ -940,7 +940,7 @@ def get_required_workforce():
             time = f'{formatted_time}:00'
             new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
             temp = TimeReq.query.filter_by(company_name=user.company_name, date=new_date, start_time=new_time).first()
-            if temp is None:
+            if temp is None or temp.worker > 0:
                 pass
             else:
                 new_i = i + 1
@@ -961,6 +961,23 @@ def get_required_workforce():
             opening_dict[str(new_i) + '&1'] = opening.end_time.strftime("%H:%M") if opening.end_time else None
             opening_dict[str(new_i) + '&2'] = opening.start_time2.strftime("%H:%M") if opening.start_time2 else None
             opening_dict[str(new_i) + '&3'] = opening.end_time2.strftime("%H:%M") if opening.end_time2 else None
+
+    template1_dict = {}
+    for i in range(day_num):
+        for hour in range(daily_slots):
+            new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+            quarter_hour = hour / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
+            quarter_minute = (hour % hour_divider) * minutes  # Remainder gives the quarter in the hour
+            formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+            time = f'{formatted_time}:00'
+            new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+            temp = TemplateTimeRequirement.query.filter_by(company_name=user.company_name, start_time=new_time, template_name="Template 1").first()
+            if temp is None or temp.worker > 0:
+                pass
+            else:
+                new_i = i + 1
+                template1_dict["{}-{}".format(i, hour)] = temp.worker
+    print(template1_dict)
    
     #Submit the required FTE per hour
     if request.method == 'POST':
@@ -1008,7 +1025,6 @@ def get_required_workforce():
                                     changed_by=company_id, 
                                     creation_timestamp = creation_date
                                     )
-                        print(req)
                         db.session.add(req)
                         db.session.commit()
 
@@ -1017,11 +1033,11 @@ def get_required_workforce():
         button = request.json.get("button", None)
         if button == "Save Template":
             workforce_data = request.get_json()
+            delete_entry = TemplateTimeRequirement.query.filter_by(company_name=user.company_name, template_name=workforce_data['template_name'])
+            if delete_entry:
+                delete_entry.delete()
+                db.session.commit()
             for i in range(day_num):
-                delete_entry = TemplateTimeRequirement.query.filter_by(company_name=user.company_name, template_name=workforce_data['template_name'])
-                if delete_entry:
-                    delete_entry.delete()
-                    db.session.commit()
                 for quarter in range(daily_slots): # There are 96 quarters in a day
                     quarter_hour = quarter / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
                     quarter_minute = (quarter % hour_divider) * minutes  # Remainder gives the quarter in the hour
@@ -1054,12 +1070,17 @@ def get_required_workforce():
         'week_start': week_start,
         'hour_divider': hour_divider,
         'daily_slots': daily_slots,
-        'minutes': minutes
+        'minutes': minutes,
+        'template1_dict': template1_dict
     }
 
     return jsonify(calendar_dict)
 
 
+
+#from datetime import date, timedelta, datetime
+import calendar
+from functools import wraps
 
 @app.route('/api/schichtplanung', methods=['POST', 'GET'])
 @jwt_required()
