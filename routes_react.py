@@ -329,8 +329,6 @@ def get_company():
 
                 db.session.add(opening)
                 db.session.commit()
-    
-    print(temp_dict)
 
 
     company_list = {
@@ -456,54 +454,6 @@ def get_availability():
 
                 db.session.add(data)
                 db.session.commit()
-
-    '''
-    #Save templates
-    if request.method == 'POST' and 'template' in request.form:
-        for i in range(day_num):
-            entry1 = request.form.get(f'day_{i}_0')
-            entry2 = request.form.get(f'day_{i}_1')
-            entry3 = request.form.get(f'day_{i}_2')
-            entry4 = request.form.get(f'day_{i}_3')
-            entry5 = request.form.get(f'day_{i}_4')
-            entry6 = request.form.get(f'day_{i}_5')
-            if entry1:
-                last = TemplateAvailability.query.order_by(TemplateAvailability.id.desc()).first()
-                if last is None:
-                    new_id = 1
-                else:
-                    new_id = last.id + 1
-                new_name = planning_form.template_name.data
-                new_date = monday + datetime.timedelta(days=i)
-                new_entry1 = datetime.datetime.strptime(entry1, '%H:%M').time()
-                new_entry2 = datetime.datetime.strptime(entry2, '%H:%M').time()
-                new_entry3 = datetime.datetime.strptime(entry3, '%H:%M').time()
-                new_entry4 = datetime.datetime.strptime(entry4, '%H:%M').time()
-                new_entry5 = datetime.datetime.strptime(entry5, '%H:%M').time()
-                new_entry6 = datetime.datetime.strptime(entry6, '%H:%M').time()
-                new_weekday = weekdays[i]
-
-                data = TemplateAvailability(
-                    id=new_id, 
-                    template_name=new_name, 
-                    date=new_date, 
-                    weekday=new_weekday, 
-                    email=user.email,
-                    start_time=new_entry1, 
-                    end_time=new_entry2, 
-                    start_time2=new_entry3,
-                    end_time2=new_entry4, 
-                    start_time3=new_entry5, 
-                    end_time3=new_entry6,
-                    created_by=company_id, 
-                    changed_by=company_id, 
-                    creation_timestamp = creation_date
-                    )
-
-
-                db.session.add(data)
-                db.session.commit()
-            '''
 
     availability_list = {
         'weekdays': weekdays,
@@ -697,20 +647,18 @@ def solver_req():
         nb19 = solver_requirement.nb19
         nb20 =solver_requirement.nb20
 
+    #Submit Solver Requirements
     if request.method =='POST':
         solver_req_data = request.get_json()
-
-        SolverRequirement.query.filter_by(company_name=user.company_name).delete()
-        db.session.commit()
-
-        last = SolverRequirement.query.order_by(SolverRequirement.id.desc()).first()
-        if last is None:
-            new_id = 1
+        data_deletion = SolverRequirement.query.filter_by(company_name=user.company_name)
+        if solver_requirement:
+            data_deletion.delete()
+            db.session.commit()
         else:
-            new_id = last.id + 1
+            pass
 
         data = SolverRequirement(       
-                                id = new_id,
+                                id = None,
                                 company_name = user.company_name,
                                 weekly_hours = company.weekly_hours,
                                 shifts = company.shifts,
