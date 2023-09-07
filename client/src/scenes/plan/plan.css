@@ -155,10 +155,6 @@
   text-align: center;
 }
 
-.week-view-header {
-  margin-bottom: 10px;
-}
-
 .weekday-box {
   flex: 1;
   padding: 10px;
@@ -188,7 +184,7 @@
 }
 
 .worker-name {
-  background-color: #3da58a; /* Or any color you prefer */
+  background-color: #8bc2b3; /* Or any color you prefer */
   color: #fff;  /* Adjust the text color if needed, especially for legibility on colored backgrounds */
   padding: 4px 10px; /* Gives a little space around the name for better presentation */
   border-radius: 4px; /* Optional, to give the background a rounded appearance */
