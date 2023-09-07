@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTheme, Box, Button, TextField, Snackbar, Typography, ButtonGroup, IconButton } from "@mui/material";
 import { Select, MenuItem } from "@mui/material";
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
+import { useNavigate  } from 'react-router-dom';
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -43,6 +44,7 @@ const TimeReq = ({ timereq }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [slotEmployeeCounts, setSlotEmployeeCounts] = useState(null);
   const [selectedTemplate, setSelectedTemplate] = useState('');
+  const navigate = useNavigate();
 
   const convertTimeToMinutes = (timeStr) => {
     if (!timeStr) return 0;
@@ -160,6 +162,9 @@ const TimeReq = ({ timereq }) => {
         } catch (error) {
           console.error('Error fetching Time Requirements:', error);
           setIsLoading(false);
+          if (error.response.status === 401 || error.response.status === 500) {
+            navigate('/login');
+          }
         }
     };
 
