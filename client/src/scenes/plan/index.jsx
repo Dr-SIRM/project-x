@@ -255,6 +255,23 @@ const GanttChart = () => {
     return weekNumber;
   };
 
+  const goToNextWeek = () => {
+    setCurrentDay(prevDay => {
+      const nextWeekStart = new Date(prevDay);
+      nextWeekStart.setDate(prevDay.getDate() + 7);
+      return nextWeekStart;
+    });
+  };
+  
+  const goToPrevWeek = () => {
+    setCurrentDay(prevDay => {
+      const prevWeekStart = new Date(prevDay);
+      prevWeekStart.setDate(prevDay.getDate() - 7);
+      return prevWeekStart;
+    });
+  };
+  
+
   const daysOfWeek = (startDate, endDate) => {
     const dates = [];
     let currentDate = new Date(startDate);  // Copy to ensure we don't mutate the original date
@@ -353,21 +370,6 @@ const renderWeekShifts = (day) => {
   );
 };
 
-const goToNextWeek = () => {
-  setCurrentDay(prevDay => {
-    const nextWeekStart = new Date(prevDay);
-    nextWeekStart.setDate(prevDay.getDate() + 7);
-    return nextWeekStart;
-  });
-};
-
-const goToPrevWeek = () => {
-  setCurrentDay(prevDay => {
-    const prevWeekStart = new Date(prevDay);
-    prevWeekStart.setDate(prevDay.getDate() - 7);
-    return prevWeekStart;
-  });
-};
 
 
 
@@ -417,7 +419,15 @@ const goToPrevWeek = () => {
       </div>
       {view === 'week' && (
         <div className="week-view">
-          <h3 className="week-view-header">Woche {getWeekNumber(currentDay)}</h3>
+          <div className="date-navigation">
+            <IconButton onClick={goToPrevWeek} style={BUTTON_STYLE}>
+              <ChevronLeft />
+            </IconButton>
+            <span className="date-display">Woche {getWeekNumber(currentDay)}</span>
+            <IconButton onClick={goToNextWeek} style={BUTTON_STYLE}>
+              <ChevronRight />
+            </IconButton>
+          </div>
           <div className="weekdays">
             {daysOfWeek(getStartOfWeek(currentDay), getEndOfWeek(currentDay)).map((day, index) => {    
               return (
@@ -433,6 +443,7 @@ const goToPrevWeek = () => {
           </div>
         </div>
       )}
+
 
 
     </Box>
