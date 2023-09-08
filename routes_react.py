@@ -102,7 +102,7 @@ def get_general_data():
 
     return jsonify(general_dict)
 
-@app.route('/api/users')
+@app.route('/api/users', methods=['GET'])
 @jwt_required()
 def get_data():
     react_user_email = get_jwt_identity()
@@ -120,6 +120,7 @@ def get_data():
     user_list = []
     for user in users:
         user_dict = {
+            'id': user.id,
             'first_name': user.first_name,
             'last_name': user.last_name,
             'company_name': user.company_name,

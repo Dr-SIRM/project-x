@@ -28,36 +28,42 @@ const Team = () => {
             'Authorization': `Bearer ${token}`
           }
         });
-
-        const usersWithId = response.data.map((user, index) => ({
-          ...user,
-          id: index + 1, 
-        }));
-
-        setUsers(usersWithId);
+  
+        setUsers(response.data);
         setIsLoading(false);
       } catch (error) {
         console.error('Error fetching update details:', error);
         setIsLoading(false);
       }
     };
-
+  
     fetchUser();
   }, []);
+  
     
-  const handleEditCellChangeCommitted = async ({ id, field, props }) => {
-    console.log("handleEditCellChangeCommitted called", { id, field, props });  
-    const newValue = props.value;
+  const handleEditRowsModelChange = async (params) => {
+    console.log("handleEditRowsModelChange called", params);
+
+    const id = params.model[0].id;
+    const field = params.model[0].field;
+    const newValue = params.model[0].value;
+
+    // Prepare the data to be sent to the server
+    let sendData = {[field]: newValue};
+
+    // Check if the edited field is 'employment_level' and modify the data accordingly
+    if (field === 'employment_level') {
+        sendData[field] = newValue / 100;  // Convert percentage back to a value between 0 and 1
+    }
 
     try {
-        await axios.put(`http://localhost:5000/api/users/update/${id}`, {
-            [field]: newValue
-        }, {
+        // Send the modified data to the server
+        await axios.put(`http://localhost:5000/api/users/update/${id}`, sendData, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         });
-        
+
         const updatedUsers = users.map(user => {
             if (user.id === id) {
                 return { ...user, [field]: newValue };
@@ -69,6 +75,10 @@ const Team = () => {
         console.error('Error updating user:', error);
     }
 };
+
+  
+  
+
 
   if (isLoading) {
     return (
@@ -114,13 +124,18 @@ const Team = () => {
       field: "employment_level",
       headerName: "Anstellungsgrad",
       flex: 1,
-      valueGetter: (params) => {
-        const employment_level = params.row.employment_level;
-        const isValidNumber = !isNaN(employment_level);
-        const modifiedValue = isValidNumber ? `${employment_level * 100}%` : "";
-        return modifiedValue;
+      editable: true,
+      valueFormatter: (params) => {
+          const employment_level = params.value;
+          const isValidNumber = !isNaN(employment_level);
+          const modifiedValue = isValidNumber ? `${employment_level * 100}%` : "";
+          return modifiedValue;
       },
-    },
+      valueParser: (value) => {
+          return parseFloat(value) / 100;
+      },
+  },
+  
     {
       field: "department",
       headerName: "Abteilung",
@@ -191,13 +206,15 @@ const Team = () => {
             color: `${colors.greenAccent[200]} !important`,
           },
         }}
-      >
+      >        
         <DataGrid
-            checkboxSelection
-            rows={users}
-            columns={columns}
-            onEditCellChangeCommitted={handleEditCellChangeCommitted}
-        />
+          checkboxSelection
+          rows={users}
+          columns={columns}
+          onEditRowsModelChange={() => console.log('Edit event triggered')}
+          onCellClick={() => console.log('Cell clicked')}
+      />
+
       </Box>
     </Box>
   );
