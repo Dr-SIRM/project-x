@@ -50,3 +50,265 @@ Max Arbeitsstunden pro Tag nicht überschreiten
                     print(mitarbeiter[i], " has not planned enough hours.")
                 else:
                     pass
+
+
+
+@app.route('/api/requirement/workforce', methods = ['GET', 'POST'])
+@jwt_required()
+def get_required_workforce():
+    react_user = get_jwt_identity()
+    user = User.query.filter_by(email=react_user).first()
+    creation_date = datetime.datetime.now()
+    weekdays = {0: 'Monday', 1: 'Tuesday', 2: 'Wednesday', 3: 'Thursday', 4: 'Friday', 5: 'Saturday', 6: 'Sunday'}
+    today = datetime.date.today()
+    solverreq = SolverRequirement.query.filter_by(company_name=user.company_name).first()
+    hour_divider = solverreq.hour_devider
+    full_day = (24 * hour_divider) - 1
+    minutes = 60 / hour_divider
+    day_num = 7   
+    company_id = user.company_id
+
+
+    # Calculation Working Day
+    closing_times = []
+    for i in range(day_num):
+        closing = OpeningHours.query.filter_by(company_name=user.company_name, weekday=weekdays[i]).first()
+        slot = 24
+        if closing.end_time2.strftime("%H:%M")=="00:00":
+            if closing.end_time < closing.start_time:
+                hour = closing.end_time.hour
+                if closing.end_time.minute == 0:
+                    minute = 0
+                else:
+                    minute = closing.end_time.minute / 60
+                slot += hour + minute
+        else:
+            if closing.end_time2 < closing.start_time:
+                hour = closing.end_time2.hour
+                if closing.end_time2.minute == 0:
+                    minute = 0
+                else:
+                    minute = closing.end_time2.minute / 60
+                slot += hour + minute
+        closing_times.append(slot)
+    print(closing_times)
+
+    daily_slots = max(closing_times) * hour_divider
+
+    # Week with adjustments
+    monday = today - datetime.timedelta(days=today.weekday())
+    week_adjustment = int(request.args.get('week_adjustment', 0))
+    week_start = monday + datetime.timedelta(days=week_adjustment)
+
+    slot_dict = {}
+    for i in range(daily_slots):
+        if i > full_day:
+            i -= full_day
+        else:
+            pass
+        quarter_hour = i / hour_divider
+        quarter_minute = (i % hour_divider) * minutes  # Remainder gives the quarter in the hour
+        formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+        slot_dict[i] = formatted_time
+    
+    timereq_dict = {}
+    for i in range(day_num):
+        for hour in range(daily_slots):
+            if hour > full_day:
+                hour -= full_day
+            else:
+                pass
+            new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+            quarter_hour = hour / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
+            quarter_minute = (hour % hour_divider) * minutes  # Remainder gives the quarter in the hour
+            formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+            time = f'{formatted_time}:00'
+            new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+            temp = TimeReq.query.filter_by(company_name=user.company_name, date=new_date, start_time=new_time).first()
+            if temp is None or temp.worker == 0:
+                pass
+            else:
+                new_i = i + 1
+                timereq_dict["{}-{}".format(i, hour)] = temp.worker
+
+    opening_dict = {}
+    for i in range(day_num):
+        opening = OpeningHours.query.filter_by(company_name=user.company_name, weekday=weekdays[i]).first()
+        if opening is None:
+            pass
+        elif opening.end_time2.strftime("%H:%M")=="00:00":
+            new_i = i + 1 
+            opening_dict[str(new_i) + '&0'] = opening.start_time.strftime("%H:%M") if opening.start_time else None
+            opening_dict[str(new_i) + '&1'] = opening.end_time.strftime("%H:%M") if opening.end_time else None
+        else:
+            new_i = i + 1 
+            opening_dict[str(new_i) + '&0'] = opening.start_time.strftime("%H:%M") if opening.start_time else None
+            opening_dict[str(new_i) + '&1'] = opening.end_time.strftime("%H:%M") if opening.end_time else None
+            opening_dict[str(new_i) + '&2'] = opening.start_time2.strftime("%H:%M") if opening.start_time2 else None
+            opening_dict[str(new_i) + '&3'] = opening.end_time2.strftime("%H:%M") if opening.end_time2 else None
+
+    template1_dict = {}
+    for i in range(day_num):
+        for hour in range(daily_slots):
+            if hour > full_day:
+                hour -= full_day
+            else:
+                pass
+            new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+            quarter_hour = hour / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
+            quarter_minute = (hour % hour_divider) * minutes  # Remainder gives the quarter in the hour
+            formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+            time = f'{formatted_time}:00'
+            new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+            temp = TemplateTimeRequirement.query.filter_by(company_name=user.company_name, weekday={i}, start_time=new_time, template_name="Template 1").first()
+            if temp is None or temp.worker == 0:
+                pass
+            else:
+                template1_dict["{}-{}".format(i, hour)] = temp.worker
+
+    template2_dict = {}
+    for i in range(day_num):
+        for hour in range(daily_slots):
+            if hour > full_day:
+                hour -= full_day
+            else:
+                pass
+            new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+            quarter_hour = hour / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
+            quarter_minute = (hour % hour_divider) * minutes  # Remainder gives the quarter in the hour
+            formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+            time = f'{formatted_time}:00'
+            new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+            temp = TemplateTimeRequirement.query.filter_by(company_name=user.company_name, weekday={i}, start_time=new_time, template_name="Template 2").first()
+            if temp is None or temp.worker == 0:
+                pass
+            else:
+                template1_dict["{}-{}".format(i, hour)] = temp.worker
+
+    template3_dict = {}
+    for i in range(day_num):
+        for hour in range(daily_slots):
+            if hour > full_day:
+                hour -= full_day
+            else:
+                pass
+            new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+            quarter_hour = hour / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
+            quarter_minute = (hour % hour_divider) * minutes  # Remainder gives the quarter in the hour
+            formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+            time = f'{formatted_time}:00'
+            new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+            temp = TemplateTimeRequirement.query.filter_by(company_name=user.company_name, weekday={i}, start_time=new_time, template_name="Template 3").first()
+            if temp is None or temp.worker == 0:
+                pass
+            else:
+                template1_dict["{}-{}".format(i, hour)] = temp.worker
+
+   
+    #Submit the required FTE per hour
+    if request.method == 'POST':
+        button = request.json.get("button", None)
+        if button == "Submit":
+            workforce_data = request.get_json()
+            week_adjustment = int(request.args.get('week_adjustment', 0))
+            for i in range(day_num):
+                new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+                data_deletion = TimeReq.query.filter_by(company_name=user.company_name, date=new_date)
+                if data_deletion:
+                    data_deletion.delete()
+                    db.session.commit()
+                else:
+                    pass
+                
+                for quarter in range(daily_slots): # There are 96 quarters in a day
+                    if quarter > full_day:
+                        quarter -= full_day
+                    else:
+                        pass
+                    quarter_hour = quarter / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
+                    quarter_minute = (quarter % hour_divider) * minutes  # Remainder gives the quarter in the hour
+                    formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+                    capacity = workforce_data.get(f'worker_{i}_{formatted_time}')
+                    if capacity:
+                        new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+                        time = f'{formatted_time}:00'
+                        new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+
+                        req = TimeReq(id=None, 
+                                    company_name=user.company_name, 
+                                    date=new_date, 
+                                    start_time=new_time, 
+                                    worker=capacity, 
+                                    created_by=company_id,
+                                    changed_by=company_id, 
+                                    creation_timestamp = creation_date
+                                    )
+                                
+                        db.session.add(req)
+                        db.session.commit()
+                    else:
+                        new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+                        time = f'{formatted_time}:00'
+                        new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+
+                        req = TimeReq(id=None, 
+                                    company_name=user.company_name, 
+                                    date=new_date, 
+                                    start_time=new_time, 
+                                    worker=0, 
+                                    created_by=company_id,
+                                    changed_by=company_id, 
+                                    creation_timestamp = creation_date
+                                    )
+                        db.session.add(req)
+                        db.session.commit()
+
+    #Save Templates
+    if request.method == 'POST':
+        button = request.json.get("button", None)
+        if button == "Save Template":
+            workforce_data = request.get_json()
+            data_deletion = TemplateTimeRequirement.query.filter_by(company_name=user.company_name, template_name=workforce_data['template_name'])
+            if data_deletion:
+                data_deletion.delete()
+                db.session.commit()
+            for i in range(day_num):
+                for quarter in range(daily_slots): # There are 96 quarters in a day
+                    quarter_hour = quarter / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
+                    quarter_minute = (quarter % hour_divider) * minutes  # Remainder gives the quarter in the hour
+                    formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+                    capacity = workforce_data.get(f'worker_{i}_{formatted_time}')
+                    if capacity:
+                        time = f'{formatted_time}:00'
+                        new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+
+                        temp_req = TemplateTimeRequirement(
+                            id=None, 
+                            company_name = user.company_name,
+                            template_name = workforce_data['template_name'],
+                            weekday = {i},
+                            start_time = new_time,
+                            worker = capacity,
+                            created_by = user.company_id,
+                            changed_by = user.company_id,
+                            creation_timestamp = creation_date
+                            )
+                        db.session.add(temp_req)
+                        db.session.commit()
+        
+    calendar_dict={
+        'weekdays': weekdays,
+        'opening_dict': opening_dict,
+        'slots_dict': slot_dict,
+        'day_num': day_num,
+        'timereq_dict': timereq_dict,
+        'week_start': week_start,
+        'hour_divider': hour_divider,
+        'daily_slots': daily_slots,
+        'minutes': minutes,
+        'template1_dict': template1_dict,
+        'template2_dict': template2_dict,
+        'template3_dict': template3_dict,
+    }
+
+    return jsonify(calendar_dict)

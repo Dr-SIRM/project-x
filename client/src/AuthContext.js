@@ -8,6 +8,38 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState('');
 
+
+  const checkTokenExpiration = () => {
+    const lastActivity = new Date(localStorage.getItem('last_activity'));
+    const now = new Date();
+    const difference = now - lastActivity;
+    const differenceInMinutes = Math.floor(difference / 1000 / 60);
+
+    if (differenceInMinutes >= 15) {
+      localStorage.removeItem('session_token');
+      localStorage.removeItem('last_activity');
+      localStorage.removeItem('user');
+      setUser(null);
+      navigate('/login');
+    }
+  };
+
+  useEffect(() => {
+    checkTokenExpiration();
+
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('last_activity', new Date().toString());
+      navigate('/dashboard');
+    }
+  }, [user]);
+
   const login = async (email, password) => {
     try {
       console.log('Email:', email, 'Password:', password);

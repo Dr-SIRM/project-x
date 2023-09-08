@@ -80,10 +80,10 @@ const Company = ({ company }) => {
           weekly_hours: companyData.weekly_hours,
           shifts: companyData.shifts,
           ...Array.from({ length: companyData.day_num }).reduce((acc, _, rowIndex) => {
-            acc[`day_${rowIndex}_0`] = companyData.temp_dict[`${rowIndex + 1}&0`];
-            acc[`day_${rowIndex}_1`] = companyData.temp_dict[`${rowIndex + 1}&1`];
-            acc[`day_${rowIndex}_2`] = companyData.temp_dict[`${rowIndex + 1}&2`];
-            acc[`day_${rowIndex}_3`] = companyData.temp_dict[`${rowIndex + 1}&3`];
+            acc[`day_${rowIndex}_0`] = companyData.opening_dict[`${rowIndex + 1}&0`];
+            acc[`day_${rowIndex}_1`] = companyData.opening_dict[`${rowIndex + 1}&1`];
+            acc[`day_${rowIndex}_2`] = companyData.opening_dict[`${rowIndex + 1}&2`];
+            acc[`day_${rowIndex}_3`] = companyData.opening_dict[`${rowIndex + 1}&3`];
             return acc;
           }, {}),
         }}
