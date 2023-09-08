@@ -3,6 +3,9 @@ import datetime
 import pymysql
 import time
 import math
+
+import sys
+
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font
 from openpyxl.utils import get_column_letter
@@ -14,6 +17,53 @@ from models import Timetable, User, SolverAnalysis
 # New 
 from ortools.sat.python import cp_model
 
+"""
+To-Do Liste:
+
+Prio 1:
+
+ - (erl.) NB6: Max. einen Arbeitsblock pro Tag
+ - (erl.) die calc_time soll automatisch errechnet werden
+ - (erl.) Als Key oder i für MA soll nicht mehr MA1, MA2 usw stehen, sondern die user_id (zB. 1002)
+ - (erl.) Shifts/Employment_level aus der Datenbank ziehen
+ - (erl.) auf Viertelstunden wechseln
+ - (erl.) Gerechte Verteilung Anpassen, das Stunden von "Perm" Mitarbeiter abgezogen werden
+ - (erl.) Weiche NB4 implementieren, hat noch nicht wunschgemäss geklappt
+ - (erl.) Den Übergang auf harte und weiche NBs machen? 
+ - (erl.) Die gesolvten Daten in der Datenbank speichern
+ - (erl.) Daten für Solven in die Datenbank einpflegen (max. Zeit, min. Zeit, Solvingzeitraum, Toleranz für die Stundenverteilung, ...)
+ - (erl.) Eine if Anweseiung, wenn der Betrieb an einem Tag geschlossen hat. Dann soll an diesem Tag nicht gesolvet werden
+ - (erl.) Stunden Teiler für 1/4, 1/2 und 1h einbauen
+ - (erl.) NB10 die weiche fertigbauen
+ - (erl.) Opening Hour 2 einbauen
+
+ To-Do's 
+ -------------------------------
+ - (*) NB9 mit 3 Schichten fertigbauen
+ - (*) Während des Solvings Daten ziehen --> Fragen gestellt
+
+ - gerechte_verteilung funktioniert noch nicht richtig, wenn ein MA fast keine Stunden availability eingibt. Das muss noch geändert werden.
+ 
+ - self.min_working_hour_per_block in Solver Req einbauen und ziehen
+ - self.working_blocks in Solver Req einbauen und ziehen
+ - self.max_consecutive_days in Solver Req einbauen und ziehen
+
+ - start_time und end_time zwei und drei noch implementieren (noch warten bis über 00:00 Zeiten eingegeben werden können!)
+
+ - Der erstellte "divisor" in data_processing könnte als Attribut initialisiert werden, damit es nicht bei jeder Methode einzeln berechnet werden muss
+
+ 
+ Fragen an die Runde (Juli 2023):
+ -------------------------------
+ - MA mit verschiedenen Profilen - Department (Koch, Service, ..)? Wie genau lösen wir das?
+ - Wie oft darf gesolvt werden? zb. max 2x pro Woche?
+ - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden?
+ -------------------------------
+
+ - Jeder MA muss vor dem Solven eingegeben haben, wann er arbeiten kann. Auch wenn es alles 0 sind.
+
+
+"""
 
 class ORAlgorithm_cp:
     def __init__(self, dp: DataProcessing):
@@ -815,7 +865,7 @@ class ORAlgorithm_cp:
         # NB 5 - Anzahl Arbeitsblöcke
         # -------------------------------------------------------------------------------------------------------
 
-        self.working_blocks = 2
+        self.working_blocks = 1
                 
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
@@ -1159,12 +1209,31 @@ class ORAlgorithm_cp:
         """
         Problem lösen und Kosten ausgeben
         """
-        # self.model.ExportToFile('slow_model.pb.txt')
+        log_file = open('log.txt', 'w')
+
+        def log_callback(message):
+            log_file.write(message)
+            log_file.flush() # Alle Daten die sich im Puffer befinden werden sofort in die Datei geschrieben
+
         self.solver.parameters.log_search_progress = True
+        self.solver.parameters.log_to_stdout = True # Ausgabe in der Konsole?
+        self.solver.log_callback = log_callback
+
         self.status = self.solver.Solve(self.model)
 
+        log_file.close()
+        
+        # self.model.ExportToFile('slow_model.pb.txt')
+        # self.solver.parameters.log_search_progress = True
+        # self.status = self.solver.Solve(self.model)
 
         # ----------------------------------------------------------------
+        # Die Werte von s2 printen
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                # Drucken Sie den Wert von s3[i, j]
+                print(f"s2[{i}][{j}] =", self.solver.Value(self.s2[i, j]))
+
         # Die Werte von a printen
         for i in self.mitarbeiter:
             for j in range(self.calc_time):

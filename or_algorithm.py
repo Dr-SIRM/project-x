@@ -12,6 +12,7 @@ from sqlalchemy import text
 from models import Timetable, User, SolverAnalysis
 
 """
+(SCIP Solver ab 08.09.23 nicht mehr weiterentwickelt)
 To-Do Liste:
 
 Prio 1:

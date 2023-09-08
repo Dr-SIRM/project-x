@@ -105,8 +105,8 @@ class DataProcessing:
         # self.end_date = "2023-07-30"
 
         # usecase_1
-        # self.start_date = "2023-08-28"
-        # self.end_date = "2023-09-03"
+        self.start_date = "2023-08-28"
+        self.end_date = "2023-09-03"
 
         print(self.start_date)
         print(self.end_date)
@@ -184,7 +184,7 @@ class DataProcessing:
 
         # end_time in dieser Methode auf end_time2 wechslen!!
         # end_time == 0 / end_time2 == 1
-        self.end_time_choice = 1
+        self.end_time_choice = 0
         end_time_field = "end_time2" if self.end_time_choice == 1 else "end_time"
 
 
@@ -284,7 +284,6 @@ class DataProcessing:
 
             # Sortiere das Wörterbuch nach Datum
             self.time_req = OrderedDict(sorted(time_req_dict_2.items()))
-
 
 
     def get_shift_weeklyhours_emp_lvl(self):
