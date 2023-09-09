@@ -39,6 +39,7 @@ Prio 1:
 
  To-Do's 
  -------------------------------
+ - (*) Shifts aus Solver_req Datenbank rauslöschen und Daten nicht mehr ziehen
  - (*) NB9 mit 3 Schichten fertigbauen
  - (*) Während des Solvings Daten ziehen --> Fragen gestellt
 
@@ -145,8 +146,8 @@ class ORAlgorithm_cp:
 
         # Attribute der Methode "solve_problem"
         self.status = None
-        self.solving_time_seconds = None
 
+        # Attribute der Methode "calculate_costs"
         self.violation_nb1 = None
         self.violation_nb2 = None
         self.violation_nb3 = None
@@ -185,6 +186,7 @@ class ORAlgorithm_cp:
         self.objective_function()
         self.constraints()
         self.solve_problem()
+        self.calculate_costs()
         self.store_solved_data()
         self.output_result_excel()
         self.save_data_in_database()
@@ -535,7 +537,7 @@ class ORAlgorithm_cp:
         self.model = cp_model.CpModel()
         self.solver = cp_model.CpSolver()
         
-        # self.solver.parameters.max_time_in_seconds = 120
+        self.solver.parameters.max_time_in_seconds = 120
 
 
 
@@ -740,13 +742,10 @@ class ORAlgorithm_cp:
             for j in range(7):
                 self.cost_expressions.append(self.nb7_violation[i, j] * self.penalty_cost_nb7)
 
-        """
         # Kosten für Weiche NB8 "Innerhalb der zweiten Woche immer gleiche Schichten"
         for i in self.mitarbeiter:
             for j in range(7, self.calc_time):
                 self.cost_expressions.append(self.nb8_violation[i, j] * self.penalty_cost_nb8)
-
-        """
 
         # Kosten für Weiche NB9 "Minimale Arbeitsstunden pro Block"
         for i in self.mitarbeiter:
@@ -1209,6 +1208,7 @@ class ORAlgorithm_cp:
         """
         Problem lösen und Kosten ausgeben
         """
+
         log_file = open('log.txt', 'w')
 
         def log_callback(message):
@@ -1240,6 +1240,13 @@ class ORAlgorithm_cp:
                 # Drucken Sie den Wert von a[i, j]
                 print(f"a[{i}][{j}] =", self.solver.Value(self.a[i, j]))
         # ----------------------------------------------------------------
+
+
+
+    def calculate_costs(self):
+        """
+        In dieser Methode werden die Kosten der einzelnen Nebenbedingungen berechnet und ausgegeben
+        """
 
         # Kosten für die Einstellung von Mitarbeitern
         self.hiring_costs = sum((self.kosten[i] / self.hour_devider) * self.solver.Value(self.x[i, j, k]) for i in self.mitarbeiter for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[i][j])))

@@ -106,7 +106,7 @@ class DataProcessing:
 
         # usecase_1
         self.start_date = "2023-08-28"
-        self.end_date = "2023-09-03"
+        self.end_date = "2023-09-10"
 
         print(self.start_date)
         print(self.end_date)
