@@ -5,6 +5,7 @@ import time
 import math
 
 import sys
+import re
 
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font
@@ -1208,12 +1209,18 @@ class ORAlgorithm_cp:
         """
         Problem lösen und Kosten ausgeben
         """
+        self.best_values = []
+        self.last_read_time = 0
 
         log_file = open('log.txt', 'w')
 
         def log_callback(message):
             log_file.write(message)
             log_file.flush() # Alle Daten die sich im Puffer befinden werden sofort in die Datei geschrieben
+            current_time = time.time()
+            if current_time - self.last_read_time > 2:
+                self.read_best_value(message)
+                self.last_read_time = current_time
 
         self.solver.parameters.log_search_progress = True
         self.solver.parameters.log_to_stdout = True # Ausgabe in der Konsole?
@@ -1241,12 +1248,19 @@ class ORAlgorithm_cp:
                 print(f"a[{i}][{j}] =", self.solver.Value(self.a[i, j]))
         # ----------------------------------------------------------------
 
+    def read_best_value(self, message):
+        match = re.search(r'best:(\d+)', message)
+        if match:
+            self.best_values.append(int(match.group(1)))
+
 
 
     def calculate_costs(self):
         """
         In dieser Methode werden die Kosten der einzelnen Nebenbedingungen berechnet und ausgegeben
         """
+
+        print("Best Values: ", self.best_values)
 
         # Kosten für die Einstellung von Mitarbeitern
         self.hiring_costs = sum((self.kosten[i] / self.hour_devider) * self.solver.Value(self.x[i, j, k]) for i in self.mitarbeiter for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[i][j])))
