@@ -129,7 +129,13 @@ const Company = ({ company }) => {
                 name="company_name"
                 error={!!touched.company_name && !!errors.company_name}
                 helperText={touched.company_name && errors.company_name}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
               />
               <Typography
                 color={colors.greenAccent[500]}
@@ -165,7 +171,13 @@ const Company = ({ company }) => {
                 placeholder={companyData.weekly_hours || ""}
                 error={!!touched.weekly_hours && !!errors.weekly_hours}
                 helperText={touched.weekly_hours && errors.weekly_hours}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
               />
               <Typography
                 color={colors.greenAccent[500]}
@@ -200,7 +212,13 @@ const Company = ({ company }) => {
                 name="shifts"
                 error={!!touched.shifts && !!errors.shifts}
                 helperText={touched.shifts && errors.shifts}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
                 >
                 <MenuItem value={ '1' }>1</MenuItem>
                 <MenuItem value={ '2' }>2</MenuItem>
@@ -334,7 +352,13 @@ const Company = ({ company }) => {
                       touched[`day_${rowIndex}_0`] &&
                       errors[`day_${rowIndex}_0`]
                     }
-                    sx={{ gridColumn: "span 1" }}
+                    sx={{
+                      gridColumn: "span 1",
+                      '& .MuiFilledInput-input': {
+                        paddingTop: '10px',
+                        paddingBottom: '10px',
+                      },
+                    }}
                   />
                   <TextField
                     key={`day_${rowIndex}_1`}
@@ -353,7 +377,13 @@ const Company = ({ company }) => {
                       touched[`day_${rowIndex}_1`] &&
                       errors[`day_${rowIndex}_1`]
                     }
-                    sx={{ gridColumn: "span 1" }}
+                    sx={{
+                      gridColumn: "span 1",
+                      '& .MuiFilledInput-input': {
+                        paddingTop: '10px',
+                        paddingBottom: '10px',
+                      },
+                    }}
                   />
                   <TextField
                     key={`day_${rowIndex}_2`}
@@ -372,7 +402,13 @@ const Company = ({ company }) => {
                       touched[`day_${rowIndex}_2`] &&
                       errors[`day_${rowIndex}_2`]
                     }
-                    sx={{ gridColumn: "span 1" }}
+                    sx={{
+                      gridColumn: "span 1",
+                      '& .MuiFilledInput-input': {
+                        paddingTop: '10px',
+                        paddingBottom: '10px',
+                      },
+                    }}
                   />
                   <TextField
                     key={`day_${rowIndex}_3`}
@@ -391,7 +427,13 @@ const Company = ({ company }) => {
                       touched[`day_${rowIndex}_3`] &&
                       errors[`day_${rowIndex}_3`]
                     }
-                    sx={{ gridColumn: "span 1" }}
+                    sx={{
+                      gridColumn: "span 1",
+                      '& .MuiFilledInput-input': {
+                        paddingTop: '10px',
+                        paddingBottom: '10px',
+                      },
+                    }}
                   />
                   <Typography
                     key={`empty-1-${rowIndex}`}
