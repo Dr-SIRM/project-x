@@ -211,7 +211,7 @@ const Team = () => {
           checkboxSelection
           rows={users}
           columns={columns}
-          onEditRowsModelChange={() => console.log('Edit event triggered')}
+          onEditCellChange={() => console.log('Edit cell change')}
           onCellClick={() => console.log('Cell clicked')}
       />
 
