@@ -19,7 +19,8 @@ const Company = ({ company }) => {
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [companyData, setcompanyData] = useState({});
   const [isLoading, setIsLoading] = useState(true); 
-  const token = localStorage.getItem('session_token'); // Get the session token from local storage
+  const token = localStorage.getItem('session_token');
+  const [additionalTimes, setAdditionalTimes] = useState(0);
 
   useEffect(() => {
     const fetchCompany = async () => {
@@ -63,6 +64,12 @@ const Company = ({ company }) => {
       </Box>
     );
   }
+
+  const handleAddTime = () => {
+    if (additionalTimes < 2) {
+      setAdditionalTimes(additionalTimes + 1);
+    }
+  };
 
   return (
     <Box m="20px">
@@ -308,6 +315,7 @@ const Company = ({ company }) => {
               >
                 Endezeit 2
               </Typography>
+
               <Typography
                 color={colors.greenAccent[500]}
                 variant=""
@@ -451,6 +459,9 @@ const Company = ({ company }) => {
               ))}
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
+              <Button onClick={handleAddTime} color="primary" variant="contained" sx={{ marginRight: '10px' }}>
+                Add Time
+              </Button>
               <Button type="submit" color="secondary" variant="contained">
                 Update
               </Button>
@@ -458,36 +469,6 @@ const Company = ({ company }) => {
           </form>
         )}
       </Formik>
-      <Snackbar
-        open={showSuccessNotification}
-        onClose={() => setShowSuccessNotification(false)}
-        message="Registration successful"
-        autoHideDuration={3000}
-        sx={{
-          backgroundColor: "green !important",
-          color: "white",
-          "& .MuiSnackbarContent-root": {
-            borderRadius: "4px",
-            padding: "15px",
-            fontSize: "16px",
-          },
-        }}
-      />
-      <Snackbar
-        open={showErrorNotification}
-        onClose={() => setShowErrorNotification(false)}
-        message="Error occurred - Your shifts might already be in use"
-        autoHideDuration={3000}
-        sx={{
-          backgroundColor: "red !important",
-          color: "white",
-          "& .MuiSnackbarContent-root": {
-            borderRadius: "4px",
-            padding: "15px",
-            fontSize: "16px",
-          },
-        }}
-      />
     </Box>
   );
 };

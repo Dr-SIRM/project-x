@@ -351,6 +351,21 @@ useEffect(() => {
               Verfügbarkeit erfolgreich erfasst
           </Alert>
       </Snackbar>
+      <Snackbar
+        open={showErrorNotification}
+        onClose={() => setShowErrorNotification(false)}
+        autoHideDuration={3000}
+        ContentProps={{
+            sx: {
+                backgroundColor: "red !important",
+                color: "white",
+            }
+        }}
+    >
+        <Alert onClose={() => setShowErrorNotification(false)} severity="error" sx={{ width: '100%' }}>
+            Update nicht erfolgreich
+        </Alert>
+    </Snackbar>
 
     </Box>
   );
