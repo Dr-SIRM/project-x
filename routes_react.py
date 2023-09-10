@@ -1181,7 +1181,7 @@ def get_shift():
         if record.start_time is not None and record.end_time is not None:
             opening_hours_data[record.weekday.lower()] = {
                 "start": record.start_time.strftime("%H:%M"),
-                "end": record.end_time2.strftime("%H:%M")
+                "end": record.end_time.strftime("%H:%M")
             }
 
     if start_date and end_date:

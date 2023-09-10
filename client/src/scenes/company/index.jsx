@@ -19,7 +19,8 @@ const Company = ({ company }) => {
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [companyData, setcompanyData] = useState({});
   const [isLoading, setIsLoading] = useState(true); 
-  const token = localStorage.getItem('session_token'); // Get the session token from local storage
+  const token = localStorage.getItem('session_token');
+  const [additionalTimes, setAdditionalTimes] = useState(0);
 
   useEffect(() => {
     const fetchCompany = async () => {
@@ -63,6 +64,12 @@ const Company = ({ company }) => {
       </Box>
     );
   }
+
+  const handleAddTime = () => {
+    if (additionalTimes < 2) {
+      setAdditionalTimes(additionalTimes + 1);
+    }
+  };
 
   return (
     <Box m="20px">
@@ -129,7 +136,13 @@ const Company = ({ company }) => {
                 name="company_name"
                 error={!!touched.company_name && !!errors.company_name}
                 helperText={touched.company_name && errors.company_name}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
               />
               <Typography
                 color={colors.greenAccent[500]}
@@ -165,7 +178,13 @@ const Company = ({ company }) => {
                 placeholder={companyData.weekly_hours || ""}
                 error={!!touched.weekly_hours && !!errors.weekly_hours}
                 helperText={touched.weekly_hours && errors.weekly_hours}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
               />
               <Typography
                 color={colors.greenAccent[500]}
@@ -200,7 +219,13 @@ const Company = ({ company }) => {
                 name="shifts"
                 error={!!touched.shifts && !!errors.shifts}
                 helperText={touched.shifts && errors.shifts}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
                 >
                 <MenuItem value={ '1' }>1</MenuItem>
                 <MenuItem value={ '2' }>2</MenuItem>
@@ -290,6 +315,7 @@ const Company = ({ company }) => {
               >
                 Endezeit 2
               </Typography>
+
               <Typography
                 color={colors.greenAccent[500]}
                 variant=""
@@ -334,7 +360,13 @@ const Company = ({ company }) => {
                       touched[`day_${rowIndex}_0`] &&
                       errors[`day_${rowIndex}_0`]
                     }
-                    sx={{ gridColumn: "span 1" }}
+                    sx={{
+                      gridColumn: "span 1",
+                      '& .MuiFilledInput-input': {
+                        paddingTop: '10px',
+                        paddingBottom: '10px',
+                      },
+                    }}
                   />
                   <TextField
                     key={`day_${rowIndex}_1`}
@@ -353,7 +385,13 @@ const Company = ({ company }) => {
                       touched[`day_${rowIndex}_1`] &&
                       errors[`day_${rowIndex}_1`]
                     }
-                    sx={{ gridColumn: "span 1" }}
+                    sx={{
+                      gridColumn: "span 1",
+                      '& .MuiFilledInput-input': {
+                        paddingTop: '10px',
+                        paddingBottom: '10px',
+                      },
+                    }}
                   />
                   <TextField
                     key={`day_${rowIndex}_2`}
@@ -372,7 +410,13 @@ const Company = ({ company }) => {
                       touched[`day_${rowIndex}_2`] &&
                       errors[`day_${rowIndex}_2`]
                     }
-                    sx={{ gridColumn: "span 1" }}
+                    sx={{
+                      gridColumn: "span 1",
+                      '& .MuiFilledInput-input': {
+                        paddingTop: '10px',
+                        paddingBottom: '10px',
+                      },
+                    }}
                   />
                   <TextField
                     key={`day_${rowIndex}_3`}
@@ -391,7 +435,13 @@ const Company = ({ company }) => {
                       touched[`day_${rowIndex}_3`] &&
                       errors[`day_${rowIndex}_3`]
                     }
-                    sx={{ gridColumn: "span 1" }}
+                    sx={{
+                      gridColumn: "span 1",
+                      '& .MuiFilledInput-input': {
+                        paddingTop: '10px',
+                        paddingBottom: '10px',
+                      },
+                    }}
                   />
                   <Typography
                     key={`empty-1-${rowIndex}`}
@@ -409,6 +459,9 @@ const Company = ({ company }) => {
               ))}
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
+              <Button onClick={handleAddTime} color="primary" variant="contained" sx={{ marginRight: '10px' }}>
+                Add Time
+              </Button>
               <Button type="submit" color="secondary" variant="contained">
                 Update
               </Button>
@@ -416,36 +469,6 @@ const Company = ({ company }) => {
           </form>
         )}
       </Formik>
-      <Snackbar
-        open={showSuccessNotification}
-        onClose={() => setShowSuccessNotification(false)}
-        message="Registration successful"
-        autoHideDuration={3000}
-        sx={{
-          backgroundColor: "green !important",
-          color: "white",
-          "& .MuiSnackbarContent-root": {
-            borderRadius: "4px",
-            padding: "15px",
-            fontSize: "16px",
-          },
-        }}
-      />
-      <Snackbar
-        open={showErrorNotification}
-        onClose={() => setShowErrorNotification(false)}
-        message="Error occurred - Your shifts might already be in use"
-        autoHideDuration={3000}
-        sx={{
-          backgroundColor: "red !important",
-          color: "white",
-          "& .MuiSnackbarContent-root": {
-            borderRadius: "4px",
-            padding: "15px",
-            fontSize: "16px",
-          },
-        }}
-      />
     </Box>
   );
 };
