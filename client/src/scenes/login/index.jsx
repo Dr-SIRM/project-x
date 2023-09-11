@@ -44,6 +44,17 @@ const Login = () => {
       alignItems="center" 
       minHeight="100vh"
     >
+      <Button
+      variant="contained"
+      href="/landing-page"
+      style={{
+        position: 'absolute',
+        top: '10px',
+        right: '10px'
+      }}
+    >
+      Zurück
+    </Button>
       <Header title="Login" subtitle="" />
       <Box width="300px" p={2}>
         <form onSubmit={handleFormSubmit}>
