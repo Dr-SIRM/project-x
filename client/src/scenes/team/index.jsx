@@ -144,7 +144,7 @@ const Team = () => {
     },
     {
       field: "access_level",
-      headerName: "Access Level",
+      headerName: "Zugriffslevel",
       flex: 1,
       renderCell: ({ row: { access_level } }) => {
         return (

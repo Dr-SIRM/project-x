@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { Box, Typography, TextField, Button, Alert, useTheme, Link, CircularProgress, Snackbar } from '@mui/material';
+import { Box, Typography, TextField, Button, Alert, useTheme, Link, CircularProgress } from '@mui/material';
 import Header from "../../components/Header";
 import { useNavigate } from 'react-router-dom';
 import { tokens } from "../../theme";
@@ -29,7 +29,7 @@ const Login = () => {
       await login(email, password);
       setTimeout(() => {
         navigate('/dashboard'); 
-      }, 3000);
+      }, 2000);
     } catch (error) {
       setError('Invalid email or password');
       setLoading(false);
@@ -96,21 +96,7 @@ const Login = () => {
             </Typography>
           </Box>
         </form>
-        <Snackbar
-          open={showErrorNotification}
-          onClose={() => setShowErrorNotification(false)}
-          message="Email or Password is incorrect"
-          autoHideDuration={3000}
-          sx={{
-            backgroundColor: "red !important",
-            color: "white",
-            "& .MuiSnackbarContent-root": {
-              borderRadius: "4px",
-              padding: "15px",
-              fontSize: "16px",
-            },
-          }}
-        />
+        
       </Box>
     </Box>
   );

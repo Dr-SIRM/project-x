@@ -69,7 +69,7 @@ const Invite = ({ invite }) => {
     <Box m="20px">
       <Header
         title="Einladen"
-        subtitle="Add your new team member into your business."
+        subtitle=""
       />
       <h2>Lade dein Teammitglieder ein</h2>
 
@@ -282,7 +282,7 @@ const Invite = ({ invite }) => {
                   height: "100%",
                 }}
               >
-                Access Level
+                Zugriffslevel
               </Typography>
               <Select
                 fullWidth
