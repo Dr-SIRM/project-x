@@ -6,6 +6,7 @@ import math
 
 import sys
 import re
+import threading
 
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font
@@ -1210,29 +1211,53 @@ class ORAlgorithm_cp:
         Problem lösen und Kosten ausgeben
         """
         self.best_values = []
+        self.last_best_value = None
         self.last_read_time = 0
+        self.stop_thread = False
+        self.best_test_time = 5
 
         log_file = open('log.txt', 'w')
 
         def log_callback(message):
             log_file.write(message)
-            log_file.flush() # Alle Daten die sich im Puffer befinden werden sofort in die Datei geschrieben
+            log_file.flush()
             current_time = time.time()
-            if current_time - self.last_read_time > 2:
+            if current_time - self.last_read_time > self.best_test_time:
                 self.read_best_value(message)
                 self.last_read_time = current_time
 
+        def add_best_value_to_list():
+            while not self.stop_thread:
+                time.sleep(self.best_test_time)
+                self.best_values.append(self.last_best_value)
+                print("------------------ NEUER WERT HINZUGEFÜGT: ", self.last_best_value, "------------------------")
+
         self.solver.parameters.log_search_progress = True
-        self.solver.parameters.log_to_stdout = True # Ausgabe in der Konsole?
+        self.solver.parameters.log_to_stdout = True
         self.solver.log_callback = log_callback
+
+        thread = threading.Thread(target=add_best_value_to_list)
+        thread.start()
 
         self.status = self.solver.Solve(self.model)
 
+        self.stop_thread = True
+        thread.join()
         log_file.close()
-        
+
+    def read_best_value(self, message):
+        match = re.search(r'best:(\d+)', message)
+        if match:
+            self.last_best_value = int(match.group(1))
+
+
+    def calculate_costs(self):
+        """
+        In dieser Methode werden die Kosten der einzelnen Nebenbedingungen berechnet und ausgegeben
+        """
         # self.model.ExportToFile('slow_model.pb.txt')
-        # self.solver.parameters.log_search_progress = True
-        # self.status = self.solver.Solve(self.model)
+
+        print("Best Values: ", self.best_values)
 
         # ----------------------------------------------------------------
         # Die Werte von s2 printen
@@ -1247,20 +1272,6 @@ class ORAlgorithm_cp:
                 # Drucken Sie den Wert von a[i, j]
                 print(f"a[{i}][{j}] =", self.solver.Value(self.a[i, j]))
         # ----------------------------------------------------------------
-
-    def read_best_value(self, message):
-        match = re.search(r'best:(\d+)', message)
-        if match:
-            self.best_values.append(int(match.group(1)))
-
-
-
-    def calculate_costs(self):
-        """
-        In dieser Methode werden die Kosten der einzelnen Nebenbedingungen berechnet und ausgegeben
-        """
-
-        print("Best Values: ", self.best_values)
 
         # Kosten für die Einstellung von Mitarbeitern
         self.hiring_costs = sum((self.kosten[i] / self.hour_devider) * self.solver.Value(self.x[i, j, k]) for i in self.mitarbeiter for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[i][j])))
@@ -1527,7 +1538,7 @@ class ORAlgorithm_cp:
             self_min_anwesend = str(self.min_anwesend),
             self_gerechte_verteilung = str(self.gerechte_verteilung),
             self_fair_distribution = self.fair_distribution,
-            solving_time = self.solving_time_seconds,
+            solving_time = None,
             lp_iteration = None,
             violation_nb1 = self.violation_nb1,
             violation_nb2 = self.violation_nb2,
