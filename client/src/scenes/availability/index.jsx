@@ -115,6 +115,18 @@ useEffect(() => {
             return acc;
           }, {}),
         }}
+        validationSchema={checkoutSchema}
+        validate={values => {
+          const errors = {};
+          for (let i = 0; i < availabilityData.day_num; i++) {
+            const end_time1 = values[`day_${i}_1`];
+            const start_time2 = values[`day_${i}_2`];
+            if (start_time2 <= end_time1) {
+              errors[`day_${i}_2`] = 'Start Zeit 2 muss grösser als Endzeit 1 sein';
+            }
+          }
+          return errors;
+        }}
       >
         {({
           values,
@@ -372,6 +384,10 @@ useEffect(() => {
 
 };
 
-
+const checkoutSchema = yup.object().shape({
+  company_name: yup.string(),
+  weekly_hours: yup.number(),
+  shifts: yup.number(),
+});
 
 export default Availability;
