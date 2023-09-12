@@ -397,7 +397,6 @@ const TimeReq = ({ timereq }) => {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    width: 100, // Set a fixed width
                     }}>
               <Typography variant="h4" gutterBottom component="div">
                 {timereqData.weekdays[columnIndex]}
@@ -415,9 +414,11 @@ const TimeReq = ({ timereq }) => {
                 variant="contained"
                 color="primary"
                 onClick={() => EnteredSlots(columnIndex)}
+                sx={{ marginBottom: '10px' }} // Adjust as needed
               >
                 Enter
               </Button>
+
               <Box sx={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -496,6 +497,8 @@ const TimeReq = ({ timereq }) => {
                             color: "white",
                             backgroundColor: "#2e7c67",
                           },
+                          width: '100%', // Full width
+                          
                         }}
                       >
                       {`${timereqData.slots_dict && timereqData.slots_dict[btnIndex]}`}

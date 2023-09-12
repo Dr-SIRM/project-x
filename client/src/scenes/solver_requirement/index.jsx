@@ -134,14 +134,20 @@ const SolverReq = ({ solverreq }) => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label= ""
+                label=''
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.desired_min_time_day}
                 name="desired_min_time_day"
                 error={!!touched.desired_min_time_day && !!errors.desired_min_time_day}
                 helperText={touched.desired_min_time_day && errors.desired_min_time_day}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
               />
             <Typography
                 color={colors.greenAccent[500]}
@@ -166,7 +172,13 @@ const SolverReq = ({ solverreq }) => {
                 name="min_time_day"
                 error={!!touched.min_time_day && !!errors.min_time_day}
                 helperText={touched.min_time_day && errors.min_time_day}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
               />
               <Typography
                 color={colors.greenAccent[500]}
@@ -201,7 +213,13 @@ const SolverReq = ({ solverreq }) => {
                 name="max_time_day"
                 error={!!touched.max_time_day && !!errors.max_time_day}
                 helperText={touched.max_time_day && errors.max_time_day}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
               />
               <Typography
                 color={colors.greenAccent[500]}
@@ -226,7 +244,13 @@ const SolverReq = ({ solverreq }) => {
                 name="desired_max_time_day"
                 error={!!touched.desired_max_time_day && !!errors.desired_max_time_day}
                 helperText={touched.desired_max_time_day && errors.desired_max_time_day}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
               />
               <Typography
                 color={colors.greenAccent[500]}
@@ -261,7 +285,13 @@ const SolverReq = ({ solverreq }) => {
                 name="max_time_week"
                 error={!!touched.max_time_week && !!errors.max_time_week}
                 helperText={touched.max_time_week && errors.max_time_week}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
               />
               <Typography
                 color={colors.greenAccent[500]}
@@ -286,7 +316,13 @@ const SolverReq = ({ solverreq }) => {
                 name="fair_distribution"
                 error={!!touched.fair_distribution && !!errors.fair_distribution}
                 helperText={touched.fair_distribution && errors.fair_distribution}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
               />
               <Typography
                 color={colors.greenAccent[500]}
@@ -321,7 +357,13 @@ const SolverReq = ({ solverreq }) => {
                 name="hour_devider"
                 error={!!touched.hour_devider && !!errors.hour_devider}
                 helperText={touched.hour_devider && errors.hour_devider}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
               >
                 <MenuItem value={ '1' }>1</MenuItem>
                 <MenuItem value={ '2' }>2</MenuItem>
@@ -350,7 +392,13 @@ const SolverReq = ({ solverreq }) => {
                 name="week_timeframe"
                 error={!!touched.week_timeframe && !!errors.week_timeframe}
                 helperText={touched.week_timeframe && errors.week_timeframe}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
               >
                 <MenuItem value={ '1' }>1</MenuItem>
                 <MenuItem value={ '2' }>2</MenuItem>
@@ -389,7 +437,13 @@ const SolverReq = ({ solverreq }) => {
                 name="nb1"
                 error={!!touched.nb1 && !!errors.nb1}
                 helperText={touched.nb1 && errors.nb1}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
               >
                 <MenuItem value={ '0' }>0</MenuItem>
                 <MenuItem value={ '1' }>1</MenuItem>
@@ -431,7 +485,13 @@ const SolverReq = ({ solverreq }) => {
                 name="nb2"
                 error={!!touched.nb2 && !!errors.nb2}
                 helperText={touched.nb2 && errors.nb2}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
                 <MenuItem value={ '1' }>1</MenuItem>
@@ -473,7 +533,13 @@ const SolverReq = ({ solverreq }) => {
                 name="nb3"
                 error={!!touched.nb3 && !!errors.nb3}
                 helperText={touched.nb3 && errors.nb3}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
                 <MenuItem value={ '1' }>1</MenuItem>
@@ -515,7 +581,13 @@ const SolverReq = ({ solverreq }) => {
                 name="nb4"
                 error={!!touched.nb4 && !!errors.nb4}
                 helperText={touched.nb4 && errors.nb4}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
                 <MenuItem value={ '1' }>1</MenuItem>
@@ -557,7 +629,13 @@ const SolverReq = ({ solverreq }) => {
                 name="nb5"
                 error={!!touched.nb5 && !!errors.nb5}
                 helperText={touched.nb5 && errors.nb5}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
                 <MenuItem value={ '1' }>1</MenuItem>
@@ -599,7 +677,13 @@ const SolverReq = ({ solverreq }) => {
                 name="nb6"
                 error={!!touched.nb6 && !!errors.nb6}
                 helperText={touched.nb6 && errors.nb6}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
                 <MenuItem value={ '1' }>1</MenuItem>
@@ -641,7 +725,13 @@ const SolverReq = ({ solverreq }) => {
                 name="nb7"
                 error={!!touched.nb7 && !!errors.nb7}
                 helperText={touched.nb7 && errors.nb7}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
                 <MenuItem value={ '1' }>1</MenuItem>
@@ -683,7 +773,13 @@ const SolverReq = ({ solverreq }) => {
                 name="nb8"
                 error={!!touched.nb8 && !!errors.nb8}
                 helperText={touched.nb8 && errors.nb8}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
                 <MenuItem value={ '1' }>1</MenuItem>
@@ -725,7 +821,13 @@ const SolverReq = ({ solverreq }) => {
                 name="nb9"
                 error={!!touched.nb9 && !!errors.nb9}
                 helperText={touched.nb9 && errors.nb9}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
                 <MenuItem value={ '1' }>1</MenuItem>
@@ -767,7 +869,13 @@ const SolverReq = ({ solverreq }) => {
                 name="nb10"
                 error={!!touched.nb10 && !!errors.nb10}
                 helperText={touched.nb10 && errors.nb10}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
                 <MenuItem value={ '1' }>1</MenuItem>
@@ -809,7 +917,13 @@ const SolverReq = ({ solverreq }) => {
                 name="nb11"
                 error={!!touched.nb11 && !!errors.nb11}
                 helperText={touched.nb11 && errors.nb11}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
                 <MenuItem value={ '1' }>1</MenuItem>
@@ -851,7 +965,13 @@ const SolverReq = ({ solverreq }) => {
                 name="nb12"
                 error={!!touched.nb12 && !!errors.nb12}
                 helperText={touched.nb12 && errors.nb12}
-                sx={{ gridColumn: "span 1" }}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
                 <MenuItem value={ '1' }>1</MenuItem>
@@ -915,8 +1035,5 @@ const SolverReq = ({ solverreq }) => {
     </Box>
   );
 };
-
-
-
 
 export default SolverReq;

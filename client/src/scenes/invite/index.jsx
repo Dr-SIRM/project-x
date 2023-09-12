@@ -68,10 +68,10 @@ const Invite = ({ invite }) => {
   return (
     <Box m="20px">
       <Header
-        title="INVITE"
+        title="Einladen"
         subtitle="Add your new team member into your business."
       />
-      <h2>Invite your Teammember</h2>
+      <h2>Lade dein Teammitglieder ein</h2>
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -126,7 +126,13 @@ const Invite = ({ invite }) => {
                 name="email"
                 error={!!touched.email && !!errors.email}
                 helperText={touched.email && errors.email}
-                sx={{ gridColumn: "span 2" }}
+                sx={{
+                  gridColumn: "span 2",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
               />
               <Typography
                 color={colors.greenAccent[500]}
@@ -138,7 +144,7 @@ const Invite = ({ invite }) => {
                   height: "100%",
                 }}
               >
-                Company
+                Firma
               </Typography>
               <TextField
                 fullWidth
@@ -151,7 +157,13 @@ const Invite = ({ invite }) => {
                 name="company_name"
                 error={!!touched.company_name && !!errors.company_name}
                 helperText={touched.company_name && errors.company_name}
-                sx={{ gridColumn: "span 2" }}
+                sx={{
+                  gridColumn: "span 2",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
               />
               <Typography
                 color={colors.greenAccent[500]}
@@ -176,7 +188,13 @@ const Invite = ({ invite }) => {
                 name="department"
                 error={!!touched.department && !!errors.department}
                 helperText={touched.department && errors.department}
-                sx={{ gridColumn: "span 2" }}
+                sx={{
+                  gridColumn: "span 2",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
               />
               <Typography
                 color={colors.greenAccent[500]}
@@ -188,7 +206,7 @@ const Invite = ({ invite }) => {
                   height: "100%",
                 }}
               >
-                Employment
+                Anstellung
               </Typography>
               <Select
                 fullWidth
@@ -201,7 +219,13 @@ const Invite = ({ invite }) => {
                 name="employment"
                 error={!!touched.employment && !!errors.employment}
                 helperText={touched.employment && errors.employment}
-                sx={{ gridColumn: "span 2" }}
+                sx={{
+                  gridColumn: "span 2",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
               >
                 <MenuItem value={'Perm'}>Festangestellt</MenuItem>
                 <MenuItem value={'Temp'}>Teilzeit</MenuItem>
@@ -216,7 +240,7 @@ const Invite = ({ invite }) => {
                   height: "100%",
                 }}
               >
-                Employment Level
+                Anstellungsgrad
               </Typography>
               <Select
                 fullWidth
@@ -229,7 +253,13 @@ const Invite = ({ invite }) => {
                 name="employment_level"
                 error={!!touched.employment_level && !!errors.employment_level}
                 helperText={touched.employment_level && errors.employment_level}
-                sx={{ gridColumn: "span 2" }}
+                sx={{
+                  gridColumn: "span 2",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
               >
                 <MenuItem value={'1'}>100%</MenuItem>
                 <MenuItem value={'0.9'}>90%</MenuItem>
@@ -265,7 +295,13 @@ const Invite = ({ invite }) => {
                 name="access_level"
                 error={!!touched.access_level && !!errors.access_level}
                 helperText={touched.access_level && errors.access_level}
-                sx={{ gridColumn: "span 2" }}
+                sx={{
+                  gridColumn: "span 2",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
               >
                 <MenuItem value={'User'}>User</MenuItem>
                 <MenuItem value={'Admin'}>Admin</MenuItem>

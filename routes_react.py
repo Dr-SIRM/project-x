@@ -889,6 +889,9 @@ def get_template_dict(template_name, day_num, daily_slots, hour_divider, minutes
     
     # Convert them to a dictionary for faster lookup
     temp_dict = {(temp.weekday, temp.start_time): temp.worker for temp in all_temps}
+
+    print("all_temps:", all_temps)
+    print("temp_dict:", temp_dict)
     
     for i in range(day_num):
         for hour in range(daily_slots):
@@ -965,7 +968,7 @@ def get_required_workforce():
     week_start = monday + datetime.timedelta(days=week_adjustment)
 
     template1_dict = get_template_dict("Template 1", day_num, daily_slots, hour_divider, minutes, user.company_name, week_adjustment, monday, full_day)
-    print(template1_dict)
+    print('temp1:', template1_dict)
 
     slot_dict = {}
     for i in range(daily_slots):
@@ -1178,7 +1181,7 @@ def get_shift():
         if record.start_time is not None and record.end_time is not None:
             opening_hours_data[record.weekday.lower()] = {
                 "start": record.start_time.strftime("%H:%M"),
-                "end": record.end_time2.strftime("%H:%M")
+                "end": record.end_time.strftime("%H:%M")
             }
 
     if start_date and end_date:

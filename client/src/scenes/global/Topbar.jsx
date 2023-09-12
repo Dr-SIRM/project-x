@@ -1,4 +1,4 @@
-import { Box, IconButton, useTheme, Popover, Typography } from "@mui/material";
+import { Box, IconButton, useTheme, Popover, Typography, Link } from "@mui/material";
 import { useContext, useState } from "react";
 import { ColorModeContext, tokens } from "../../theme";
 import InputBase from "@mui/material/InputBase";
@@ -7,20 +7,25 @@ import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import LogoutIcon from "@mui/icons-material/Logout";
+import SettingsIcon from '@mui/icons-material/Settings';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import UpdateIcon from '@mui/icons-material/Update';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
 import { AuthContext } from "../../AuthContext";
 
 const Topbar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
-
-  // Consume the AuthContext
   const authContext = useContext(AuthContext);
   const { logout } = authContext;
 
   const [isLogoutHovered, setIsLogoutHovered] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [notificationsAnchor, setNotificationsAnchor] = useState(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [settingsAnchor, setSettingsAnchor] = useState(null);
+
 
   const handleLogoutMouseEnter = () => {
     setIsLogoutHovered(true);
@@ -38,6 +43,18 @@ const Topbar = () => {
   const handlePopoverClose = () => {
     setIsNotificationsOpen(false);
   };
+
+  const handleSettingsClick = (event) => {
+    setIsSettingsOpen(true);
+    setSettingsAnchor(event.currentTarget);
+  };
+
+  const handleSettingsClose = () => {
+    setIsSettingsOpen(false);
+  };
+  
+  
+  
 
   return (
     <Box
@@ -97,6 +114,61 @@ const Topbar = () => {
             </Typography>
           </Box>
         </Popover>
+        <IconButton onClick={handleSettingsClick}>
+            <SettingsIcon />
+          </IconButton>
+
+          <Popover
+            open={isSettingsOpen}
+            anchorEl={settingsAnchor}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'center',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'center',
+            }}
+            onClose={handleSettingsClose}
+            disableRestoreFocus
+            sx={{
+              '& .MuiPaper-root': {
+                minHeight: '250',
+                maxWidth: '350',
+                borderRadius: '8px',
+                padding: '10px',
+                backgroundColor: theme.palette.mode === 'dark' ? 'black' : 'white',
+              },
+            }}
+          >
+            <Box sx={{ padding: '10px' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                <AccountCircleIcon sx={{ marginRight: '10px' }} />
+                <Typography variant="body2">
+                  <Link href="/account-overview" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    Account Übersicht
+                  </Link>
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                <UpdateIcon sx={{ marginRight: '10px' }} />
+                <Typography variant="body2">
+                  <Link href="/update-password" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    Update Personalien
+                  </Link>
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                <LockOpenIcon sx={{ marginRight: '10px' }} />
+                <Typography variant="body2">
+                  <Link href="/forgot-password" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    Passwort zurücksetzen
+                  </Link>
+                </Typography>
+              </Box>
+            </Box>
+          </Popover>
+
         <IconButton
           onClick={logout}
           onMouseEnter={handleLogoutMouseEnter}

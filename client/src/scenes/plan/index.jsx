@@ -4,6 +4,7 @@ import './plan.css';
 import { Box, IconButton } from "@mui/material";
 import Header from "../../components/Header";
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
+import { ThreeDots } from "react-loader-spinner"; 
 
 const GanttChart = () => {
   const [view, setView] = useState('day');
@@ -123,18 +124,22 @@ const GanttChart = () => {
         return { left: 0, width: 0 }; // Default values if no hours are specified
     }
 
-    const startHour = parseInt(hours.start.split(":")[0], 10);
-    const endHour = parseInt(hours.end.split(":")[0], 10);
-    
-    const shiftStartHour = parseInt(shift.start_time.split(":")[0], 10);
-    const shiftEndHour = parseInt(shift.end_time.split(":")[0], 10);
+    const startHourMinutes = hours.start.split(":").map(Number);
+    const endHourMinutes = hours.end.split(":").map(Number);
+    const shiftStartHourMinutes = shift.start_time.split(":").map(Number);
+    const shiftEndHourMinutes = shift.end_time.split(":").map(Number);
+
+    const startMinutes = startHourMinutes[0] * 60 + startHourMinutes[1];
+    const endMinutes = endHourMinutes[0] * 60 + endHourMinutes[1];
+    const shiftStartMinutes = shiftStartHourMinutes[0] * 60 + shiftStartHourMinutes[1];
+    const shiftEndMinutes = shiftEndHourMinutes[0] * 60 + shiftEndHourMinutes[1];
 
     let maxDuration, left, width;
     switch (view) {
         case 'day':
-            maxDuration = endHour - startHour; 
-            left = (shiftStartHour - startHour) / maxDuration * 100;
-            width = (shiftEndHour - shiftStartHour) / maxDuration * 100;
+            maxDuration = endMinutes - startMinutes;
+            left = (shiftStartMinutes - startMinutes) / maxDuration * 100;
+            width = (shiftEndMinutes - shiftStartMinutes) / maxDuration * 100;
             break;
         default:
             return { left: 0, width: 0 }; 
@@ -143,55 +148,81 @@ const GanttChart = () => {
     return { left: `${left}%`, width: `${width}%` };
 };
 
+const getCurrentTimePercentage = () => {
+  const today = new Date(currentDay);
+  const weekday = today.toLocaleDateString('en-US', { weekday: 'long' });
+  const hours = openingHours[weekday.toLowerCase()];
+  
+  if (!hours) {
+      return 0; // Default value if no hours are specified
+  }
 
-  const renderShifts = (worker) => {
-    let maxDuration;
-    const today = currentDay;
-  
-    switch (view) {
+  const currentHour = today.getHours();
+  const currentMinute = today.getMinutes();
+  const startHour = parseInt(hours.start.split(":")[0], 10);
+  const endHour = parseInt(hours.end.split(":")[0], 10);
+  const totalDuration = endHour - startHour;
+  const pastDuration = currentHour - startHour + currentMinute / 60;
+  return (pastDuration / totalDuration) * 100;
+};
+
+
+
+
+const renderShifts = (worker) => {
+  let maxDuration;
+  const today = currentDay;
+
+  switch (view) {
       case 'day':
-        maxDuration = getWorkingHoursDuration(today);
-        break;
-    }
-  
-    const validShifts = [];
-    
-    worker.shifts.forEach(shiftData => {
+          maxDuration = getWorkingHoursDuration(today);
+          break;
+  }
+
+  const validShifts = [];
+
+  worker.shifts.forEach(shiftData => {
       const { shifts } = shiftData;
       shifts.forEach(shift => {
-        console.log(`Start time for shift: ${shift.start_time}`);
-        console.log(`End time for shift: ${shift.end_time}`);
-    
-        if (shift.start_time && shift.end_time) {
-          validShifts.push({
-            ...shiftData,
-            start_time: shift.start_time,
-            end_time: shift.end_time,
-          });
-        }
+          console.log(`Start time for shift: ${shift.start_time}`);
+          console.log(`End time for shift: ${shift.end_time}`);
+
+          if (shift.start_time && shift.end_time) {
+              validShifts.push({
+                  ...shiftData,
+                  start_time: shift.start_time,
+                  end_time: shift.end_time,
+              });
+          }
       });
-    });
-  
-    return (
-      <div className="gantt-bar-container">
-        {validShifts.map((shift, index) => (
-          <div
-            key={index}
-            className="gantt-bar"
-            style={getShiftPosition(shift)}
-          >
-            <div className="tooltip">
-              Start: {shift.start_time} - Ende: {shift.end_time}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-    
+  });
+
+  const currentTimePercentage = getCurrentTimePercentage();
+  const currentTimeLineStyle = {
+      left: `${currentTimePercentage}%`,
   };
 
+  return (
+      <div className="gantt-bar-container">
+          <div className="current-time-line" style={currentTimeLineStyle}></div>
+          {validShifts.map((shift, index) => (
+              <div
+                  key={index}
+                  className="gantt-bar"
+                  style={getShiftPosition(shift)}
+              >
+                  <div className="tooltip">
+                      Start: {shift.start_time} - Ende: {shift.end_time}
+                  </div>
+              </div>
+          ))}
+      </div>
+  );
+};
+
+
   const getTimelineLabels = () => {
-    const today = currentDay;
+    const today = new Date(currentDay);
     const weekday = today.toLocaleDateString('en-US', { weekday: 'long' });
     const hours = openingHours[weekday.toLowerCase()];
 

@@ -1,10 +1,12 @@
 import React, { useState } from "react";
-import { Box, Typography, TextField, Button, Alert, useTheme, Link } from '@mui/material';
+import { Box, Typography, TextField, Button, Alert, useTheme, Link, CircularProgress } from '@mui/material';
+import Header from "../../components/Header";
 import axios from "axios";
 
 function ForgetPassword() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,29 +25,44 @@ function ForgetPassword() {
   };
 
   return (
-    <div>
+    <Box
+      display="flex"
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="center" 
+      minHeight="100vh"
+    >
+    <Header title="Passwort vergessen" subtitle="" />
+    <Box width="300px" p={2}>
       <form onSubmit={handleSubmit}>
-        <label>
-          Email:
-          <input
+        <Box mb={2}>
+          <TextField
             type="email"
+            label="Email"
+            fullWidth
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-        </label>
-        <input type="submit" value="Submit" />
-        <Box mb={2}>
-          <Typography>
-            <Link href="/login" style={{ textDecoration: 'none', color: 'inherit' }}>
-              Back
-            </Link>
-          </Typography>
         </Box>
+        <Button type="submit" variant="contained" fullWidth disabled={loading}>
+            {loading ? (
+              <CircularProgress size={24} color="inherit" /> 
+            ) : (
+              'Zurücksetzen'
+            )}
+          </Button>
+          <Box mb={2}>
+            <Button variant="contained" href="/login" fullWidth style={{ textDecoration: 'none', color: 'inherit', marginTop: '20px' }}>
+              Zurück
+            </Button>
+          </Box>
       </form>
       {message && <p>{message}</p>}
-    </div>
-  );
-}
+    
+    </Box>
+  </Box>
+)}
+
 
 export default ForgetPassword;
