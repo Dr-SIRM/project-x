@@ -70,6 +70,7 @@ useEffect(() => {
   const goToPreviousWeek = () => {
     setWeekAdjustment(weekAdjustment - 7);
   };
+  
 
   const handleFormSubmit = async (values) => {
     try {
@@ -184,6 +185,83 @@ useEffect(() => {
                 <ChevronRight />
               </IconButton>
             </Box>
+            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', marginBottom: '1rem' }}>
+              <Button 
+                variant="outlined"
+                color="inherit"
+                size="small"
+                onClick={handleFormSubmit}
+                sx={{
+                  borderColor: 'white',
+                  height: '20px',
+                  minHeight: '20px',
+                  fontSize: '10px',
+                  '&.MuiButtonOutlined': {
+                    borderColor: 'white',
+                  },
+                  '&:hover': {
+                    borderColor: 'white',
+                  },
+                  '&.MuiButtonText': {
+                    borderColor: 'white',
+                    color: 'white',
+                    backgroundColor: '#2e7c67',
+                  }
+                }}
+              >
+                Template 1
+              </Button>
+              <Button 
+                variant="outlined"
+                color="inherit"
+                size="small"
+                onClick={handleFormSubmit}
+                sx={{
+                  borderColor: 'white',
+                  height: '20px',
+                  minHeight: '20px',
+                  fontSize: '10px',
+                  '&.MuiButtonOutlined': {
+                    borderColor: 'white',
+                  },
+                  '&:hover': {
+                    borderColor: 'white',
+                  },
+                  '&.MuiButtonText': {
+                    borderColor: 'white',
+                    color: 'white',
+                    backgroundColor: '#2e7c67',
+                  }
+                }}
+              >
+                Template 2
+              </Button>
+              <Button 
+                variant="outlined"
+                color="inherit"
+                size="small"
+                onClick={handleFormSubmit}
+                sx={{
+                  borderColor: 'white',
+                  height: '20px',
+                  minHeight: '20px',
+                  fontSize: '10px',
+                  '&.MuiButtonOutlined': {
+                    borderColor: 'white',
+                  },
+                  '&:hover': {
+                    borderColor: 'white',
+                  },
+                  '&.MuiButtonText': {
+                    borderColor: 'white',
+                    color: 'white',
+                    backgroundColor: '#2e7c67',
+                  }
+                }}
+              >
+                Template 3
+              </Button>
+              </Box>
             <Box
       display="grid"
       gap="30px"
@@ -314,7 +392,7 @@ useEffect(() => {
               type="time"
               onBlur={handleBlur}
               onChange={handleChange}
-              value={values[`day_${rowIndex}_${columnIndex}`] || 0}
+              value={values[`day_${rowIndex}_${columnIndex}`] === '00:00' ? '' : values[`day_${rowIndex}_${columnIndex}`]}
               name={`day_${rowIndex}_${columnIndex}`}
               error={
                 !!touched[`day_${rowIndex}_${columnIndex}`] &&

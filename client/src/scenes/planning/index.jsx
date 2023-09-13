@@ -199,6 +199,48 @@ const TimeReq = ({ timereq }) => {
     setSlotEmployeeCounts(updatedCounts);
   };
 
+  const applyTemplate2 = () => {
+    const updatedCounts = { ...slotEmployeeCounts };
+
+    Array.from({ length: timereqData.day_num }).forEach((_, columnIndex) => {
+      Array.from({ length: timereqData.daily_slots }).forEach((_, btnIndex) => {
+        const currentTimeMinutes = convertTimeToMinutes(timereqData.slots_dict[btnIndex]);
+        const openingTimeMinutes = convertTimeToMinutes(openingHours[columnIndex]);
+        const startBreakTimeMinutes = convertTimeToMinutes(startBreak[columnIndex]) - 1;
+        const endBreakTimeMinutes = convertTimeToMinutes(endBreak[columnIndex]);
+        const closingTimeMinutes = convertTimeToMinutes(closingHours[columnIndex]) - 1;
+
+        if (isTimeWithinRange(currentTimeMinutes, openingTimeMinutes, startBreakTimeMinutes, endBreakTimeMinutes, closingTimeMinutes)) {
+          const key = `${columnIndex}-${btnIndex}`;
+          updatedCounts[key] = timereqData.template1_dict[key];
+        }
+      });
+    });
+
+    setSlotEmployeeCounts(updatedCounts);
+  };
+
+  const applyTemplate3 = () => {
+    const updatedCounts = { ...slotEmployeeCounts };
+
+    Array.from({ length: timereqData.day_num }).forEach((_, columnIndex) => {
+      Array.from({ length: timereqData.daily_slots }).forEach((_, btnIndex) => {
+        const currentTimeMinutes = convertTimeToMinutes(timereqData.slots_dict[btnIndex]);
+        const openingTimeMinutes = convertTimeToMinutes(openingHours[columnIndex]);
+        const startBreakTimeMinutes = convertTimeToMinutes(startBreak[columnIndex]) - 1;
+        const endBreakTimeMinutes = convertTimeToMinutes(endBreak[columnIndex]);
+        const closingTimeMinutes = convertTimeToMinutes(closingHours[columnIndex]) - 1;
+
+        if (isTimeWithinRange(currentTimeMinutes, openingTimeMinutes, startBreakTimeMinutes, endBreakTimeMinutes, closingTimeMinutes)) {
+          const key = `${columnIndex}-${btnIndex}`;
+          updatedCounts[key] = timereqData.template1_dict[key];
+        }
+      });
+    });
+
+    setSlotEmployeeCounts(updatedCounts);
+  };
+
   const handleFormSubmit = async (buttonName) => {
     try {
       const payload = {};
@@ -291,7 +333,7 @@ const TimeReq = ({ timereq }) => {
           variant="outlined"
           color="inherit"
           size="small"
-          onClick={handleFormSubmit}
+          onClick={applyTemplate2}
           sx={{
             borderColor: 'white',
             height: '20px',
@@ -316,7 +358,7 @@ const TimeReq = ({ timereq }) => {
           variant="outlined"
           color="inherit"
           size="small"
-          onClick={handleFormSubmit}
+          onClick={applyTemplate3}
           sx={{
             borderColor: 'white',
             height: '20px',

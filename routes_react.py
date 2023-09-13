@@ -7,6 +7,7 @@ import random
 from models import db
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 from app import app, mail
+from openpyxl import Workbook
 
 
 #Import of Database
@@ -357,6 +358,31 @@ def get_company():
     
     
     return jsonify(company_list)
+
+def get_temp_availability_dict(template_name, day_num, daily_slots, hour_divider, minutes, company_name, week_adjustment, monday, full_day):
+    temp_availability_dict = {}
+    for i in range(day_num):
+        for hour in range(daily_slots):
+            if hour > full_day:  # you might need to define full_day or pass it as a parameter
+                hour -= full_day
+            else:
+                pass
+            quarter_hour = hour / hour_divider
+            quarter_minute = (hour % hour_divider) * minutes
+            formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+            time = f'{formatted_time}:00'
+            new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+            temp = TemplateTimeRequirement.query.filter_by(
+                company_name=company_name,
+                weekday={i},
+                start_time=new_time,
+                template_name=template_name
+            ).first()
+            if temp is None or temp.worker == 0:
+                pass
+            else:
+                template_dict["{}-{}".format(i, hour)] = temp.worker
+    return temp_availability_dict
 
 
 @app.route('/api/availability', methods = ['GET', 'POST'])
@@ -878,38 +904,30 @@ def get_admin_registration():
     return jsonify({'message': 'Get Ready!'}), 200
                 
 
-def get_template_dict(template_name, day_num, daily_slots, hour_divider, minutes, company_name, week_adjustment, monday, full_day):
-    template_dict = {}
-    
-    # Pre-fetch TemplateTimeRequirement records
-    all_temps = TemplateTimeRequirement.query.filter_by(
-        company_name=company_name,
-        template_name=template_name
-    ).all()
-    
-    # Convert them to a dictionary for faster lookup
-    temp_dict = {(temp.weekday, temp.start_time): temp.worker for temp in all_temps}
-
-    print("all_temps:", all_temps)
-    print("temp_dict:", temp_dict)
-    
+def get_temp_timereq_dict(template_name, day_num, daily_slots, hour_divider, minutes, company_name, week_adjustment, monday, full_day):
+    temp_timereq_dict = {}
     for i in range(day_num):
         for hour in range(daily_slots):
-            actual_hour = hour if hour <= full_day else hour - full_day
-            
-            quarter_hour = actual_hour // hour_divider  # Use integer division
-            quarter_minute = (actual_hour % hour_divider) * minutes
-            
+            if hour > full_day:  # you might need to define full_day or pass it as a parameter
+                hour -= full_day
+            else:
+                pass
+            quarter_hour = hour / hour_divider
+            quarter_minute = (hour % hour_divider) * minutes
             formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
             time = f'{formatted_time}:00'
             new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
-            
-            worker_count = temp_dict.get((i, new_time), 0)
-            
-            if worker_count != 0:
-                template_dict["{}-{}".format(i, hour)] = worker_count
-
-    return template_dict
+            temp = TemplateTimeRequirement.query.filter_by(
+                company_name=company_name,
+                weekday={i},
+                start_time=new_time,
+                template_name=template_name
+            ).first()
+            if temp is None or temp.worker == 0:
+                pass
+            else:
+                temp_timereq_dict["{}-{}".format(i, hour)] = temp.worker
+    return temp_timereq_dict
 
 
 @app.route('/api/requirement/workforce', methods = ['GET', 'POST'])
@@ -926,6 +944,8 @@ def get_required_workforce():
     minutes = 60 / hour_divider
     day_num = 7   
     company_id = user.company_id
+
+    get_excel()
 
     
 
@@ -966,9 +986,6 @@ def get_required_workforce():
     monday = today - datetime.timedelta(days=today.weekday())
     week_adjustment = int(request.args.get('week_adjustment', 0))
     week_start = monday + datetime.timedelta(days=week_adjustment)
-
-    template1_dict = get_template_dict("Template 1", day_num, daily_slots, hour_divider, minutes, user.company_name, week_adjustment, monday, full_day)
-    print('temp1:', template1_dict)
 
     slot_dict = {}
     for i in range(daily_slots):
@@ -1115,9 +1132,10 @@ def get_required_workforce():
         'hour_divider': hour_divider,
         'daily_slots': daily_slots,
         'minutes': minutes,
-        'template1_dict': template1_dict,
-        'template2_dict': get_template_dict("Template 2", day_num, daily_slots, hour_divider, minutes, user.company_name, week_adjustment, monday, full_day),
-        'template3_dict': get_template_dict("Template 3", day_num, daily_slots, hour_divider, minutes, user.company_name, week_adjustment, monday, full_day),
+        'template1_dict': get_temp_timereq_dict("Template 1", day_num, daily_slots, hour_divider, minutes, user.company_name, week_adjustment, monday, full_day),
+        'template2_dict': get_temp_timereq_dict("Template 2", day_num, daily_slots, hour_divider, minutes, user.company_name, week_adjustment, monday, full_day),
+        'template3_dict': get_temp_timereq_dict("Template 3", day_num, daily_slots, hour_divider, minutes, user.company_name, week_adjustment, monday, full_day),
+
     }
 
     return jsonify(calendar_dict)
@@ -1249,3 +1267,31 @@ def get_worker_count():
 
     return jsonify({'worker_count': worker_count, 'start_time_count': start_time_count})
 
+
+@app.route('/api/download', methods=['POST', 'GET'])
+@jwt_required()
+def get_excel():
+    react_user = get_jwt_identity()
+    user = User.query.filter_by(email=react_user).first()
+
+    wb = Workbook()
+    ws = wb.active
+
+    # Set headers
+    ws['B2'] = "First Name"
+    ws['C2'] = "Last Name"
+
+    row = 3  # Starting row for data
+
+    employees = Timetable.query.all()  # Assuming SQLAlchemy for querying
+
+    for emp in employees:
+        ws[f'B{row}'] = emp.first_name
+        ws[f'C{row}'] = emp.last_name
+        row += 1
+
+    # Save the workbook
+    wb.save("employees.xlsx")
+
+    return get_excel
+    
