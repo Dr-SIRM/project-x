@@ -117,7 +117,7 @@ useEffect(() => {
           }, {}),
         }}
         validationSchema={checkoutSchema}
-        validate={values => {
+       /*  validate={values => {
           const errors = {};
           for (let i = 0; i < availabilityData.day_num; i++) {
             const end_time1 = values[`day_${i}_1`];
@@ -127,7 +127,7 @@ useEffect(() => {
             }
           }
           return errors;
-        }}
+        }} */
       >
         {({
           values,
