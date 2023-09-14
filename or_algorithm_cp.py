@@ -3,8 +3,6 @@ import datetime
 import pymysql
 import time
 import math
-
-import sys
 import re
 import threading
 
