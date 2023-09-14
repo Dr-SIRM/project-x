@@ -904,29 +904,34 @@ def get_admin_registration():
     return jsonify({'message': 'Get Ready!'}), 200
                 
 
-def get_temp_timereq_dict(template_name, day_num, daily_slots, hour_divider, minutes, company_name, week_adjustment, monday, full_day):
+def get_temp_timereq_dict(template_name, day_num, daily_slots, hour_divider, minutes, company_name, full_day):
     temp_timereq_dict = {}
+
+    # Query once to get all relevant TemplateTimeRequirements
+    all_temps = TemplateTimeRequirement.query.filter_by(
+        company_name=company_name,
+        template_name=template_name
+    ).all()
+
+    # Convert all_temps to a convenient lookup structure
+    temp_lookup = {(temp.weekday, temp.start_time): temp.worker for temp in all_temps if temp.worker != 0}
+    
     for i in range(day_num):
         for hour in range(daily_slots):
-            if hour > full_day:  # you might need to define full_day or pass it as a parameter
+            if hour > full_day:
                 hour -= full_day
-            else:
-                pass
-            quarter_hour = hour / hour_divider
-            quarter_minute = (hour % hour_divider) * minutes
-            formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+            quarter_hour = int(hour / hour_divider)
+            quarter_minute = int((hour % hour_divider) * minutes)
+            formatted_time = f'{quarter_hour:02d}:{quarter_minute:02d}'
             time = f'{formatted_time}:00'
             new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
-            temp = TemplateTimeRequirement.query.filter_by(
-                company_name=company_name,
-                weekday={i},
-                start_time=new_time,
-                template_name=template_name
-            ).first()
-            if temp is None or temp.worker == 0:
-                pass
-            else:
-                temp_timereq_dict["{}-{}".format(i, hour)] = temp.worker
+
+            # Use lookup instead of database query
+            worker_count = temp_lookup.get((str(i), new_time))
+            
+            if worker_count is not None:
+                temp_timereq_dict[f"{i}-{hour}"] = worker_count
+    
     return temp_timereq_dict
 
 
@@ -978,7 +983,6 @@ def get_required_workforce():
                     slot += hour + minute
                     
         closing_times.append(slot)
-    print(closing_times)
 
     daily_slots = max(closing_times) * hour_divider
 
@@ -1132,9 +1136,9 @@ def get_required_workforce():
         'hour_divider': hour_divider,
         'daily_slots': daily_slots,
         'minutes': minutes,
-        'template1_dict': get_temp_timereq_dict("Template 1", day_num, daily_slots, hour_divider, minutes, user.company_name, week_adjustment, monday, full_day),
-        'template2_dict': get_temp_timereq_dict("Template 2", day_num, daily_slots, hour_divider, minutes, user.company_name, week_adjustment, monday, full_day),
-        'template3_dict': get_temp_timereq_dict("Template 3", day_num, daily_slots, hour_divider, minutes, user.company_name, week_adjustment, monday, full_day),
+        'template1_dict': get_temp_timereq_dict("Template 1", day_num, daily_slots, hour_divider, minutes, user.company_name, full_day),
+        'template2_dict': get_temp_timereq_dict("Template 2", day_num, daily_slots, hour_divider, minutes, user.company_name, full_day),
+        'template3_dict': get_temp_timereq_dict("Template 3", day_num, daily_slots, hour_divider, minutes, user.company_name, full_day),
 
     }
 

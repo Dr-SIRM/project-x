@@ -361,7 +361,7 @@ const Company = ({ company }) => {
                     type="time"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values[`day_${rowIndex}_0`]}
+                    value={values[`day_${rowIndex}_0`] === '00:00' ? '' : values[`day_${rowIndex}_0`]}
                     name={`day_${rowIndex}_0`}
                     error={
                       !!touched[`day_${rowIndex}_0`] &&
@@ -386,7 +386,7 @@ const Company = ({ company }) => {
                     type="time"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values[`day_${rowIndex}_1`]}
+                    value={values[`day_${rowIndex}_1`] === '00:00' ? '' : values[`day_${rowIndex}_1`]}
                     name={`day_${rowIndex}_1`}
                     error={
                       !!touched[`day_${rowIndex}_1`] &&
@@ -411,7 +411,7 @@ const Company = ({ company }) => {
                     type="time"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values[`day_${rowIndex}_2`]}
+                    value={values[`day_${rowIndex}_2`] === '00:00' ? '' : values[`day_${rowIndex}_2`]}
                     name={`day_${rowIndex}_2`}
                     error={
                       !!touched[`day_${rowIndex}_2`] &&
@@ -436,7 +436,7 @@ const Company = ({ company }) => {
                     type="time"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values[`day_${rowIndex}_3`]}
+                    value={values[`day_${rowIndex}_3`] === '00:00' ? '' : values[`day_${rowIndex}_3`]}
                     name={`day_${rowIndex}_3`}
                     error={
                       !!touched[`day_${rowIndex}_3`] &&
