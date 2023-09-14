@@ -1281,20 +1281,50 @@ def get_excel():
     wb = Workbook()
     ws = wb.active
 
-    # Set headers
-    ws['B2'] = "First Name"
-    ws['C2'] = "Last Name"
+    row = 2  # Starting row for data
 
-    row = 3  # Starting row for data
+    # Query records and sort by date and time
+    records = Timetable.query.order_by(Timetable.date, Timetable.start_time).all()
 
-    employees = Timetable.query.all()  # Assuming SQLAlchemy for querying
+    current_date = None  # Variable to keep track of current date
+    col = 4  # Column where the time slots will start
 
-    for emp in employees:
-        ws[f'B{row}'] = emp.first_name
-        ws[f'C{row}'] = emp.last_name
-        row += 1
+    time_plans = {}
+    for record in records:
+        if current_date != record.date:
+            if current_date is not None:  # Skip merging for the first row
+                ws.merge_cells(start_row=row, start_column=4, end_row=row, end_column=col - 1)
+            ws[f'D{row}'] = record.date
+            row += 1
+            
+            # Insert headers
+            ws[f'B{row}'] = "First Name"
+            ws[f'C{row}'] = "Last Name"
+            
+            current_date = record.date
+            time_plans.clear()
+            col = 4
 
-    # Save the workbook
+        for time_slot in ['start_time', 'start_time2', 'start_time3']:  # Loop through all time slots
+            slot_time = getattr(record, time_slot)
+            if slot_time is not None:
+                if slot_time not in time_plans:
+                    ws.cell(row=row, column=col, value=slot_time)
+                    time_plans[slot_time] = col
+                    col += 1
+
+        # Insert the employee's record in the next row
+        ws[f'B{row + 1}'] = record.first_name
+        ws[f'C{row + 1}'] = record.last_name
+        for time_slot in ['start_time', 'start_time2', 'start_time3']:  # Loop through all time slots
+            slot_time = getattr(record, time_slot)
+            if slot_time in time_plans:
+                ws.cell(row=row + 1, column=time_plans[slot_time], value=1)
+    
+    if current_date is not None:  # Merge cells for the last date
+        ws.merge_cells(start_row=row, start_column=4, end_row=row, end_column=col - 1)
+    
+    # Save workbook
     wb.save("employees.xlsx")
 
     return get_excel
