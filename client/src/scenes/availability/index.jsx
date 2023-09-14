@@ -73,6 +73,13 @@ useEffect(() => {
   
 
   const handleFormSubmit = async (values) => {
+
+    Object.keys(values).forEach((key) => {
+      if (values[key] === '' || values[key] === undefined) {
+        values[key] = '00:00';
+      }
+    });
+    
     try {
       // Send the updated form values to the server for database update
       await axios.post('http://localhost:5000/api/availability?week_adjustment=' + weekAdjustment, values, {
