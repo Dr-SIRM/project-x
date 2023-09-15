@@ -146,6 +146,7 @@ class ORAlgorithm_cp:
 
         # Attribute der Methode "solve_problem"
         self.status = None
+        self.solving_time_seconds = None
 
         # Attribute der Methode "calculate_costs"
         self.violation_nb1 = None
@@ -1214,6 +1215,8 @@ class ORAlgorithm_cp:
         self.stop_thread = False
         self.best_test_time = 5
 
+        start_time_solver = time.time()
+
         log_file = open('log.txt', 'w')
 
         def log_callback(message):
@@ -1239,6 +1242,9 @@ class ORAlgorithm_cp:
 
         self.status = self.solver.Solve(self.model)
 
+        end_time_solver = time.time()
+        self.solving_time_seconds = end_time_solver - start_time_solver
+        
         self.stop_thread = True
         thread.join()
         log_file.close()
@@ -1536,7 +1542,7 @@ class ORAlgorithm_cp:
             self_min_anwesend = str(self.min_anwesend),
             self_gerechte_verteilung = str(self.gerechte_verteilung),
             self_fair_distribution = self.fair_distribution,
-            solving_time = None,
+            solving_time = self.solving_time_seconds,
             lp_iteration = None,
             violation_nb1 = self.violation_nb1,
             violation_nb2 = self.violation_nb2,
