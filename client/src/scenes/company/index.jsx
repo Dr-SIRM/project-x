@@ -44,6 +44,13 @@ const Company = ({ company }) => {
 
   
   const handleFormSubmit = async (values) => {
+    
+    Object.keys(values).forEach((key) => {
+      if (values[key] === '' || values[key] === undefined) {
+        values[key] = '00:00';
+      }
+    });
+
     try {
       // Send the updated form values to the server for database update
       await axios.post('http://localhost:5000/api/company', values, {
@@ -95,17 +102,17 @@ const Company = ({ company }) => {
           }, {}),
         }}
         validationSchema={checkoutSchema}
-        validate={values => {
-          const errors = {};
-          for (let i = 0; i < companyData.day_num; i++) {
-            const end_time1 = values[`day_${i}_1`];
-            const start_time2 = values[`day_${i}_2`];
-            if (start_time2 <= end_time1) {
-              errors[`day_${i}_2`] = 'Start Zeit 2 muss grösser als Endzeit 1 sein';
-            }
-          }
-          return errors;
-        }}
+        // validate={values => {
+        //   const errors = {};
+        //   for (let i = 0; i < companyData.day_num; i++) {
+        //     const end_time1 = values[`day_${i}_1`];
+        //     const start_time2 = values[`day_${i}_2`];
+        //     if (start_time2 <= end_time1) {
+        //       errors[`day_${i}_2`] = 'Start Zeit 2 muss grösser als Endzeit 1 sein';
+        //     }
+        //   }
+        //   return errors;
+        // }}
       >
         {({
           values,

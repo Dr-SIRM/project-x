@@ -222,6 +222,12 @@ def react_update():
 
     return jsonify(user_dict)
 
+def get_time_str(time_str):
+    try:
+        return datetime.datetime.strptime(time_str, '%H:%M:%S').time()
+    except:
+        return datetime.datetime.strptime(time_str, '%H:%M').time()
+
 
 @app.route('/api/company', methods=['GET', 'POST'])
 @jwt_required()
@@ -268,24 +274,14 @@ def get_company():
     if request.method == 'POST':
         company_data = request.get_json()
 
-        # Company Data 
-        data_deletion = OpeningHours.query.filter_by(company_name=user.company_name)
-        if data_deletion:
-            data_deletion.delete()
-            db.session.commit()
-        else:
-            pass
-        
-        company_no = Company.query.order_by(Company.id.desc()).first()
-        if company_no is None:
-            new_company_no = 1
-        else:
-            new_company_no = company_no.id + 1
-        
+        # Delete existing company data
+        OpeningHours.query.filter_by(company_name=user.company_name).delete()
+        db.session.commit()
 
-
-        company_data = Company(
-            id=new_company_no,
+        # Insert new company data
+        # Removed manual ID setting, assuming that the ID column in your database is set to auto-increment
+        new_company_data = Company(
+            id=None,
             company_name=company_data['company_name'],
             weekly_hours=company_data['weekly_hours'],
             shifts=company_data['shifts'],
@@ -293,58 +289,45 @@ def get_company():
             changed_by=company_id,
             creation_timestamp=creation_date
         )
+        db.session.merge(new_company_data)
 
-        db.session.merge(company_data)
-        db.session.commit()
+        # Create list to hold new OpeningHours entries
+        new_opening_hours_entries = []
 
         for i in range(day_num):
             entry1 = request.json.get(f'day_{i}_0')
             entry2 = request.json.get(f'day_{i}_1')
             entry3 = request.json.get(f'day_{i}_2')
             entry4 = request.json.get(f'day_{i}_3')
+            
             if entry1:
-                last = OpeningHours.query.order_by(OpeningHours.id.desc()).first()
-                if last is None:
-                    new_id = 1
-                else:
-                    new_id = last.id + 1
-                try:
-                    new_entry1 = datetime.datetime.strptime(entry1, '%H:%M:%S').time()
-                except:
-                    new_entry1 = datetime.datetime.strptime(entry1, '%H:%M').time()
-
-                try:
-                    new_entry2 = datetime.datetime.strptime(entry2, '%H:%M:%S').time()
-                except:
-                    new_entry2 = datetime.datetime.strptime(entry2, '%H:%M').time()
-
-                try:
-                    new_entry3 = datetime.datetime.strptime(entry3, '%H:%M:%S').time()
-                except:
-                    new_entry3 = datetime.datetime.strptime(entry3, '%H:%M').time()
-
-                try:
-                    new_entry4 = datetime.datetime.strptime(entry4, '%H:%M:%S').time()
-                except:
-                    new_entry4 = datetime.datetime.strptime(entry4, '%H:%M').time()
+                new_entry1 = get_time_str(entry1)
+                new_entry2 = get_time_str(entry2)
+                new_entry3 = get_time_str(entry3)
+                new_entry4 = get_time_str(entry4)
 
                 new_weekday = weekdays[i]
-
+                
+                # Create new OpeningHours entry
                 opening = OpeningHours(
-                id=new_id,
-                company_name=user.company_name,
-                weekday=new_weekday,
-                start_time=new_entry1,
-                end_time=new_entry2,
-                start_time2=new_entry3,
-                end_time2=new_entry4,
-                created_by=company_id,
-                changed_by=company_id,
-                creation_timestamp=creation_date
-            )
+                    id=None,
+                    company_name=user.company_name,
+                    weekday=new_weekday,
+                    start_time=new_entry1,
+                    end_time=new_entry2,
+                    start_time2=new_entry3,
+                    end_time2=new_entry4,
+                    created_by=company_id,
+                    changed_by=company_id,
+                    creation_timestamp=creation_date
+                )
+                
+                # Append to list of new entries
+                new_opening_hours_entries.append(opening)
 
-            db.session.add(opening)
-            db.session.commit()
+        # Bulk insert all new OpeningHours entries and commit
+        db.session.bulk_save_objects(new_opening_hours_entries)
+        db.session.commit()
 
 
     company_list = {
@@ -430,84 +413,96 @@ def get_availability():
     
     #Save Availability
     if request.method == 'POST':
-        availability_data = request.get_json()
-        for i in range(day_num):
-            new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
-            data_deletion = Availability.query.filter_by(user_id=user.id, date=new_date)
+        button = request.json.get("button", None)
+        if button == "Submit":
+            new_entries = []
             
-            if data_deletion:
-                data_deletion.delete()
-                db.session.commit()
-            else:
-                pass
+            # Delete all entries for the range in one operation
+            for i in range(day_num):
+                new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+                Availability.query.filter_by(user_id=user.id, date=new_date).delete()
+            db.session.commit()
 
-            entry1 = request.json.get(f'day_{i}_0')
-            entry2 = request.json.get(f'day_{i}_1')
-            entry3 = request.json.get(f'day_{i}_2')
-            entry4 = request.json.get(f'day_{i}_3')
-            entry5 = request.json.get(f'day_{i}_4')
-            entry6 = request.json.get(f'day_{i}_5')
-            if entry1:
-                last = Availability.query.order_by(Availability.id.desc()).first()
-                if last is None:
-                    new_id = 1
-                else:
-                    new_id = last.id + 1
-    
-                try:
-                    new_entry1 = datetime.datetime.strptime(entry1, '%H:%M:%S').time()
-                except:
-                    new_entry1 = datetime.datetime.strptime(entry1, '%H:%M').time()
-                
-                try:
-                    new_entry2 = datetime.datetime.strptime(entry2, '%H:%M:%S').time()
-                except:
-                    new_entry2 = datetime.datetime.strptime(entry2, '%H:%M').time()
-                
-                try:
-                    new_entry3 = datetime.datetime.strptime(entry3, '%H:%M:%S').time()
-                except:
-                    new_entry3 = datetime.datetime.strptime(entry3, '%H:%M').time()
-                
-                try:
-                    new_entry4 = datetime.datetime.strptime(entry4, '%H:%M:%S').time()
-                except:
-                    new_entry4 = datetime.datetime.strptime(entry4, '%H:%M').time()
-               
-                try:
-                    new_entry5 = datetime.datetime.strptime(entry5, '%H:%M:%S').time()
-                except:
-                    new_entry5 = datetime.datetime.strptime(entry5, '%H:%M').time()
-                
-                try:
-                    new_entry6 = datetime.datetime.strptime(entry6, '%H:%M:%S').time()
-                except:
-                    new_entry6 = datetime.datetime.strptime(entry6, '%H:%M').time()
-
-                
+            # Create all new entries
+            for i in range(day_num):
+                new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
                 new_weekday = weekdays[i]
+                
+                # Loop through entries
+                new_entry = {}
+                for j in range(6):
+                    entry = request.json.get(f'day_{i}_{j}')
+                    new_entry[f'entry{j + 1}'] = get_time_str(entry)
 
-
+                # Create a new Availability instance and add to list
                 data = Availability(
-                    id=new_id, 
+                    id=None,
                     user_id=user.id, 
                     date=new_date, 
                     weekday=new_weekday, 
                     email=user.email,
-                    start_time=new_entry1, 
-                    end_time=new_entry2, 
-                    start_time2=new_entry3,
-                    end_time2=new_entry4, 
-                    start_time3=new_entry5, 
-                    end_time3=new_entry6,
+                    start_time=new_entry['entry1'], 
+                    end_time=new_entry['entry2'], 
+                    start_time2=new_entry['entry3'],
+                    end_time2=new_entry['entry4'], 
+                    start_time3=new_entry['entry5'], 
+                    end_time3=new_entry['entry6'],
                     created_by=company_id, 
                     changed_by=company_id, 
-                    creation_timestamp = creation_date
-                    )
+                    creation_timestamp=creation_date
+                )
+                new_entries.append(data)
+                
+            # Bulk insert and commit
+            db.session.bulk_save_objects(new_entries)
+            db.session.commit()
 
+    """
+    #Save Availability
+    if request.method == 'POST':
+        new_entries = []
+        
+        # Delete all entries for the range in one operation
+        for i in range(day_num):
+            new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+            Availability.query.filter_by(user_id=user.id, date=new_date).delete()
+        db.session.commit()
 
-                db.session.add(data)
-                db.session.commit()
+        # Create all new entries
+        for i in range(day_num):
+            new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+            new_weekday = weekdays[i]
+            
+            # Loop through entries
+            new_entry = {}
+            for j in range(6):
+                entry = request.json.get(f'day_{i}_{j}')
+                new_entry[f'entry{j + 1}'] = get_time_str(entry)
+
+            # Create a new Availability instance and add to list
+            data = Availability(
+                id=None,
+                user_id=user.id, 
+                date=new_date, 
+                weekday=new_weekday, 
+                email=user.email,
+                start_time=new_entry['entry1'], 
+                end_time=new_entry['entry2'], 
+                start_time2=new_entry['entry3'],
+                end_time2=new_entry['entry4'], 
+                start_time3=new_entry['entry5'], 
+                end_time3=new_entry['entry6'],
+                created_by=company_id, 
+                changed_by=company_id, 
+                creation_timestamp=creation_date
+            )
+            new_entries.append(data)
+            
+        # Bulk insert and commit
+        db.session.bulk_save_objects(new_entries)
+        db.session.commit()
+    """
+
 
     availability_list = {
         'weekdays': weekdays,
