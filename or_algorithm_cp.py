@@ -1248,6 +1248,7 @@ class ORAlgorithm_cp:
         self.stop_thread = True
         thread.join()
         log_file.close()
+        print("Best Values: ", self.best_values)
 
     def read_best_value(self, message):
         match = re.search(r'best:(\d+)', message)
@@ -1261,8 +1262,7 @@ class ORAlgorithm_cp:
         """
         # self.model.ExportToFile('slow_model.pb.txt')
 
-        print("Best Values: ", self.best_values)
-
+        """
         # ----------------------------------------------------------------
         # Die Werte von s2 printen
         for i in self.mitarbeiter:
@@ -1276,6 +1276,7 @@ class ORAlgorithm_cp:
                 # Drucken Sie den Wert von a[i, j]
                 print(f"a[{i}][{j}] =", self.solver.Value(self.a[i, j]))
         # ----------------------------------------------------------------
+        """
 
         # Kosten für die Einstellung von Mitarbeitern
         self.hiring_costs = sum((self.kosten[i] / self.hour_devider) * self.solver.Value(self.x[i, j, k]) for i in self.mitarbeiter for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[i][j])))
