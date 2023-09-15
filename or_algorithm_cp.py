@@ -1211,6 +1211,7 @@ class ORAlgorithm_cp:
         """
         self.best_values = []
         self.last_best_value = None
+        self.current_best_value = None
         self.last_read_time = 0
         self.stop_thread = False
         self.best_test_time = 5
@@ -1222,16 +1223,18 @@ class ORAlgorithm_cp:
         def log_callback(message):
             log_file.write(message)
             log_file.flush()
+            self.read_best_value(message)
             current_time = time.time()
             if current_time - self.last_read_time > self.best_test_time:
-                self.read_best_value(message)
                 self.last_read_time = current_time
 
         def add_best_value_to_list():
             while not self.stop_thread:
                 time.sleep(self.best_test_time)
-                self.best_values.append(self.last_best_value)
-                print("------------------ NEUER WERT HINZUGEFÜGT: ", self.last_best_value, "------------------------")
+                if self.last_best_value is not None:
+                    self.current_best_value = self.last_best_value
+                self.best_values.append(self.current_best_value)
+                print("------------------ NEUER WERT HINZUGEFÜGT: ", self.current_best_value, "------------------------")
 
         self.solver.parameters.log_search_progress = True
         self.solver.parameters.log_to_stdout = True
@@ -1244,16 +1247,19 @@ class ORAlgorithm_cp:
 
         end_time_solver = time.time()
         self.solving_time_seconds = end_time_solver - start_time_solver
-        
+
         self.stop_thread = True
         thread.join()
         log_file.close()
+
         print("Best Values: ", self.best_values)
 
     def read_best_value(self, message):
         match = re.search(r'best:(\d+)', message)
         if match:
             self.last_best_value = int(match.group(1))
+
+
 
 
     def calculate_costs(self):
