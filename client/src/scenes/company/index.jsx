@@ -8,6 +8,7 @@ import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import { ThreeDots } from "react-loader-spinner"; 
 import axios from 'axios';
+import Alert from '@mui/material/Alert';
 
 
 
@@ -487,6 +488,36 @@ const Company = ({ company }) => {
           </form>
         )}
       </Formik>
+      <Snackbar
+          open={showSuccessNotification}
+          onClose={() => setShowSuccessNotification(false)}
+          autoHideDuration={3000}
+          ContentProps={{
+              sx: {
+                  backgroundColor: "green !important",
+                  color: "white",
+              }
+          }}
+      >
+          <Alert onClose={() => setShowSuccessNotification(false)} severity="success" sx={{ width: '100%' }}>
+              Verfügbarkeit erfolgreich erfasst
+          </Alert>
+      </Snackbar>
+      <Snackbar
+        open={showErrorNotification}
+        onClose={() => setShowErrorNotification(false)}
+        autoHideDuration={3000}
+        ContentProps={{
+            sx: {
+                backgroundColor: "red !important",
+                color: "white",
+            }
+        }}
+    >
+        <Alert onClose={() => setShowErrorNotification(false)} severity="error" sx={{ width: '100%' }}>
+            Update nicht erfolgreich
+        </Alert>
+    </Snackbar>
     </Box>
   );
 };

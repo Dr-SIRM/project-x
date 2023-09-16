@@ -387,7 +387,7 @@ def get_availability():
     week_start = monday + datetime.timedelta(days=week_adjustment)
 
     query_weekdays = [weekdays[i] for i in range(day_num)]
-    dates = [week_start for i in range(day_num)]
+    dates = [week_start + datetime.timedelta(days=i) for i in range(day_num)]
 
     # Fetch all relevant Availability records in a single query
     availabilities = Availability.query.filter(
@@ -410,7 +410,7 @@ def get_availability():
             temp_dict[f"{new_i}&3"] = temp.end_time2.strftime("%H:%M") if temp.end_time2 else None
             temp_dict[f"{new_i}&4"] = temp.start_time3.strftime("%H:%M") if temp.start_time3 else None
             temp_dict[f"{new_i}&5"] = temp.end_time3.strftime("%H:%M") if temp.end_time3 else None
-    
+
     #Save Availability
     if request.method == 'POST':
         button = request.json.get("button", None)
@@ -457,51 +457,54 @@ def get_availability():
             db.session.bulk_save_objects(new_entries)
             db.session.commit()
 
-    """
-    #Save Availability
+    
+    #Save Template Availability
     if request.method == 'POST':
-        new_entries = []
-        
-        # Delete all entries for the range in one operation
-        for i in range(day_num):
-            new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
-            Availability.query.filter_by(user_id=user.id, date=new_date).delete()
-        db.session.commit()
+        button = request.json.get("button", None)
+        if button == "Save Template":
+            new_entries = []
+            availability_data = request.get_json()
+            print(request.json)
+       
+            # Delete all entries for the range in one operation
+            for i in range(day_num):
+                TemplateAvailability.query.filter_by(user_id=user.id, template_name=availability_data['template_name']).delete()
+            db.session.commit()
 
-        # Create all new entries
-        for i in range(day_num):
-            new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
-            new_weekday = weekdays[i]
-            
-            # Loop through entries
-            new_entry = {}
-            for j in range(6):
-                entry = request.json.get(f'day_{i}_{j}')
-                new_entry[f'entry{j + 1}'] = get_time_str(entry)
+            # Create all new entries
+            for i in range(day_num):
+                new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+                new_weekday = weekdays[i]
+                
+                # Loop through entries
+                new_entry = {}
+                for j in range(6):
+                    entry = request.json.get(f'day_{i}_{j}')
+                    new_entry[f'entry{j + 1}'] = get_time_str(entry)
 
-            # Create a new Availability instance and add to list
-            data = Availability(
-                id=None,
-                user_id=user.id, 
-                date=new_date, 
-                weekday=new_weekday, 
-                email=user.email,
-                start_time=new_entry['entry1'], 
-                end_time=new_entry['entry2'], 
-                start_time2=new_entry['entry3'],
-                end_time2=new_entry['entry4'], 
-                start_time3=new_entry['entry5'], 
-                end_time3=new_entry['entry6'],
-                created_by=company_id, 
-                changed_by=company_id, 
-                creation_timestamp=creation_date
-            )
-            new_entries.append(data)
-            
-        # Bulk insert and commit
-        db.session.bulk_save_objects(new_entries)
-        db.session.commit()
-    """
+                # Create a new Availability instance and add to list
+                data = TemplateAvailability(
+                    id=None,
+                    template_name=availability_data['template_name'],
+                    user_id=user.id, 
+                    date=new_date, 
+                    weekday=new_weekday, 
+                    email=user.email,
+                    start_time=new_entry['entry1'], 
+                    end_time=new_entry['entry2'], 
+                    start_time2=new_entry['entry3'],
+                    end_time2=new_entry['entry4'], 
+                    start_time3=new_entry['entry5'], 
+                    end_time3=new_entry['entry6'],
+                    created_by=company_id, 
+                    changed_by=company_id, 
+                    creation_timestamp=creation_date
+                )
+                new_entries.append(data)
+                
+            # Bulk insert and commit
+            db.session.bulk_save_objects(new_entries)
+            db.session.commit()
 
 
     availability_list = {
