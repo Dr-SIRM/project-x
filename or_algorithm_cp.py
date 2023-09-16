@@ -5,10 +5,12 @@ import time
 import math
 import re
 import threading
+import os
 
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font
 from openpyxl.utils import get_column_letter
+from openpyxl.chart import LineChart, Reference
 from data_processing import DataProcessing
 from app import app, db
 from sqlalchemy import text
@@ -190,6 +192,7 @@ class ORAlgorithm_cp:
         self.calculate_costs()
         self.store_solved_data()
         self.output_result_excel()
+        self.plot_costs_excel()
         self.save_data_in_database()
         self.save_data_in_database_testing()
 
@@ -538,9 +541,7 @@ class ORAlgorithm_cp:
         self.model = cp_model.CpModel()
         self.solver = cp_model.CpSolver()
         
-        self.solver.parameters.max_time_in_seconds = 120
-
-
+        # self.solver.parameters.max_time_in_seconds = 120
 
 
     def define_penalty_costs(self):
@@ -1429,9 +1430,47 @@ class ORAlgorithm_cp:
                 adjusted_width = 3
             ws.column_dimensions[get_column_letter(column[0].column)].width = adjusted_width
 
-        # Speichern Sie das Workbook
-        
         wb.save("Einsatzplan.xlsx")
+
+
+    def plot_costs_excel(self):
+        """
+        In dieser Methode werden die besten Kosten nach X Sekunden als Liniendiagramm in einem Excel gespeichert
+        """
+        print(self.best_test_time) # 5
+        print(self.hiring_costs) # 26000
+        print(self.best_values) # [54295, 47060, 34400, 29750, 29450, 29000, 28850, 27650, 27650, 27650, 27500, 27500, 26300, 26300, 26300, 26300, 26300, 26300, 26300, 26300, 26300, 26300, 26300, 26300]
+
+        # Workbook erstellen
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Kosten"
+
+        # Datei in das Arbeitsblatt einfügen
+        data = [
+            ['Zeit (Sekunden)', 'Beste Werte', 'Optimale Werte'],
+        ]
+        times = [i * self.best_test_time for i in range(1, len(self.best_values) + 1)]
+        for i in range(len(times)):
+            data.append([times[i], self.best_values[i], self.hiring_costs])
+
+        for row in data:
+            ws.append(row)
+
+        # Liniendiagramm erstellen
+        chart = LineChart()
+        chart.title = "Kosten über die Zeit"
+        chart.style = 13
+        chart.x_axis.title = 'Zeit (Sekunden)'
+        chart.y_axis.title = 'Kosten'
+
+        data = Reference(ws, min_col=2, min_row=1, max_col=3, max_row=len(self.best_values)+1)
+        chart.add_data(data, titles_from_data=True)
+        times = Reference(ws, min_col=1, min_row=2, max_row=len(self.best_values)+1)
+        chart.set_categories(times)
+        ws.add_chart(chart, "E5")
+
+        wb.save("Kostenanalyse.xlsx")
 
 
     def save_data_in_database(self):
