@@ -541,7 +541,8 @@ class ORAlgorithm_cp:
         self.model = cp_model.CpModel()
         self.solver = cp_model.CpSolver()
         
-        # self.solver.parameters.max_time_in_seconds = 120
+        self.solver.parameters.max_time_in_seconds = 220
+        # self.solver.parameters.num_search_workers = 4 # Anzahl Kerne --> noch genau testen was das optimum ist (CPU-Auslastung beachten!)
 
 
     def define_penalty_costs(self):
@@ -550,16 +551,16 @@ class ORAlgorithm_cp:
         """
         # Strafkosten für jede NB
         penalty_values = {
-            "nb1": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
-            "nb2": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
-            "nb3": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
-            "nb4": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
-            "nb5": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
-            "nb6": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
-            "nb7": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
-            "nb8": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
-            "nb9": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000},
-            "nb10": {0: 1, 1: 150, 2: 250, 3: 400 , 4: 600, 5: 10000}
+            "nb1": {0: 1, 1: 100, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb2": {0: 1, 1: 100, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb3": {0: 1, 1: 100, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb4": {0: 1, 1: 100, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb5": {0: 1, 1: 100, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb6": {0: 1, 1: 100, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb7": {0: 1, 1: 100, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb8": {0: 1, 1: 100, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb9": {0: 1, 1: 100, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb10": {0: 1, 1: 100, 2: 250, 3: 400 , 4: 600, 5: 10000}
         }
 
         # Mapping für die entsprechenden Namen der Klassenattribute
@@ -707,23 +708,20 @@ class ORAlgorithm_cp:
                     self.cost_expressions.append(self.x[i, j, k] * int(self.kosten[i] / self.hour_devider))
 
         # Kosten Weiche NB1
-        for i in self.mitarbeiter:
-            for j in range(self.calc_time):
-                for k in range(len(self.verfügbarkeit[i][j])):
-                    self.cost_expressions.append(self.nb1_violation[j, k] * int(self.penalty_cost_nb1 / self.hour_devider))
+        for j in range(self.calc_time):
+            for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):
+                self.cost_expressions.append(self.nb1_violation[j, k] * int(self.penalty_cost_nb1 / self.hour_devider))
 
-        
         # Kosten Weiche NB2
         for i in self.mitarbeiter:
             for week in range(1, self.week_timeframe + 1):
                 self.cost_expressions.append(self.nb2_violation[i][week] * self.penalty_cost_nb2)
         
-
         # Kosten für Weiche NB3 Mindestarbeitszeit Verletzung
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 self.cost_expressions.append(self.nb3_min_violation[i, j] * self.penalty_cost_nb3_min)
-
+                
         # Kosten für Weiche NB4 Höchstarbeitszeit Verletzung
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
@@ -738,30 +736,30 @@ class ORAlgorithm_cp:
         for i in self.mitarbeiter:
             for week in range(1, self.week_timeframe + 1):
                 self.cost_expressions.append(self.nb6_max_violation[i][week-1] * self.penalty_cost_nb6_max)
-
+        
         # Kosten für Weiche NB7 "Innerhalb einer Woche immer gleiche Schichten"
         for i in self.mitarbeiter:
             for j in range(7):
                 self.cost_expressions.append(self.nb7_violation[i, j] * self.penalty_cost_nb7)
-
+        
         # Kosten für Weiche NB8 "Innerhalb der zweiten Woche immer gleiche Schichten"
         for i in self.mitarbeiter:
             for j in range(7, self.calc_time):
                 self.cost_expressions.append(self.nb8_violation[i, j] * self.penalty_cost_nb8)
-
+        
         # Kosten für Weiche NB9 "Minimale Arbeitsstunden pro Block"
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
                     self.cost_expressions.append(self.nb9_violation[i, j, k] * int(self.penalty_cost_nb9 / self.hour_devider))
-
+        
         # Kosten für Weiche NB10 "Max. Anzahl an Arbeitstagen in Folge"
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 self.cost_expressions.append(self.nb10_violation[i, j] * self.penalty_cost_nb10)
         
                 
-        # Addiere alle Kosten-Ausdrücke und setze das Ziel der Minimierung
+        # Alle Kosten-Ausdrücke summieren und dem Model befehlen, die Kosten zu minimieren
         total_cost = sum(self.cost_expressions)
         self.model.Minimize(total_cost)
 
@@ -1188,7 +1186,7 @@ class ORAlgorithm_cp:
         # ***** Weiche Nebenbedingung 10 *****
         # -------------------------------------------------------------------------------------------------------
         
-        self.max_consecutive_days = 4
+        self.max_consecutive_days = 5
 
         for i in self.mitarbeiter:
             for j in range(self.calc_time - self.max_consecutive_days):
@@ -1452,7 +1450,7 @@ class ORAlgorithm_cp:
         ]
         times = [i * self.best_test_time for i in range(1, len(self.best_values) + 1)]
         for i in range(len(times)):
-            data.append([times[i], self.best_values[i], self.hiring_costs])
+            data.append([times[i], self.best_values[i], (self.hiring_costs - self.nb1_penalty_costs)]) # Penaltykosten von NB1 werden abgezogen, damit nur die minimale Einstellung der MA berechnet wird
 
         for row in data:
             ws.append(row)
