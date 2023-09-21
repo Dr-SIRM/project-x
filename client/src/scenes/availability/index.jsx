@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTheme, Box, Button, TextField, Snackbar, Typography, ButtonGroup, IconButton } from "@mui/material";
+import { Select, MenuItem } from "@mui/material";
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -23,6 +24,11 @@ const Availability = ({ availability }) => {
   const token = localStorage.getItem('session_token'); 
   const [additionalTimes, setAdditionalTimes] = useState(0);
   const [selectedTemplate, setSelectedTemplate] = useState('');
+  const [activeTemplateData, setActiveTemplateData] = useState({});
+
+  useEffect(() => {
+    setActiveTemplateData(availabilityData.temp_dict);
+}, [availabilityData]);
 
   useEffect(() => {
     const fetchAvailabilityData = async () => {
@@ -103,6 +109,19 @@ useEffect(() => {
       </Box>
     );
   }
+
+  const fetchTemplate1Data = () => {
+    setActiveTemplateData(availabilityData.template1_dict);
+  };
+  
+  const fetchTemplate2Data = () => {
+    setActiveTemplateData(availabilityData.template2_dict);
+  };
+  
+  const fetchTemplate3Data = () => {
+    setActiveTemplateData(availabilityData.template3_dict);
+  };
+
   
 
   return (
@@ -116,13 +135,13 @@ useEffect(() => {
         onSubmit={handleFormSubmit}
         enableReinitialize={true}
         initialValues={{
-          ...Array.from({ length: availabilityData.day_num }).reduce((acc, _, rowIndex) => {
-            acc[`day_${rowIndex}_0`] = availabilityData.temp_dict[`${rowIndex + 1}&0`] || '00:00';
-            acc[`day_${rowIndex}_1`] = availabilityData.temp_dict[`${rowIndex + 1}&1`] || '00:00';
-            acc[`day_${rowIndex}_2`] = availabilityData.temp_dict[`${rowIndex + 1}&2`] || '00:00';
-            acc[`day_${rowIndex}_3`] = availabilityData.temp_dict[`${rowIndex + 1}&3`] || '00:00';
-            acc[`day_${rowIndex}_4`] = availabilityData.temp_dict[`${rowIndex + 1}&4`] || '00:00';
-            acc[`day_${rowIndex}_5`] = availabilityData.temp_dict[`${rowIndex + 1}&5`] || '00:00';
+          ...Array.from({ length: availabilityData.day_num || 0 }).reduce((acc, _, rowIndex) => {
+            acc[`day_${rowIndex}_0`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&0`] ? activeTemplateData[`${rowIndex + 1}&0`] : '00:00';
+            acc[`day_${rowIndex}_1`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&1`] ? activeTemplateData[`${rowIndex + 1}&1`] : '00:00';
+            acc[`day_${rowIndex}_2`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&2`] ? activeTemplateData[`${rowIndex + 1}&2`] : '00:00';
+            acc[`day_${rowIndex}_3`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&3`] ? activeTemplateData[`${rowIndex + 1}&3`] : '00:00';
+            acc[`day_${rowIndex}_4`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&4`] ? activeTemplateData[`${rowIndex + 1}&4`] : '00:00';
+            acc[`day_${rowIndex}_5`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&5`] ? activeTemplateData[`${rowIndex + 1}&5`] : '00:00';
             return acc;
           }, {}),
         }}
@@ -200,7 +219,7 @@ useEffect(() => {
                 variant="outlined"
                 color="inherit"
                 size="small"
-                onClick={handleFormSubmit}
+                onClick={fetchTemplate1Data}
                 sx={{
                   borderColor: 'white',
                   height: '20px',
@@ -225,7 +244,7 @@ useEffect(() => {
                 variant="outlined"
                 color="inherit"
                 size="small"
-                onClick={handleFormSubmit}
+                onClick={fetchTemplate2Data}
                 sx={{
                   borderColor: 'white',
                   height: '20px',
@@ -250,7 +269,7 @@ useEffect(() => {
                 variant="outlined"
                 color="inherit"
                 size="small"
-                onClick={handleFormSubmit}
+                onClick={fetchTemplate3Data}
                 sx={{
                   borderColor: 'white',
                   height: '20px',
@@ -272,6 +291,52 @@ useEffect(() => {
                 Template 3
               </Button>
               </Box>
+              <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', marginBottom: '1rem' }}>
+        <Button 
+              variant="outlined"
+              color="inherit"
+              size="small"
+              onClick={() => handleFormSubmit(values, "Save Template")}
+              sx={{
+                borderColor: 'white',
+                height: '20px',
+                minHeight: '20px',
+                fontSize: '10px',
+                '&.MuiButtonOutlined': {
+                  borderColor: 'white',
+                },
+                '&:hover': {
+                  borderColor: 'white',
+                },
+                '&.MuiButtonText': {
+                  borderColor: 'white',
+                  color: 'white',
+                  backgroundColor: '#2e7c67',
+                }
+              }}
+            >
+              Save Template
+            </Button>
+            <Select 
+                type="text"
+                size="small"
+                name="template_name"
+                value={selectedTemplate}
+                onChange={(e) => setSelectedTemplate(e.target.value)}
+                inputProps={{ maxLength: 30 }}
+                sx={{
+                  height: '20px', // explicitly set height
+                  '.MuiInputBase-root': {
+                    height: '20px', // explicitly set input field height
+                    fontSize: '10px' // explicitly set font size
+                  }
+                }}
+              >
+                <MenuItem value={ 'Template 1' }>Template 1</MenuItem>
+                <MenuItem value={ 'Template 2' }>Template 2</MenuItem>
+                <MenuItem value={ 'Template 3' }>Template 3</MenuItem>
+                </Select>
+        </Box>
             <Box
       display="grid"
       gap="30px"
