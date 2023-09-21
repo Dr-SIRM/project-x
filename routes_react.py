@@ -1,7 +1,7 @@
 from flask import request, url_for, session, jsonify, send_from_directory, make_response
 from flask_mail import Message
 import datetime
-from datetime import date, timedelta
+from datetime import date, timedelta, date, time, datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 import random
 from models import db
@@ -235,7 +235,7 @@ def get_company():
     react_user = get_jwt_identity()
     user = User.query.filter_by(email=react_user).first()
     opening_hours = OpeningHours.query.filter_by(company_name=user.company_name).first()
-    weekdays = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
+    weekdays = {0:'Montag', 1:'Dienstag', 2:'Mittwoch', 3:'Donnerstag', 4:'Freitag', 5:'Samstag', 6:'Sonntag'}
     company = Company.query.filter_by(company_name=user.company_name).first()
     day_num = 7
     company_id = user.company_id
@@ -377,7 +377,7 @@ def get_availability():
     today = datetime.date.today()
     creation_date = datetime.datetime.now()
     monday = today - datetime.timedelta(days=today.weekday())
-    weekdays = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
+    weekdays = {0:'Montag', 1:'Dienstag', 2:'Mittwoch', 3:'Donnerstag', 4:'Freitag', 5:'Samstag', 6:'Sonntag'}
     day_num = 7
     company_id = user.company_id
 
@@ -1144,8 +1144,7 @@ def get_required_workforce():
 
 
 
-#from datetime import date, timedelta, datetime
-import calendar
+
 from functools import wraps
 
 @app.route('/api/schichtplanung', methods=['POST', 'GET'])
@@ -1268,6 +1267,33 @@ def get_worker_count():
     ).count()
 
     return jsonify({'worker_count': worker_count, 'start_time_count': start_time_count})
+
+
+
+
+@app.route('/api/calendar', methods=['GET'])
+@jwt_required()
+def get_calendar():
+    current_user_id = get_jwt_identity()
+    current_user = User.query.filter_by(email=current_user_id).first()
+    if not current_user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    # Get the shifts for the current user
+    shifts = Timetable.query.filter_by(email=current_user_id).all()
+    
+    # Convert the shifts to the format expected by FullCalendar
+    events = [{
+        'id': shift.id,
+        'title': f"{shift.first_name} {shift.last_name}",
+        'date': shift.date.strftime('%Y-%m-%d'),
+        'start': datetime.combine(shift.date, shift.start_time).strftime('%Y-%m-%dT%H:%M:%S'),
+        'end': datetime.combine(shift.date, shift.end_time).strftime('%Y-%m-%dT%H:%M:%S'),
+    } for shift in shifts]
+    print(events)
+    return jsonify(events)
+
+
 
 
 @app.route('/api/download', methods=['POST', 'GET'])

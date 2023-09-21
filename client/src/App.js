@@ -75,7 +75,7 @@ function AppContent({ isSidebar, setIsSidebar }) {
           <Route path="/Pie" element={<PrivateRoute component={Pie} accessLevels={["Super_Admin", "Admin"]} />} />
           <Route path="/FAQ" element={<PrivateRoute component={FAQ} accessLevels={["Super_Admin", "Admin", "User"]} />} />
           <Route path="/Geography" element={<PrivateRoute component={Geography} accessLevels={["Super_Admin", "Admin"]} />} />
-          <Route path="/Calendar" element={<PrivateRoute component={Calendar} accessLevels={["Super_Admin", "Admin"]} />} />
+          <Route path="/Calendar" element={<PrivateRoute component={Calendar} accessLevels={["Super_Admin", "Admin", "User"]} />} />
           <Route path="/Planning" element={<PrivateRoute component={Planning} accessLevels={["Super_Admin", "Admin"]} />} />
           <Route path="/Plan" element={<PrivateRoute component={Plan} accessLevels={["Super_Admin", "Admin"]} />} />
         </Routes>

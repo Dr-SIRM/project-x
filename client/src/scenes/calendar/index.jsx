@@ -1,4 +1,5 @@
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from 'axios';
 import { formatDate } from "@fullcalendar/core";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -20,6 +21,28 @@ const Calendar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [currentEvents, setCurrentEvents] = useState([]);
+  const token = localStorage.getItem('session_token');
+
+  useEffect(() => {
+    const fetchCalendar = async () => {
+
+        try {
+          const response = await axios.get('http://localhost:5000/api/calendar', {
+              headers: {
+                  'Authorization': `Bearer ${token}`
+              }
+          });
+          setCurrentEvents(response.data);
+          console.log(response.data)
+        } catch (error) {
+          console.error('Error fetching calendar details:', error);
+
+        }
+    };
+
+    fetchCalendar();
+  }, []);
+
 
   const handleDateClick = (selected) => {
     const title = prompt("Please enter a new title for your event");
@@ -37,15 +60,6 @@ const Calendar = () => {
     }
   };
 
-  const handleEventClick = (selected) => {
-    if (
-      window.confirm(
-        `Are you sure you want to delete the event '${selected.event.title}'`
-      )
-    ) {
-      selected.event.remove();
-    }
-  };
 
   return (
     <Box m="20px">
@@ -58,6 +72,7 @@ const Calendar = () => {
           backgroundColor={colors.primary[400]}
           p="15px"
           borderRadius="4px"
+          style={{ maxHeight: 'calc(8 * 60px + 10px)', overflowY: 'auto' }}  // Added these styles
         >
           <Typography variant="h5">Events</Typography>
           <List>
@@ -65,7 +80,7 @@ const Calendar = () => {
               <ListItem
                 key={event.id}
                 sx={{
-                  backgroundColor: colors.greenAccent[500],
+                  backgroundColor: colors.greenAccent[600],
                   margin: "10px 0",
                   borderRadius: "2px",
                 }}
@@ -86,10 +101,17 @@ const Calendar = () => {
             ))}
           </List>
         </Box>
-
         {/* CALENDAR */}
         <Box flex="1 1 100%" ml="15px">
           <FullCalendar
+            slotLabelFormat={{ hour: '2-digit', minute: '2-digit', hour12: false }}
+            timeFormat={{ hour: '2-digit', minute: '2-digit', hour12: false }}
+            dayHeaderContent={({date}) => {
+              const day = date.getUTCDate();  // gets the day of the month
+              const month = date.getUTCMonth() + 1;  // gets the month (0-11, so we add 1)
+              const dayOfWeek = date.toLocaleString('default', { weekday: 'short' }); // gets the abbreviated day of the week
+              return `${dayOfWeek} ${day}.${month < 10 ? '0' + month : month}`;
+          }}
             height="75vh"
             plugins={[
               dayGridPlugin,
@@ -97,31 +119,27 @@ const Calendar = () => {
               interactionPlugin,
               listPlugin,
             ]}
+            
             headerToolbar={{
               left: "prev,next today",
               center: "title",
               right: "dayGridMonth,timeGridWeek,timeGridDay,listMonth",
             }}
-            initialView="dayGridMonth"
-            editable={true}
-            selectable={true}
-            selectMirror={true}
-            dayMaxEvents={true}
+            initialView="timeGridWeek"
+            editable={false}
+            selectable={false}
+            selectMirror={false}
+            dayMaxEvents={false}
             select={handleDateClick}
-            eventClick={handleEventClick}
-            eventsSet={(events) => setCurrentEvents(events)}
-            initialEvents={[
-              {
-                id: "12315",
-                title: "All-day event",
-                date: "2022-09-14",
-              },
-              {
-                id: "5123",
-                title: "Timed event",
-                date: "2022-09-28",
-              },
-            ]}
+                
+            
+            events={currentEvents.map(event => ({
+              ...event,
+              backgroundColor: "grey",  
+              borderColor: "black",
+              textColor: "white"
+          }))}
+          
           />
         </Box>
       </Box>
