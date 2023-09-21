@@ -19,6 +19,9 @@ const SolverReq = ({ solverreq }) => {
   const [solverData, setsolverData] = useState({});
   const token = localStorage.getItem('session_token'); // Get the session token from local storage
 
+  const [isChecked, setIsChecked] = useState(false);
+  const [inputText, setInputText] = useState('');
+
   useEffect(() => {
     const fetchSolver = async () => {
         try {
@@ -111,6 +114,53 @@ const SolverReq = ({ solverreq }) => {
           <form onSubmit={handleSubmit}>           
             <br></br>
             <Box
+              display="grid"
+              gap="30px"
+              gridTemplateColumns="repeat(10, minmax(0, 1fr))"
+              sx={{
+                "& > div": { gridColumn: isNonMobile ? undefined : "span 10" },
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={(e) => setIsChecked(e.target.checked)}
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "left",
+                  height: "100%",
+                }}
+              />
+              <Typography
+                color={colors.greenAccent[500]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 5",
+                  display: "flex",
+                  alignItems: "left",
+                  height: "100%",
+                }}
+              >
+                Gewünschte Mindestanzahl Arbeitsstunden pro Tag
+              </Typography>
+              <input
+                type="text"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                disabled={!isChecked} // Disable textfield if checkbox isn't checked
+                sx={{
+                  gridColumn: "span 3",
+                  display: "flex",
+                  alignItems: "left",
+                  height: "100%",
+                }}
+              />
+              
+              </Box>
+              <br></br>
+              <br></br>
+              <Box
               display="grid"
               gap="30px"
               gridTemplateColumns="repeat(6, minmax(0, 1fr))"

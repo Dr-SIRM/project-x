@@ -10,6 +10,8 @@ import { tokens } from "../../theme";
 import { ThreeDots } from "react-loader-spinner"; 
 import axios from 'axios';
 import Alert from '@mui/material/Alert';
+import Tooltip from '@mui/material/Tooltip';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 
 const Availability = ({ availability }) => {
@@ -221,6 +223,7 @@ useEffect(() => {
                 size="small"
                 onClick={fetchTemplate1Data}
                 sx={{
+                  marginRight: '0.2rem',
                   borderColor: 'white',
                   height: '20px',
                   minHeight: '20px',
@@ -246,6 +249,7 @@ useEffect(() => {
                 size="small"
                 onClick={fetchTemplate2Data}
                 sx={{
+                  marginRight: '0.2rem',
                   borderColor: 'white',
                   height: '20px',
                   minHeight: '20px',
@@ -271,6 +275,7 @@ useEffect(() => {
                 size="small"
                 onClick={fetchTemplate3Data}
                 sx={{
+                  marginRight: '0.2rem',
                   borderColor: 'white',
                   height: '20px',
                   minHeight: '20px',
@@ -290,6 +295,16 @@ useEffect(() => {
               >
                 Template 3
               </Button>
+              <Tooltip 
+                title={
+                <>
+                <span style={{ fontWeight: 'bold' }}>Speicher deine Vorlage</span><br />
+                <br />
+                1. Trage deine Verfügbarkeiten unten ein<br />
+                2. Wähle einen Vorlagenamen aus der Drop-Down Liste<br />
+                3.Speicher deine Vorlage über den Save Template Knopf</>}>
+                <InfoOutlinedIcon color="inherit" />
+              </Tooltip>
               </Box>
               <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', marginBottom: '1rem' }}>
         <Button 
@@ -298,6 +313,7 @@ useEffect(() => {
               size="small"
               onClick={() => handleFormSubmit(values, "Save Template")}
               sx={{
+                marginRight: '0.2rem',
                 borderColor: 'white',
                 height: '20px',
                 minHeight: '20px',
@@ -325,6 +341,7 @@ useEffect(() => {
                 onChange={(e) => setSelectedTemplate(e.target.value)}
                 inputProps={{ maxLength: 30 }}
                 sx={{
+                  marginRight: '0.2rem',
                   height: '20px', // explicitly set height
                   '.MuiInputBase-root': {
                     height: '20px', // explicitly set input field height
