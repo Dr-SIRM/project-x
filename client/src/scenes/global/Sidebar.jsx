@@ -88,7 +88,7 @@ const Sidebar = () => {
     <Box
       sx={{
         "& .pro-sidebar-inner": {
-          background: `${colors.primary[400]} !important`,
+          background: `${colors.primary[500]} !important`,
         },
         "& .pro-icon-wrapper": {
           backgroundColor: "transparent !important",
@@ -123,9 +123,15 @@ const Sidebar = () => {
                 alignItems="center"
                 ml="15px"
               >
-                <Typography variant="h4" color={colors.grey[100]}>
-                  TimeTab
-                </Typography>
+                <Box display="flex" justifyContent="center" alignItems="center">
+                <img
+                  alt="TimeTab-Logo"
+                  width="120px"
+                  height="50px"
+                  src={`../../assets/TimeTab.png`}
+                  style={{ cursor: "pointer", borderRadius: "20%" }}
+                />
+              </Box>
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon />
                 </IconButton>
@@ -135,25 +141,16 @@ const Sidebar = () => {
           {/* USER */}
           {!isCollapsed && (
             <Box mb="25px">
-              <Box display="flex" justifyContent="center" alignItems="center">
-                <img
-                  alt="TimeTab-Logo"
-                  width="80px"
-                  height="80px"
-                  src={`../../assets/TimeTab.png`}
-                  style={{ cursor: "pointer", borderRadius: "20%" }}
-                />
-              </Box>
               <Box textAlign="center">
                 <Typography
-                  variant="h3"
+                  variant="h4"
                   color={colors.grey[100]}
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
                   {user.firstName} {user.lastName}
                 </Typography>
-                <Typography variant="h5" color={colors.greenAccent[500]}>
+                <Typography variant="h6" color={colors.greenAccent[500]}>
                   {user.accessLevel}
                 </Typography>
               </Box>
