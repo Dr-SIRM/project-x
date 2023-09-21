@@ -45,7 +45,7 @@ Prio 1:
  -------------------------------
  - (*) Phu fragen: Verschiedene Openinghours, time_req werden nicht richtig in die Datenbank gespühlt
  - (*) Solver Vorlage den anderen zeigen, Vorüberprüfungen fertigstellen und Daten an React geben
- - (*)  Jeder MA muss vor dem Solven eingegeben haben, wann er arbeiten kann. Auch wenn es alles 0 sind.
+ - (*) Jeder MA muss vor dem Solven eingegeben haben, wann er arbeiten kann. Auch wenn es alles 0 sind.
  - (*) NB9 mit 3 Schichten fertigbauen
 
  - gerechte_verteilung funktioniert noch nicht richtig, wenn ein MA fast keine Stunden availability eingibt. Das muss noch geändert werden.
