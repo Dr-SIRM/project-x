@@ -24,6 +24,11 @@ const Availability = ({ availability }) => {
   const token = localStorage.getItem('session_token'); 
   const [additionalTimes, setAdditionalTimes] = useState(0);
   const [selectedTemplate, setSelectedTemplate] = useState('');
+  const [activeTemplateData, setActiveTemplateData] = useState({});
+
+  useEffect(() => {
+    setActiveTemplateData(availabilityData.temp_dict);
+}, [availabilityData]);
 
   useEffect(() => {
     const fetchAvailabilityData = async () => {
@@ -104,6 +109,19 @@ useEffect(() => {
       </Box>
     );
   }
+
+  const fetchTemplate1Data = () => {
+    setActiveTemplateData(availabilityData.template1_dict);
+  };
+  
+  const fetchTemplate2Data = () => {
+    setActiveTemplateData(availabilityData.template2_dict);
+  };
+  
+  const fetchTemplate3Data = () => {
+    setActiveTemplateData(availabilityData.template3_dict);
+  };
+
   
 
   return (
@@ -117,13 +135,13 @@ useEffect(() => {
         onSubmit={handleFormSubmit}
         enableReinitialize={true}
         initialValues={{
-          ...Array.from({ length: availabilityData.day_num }).reduce((acc, _, rowIndex) => {
-            acc[`day_${rowIndex}_0`] = availabilityData.temp_dict[`${rowIndex + 1}&0`] || '00:00';
-            acc[`day_${rowIndex}_1`] = availabilityData.temp_dict[`${rowIndex + 1}&1`] || '00:00';
-            acc[`day_${rowIndex}_2`] = availabilityData.temp_dict[`${rowIndex + 1}&2`] || '00:00';
-            acc[`day_${rowIndex}_3`] = availabilityData.temp_dict[`${rowIndex + 1}&3`] || '00:00';
-            acc[`day_${rowIndex}_4`] = availabilityData.temp_dict[`${rowIndex + 1}&4`] || '00:00';
-            acc[`day_${rowIndex}_5`] = availabilityData.temp_dict[`${rowIndex + 1}&5`] || '00:00';
+          ...Array.from({ length: availabilityData.day_num || 0 }).reduce((acc, _, rowIndex) => {
+            acc[`day_${rowIndex}_0`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&0`] ? activeTemplateData[`${rowIndex + 1}&0`] : '00:00';
+            acc[`day_${rowIndex}_1`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&1`] ? activeTemplateData[`${rowIndex + 1}&1`] : '00:00';
+            acc[`day_${rowIndex}_2`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&2`] ? activeTemplateData[`${rowIndex + 1}&2`] : '00:00';
+            acc[`day_${rowIndex}_3`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&3`] ? activeTemplateData[`${rowIndex + 1}&3`] : '00:00';
+            acc[`day_${rowIndex}_4`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&4`] ? activeTemplateData[`${rowIndex + 1}&4`] : '00:00';
+            acc[`day_${rowIndex}_5`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&5`] ? activeTemplateData[`${rowIndex + 1}&5`] : '00:00';
             return acc;
           }, {}),
         }}
@@ -201,7 +219,7 @@ useEffect(() => {
                 variant="outlined"
                 color="inherit"
                 size="small"
-                onClick={handleFormSubmit}
+                onClick={fetchTemplate1Data}
                 sx={{
                   borderColor: 'white',
                   height: '20px',
@@ -226,7 +244,7 @@ useEffect(() => {
                 variant="outlined"
                 color="inherit"
                 size="small"
-                onClick={handleFormSubmit}
+                onClick={fetchTemplate2Data}
                 sx={{
                   borderColor: 'white',
                   height: '20px',
@@ -251,7 +269,7 @@ useEffect(() => {
                 variant="outlined"
                 color="inherit"
                 size="small"
-                onClick={handleFormSubmit}
+                onClick={fetchTemplate3Data}
                 sx={{
                   borderColor: 'white',
                   height: '20px',
