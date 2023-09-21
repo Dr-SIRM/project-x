@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTheme, Box, Button, TextField, Snackbar, Typography, ButtonGroup, IconButton } from "@mui/material";
+import { Select, MenuItem } from "@mui/material";
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -272,6 +273,52 @@ useEffect(() => {
                 Template 3
               </Button>
               </Box>
+              <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', marginBottom: '1rem' }}>
+        <Button 
+              variant="outlined"
+              color="inherit"
+              size="small"
+              onClick={() => handleFormSubmit(values, "Save Template")}
+              sx={{
+                borderColor: 'white',
+                height: '20px',
+                minHeight: '20px',
+                fontSize: '10px',
+                '&.MuiButtonOutlined': {
+                  borderColor: 'white',
+                },
+                '&:hover': {
+                  borderColor: 'white',
+                },
+                '&.MuiButtonText': {
+                  borderColor: 'white',
+                  color: 'white',
+                  backgroundColor: '#2e7c67',
+                }
+              }}
+            >
+              Save Template
+            </Button>
+            <Select 
+                type="text"
+                size="small"
+                name="template_name"
+                value={selectedTemplate}
+                onChange={(e) => setSelectedTemplate(e.target.value)}
+                inputProps={{ maxLength: 30 }}
+                sx={{
+                  height: '20px', // explicitly set height
+                  '.MuiInputBase-root': {
+                    height: '20px', // explicitly set input field height
+                    fontSize: '10px' // explicitly set font size
+                  }
+                }}
+              >
+                <MenuItem value={ 'Template 1' }>Template 1</MenuItem>
+                <MenuItem value={ 'Template 2' }>Template 2</MenuItem>
+                <MenuItem value={ 'Template 3' }>Template 3</MenuItem>
+                </Select>
+        </Box>
             <Box
       display="grid"
       gap="30px"

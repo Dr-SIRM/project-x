@@ -470,8 +470,10 @@ def get_availability():
        
             # Delete all entries for the range in one operation
             for i in range(day_num):
-                TemplateAvailability.query.filter_by(user_id=user.id, template_name=availability_data['template_name']).delete()
-            db.session.commit()
+                data_deletion = TemplateAvailability.query.filter_by(email=user.email, template_name=availability_data['selectedTemplate']).delete()
+                if data_deletion:
+                        data_deletion.delete()
+                        db.session.commit()
 
             # Create all new entries
             for i in range(day_num):
@@ -487,8 +489,7 @@ def get_availability():
                 # Create a new Availability instance and add to list
                 data = TemplateAvailability(
                     id=None,
-                    template_name=availability_data['template_name'],
-                    user_id=user.id, 
+                    template_name=availability_data['selectedTemplate'],
                     date=new_date, 
                     weekday=new_weekday, 
                     email=user.email,
@@ -505,6 +506,7 @@ def get_availability():
                 new_entries.append(data)
                 
             # Bulk insert and commit
+            print(new_entries)
             db.session.bulk_save_objects(new_entries)
             db.session.commit()
 
