@@ -46,6 +46,7 @@ Prio 1:
  - (*) Phu fragen: Verschiedene Openinghours, time_req werden nicht richtig in die Datenbank gespühlt
  - (*) Solver Vorlage den anderen zeigen, Vorüberprüfungen fertigstellen und Daten an React geben
  - (*) Jeder MA muss vor dem Solven eingegeben haben, wann er arbeiten kann. Auch wenn es alles 0 sind.
+ - (*) Die erste Vorüberprüfung funktioniert noch nicht, da auch ein Perm MA der 60% angestellt ist weekly_hours eingteilt werden muss.
  - (*) NB9 mit 3 Schichten fertigbauen
 
  - gerechte_verteilung funktioniert noch nicht richtig, wenn ein MA fast keine Stunden availability eingibt. Das muss noch geändert werden.
@@ -498,11 +499,12 @@ class ORAlgorithm_cp:
         4. Ist zu jeder notwendigen Zeit (self.min_anwesend) die mindestanzahl Mitarbeiter verfügbar?
         ---------------------------------------------------------------------------------------------------------------
         """
+        
         for i in range(len(self.min_anwesend)):  # Für jeden Tag in der Woche
             for j in range(len(self.min_anwesend[i])):  # Für jede Stunde am Tag
                 if sum([self.verfügbarkeit[ma][i][j] for ma in self.mitarbeiter]) < self.min_anwesend[i][j]:
                     raise ValueError(f"Es sind nicht genügend Mitarbeiter verfügbar zur notwendigen Zeit (Tag {i+1}, Stunde {j+1}).")
-
+        
         """
         ---------------------------------------------------------------------------------------------------------------
         5. Können die MA die min. Zeit täglich erreichen? Wenn 0 Stunden eingegeben wurden, läuft es durch!
@@ -542,7 +544,7 @@ class ORAlgorithm_cp:
         self.model = cp_model.CpModel()
         self.solver = cp_model.CpSolver()
         
-        self.solver.parameters.max_time_in_seconds = 220
+        self.solver.parameters.max_time_in_seconds = 500
         # self.solver.parameters.num_search_workers = 4 # Anzahl Kerne --> noch genau testen was das optimum ist (CPU-Auslastung beachten!)
 
 
