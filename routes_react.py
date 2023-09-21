@@ -1088,7 +1088,7 @@ def get_required_workforce():
                         if not (is_within_opening_hours(new_time, opening_details.start_time, opening_details.end_time) or
                                 (opening_details.start_time2 and opening_details.end_time2 and 
                                 is_within_opening_hours(new_time, opening_details.start_time2, opening_details.end_time2))):
-                            continue
+                            capacity = 0
 
                     new_record = TimeReq(
                         id=None,
