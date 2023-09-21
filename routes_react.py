@@ -1305,8 +1305,8 @@ def get_calendar():
         'id': shift.id,
         'title': f"{shift.first_name} {shift.last_name}",
         'date': shift.date.strftime('%Y-%m-%d'),
-        'start': datetime.combine(shift.date, shift.start_time).strftime('%Y-%m-%dT%H:%M:%S'),
-        'end': datetime.combine(shift.date, shift.end_time).strftime('%Y-%m-%dT%H:%M:%S'),
+        'start': datetime.datetime.combine(shift.date, shift.start_time).strftime('%Y-%m-%dT%H:%M:%S'),
+        'end': datetime.datetime.combine(shift.date, shift.end_time).strftime('%Y-%m-%dT%H:%M:%S'),
     } for shift in shifts]
     print(events)
     return jsonify(events)
