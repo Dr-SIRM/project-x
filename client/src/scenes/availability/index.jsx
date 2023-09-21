@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useTheme, Box, Button, TextField, Snackbar, Typography, ButtonGroup, IconButton } from "@mui/material";
-import { Select, MenuItem } from "@mui/material";
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -23,8 +22,6 @@ const Availability = ({ availability }) => {
   const [weekAdjustment, setWeekAdjustment] = useState(0);
   const token = localStorage.getItem('session_token'); 
   const [additionalTimes, setAdditionalTimes] = useState(0);
-  const [selectedTemplate, setSelectedTemplate] = useState('');
-
 
   useEffect(() => {
     const fetchAvailabilityData = async () => {
@@ -75,25 +72,15 @@ useEffect(() => {
   };
   
 
-  const handleFormSubmit = async (values, buttonName) => {
-
-      Object.keys(values).forEach((key) => {
-        if (values[key] === '' || values[key] === undefined) {
-          values[key] = '00:00';
-        }
-      });
-      const payload = { ...values, button: buttonName, selectedTemplate };
-      console.log("Final payload before sending to server:", payload);
-      
+  const handleFormSubmit = async (values) => {
     try {
-      await axios.post('http://localhost:5000/api/availability?week_adjustment=' + weekAdjustment, payload, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+      // Send the updated form values to the server for database update
+      await axios.post('http://localhost:5000/api/availability?week_adjustment=' + weekAdjustment, values, {
+    headers: {
+        'Authorization': `Bearer ${token}`
         }
-      });
+    });
       setShowSuccessNotification(true);
-      console.log("Sending this data to server:", payload);
     } catch (error) {
       console.error('Error updating availability details:', error);
       setShowErrorNotification(true);
@@ -275,53 +262,6 @@ useEffect(() => {
                 Template 3
               </Button>
               </Box>
-              <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', marginBottom: '1rem' }}>
-        <Button 
-              variant="outlined"
-              color="inherit"
-              size="small"
-              onClick={() => handleFormSubmit(values, "Save Template")}
-              sx={{
-                borderColor: 'white',
-                height: '20px',
-                minHeight: '20px',
-                fontSize: '10px',
-                '&.MuiButtonOutlined': {
-                  borderColor: 'white',
-                },
-                '&:hover': {
-                  borderColor: 'white',
-                },
-                '&.MuiButtonText': {
-                  borderColor: 'white',
-                  color: 'white',
-                  backgroundColor: '#2e7c67',
-                }
-              }}
-            >
-              Save Template
-            </Button>
-            <Select 
-                type="text"
-                size="small"
-                name="template_name"
-                value={selectedTemplate}
-                onChange={(e) => setSelectedTemplate(e.target.value)}
-                inputProps={{ maxLength: 30 }}
-                sx={{
-                  height: '20px', // explicitly set height
-                  '.MuiInputBase-root': {
-                    height: '20px', // explicitly set input field height
-                    fontSize: '10px' // explicitly set font size
-                  }
-                }}
-              >
-                <MenuItem value={ 'Template 1' }>Template 1</MenuItem>
-                <MenuItem value={ 'Template 2' }>Template 2</MenuItem>
-                <MenuItem value={ 'Template 3' }>Template 3</MenuItem>
-                </Select>
-            </Box>
-            <span></span>
             <Box
       display="grid"
       gap="30px"
@@ -340,7 +280,7 @@ useEffect(() => {
           height: "100%",
         }}
       >
-        Weekday
+        Wochentag
       </Typography>
       <Typography
         color={colors.greenAccent[500]}
@@ -352,7 +292,7 @@ useEffect(() => {
           height: "100%",
         }}
       >
-        Start Time 1
+        Startzeit 1
       </Typography>
       <Typography
         color={colors.greenAccent[500]}
@@ -364,7 +304,7 @@ useEffect(() => {
           height: "100%",
         }}
       >
-        End Time 1
+        Endzeit 1
       </Typography>
       {additionalTimes >= 1 && (
         <>
@@ -378,7 +318,7 @@ useEffect(() => {
               height: "100%",
             }}
           >
-            Start Time 2
+            Startzeit 2
           </Typography>
           <Typography
             color={colors.greenAccent[500]}
@@ -390,7 +330,7 @@ useEffect(() => {
               height: "100%",
             }}
           >
-            End Time 2
+            Endzeit 2
           </Typography>
         </>
       )}
@@ -478,27 +418,9 @@ useEffect(() => {
             <Button onClick={handleAddTime} color="primary" variant="contained" sx={{ marginRight: '10px' }}>
               Add Time
             </Button>
-            <Button 
-            variant="outlined"
-            color="inherit"
-            onClick={() => handleFormSubmit(values, "Submit")}
-            sx={{
-              borderColor: 'white',
-              '&.MuiButtonOutlined': {
-                borderColor: 'white',
-              },
-              '&:hover': {
-                borderColor: 'white',
-              },
-              '&.MuiButtonText': {
-                borderColor: 'white',
-                color: 'white',
-                backgroundColor: '#2e7c67',
-              }
-            }}
-          >
-            Submit
-          </Button>
+              <Button type="submit" color="secondary" variant="contained">
+                Update
+              </Button>
             </Box>
 
           </form>

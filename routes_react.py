@@ -1,7 +1,7 @@
 from flask import request, url_for, session, jsonify, send_from_directory, make_response
 from flask_mail import Message
 import datetime
-from datetime import date, timedelta
+from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
 import random
 from models import db
@@ -235,7 +235,7 @@ def get_company():
     react_user = get_jwt_identity()
     user = User.query.filter_by(email=react_user).first()
     opening_hours = OpeningHours.query.filter_by(company_name=user.company_name).first()
-    weekdays = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
+    weekdays = {0:'Montag', 1:'Dienstag', 2:'Mittwoch', 3:'Donnerstag', 4:'Freitag', 5:'Samstag', 6:'Sonntag'}
     company = Company.query.filter_by(company_name=user.company_name).first()
     day_num = 7
     company_id = user.company_id
@@ -377,7 +377,7 @@ def get_availability():
     today = datetime.date.today()
     creation_date = datetime.datetime.now()
     monday = today - datetime.timedelta(days=today.weekday())
-    weekdays = {0:'Monday', 1:'Tuesday', 2:'Wednesday', 3:'Thursday', 4:'Friday', 5:'Saturday', 6:'Sunday'}
+    weekdays = {0:'Montag', 1:'Dienstag', 2:'Mittwoch', 3:'Donnerstag', 4:'Freitag', 5:'Samstag', 6:'Sonntag'}
     day_num = 7
     company_id = user.company_id
 
@@ -932,6 +932,9 @@ def get_temp_timereq_dict(template_name, day_num, daily_slots, hour_divider, min
     
     return temp_timereq_dict
 
+def is_within_opening_hours(time, opening, closing):
+    return opening <= time < closing
+
 
 @app.route('/api/requirement/workforce', methods = ['GET', 'POST'])
 @jwt_required()
@@ -1047,6 +1050,10 @@ def get_required_workforce():
                 opening_dict[str(new_i) + '&2'] = opening.start_time2.strftime("%H:%M") if opening.start_time2 else None
                 opening_dict[str(new_i) + '&3'] = opening.end_time2.strftime("%H:%M") if opening.end_time2 else None
     print(opening_dict)
+<<<<<<< HEAD
+=======
+    
+>>>>>>> b2396e7ca6fc62f5e2ce608641c23b11d7ac42bb
     #Submit the required FTE per hour
     if request.method == 'POST':
         button = request.json.get("button", None)
@@ -1066,6 +1073,8 @@ def get_required_workforce():
             new_records = []
             for i in range(day_num):
                 new_date = new_dates[i]
+                weekday = weekdays.get(i)
+                opening_details = opening_hours_dict.get(weekday)
 
                 for quarter in range(daily_slots):
                     quarter_hour = quarter / hour_divider
@@ -1075,6 +1084,11 @@ def get_required_workforce():
                     
                     time = f'{formatted_time}:00'
                     new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+                    if opening_details:
+                        if not (is_within_opening_hours(new_time, opening_details.start_time, opening_details.end_time) or
+                                (opening_details.start_time2 and opening_details.end_time2 and 
+                                is_within_opening_hours(new_time, opening_details.start_time2, opening_details.end_time2))):
+                            continue
 
                     new_record = TimeReq(
                         id=None,
@@ -1144,8 +1158,7 @@ def get_required_workforce():
 
 
 
-#from datetime import date, timedelta, datetime
-import calendar
+
 from functools import wraps
 
 @app.route('/api/schichtplanung', methods=['POST', 'GET'])
@@ -1268,6 +1281,33 @@ def get_worker_count():
     ).count()
 
     return jsonify({'worker_count': worker_count, 'start_time_count': start_time_count})
+
+
+
+
+@app.route('/api/calendar', methods=['GET'])
+@jwt_required()
+def get_calendar():
+    current_user_id = get_jwt_identity()
+    current_user = User.query.filter_by(email=current_user_id).first()
+    if not current_user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    # Get the shifts for the current user
+    shifts = Timetable.query.filter_by(email=current_user_id).all()
+    
+    # Convert the shifts to the format expected by FullCalendar
+    events = [{
+        'id': shift.id,
+        'title': f"{shift.first_name} {shift.last_name}",
+        'date': shift.date.strftime('%Y-%m-%d'),
+        'start': datetime.combine(shift.date, shift.start_time).strftime('%Y-%m-%dT%H:%M:%S'),
+        'end': datetime.combine(shift.date, shift.end_time).strftime('%Y-%m-%dT%H:%M:%S'),
+    } for shift in shifts]
+    print(events)
+    return jsonify(events)
+
+
 
 
 @app.route('/api/download', methods=['POST', 'GET'])
