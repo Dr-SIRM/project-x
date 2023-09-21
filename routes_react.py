@@ -1046,7 +1046,7 @@ def get_required_workforce():
             if opening.end_time2.strftime("%H:%M") != "00:00":
                 opening_dict[str(new_i) + '&2'] = opening.start_time2.strftime("%H:%M") if opening.start_time2 else None
                 opening_dict[str(new_i) + '&3'] = opening.end_time2.strftime("%H:%M") if opening.end_time2 else None
-    
+    print(opening_dict)
     #Submit the required FTE per hour
     if request.method == 'POST':
         button = request.json.get("button", None)
