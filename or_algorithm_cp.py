@@ -45,6 +45,7 @@ Prio 1:
  -------------------------------
  - (*) Phu fragen: Verschiedene Openinghours, time_req werden nicht richtig in die Datenbank gespühlt
  - (*) Solver Vorlage den anderen zeigen, Vorüberprüfungen fertigstellen und Daten an React geben
+ - (*)  Jeder MA muss vor dem Solven eingegeben haben, wann er arbeiten kann. Auch wenn es alles 0 sind.
  - (*) NB9 mit 3 Schichten fertigbauen
 
  - gerechte_verteilung funktioniert noch nicht richtig, wenn ein MA fast keine Stunden availability eingibt. Das muss noch geändert werden.
@@ -61,11 +62,9 @@ Prio 1:
  Fragen an die Runde (Juli 2023):
  -------------------------------
  - MA mit verschiedenen Profilen - Department (Koch, Service, ..)? Wie genau lösen wir das?
- - Wie oft darf gesolvt werden? zb. max 2x pro Woche?
  - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden?
  -------------------------------
 
- - Jeder MA muss vor dem Solven eingegeben haben, wann er arbeiten kann. Auch wenn es alles 0 sind.
 
 
 """

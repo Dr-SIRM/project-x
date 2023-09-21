@@ -364,7 +364,7 @@ def get_temp_availability_dict(template_name, day_num, daily_slots, hour_divider
             if temp is None or temp.worker == 0:
                 pass
             else:
-                template_dict["{}-{}".format(i, hour)] = temp.worker
+                temp_availability_dict["{}-{}".format(i, hour)] = temp.worker
     return temp_availability_dict
 
 
@@ -942,7 +942,7 @@ def get_required_workforce():
     react_user = get_jwt_identity()
     user = User.query.filter_by(email=react_user).first()
     creation_date = datetime.datetime.now()
-    weekdays = {0: 'Monday', 1: 'Tuesday', 2: 'Wednesday', 3: 'Thursday', 4: 'Friday', 5: 'Saturday', 6: 'Sunday'}
+    weekdays = {0: 'Montag', 1: 'Dienstag', 2: 'Mittwoch', 3: 'Donnerstag', 4: 'Freitag', 5: 'Samstag', 6: 'Sonntag'}
     today = datetime.date.today()
     solverreq = SolverRequirement.query.filter_by(company_name=user.company_name).first()
     hour_divider = solverreq.hour_devider
@@ -962,6 +962,9 @@ def get_required_workforce():
     ).all()
     
     opening_hours_dict = {oh.weekday: oh for oh in all_opening_hours}
+    print(user.company_name)
+    print(all_opening_hours)
+    print(opening_hours_dict)
 
 
     # Calculation Working Day
@@ -1080,6 +1083,7 @@ def get_required_workforce():
                     
                     time = f'{formatted_time}:00'
                     new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+
                     if opening_details:
                         if not (is_within_opening_hours(new_time, opening_details.start_time, opening_details.end_time) or
                                 (opening_details.start_time2 and opening_details.end_time2 and 
@@ -1297,8 +1301,8 @@ def get_calendar():
         'id': shift.id,
         'title': f"{shift.first_name} {shift.last_name}",
         'date': shift.date.strftime('%Y-%m-%d'),
-        'start': datetime.datetime.combine(shift.date, shift.start_time).strftime('%Y-%m-%dT%H:%M:%S'),
-        'end': datetime.datetime.combine(shift.date, shift.end_time).strftime('%Y-%m-%dT%H:%M:%S'),
+        'start': datetime.combine(shift.date, shift.start_time).strftime('%Y-%m-%dT%H:%M:%S'),
+        'end': datetime.combine(shift.date, shift.end_time).strftime('%Y-%m-%dT%H:%M:%S'),
     } for shift in shifts]
     print(events)
     return jsonify(events)
