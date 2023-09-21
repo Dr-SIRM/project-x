@@ -364,7 +364,7 @@ def get_temp_availability_dict(template_name, day_num, daily_slots, hour_divider
             if temp is None or temp.worker == 0:
                 pass
             else:
-                template_dict["{}-{}".format(i, hour)] = temp.worker
+                temp_availability_dict["{}-{}".format(i, hour)] = temp.worker
     return temp_availability_dict
 
 
@@ -1050,10 +1050,6 @@ def get_required_workforce():
                 opening_dict[str(new_i) + '&2'] = opening.start_time2.strftime("%H:%M") if opening.start_time2 else None
                 opening_dict[str(new_i) + '&3'] = opening.end_time2.strftime("%H:%M") if opening.end_time2 else None
     print(opening_dict)
-<<<<<<< HEAD
-    
-=======
->>>>>>> 77828383978ad8d025abb4f12d5e6e9dfeb75101
     #Submit the required FTE per hour
     if request.method == 'POST':
         button = request.json.get("button", None)
