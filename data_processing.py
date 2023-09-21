@@ -196,7 +196,7 @@ class DataProcessing:
                 SELECT weekday, start_time, end_time, end_time2
                 FROM opening_hours
                 WHERE company_name = :company_name
-                ORDER BY FIELD(weekday, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
+                ORDER BY FIELD(weekday, 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag')
             """)
             result = db.session.execute(sql, {"company_name": company_name})
             times = result.fetchall()
@@ -207,13 +207,13 @@ class DataProcessing:
 
         # Ordne jedem Wochentag einen Index zu, um die Listen korrekt zu befüllen
         weekday_indices = {
-            'Monday': 0,
-            'Tuesday': 1,
-            'Wednesday': 2,
-            'Thursday': 3,
-            'Friday': 4,
-            'Saturday': 5,
-            'Sunday': 6
+            'Montag': 0,
+            'Dienstag': 1,
+            'Mittwoch': 2,
+            'Donnerstag': 3,
+            'Freitag': 4,
+            'Samstag': 5,
+            'Sonntag': 6
         }
 
         for weekday, start_time, end_time, end_time2 in times:
