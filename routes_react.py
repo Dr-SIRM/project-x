@@ -342,29 +342,30 @@ def get_company():
     
     return jsonify(company_list)
 
-def get_temp_availability_dict(template_name, day_num, daily_slots, hour_divider, minutes, company_name, week_adjustment, monday, full_day):
+def get_temp_availability_dict(template_name, email, day_num, weekdays):
     temp_availability_dict = {}
+
+    # Query once to get all relevant TemplateTimeRequirements
+    all_temps = TemplateAvailability.query.filter_by(
+        email=email,
+        template_name=template_name
+    ).all()
+
+    temp_dict = {(av.weekday): av for av in all_temps}
+    
+
     for i in range(day_num):
-        for hour in range(daily_slots):
-            if hour > full_day:  # you might need to define full_day or pass it as a parameter
-                hour -= full_day
-            else:
-                pass
-            quarter_hour = hour / hour_divider
-            quarter_minute = (hour % hour_divider) * minutes
-            formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
-            time = f'{formatted_time}:00'
-            new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
-            temp = TemplateTimeRequirement.query.filter_by(
-                company_name=company_name,
-                weekday={i},
-                start_time=new_time,
-                template_name=template_name
-            ).first()
-            if temp is None or temp.worker == 0:
-                pass
-            else:
-                temp_availability_dict["{}-{}".format(i, hour)] = temp.worker
+        temp = temp_dict.get(( weekdays[i]))
+        
+        if temp:
+            new_i = i + 1
+            temp_availability_dict[f"{new_i}&0"] = temp.start_time.strftime("%H:%M") if temp.start_time else None
+            temp_availability_dict[f"{new_i}&1"] = temp.end_time.strftime("%H:%M") if temp.end_time else None
+            temp_availability_dict[f"{new_i}&2"] = temp.start_time2.strftime("%H:%M") if temp.start_time2 else None
+            temp_availability_dict[f"{new_i}&3"] = temp.end_time2.strftime("%H:%M") if temp.end_time2 else None
+            temp_availability_dict[f"{new_i}&4"] = temp.start_time3.strftime("%H:%M") if temp.start_time3 else None
+            temp_availability_dict[f"{new_i}&5"] = temp.end_time3.strftime("%H:%M") if temp.end_time3 else None
+  
     return temp_availability_dict
 
 
@@ -410,14 +411,12 @@ def get_availability():
             temp_dict[f"{new_i}&3"] = temp.end_time2.strftime("%H:%M") if temp.end_time2 else None
             temp_dict[f"{new_i}&4"] = temp.start_time3.strftime("%H:%M") if temp.start_time3 else None
             temp_dict[f"{new_i}&5"] = temp.end_time3.strftime("%H:%M") if temp.end_time3 else None
-
+    
     #Save Availability
     if request.method == 'POST':
         button = request.json.get("button", None)
-        print(request.json)
         if button == "Submit":
             new_entries = []
-            print(request.json)
             
             # Delete all entries for the range in one operation
             for i in range(day_num):
@@ -466,7 +465,6 @@ def get_availability():
         if button == "Save Template":
             new_entries = []
             availability_data = request.get_json()
-            print(request.json)
        
             # Delete all entries for the range in one operation
             for i in range(day_num):
@@ -506,7 +504,6 @@ def get_availability():
                 new_entries.append(data)
                 
             # Bulk insert and commit
-            print(new_entries)
             db.session.bulk_save_objects(new_entries)
             db.session.commit()
 
@@ -516,6 +513,9 @@ def get_availability():
         'day_num': day_num,
         'temp_dict': temp_dict,
         'week_start': week_start,
+        'template1_dict': get_temp_availability_dict("Template 1", user.email, day_num, weekdays),
+        'template2_dict': get_temp_availability_dict("Template 2", user.email, day_num, weekdays),
+        'template3_dict': get_temp_availability_dict("Template 3", user.email, day_num, weekdays),
     }
 
     return jsonify(availability_list)
@@ -796,8 +796,6 @@ def solver_req():
     "nb20": nb20
     }
 
-    print(solver_req_dict)
-
     
     return jsonify(solver_req_dict)
 
@@ -966,10 +964,6 @@ def get_required_workforce():
     ).all()
     
     opening_hours_dict = {oh.weekday: oh for oh in all_opening_hours}
-    print(user.company_name)
-    print(all_opening_hours)
-    print(opening_hours_dict)
-
 
     # Calculation Working Day
     closing_times = []
@@ -1056,7 +1050,7 @@ def get_required_workforce():
             if opening.end_time2.strftime("%H:%M") != "00:00":
                 opening_dict[str(new_i) + '&2'] = opening.start_time2.strftime("%H:%M") if opening.start_time2 else None
                 opening_dict[str(new_i) + '&3'] = opening.end_time2.strftime("%H:%M") if opening.end_time2 else None
-    print(opening_dict)
+
     #Submit the required FTE per hour
     if request.method == 'POST':
         button = request.json.get("button", None)
