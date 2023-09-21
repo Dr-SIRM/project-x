@@ -8,6 +8,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
 import {
   Box,
+  Button,
   List,
   ListItem,
   ListItemText,
@@ -43,6 +44,31 @@ const Calendar = () => {
     fetchCalendar();
   }, []);
 
+  // iCalendar helper function
+  function eventsToICS(events) {
+    let icsEvents = events.map(event => {
+      return `BEGIN:VEVENT\r\nDTSTART:${event.start.replace(/[-:]/g, '')}\r\nDTEND:${event.end.replace(/[-:]/g, '')}\r\nSUMMARY:${event.title}\r\nEND:VEVENT`;
+    }).join('\r\n');
+
+    return `BEGIN:VCALENDAR\r\nVERSION:2.0\r\n${icsEvents}\r\nEND:VCALENDAR`;
+  }
+
+  // Function to initiate download
+  function downloadICS() {
+    let icsData = eventsToICS(currentEvents);
+    let blob = new Blob([icsData], { type: 'text/calendar' });
+    let url = window.URL.createObjectURL(blob);
+
+    let a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = 'events.ics';
+
+    document.body.appendChild(a);
+    a.click();
+
+    window.URL.revokeObjectURL(url);
+  }
 
   const handleDateClick = (selected) => {
     const title = prompt("Please enter a new title for your event");
@@ -64,6 +90,30 @@ const Calendar = () => {
   return (
     <Box m="20px">
       <Header title="Calendar" subtitle="Full Calendar Interactive Page" />
+      {/* Adding the export button */}
+      <Box mb="10px">
+        <Button variant="outlined"
+                color="inherit"
+                size="small"
+                onClick={downloadICS} 
+                sx={{
+                  borderColor: 'white',
+                  height: '20px',
+                  minHeight: '20px',
+                  fontSize: '10px',
+                  '&.MuiButtonOutlined': {
+                    borderColor: 'white',
+                  },
+                  '&:hover': {
+                    borderColor: 'white',
+                  },
+                  '&.MuiButtonText': {
+                    borderColor: 'white',
+                    color: 'white',
+                    backgroundColor: '#2e7c67',
+                  }
+                }}>Export zum Kalender</Button>
+      </Box>
 
       <Box display="flex" justifyContent="space-between">
         {/* CALENDAR SIDEBAR */}

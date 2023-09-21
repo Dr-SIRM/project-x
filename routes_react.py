@@ -1050,7 +1050,10 @@ def get_required_workforce():
                 opening_dict[str(new_i) + '&2'] = opening.start_time2.strftime("%H:%M") if opening.start_time2 else None
                 opening_dict[str(new_i) + '&3'] = opening.end_time2.strftime("%H:%M") if opening.end_time2 else None
     print(opening_dict)
+<<<<<<< HEAD
     
+=======
+>>>>>>> 77828383978ad8d025abb4f12d5e6e9dfeb75101
     #Submit the required FTE per hour
     if request.method == 'POST':
         button = request.json.get("button", None)
@@ -1298,8 +1301,8 @@ def get_calendar():
         'id': shift.id,
         'title': f"{shift.first_name} {shift.last_name}",
         'date': shift.date.strftime('%Y-%m-%d'),
-        'start': datetime.combine(shift.date, shift.start_time).strftime('%Y-%m-%dT%H:%M:%S'),
-        'end': datetime.combine(shift.date, shift.end_time).strftime('%Y-%m-%dT%H:%M:%S'),
+        'start': datetime.datetime.combine(shift.date, shift.start_time).strftime('%Y-%m-%dT%H:%M:%S'),
+        'end': datetime.datetime.combine(shift.date, shift.end_time).strftime('%Y-%m-%dT%H:%M:%S'),
     } for shift in shifts]
     print(events)
     return jsonify(events)
