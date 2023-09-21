@@ -7,6 +7,8 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import axios from 'axios';
+import CircularProgress from "@mui/material/CircularProgress";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
 
 
@@ -18,6 +20,13 @@ const Solver = ({ solver }) => {
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [solverData, setsolverData] = useState({});
   const token = localStorage.getItem('session_token'); // Get the session token from local storage
+  const [loadingSteps, setLoadingSteps] = useState([
+    { label: "Button initiated", status: null },
+    { label: "Data loading", status: null },
+    { label: "Database opened", status: null },
+    { label: "Solution saved", status: null },
+    { label: "Completion", status: null }
+  ]);
 
   useEffect(() => {
     const fetchSolver = async () => {
@@ -38,6 +47,33 @@ const Solver = ({ solver }) => {
 
   
   const handleFormSubmit = async (values) => {
+    setLoadingSteps(prev => [{...prev[0], status: "loading"}, ...prev.slice(1)]);
+        
+        setTimeout(() => {
+            setLoadingSteps(prev => [{...prev[0], status: "completed"}, {...prev[1], status: "loading"}, ...prev.slice(2)]);
+            
+            // Simulate Data loading
+            setTimeout(() => {
+                setLoadingSteps(prev => [prev[0], {...prev[1], status: "completed"}, {...prev[2], status: "loading"}, ...prev.slice(3)]);
+                
+                // Simulate Database opened
+                setTimeout(() => {
+                    setLoadingSteps(prev => [prev[0], prev[1], {...prev[2], status: "completed"}, {...prev[3], status: "loading"}, prev[4]]);
+                    
+                    // Simulate Solution saved
+                    setTimeout(() => {
+                        setLoadingSteps(prev => [prev[0], prev[1], prev[2], {...prev[3], status: "completed"}, {...prev[4], status: "loading"}]);
+                        
+                        // Simulate Completion
+                        setTimeout(() => {
+                            setLoadingSteps(prev => [...prev.slice(0, 4), {...prev[4], status: "completed"}]);
+                            
+                            setShowSuccessNotification(true);
+                        }, 3000);
+                    }, 3000);
+                }, 3000);
+            }, 3000);
+        }, 3000);
     try {
       // Send the updated form values to the server for database update
       await axios.post('http://localhost:5000/api/solver', { ...values, solverButtonClicked: true }, {
@@ -46,7 +82,6 @@ const Solver = ({ solver }) => {
         'Content-Type': 'application/json',
         }
     });
-      setShowSuccessNotification(true);
     } catch (error) {
       console.error('Error updating solver details:', error);
       setShowErrorNotification(true);
@@ -79,6 +114,15 @@ const Solver = ({ solver }) => {
           </form>
         )}
       </Formik>
+      <div>
+        {loadingSteps.map((step, index) => (
+          <div key={index} style={{ display: "flex", alignItems: "center", marginTop: "10px" }}>
+            {step.status === "loading" && <CircularProgress size={20} />}
+            {step.status === "completed" && <CheckCircleIcon style={{ color: "green" }} />}
+            <Typography variant="body1" style={{ marginLeft: "10px" }}>{step.label}</Typography>
+          </div>
+        ))}
+      </div>
       <Snackbar
         open={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
