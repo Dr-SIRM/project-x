@@ -939,7 +939,7 @@ def get_required_workforce():
     react_user = get_jwt_identity()
     user = User.query.filter_by(email=react_user).first()
     creation_date = datetime.datetime.now()
-    weekdays = {0: 'Monday', 1: 'Tuesday', 2: 'Wednesday', 3: 'Thursday', 4: 'Friday', 5: 'Saturday', 6: 'Sunday'}
+    weekdays = {0: 'Montag', 1: 'Dienstag', 2: 'Mittwoch', 3: 'Donnerstag', 4: 'Freitag', 5: 'Samstag', 6: 'Sonntag'}
     today = datetime.date.today()
     solverreq = SolverRequirement.query.filter_by(company_name=user.company_name).first()
     hour_divider = solverreq.hour_devider
