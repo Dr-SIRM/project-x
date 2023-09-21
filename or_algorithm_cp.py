@@ -38,12 +38,14 @@ Prio 1:
  - (erl.) Stunden Teiler für 1/4, 1/2 und 1h einbauen
  - (erl.) NB10 die weiche fertigbauen
  - (erl.) Opening Hour 2 einbauen
+ - (erl.) Shifts aus Solver_req Datenbank rauslöschen und Daten nicht mehr ziehen
+ - (erl.) Während des Solvings Daten ziehen --> Fragen gestellt
 
  To-Do's 
  -------------------------------
- - (*) Shifts aus Solver_req Datenbank rauslöschen und Daten nicht mehr ziehen
+ - (*) Phu fragen: Verschiedene Openinghours, time_req werden nicht richtig in die Datenbank gespühlt
+ - (*) Solver Vorlage den anderen zeigen, Vorüberprüfungen fertigstellen und Daten an React geben
  - (*) NB9 mit 3 Schichten fertigbauen
- - (*) Während des Solvings Daten ziehen --> Fragen gestellt
 
  - gerechte_verteilung funktioniert noch nicht richtig, wenn ein MA fast keine Stunden availability eingibt. Das muss noch geändert werden.
  

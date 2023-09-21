@@ -180,14 +180,7 @@ class DataProcessing:
 
     def get_opening_hours(self):
         """ In dieser Funktion werden die Öffnungszeiten (7 Tage) der jeweiligen Company aus der Datenbank gezogen. """
-
-
-        # end_time in dieser Methode auf end_time2 wechslen!!
-        # end_time == 0 / end_time2 == 1
-        self.end_time_choice = 0
-        end_time_field = "end_time2" if self.end_time_choice == 1 else "end_time"
-
-
+        
         with app.app_context():
             # Abfrage, um den company_name des aktuellen Benutzers zu erhalten
             sql = text("""
@@ -195,13 +188,12 @@ class DataProcessing:
                 FROM user
                 WHERE id = :current_user_id
             """)
-            # current_user_id ist nur ein Platzhalter, welcher im Dict nachfolgend ersetzt wird (erhöht die Sicherheit)
             result = db.session.execute(sql, {"current_user_id": self.current_user_id})
             company_name = result.fetchone()[0]
 
             # Abfrage, um die Öffnungszeiten der Firma basierend auf dem company_name abzurufen
-            sql = text(f"""
-                SELECT weekday, start_time, {end_time_field}
+            sql = text("""
+                SELECT weekday, start_time, end_time, end_time2
                 FROM opening_hours
                 WHERE company_name = :company_name
                 ORDER BY FIELD(weekday, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
@@ -224,17 +216,19 @@ class DataProcessing:
             'Sunday': 6
         }
 
-        for weekday, start_time, end_time in times:
+        for weekday, start_time, end_time, end_time2 in times:
             index = weekday_indices[weekday]
             self.laden_oeffnet[index] = start_time
-            self.laden_schliesst[index] = end_time
+            # Wenn end_time2 größer als end_time ist, wird end_time2 verwendet. Ansonsten end_time.
+            self.laden_schliesst[index] = end_time2 if end_time2 > end_time else end_time
 
         # Berechne die Öffnungszeiten für jeden Wochentag und speichere sie in einer Liste
         self.opening_hours = [(self.time_to_int(self.laden_schliesst[i]) - self.time_to_int(self.laden_oeffnet[i])) for i in range(7)]
-        # Wenn ich 2 oder 4 Wochen solve, wird auch die opening_hours Liste dementsprechend länger
         self.laden_oeffnet = self.laden_oeffnet * self.week_timeframe
         self.laden_schliesst = self.laden_schliesst * self.week_timeframe
         self.opening_hours = self.opening_hours * self.week_timeframe
+
+        print("end_time: ", self.laden_schliesst)
 
 
         
