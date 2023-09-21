@@ -414,8 +414,10 @@ def get_availability():
     #Save Availability
     if request.method == 'POST':
         button = request.json.get("button", None)
+        print(request.json)
         if button == "Submit":
             new_entries = []
+            print(request.json)
             
             # Delete all entries for the range in one operation
             for i in range(day_num):

@@ -22,6 +22,7 @@ const Availability = ({ availability }) => {
   const [weekAdjustment, setWeekAdjustment] = useState(0);
   const token = localStorage.getItem('session_token'); 
   const [additionalTimes, setAdditionalTimes] = useState(0);
+  const [selectedTemplate, setSelectedTemplate] = useState('');
 
   useEffect(() => {
     const fetchAvailabilityData = async () => {
@@ -72,10 +73,19 @@ useEffect(() => {
   };
   
 
-  const handleFormSubmit = async (values) => {
+  const handleFormSubmit = async (values, buttonName) => {
+
+    Object.keys(values).forEach((key) => {
+      if (values[key] === '' || values[key] === undefined) {
+        values[key] = '00:00';
+      }
+    });
+    const payload = { ...values, button: buttonName, selectedTemplate };
+    console.log("Final payload before sending to server:", payload);
+
     try {
       // Send the updated form values to the server for database update
-      await axios.post('http://localhost:5000/api/availability?week_adjustment=' + weekAdjustment, values, {
+      await axios.post('http://localhost:5000/api/availability?week_adjustment=' + weekAdjustment, payload, {
     headers: {
         'Authorization': `Bearer ${token}`
         }
@@ -418,9 +428,27 @@ useEffect(() => {
             <Button onClick={handleAddTime} color="primary" variant="contained" sx={{ marginRight: '10px' }}>
               Add Time
             </Button>
-              <Button type="submit" color="secondary" variant="contained">
-                Update
-              </Button>
+            <Button 
+            variant="outlined"
+            color="inherit"
+            onClick={() => handleFormSubmit(values, "Submit")}
+            sx={{
+              borderColor: 'white',
+              '&.MuiButtonOutlined': {
+                borderColor: 'white',
+              },
+              '&:hover': {
+                borderColor: 'white',
+              },
+              '&.MuiButtonText': {
+                borderColor: 'white',
+                color: 'white',
+                backgroundColor: '#2e7c67',
+              }
+            }}
+          >
+            Submit
+          </Button>
             </Box>
 
           </form>
