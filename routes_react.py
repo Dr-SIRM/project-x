@@ -932,6 +932,9 @@ def get_temp_timereq_dict(template_name, day_num, daily_slots, hour_divider, min
     
     return temp_timereq_dict
 
+def is_within_opening_hours(time, opening, closing):
+    return opening <= time < closing
+
 
 @app.route('/api/requirement/workforce', methods = ['GET', 'POST'])
 @jwt_required()
@@ -1046,6 +1049,7 @@ def get_required_workforce():
             if opening.end_time2.strftime("%H:%M") != "00:00":
                 opening_dict[str(new_i) + '&2'] = opening.start_time2.strftime("%H:%M") if opening.start_time2 else None
                 opening_dict[str(new_i) + '&3'] = opening.end_time2.strftime("%H:%M") if opening.end_time2 else None
+    print(opening_dict)
     
     #Submit the required FTE per hour
     if request.method == 'POST':
@@ -1066,6 +1070,8 @@ def get_required_workforce():
             new_records = []
             for i in range(day_num):
                 new_date = new_dates[i]
+                weekday = weekdays.get(i)
+                opening_details = opening_hours_dict.get(weekday)
 
                 for quarter in range(daily_slots):
                     quarter_hour = quarter / hour_divider
@@ -1075,6 +1081,11 @@ def get_required_workforce():
                     
                     time = f'{formatted_time}:00'
                     new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+                    if opening_details:
+                        if not (is_within_opening_hours(new_time, opening_details.start_time, opening_details.end_time) or
+                                (opening_details.start_time2 and opening_details.end_time2 and 
+                                is_within_opening_hours(new_time, opening_details.start_time2, opening_details.end_time2))):
+                            continue
 
                     new_record = TimeReq(
                         id=None,
