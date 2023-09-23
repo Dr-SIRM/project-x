@@ -9,6 +9,8 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from app import app, mail
 from openpyxl import Workbook
 import io
+from excel_output import create_excel_output
+
 
 
 #Import of Database
@@ -1309,65 +1311,14 @@ def get_calendar():
 
 
 
-
-
+# Bearbeitet von Gery am 23.09.2023
 @app.route('/api/download', methods=['POST', 'GET'])
 @jwt_required()
 def get_excel():
     react_user = get_jwt_identity()
     user = User.query.filter_by(email=react_user).first()
 
-    wb = Workbook()
-    ws = wb.active
-
-    row = 2  # Starting row for data
-
-    # Query records and sort by date and time
-    records = Timetable.query.order_by(Timetable.date, Timetable.start_time).all()
-
-    current_date = None  # Variable to keep track of current date
-    col = 4  # Column where the time slots will start
-
-    time_plans = {}
-    for record in records:
-        if current_date != record.date:
-            if current_date is not None:  # Skip merging for the first row
-                ws.merge_cells(start_row=row, start_column=4, end_row=row, end_column=col - 1)
-            ws[f'D{row}'] = record.date
-            row += 1
-            
-            # Insert headers
-            ws[f'B{row}'] = "First Name"
-            ws[f'C{row}'] = "Last Name"
-            
-            current_date = record.date
-            time_plans.clear()
-            col = 4
-
-        for time_slot in ['start_time', 'start_time2', 'start_time3']:  # Loop through all time slots
-            slot_time = getattr(record, time_slot)
-            if slot_time is not None:
-                if slot_time not in time_plans:
-                    ws.cell(row=row, column=col, value=slot_time)
-                    time_plans[slot_time] = col
-                    col += 1
-
-        # Insert the employee's record in the next row
-        ws[f'B{row + 1}'] = record.first_name
-        ws[f'C{row + 1}'] = record.last_name
-        for time_slot in ['start_time', 'start_time2', 'start_time3']:  # Loop through all time slots
-            slot_time = getattr(record, time_slot)
-            if slot_time in time_plans:
-                ws.cell(row=row + 1, column=time_plans[slot_time], value=1)
+    output = create_excel_output(user.id)
     
-    if current_date is not None:  # Merge cells for the last date
-        ws.merge_cells(start_row=row, start_column=4, end_row=row, end_column=col - 1)
-    
-    # In-memory bytes stream
-    output = io.BytesIO()
-    wb.save(output)
-    output.seek(0)  # Go to the start of the stream
-
     return send_file(output, as_attachment=True, download_name="Schichtplan.xlsx", mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
-    
