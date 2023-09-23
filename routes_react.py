@@ -941,6 +941,7 @@ def is_within_opening_hours(time, opening, closing):
     return opening <= time < closing
 
 
+
 @app.route('/api/requirement/workforce', methods = ['GET', 'POST'])
 @jwt_required()
 def get_required_workforce():
@@ -956,6 +957,7 @@ def get_required_workforce():
     day_num = 7   
     company_id = user.company_id
 
+    # BRAUCHT ES DIESE EXCELAUSGABE NOCH? Gery - 23.09.2023
     get_excel()
 
     

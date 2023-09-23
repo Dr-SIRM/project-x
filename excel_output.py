@@ -6,6 +6,13 @@ from app import app, db, timedelta
 from sqlalchemy import text
 
 def create_excel_output(user_id):
+    """
+    In dieser Funktion werden relevante gesolvte Daten aus der Datenbank gezogen und eine Excelausgabe daraus generiert.
+    """
+
+    start_date = "2023-09-25"
+    end_date = "2023-10-01"
+
     with app.app_context():
                             
                 # Hole den company_name des aktuellen Benutzers
@@ -17,19 +24,31 @@ def create_excel_output(user_id):
                 result = db.session.execute(sql, {"current_user_id": user_id})
                 company_name = result.fetchone()[0]
                 
-                # Hole das employment_level für jeden Benutzer, der in der gleichen Firma arbeitet wie der aktuelle Benutzer
+                # Abfrage, um die Öffnungszeiten der Firma basierend auf dem company_name abzurufen
                 sql = text("""
-                    SELECT id, employment
-                    FROM user
+                    SELECT weekday, start_time, end_time, end_time2
+                    FROM opening_hours
                     WHERE company_name = :company_name
+                    ORDER BY FIELD(weekday, 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag')
+                """)
+                result = db.session.execute(sql, {"company_name": company_name})
+                times = result.fetchall()
+
+                # Abfrage, um die Tiemtable Infos der User abzurufen
+                sql = text("""
+                    SELECT email, date
+                    FROM timetable
+                    WHERE company_name = :company_name
+                    AND timetable.date BETWEEN :start_date AND :end_date
                 """)
 
                 # execute = rohe Mysql Abfrage.
-                result = db.session.execute(sql, {"company_name": company_name})
+                result = db.session.execute(sql, {"company_name": company_name, "start_date": start_date, "end_date": end_date})
                 # fetchall = alle Zeilen der Datenbank werden abgerufen und in einem Tupel gespeichert
-                employment_data = result.fetchall()
+                data_timetable = result.fetchall()
 
 
+    # Excel erstellen und befüllen ----------------------------------------------------------------------------------------------
     wb = Workbook()
     ws = wb.active
 
@@ -37,13 +56,12 @@ def create_excel_output(user_id):
     row = 2
 
     # Durch die employment_data iterieren
-    for data in employment_data:
-        # Nehmen wir an, dass das erste Element die ID und das zweite Element das employment_level ist
-        user_id, employment_level = data
+    for data in data_timetable:
+        email, date = data
 
         # Daten in die entsprechenden Zellen schreiben
-        ws.cell(row=row, column=1, value=user_id)
-        ws.cell(row=row, column=2, value=employment_level)
+        ws.cell(row=row, column=1, value=email)
+        ws.cell(row=row, column=2, value=date)
 
         # Zur nächsten Zeile wechseln für den nächsten Datensatz
         row += 1
