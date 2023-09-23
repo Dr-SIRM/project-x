@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './plan.css';
-import { Box, IconButton } from "@mui/material";
+import { Box, IconButton, Button } from "@mui/material";
 import Header from "../../components/Header";
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { ThreeDots } from "react-loader-spinner"; 
@@ -401,7 +401,25 @@ const renderWeekShifts = (day) => {
   );
 };
 
-
+//export excel
+const handleExportToExcel = async () => {
+  try {
+    const response = await axios.get('http://localhost:5000/api/download', { 
+      headers: {
+        Authorization: `Bearer ${token}` ,
+      },
+      responseType: 'blob' 
+    });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'Schichtplan.xlsx');
+    document.body.appendChild(link);
+    link.click();
+  } catch (error) {
+    console.error('Failed to export data to Excel:', error);
+  }
+};
 
 
 
@@ -411,7 +429,31 @@ const renderWeekShifts = (day) => {
         title="Schichtplan"
         subtitle=""
       />
-      <h2>Übersicht über die eingeplanten Schichten</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2>Übersicht über die eingeplanten Schichten</h2>
+        <Button variant="outlined"
+                color="inherit"
+                size="small"
+                onClick={handleExportToExcel} 
+                sx={{
+                  borderColor: 'white',
+                  height: '20px',
+                  minHeight: '20px',
+                  fontSize: '10px',
+                  '&.MuiButtonOutlined': {
+                    borderColor: 'white',
+                  },
+                  '&:hover': {
+                    borderColor: 'white',
+                  },
+                  '&.MuiButtonText': {
+                    borderColor: 'white',
+                    color: 'white',
+                    backgroundColor: '#2e7c67',
+                  }
+                }}>Export to Excel</Button>
+        
+      </div>
       <div className="gantt-container">
         <div>
           <div className="gantt-controls">

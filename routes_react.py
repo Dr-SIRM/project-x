@@ -1,4 +1,4 @@
-from flask import request, url_for, session, jsonify, send_from_directory, make_response
+from flask import request, url_for, session, jsonify, send_from_directory, make_response, send_file
 from flask_mail import Message
 import datetime
 from datetime import date
@@ -8,6 +8,7 @@ from models import db
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 from app import app, mail
 from openpyxl import Workbook
+import io
 
 
 #Import of Database
@@ -1308,6 +1309,8 @@ def get_calendar():
 
 
 
+
+
 @app.route('/api/download', methods=['POST', 'GET'])
 @jwt_required()
 def get_excel():
@@ -1360,8 +1363,11 @@ def get_excel():
     if current_date is not None:  # Merge cells for the last date
         ws.merge_cells(start_row=row, start_column=4, end_row=row, end_column=col - 1)
     
-    # Save workbook
-    wb.save("employees.xlsx")
+    # In-memory bytes stream
+    output = io.BytesIO()
+    wb.save(output)
+    output.seek(0)  # Go to the start of the stream
 
-    return get_excel
+    return send_file(output, as_attachment=True, download_name="Schichtplan.xlsx", mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
     
