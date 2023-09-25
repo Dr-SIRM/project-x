@@ -13,7 +13,7 @@ def create_excel_output(user_id):
     In dieser Funktion werden relevante gesolvte Daten aus der Datenbank gezogen und eine Excelausgabe daraus generiert.
     """
 
-    # Achtung, es kann nur immer ab Montag!
+    # Achtung, start_date muss immer ein Montag sein!
     start_date = "2023-09-25"
     end_date = "2023-10-01"
 
@@ -59,18 +59,19 @@ def create_excel_output(user_id):
 
                 # Abfrage, um die user Informationen abzurufen
                 sql = text("""
-                    SELECT id, first_name, last_name, employment, employment_level
+                    SELECT id, first_name, last_name, employment, email, employment_level
                     FROM user
                     WHERE company_name = :company_name
                 """)
                 result = db.session.execute(sql, {"company_name": company_name})
                 company_users = result.fetchall()
+                print(company_users)
 
                 # ----------------------------------------------------------------------------------
  
                 # Abfrage, um die Tiemtable Infos der User abzurufen
                 sql = text("""
-                    SELECT email, date
+                    SELECT email, date, start_time, end_time, start_time2, end_time2
                     FROM timetable
                     WHERE company_name = :company_name
                     AND timetable.date BETWEEN :start_date AND :end_date
@@ -79,6 +80,7 @@ def create_excel_output(user_id):
                 result = db.session.execute(sql, {"company_name": company_name, "start_date": start_date, "end_date": end_date})
                 # fetchall = alle Zeilen der Datenbank werden abgerufen und in einem Tupel gespeichert
                 data_timetable = result.fetchall()
+                print(data_timetable)
 
 
     # Excel erstellen und befüllen ----------------------------------------------------------------------------------------------
@@ -130,7 +132,7 @@ def create_excel_output(user_id):
     
     # User-Informationen eintragen
     for user in company_users:
-        user_id, first_name, last_name, employment, employment_level = user
+        user_id, first_name, last_name, employment, email, employment_level = user
         data = [
             (2, user_id),
             (3, first_name),
