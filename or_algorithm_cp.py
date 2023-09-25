@@ -181,7 +181,7 @@ class ORAlgorithm_cp:
 
     def run(self):
         self.create_variables()
-        self.show_variables()
+        # self.show_variables()
         self.pre_check_programmer()
         self.pre_check_admin()
         self.solver_selection()
