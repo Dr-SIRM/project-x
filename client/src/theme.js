@@ -6,18 +6,18 @@ export const tokens = (mode) => ({
   ...(mode === "dark"
     ? {
         grey: {
-          100: "#e0e0e0",
-          200: "#c2c2c2",
+          100: "#EDF7F6",
+          200: "#f5f5f5",
           300: "#a3a3a3",
           400: "#858585",
           500: "#666666",
           600: "#525252",
           700: "#3d3d3d",
           800: "#292929",
-          900: "#141414",
+          900: "#FFFFFF", //white
         },
         primary: {
-          100: "#000000",
+          100: "#000000", //black
           200: "#a1a4ab",
           300: "#727681",
           400: "#1F2A40",
@@ -129,7 +129,7 @@ export const themeSettings = (mode) => {
       ...(mode === "dark"
         ? {
             primary: {
-              main: colors.primary[500],
+              main: colors.primary[100],
             },
             secondary: {
               main: colors.greenAccent[500],
@@ -140,7 +140,7 @@ export const themeSettings = (mode) => {
               light: colors.grey[100],
             },
             background: {
-              default: colors.primary[500],
+              default: colors.grey[200],
             },
           }
         : {
@@ -160,32 +160,109 @@ export const themeSettings = (mode) => {
             },
           }),
     },
+    components: {
+      MuiInputLabel: {
+        styleOverrides: {
+          root: { // this applies to the label element within the TextField
+            color: 'black', // Set the color of the label to black
+          },
+        },
+      },
+      MuiInputBase: { // For changing the text color of TextField
+        styleOverrides: {
+          input: { // This applies to the actual input element within the TextField
+            color: 'black', // Set the text color to black
+            backgroundColor: colors.grey[200], // Keeping the background color to grey[200] as set before
+          },
+        },
+      },
+      MuiFilledInput: {
+        styleOverrides: {
+          underline: {
+            '&:before': {
+              borderColor: 'black', // Set default border color to black
+            },
+            '&:hover:not(.Mui-disabled):before': {
+              borderColor: 'black', // Set hover border color to black
+            },
+          },
+          root: {
+            '& .MuiFilledInput-input': {
+              borderColor: 'black', // Set border color of the input to black
+            }
+          }
+        },
+      },
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            color: 'white', // This will set the text color of all Button components to black.
+            // If you want to also set the background color, uncomment the next line.
+            // backgroundColor: 'desiredBackgroundColor',
+          },
+          // If you want to also change the styles for specific variants or states, you can do it like this:
+          outlined: {
+            color: 'black', // This will set the text color of all outlined Button components to black.
+          },
+        },
+      },
+      
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+
+            "& .MuiOutlinedInput-notchedOutline": {
+              borderColor: 'black', // Set default border color to black
+            },
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: 'black', // Set hover border color to black
+            },
+            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              borderColor: 'black', // Set focused border color to black
+            },
+            input: { // this applies to the actual input element within the TextField
+              backgroundColor: colors.grey[200], // Set the background color to grey[100]
+            },
+
+          },
+        },
+      },
+    },
     typography: {
-      fontFamily: ["Sourse Sans Pro", "sans-serif"].join(","),
+      fontFamily: ["Poppins", "Roboto", "Sourse Sans Pro", "sans-serif"].join(","),
       fontSize: 12,
+      color: "black",
       h1: {
-        fontFamily: ["Sourse Sans Pro", "sans-serif"].join(","),
+        fontFamily: ["Poppins", "Roboto", "Sourse Sans Pro", "sans-serif"].join(","),
         fontSize: 40,
+        
+        
       },
       h2: {
-        fontFamily: ["Sourse Sans Pro", "sans-serif"].join(","),
+        fontFamily: ["Poppins", "Roboto", "Sourse Sans Pro", "sans-serif"].join(","),
         fontSize: 32,
+        color: "black",
+        
       },
       h3: {
-        fontFamily: ["Sourse Sans Pro", "sans-serif"].join(","),
+        fontFamily: ["Poppins", "Roboto", "Sourse Sans Pro", "sans-serif"].join(","),
         fontSize: 24,
+        color: "black",
       },
       h4: {
-        fontFamily: ["Sourse Sans Pro", "sans-serif"].join(","),
+        fontFamily: ["Poppins", "Roboto","Sourse Sans Pro", "sans-serif"].join(","),
         fontSize: 20,
+        color: "black",
       },
       h5: {
-        fontFamily: ["Sourse Sans Pro", "sans-serif"].join(","),
+        fontFamily: ["Poppins", "Roboto","Sourse Sans Pro", "sans-serif"].join(","),
         fontSize: 16,
+        color: "black",
       },
       h6: {
-        fontFamily: ["Sourse Sans Pro", "sans-serif"].join(","),
+        fontFamily: ["Poppins", "Roboto", "Sourse Sans Pro", "sans-serif"].join(","),
         fontSize: 14,
+        color: "black",
       },
     },
   };

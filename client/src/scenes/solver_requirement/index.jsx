@@ -63,7 +63,8 @@ const SolverReq = ({ solverreq }) => {
         title="Solver Anforderungen"
         subtitle="Bestimme deinen Einsatzplan nach deinen Bedürfnissen!"
       />
-      <h2>Anforderungen</h2>
+      <Typography variant="h4">Anforderungen</Typography>
+
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -133,7 +134,7 @@ const SolverReq = ({ solverreq }) => {
                 }}
               />
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 5",
@@ -169,7 +170,7 @@ const SolverReq = ({ solverreq }) => {
               }}
             >
             <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -200,7 +201,7 @@ const SolverReq = ({ solverreq }) => {
                 }}
               />
             <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -231,7 +232,7 @@ const SolverReq = ({ solverreq }) => {
                 }}
               />
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant=""
                 sx={{
                   gridColumn: "span 2",
@@ -241,7 +242,7 @@ const SolverReq = ({ solverreq }) => {
                 }}
               ></Typography>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -272,7 +273,7 @@ const SolverReq = ({ solverreq }) => {
                 }}
               />
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -303,7 +304,7 @@ const SolverReq = ({ solverreq }) => {
                 }}
               />
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant=""
                 sx={{
                   gridColumn: "span 2",
@@ -313,7 +314,7 @@ const SolverReq = ({ solverreq }) => {
                 }}
               ></Typography>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -344,7 +345,7 @@ const SolverReq = ({ solverreq }) => {
                 }}
               />
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -375,7 +376,7 @@ const SolverReq = ({ solverreq }) => {
                 }}
               />
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant=""
                 sx={{
                   gridColumn: "span 2",
@@ -385,7 +386,7 @@ const SolverReq = ({ solverreq }) => {
                 }}
               ></Typography>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -420,7 +421,7 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '4' }>4</MenuItem>
                 </Select>
                 <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -455,7 +456,7 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '4' }>4</MenuItem>
                 </Select>
                 <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant=""
                 sx={{
                   gridColumn: "span 2",
@@ -465,7 +466,7 @@ const SolverReq = ({ solverreq }) => {
                 }}
               ></Typography>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -503,7 +504,7 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant=""
                 sx={{
                   gridColumn: "span 1",
@@ -513,7 +514,7 @@ const SolverReq = ({ solverreq }) => {
                 }}
               ></Typography>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -551,7 +552,7 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant=""
                 sx={{
                   gridColumn: "span 1",
@@ -561,7 +562,7 @@ const SolverReq = ({ solverreq }) => {
                 }}
               ></Typography>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -599,7 +600,7 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -609,7 +610,7 @@ const SolverReq = ({ solverreq }) => {
                 }}
               ></Typography>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -647,7 +648,7 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant=""
                 sx={{
                   gridColumn: "span 1",
@@ -657,7 +658,7 @@ const SolverReq = ({ solverreq }) => {
                 }}
               ></Typography>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -695,7 +696,7 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -705,7 +706,7 @@ const SolverReq = ({ solverreq }) => {
                 }}
               ></Typography>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -743,7 +744,7 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant=""
                 sx={{
                   gridColumn: "span 1",
@@ -753,7 +754,7 @@ const SolverReq = ({ solverreq }) => {
                 }}
               ></Typography>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -791,7 +792,7 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -801,7 +802,7 @@ const SolverReq = ({ solverreq }) => {
                 }}
               ></Typography>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -839,7 +840,7 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant=""
                 sx={{
                   gridColumn: "span 1",
@@ -849,7 +850,7 @@ const SolverReq = ({ solverreq }) => {
                 }}
               ></Typography>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -887,7 +888,7 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -897,7 +898,7 @@ const SolverReq = ({ solverreq }) => {
                 }}
               ></Typography>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -935,7 +936,7 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant=""
                 sx={{
                   gridColumn: "span 1",
@@ -945,7 +946,7 @@ const SolverReq = ({ solverreq }) => {
                 }}
               ></Typography>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -983,7 +984,7 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant=""
                 sx={{
                   gridColumn: "span 1",
@@ -993,7 +994,7 @@ const SolverReq = ({ solverreq }) => {
                 }}
               ></Typography>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -1031,7 +1032,7 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.greenAccent[500]}
+                color={colors.primary[100]}
                 variant=""
                 sx={{
                   gridColumn: "span 1",
@@ -1044,7 +1045,7 @@ const SolverReq = ({ solverreq }) => {
             <Box display="flex" justifyContent="end" mt="20px">
             <Button 
                 type="submit" 
-                color="secondary" 
+                color="primary" 
                 variant="contained">
                 Submit
               </Button>

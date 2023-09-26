@@ -287,7 +287,7 @@ const TimeReq = ({ timereq }) => {
         <IconButton 
           onClick={goToPreviousWeek} 
           style={BUTTON_STYLE}>
-          <ChevronLeft />
+          <ChevronLeft style={{ color: 'black' }} />
         </IconButton>
         <Typography variant="h5" sx={{margin: '0 1rem'}}>
           {
@@ -302,7 +302,7 @@ const TimeReq = ({ timereq }) => {
         <IconButton 
           onClick={goToNextWeek} 
           style={BUTTON_STYLE}>
-          <ChevronRight />
+          <ChevronRight style={{ color: 'black' }}/>
         </IconButton>
         </Box>
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', marginBottom: '1rem' }}>
@@ -392,7 +392,7 @@ const TimeReq = ({ timereq }) => {
           1. Trage deine Verfügbarkeiten unten ein<br />
           2. Wähle einen Vorlagenamen aus der Drop-Down Liste<br />
           3.Speicher deine Vorlage über den Save Template Knopf</>}>
-          <InfoOutlinedIcon color="inherit" />
+          <InfoOutlinedIcon style={{ color: 'black' }} />
         </Tooltip>
         </Box>
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', marginBottom: '1rem' }}>
@@ -430,12 +430,16 @@ const TimeReq = ({ timereq }) => {
                 onChange={(e) => setSelectedTemplate(e.target.value)}
                 inputProps={{ maxLength: 30 }}
                 sx={{
+                  color: "black",
                   marginRight: '0.2rem',
                   height: '20px', // explicitly set height
                   '.MuiInputBase-root': {
                     height: '20px', // explicitly set input field height
                     fontSize: '10px' // explicitly set font size
-                  }
+                  },
+                  '.MuiSelect-icon': { // Change color of icon to black
+                    color: 'black',
+                }, 
                 }}
               >
                 <MenuItem value={ 'Template 1' }>Template 1</MenuItem>
@@ -577,15 +581,15 @@ const TimeReq = ({ timereq }) => {
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: '1rem' }}>
           <Button 
             variant="outlined"
-            color="inherit"
+            color="primary"
             onClick={() => handleFormSubmit("Submit")}
             sx={{
-              borderColor: 'white',
+              borderColor: 'black',
               '&.MuiButtonOutlined': {
                 borderColor: 'white',
               },
               '&:hover': {
-                borderColor: 'white',
+                borderColor: 'black',
               },
               '&.MuiButtonText': {
                 borderColor: 'white',

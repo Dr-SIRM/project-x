@@ -62,120 +62,115 @@ const Topbar = () => {
       justifyContent="space-between"
       alignItems="center"
       p={2}
+      backgroundColor="white"
     >
       {/* SEARCH BAR */}
       <Box
         display="flex"
-        backgroundColor={colors.primary[400]}
-        borderRadius="3px"
+        backgroundColor={colors.grey[200]}
+        borderRadius="15px"
       >
-        <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Search" />
-        <IconButton type="button" sx={{ p: 1 }}>
+        <InputBase sx={{ ml: 2, flex: 1, color: "black" }} placeholder="Search" />
+        <IconButton type="button" sx={{ p: 1, color: "black" }}>
           <SearchIcon />
         </IconButton>
       </Box>
 
       {/* ICONS */}
       <Box justifyContent="flex-end" sx={{ width: "960px", display: "flex" }}>
-        <IconButton onClick={colorMode.toggleColorMode}>
-          {theme.palette.mode === "dark" ? (
-            <DarkModeOutlinedIcon />
-          ) : (
-            <LightModeOutlinedIcon />
-          )}
-        </IconButton>
-        <IconButton onClick={handleNotificationsClick}>
+        
+        <IconButton onClick={handleNotificationsClick} sx={{ color: "black" }}>
           <NotificationsOutlinedIcon />
         </IconButton>
+        
         <Popover
           open={isNotificationsOpen}
           anchorEl={notificationsAnchor}
           anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "center",
+            vertical: 'bottom',
+            horizontal: 'center',
           }}
           transformOrigin={{
-            vertical: "top",
-            horizontal: "center",
+            vertical: 'top',
+            horizontal: 'center',
           }}
           onClose={handlePopoverClose}
           disableRestoreFocus
           sx={{
-            "& .MuiPaper-root": {
-              minHeight: "400px",
-              maxWidth: "300px",
-              borderRadius: "8px",
+            '& .MuiPaper-root': {
+              minHeight: '400px',
+              maxWidth: '300px',
+              borderRadius: '8px',
             },
           }}
         >
-          <Box sx={{ padding: "10px" }}>
+          <Box sx={{ padding: '10px' }}>
             <Typography variant="body2">
               Recent changes and notifications will be displayed here.
             </Typography>
           </Box>
         </Popover>
-        <IconButton onClick={handleSettingsClick}>
-            <SettingsIcon />
-          </IconButton>
-
-          <Popover
-            open={isSettingsOpen}
-            anchorEl={settingsAnchor}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'center',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'center',
-            }}
-            onClose={handleSettingsClose}
-            disableRestoreFocus
-            sx={{
-              '& .MuiPaper-root': {
-                minHeight: '250',
-                maxWidth: '350',
-                borderRadius: '8px',
-                padding: '10px',
-                backgroundColor: theme.palette.mode === 'dark' ? 'black' : 'white',
-              },
-            }}
-          >
-            <Box sx={{ padding: '10px' }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                <AccountCircleIcon sx={{ marginRight: '10px' }} />
-                <Typography variant="body2">
-                  <Link href="/account-overview" style={{ textDecoration: 'none', color: 'inherit' }}>
-                    Account Übersicht
-                  </Link>
-                </Typography>
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                <UpdateIcon sx={{ marginRight: '10px' }} />
-                <Typography variant="body2">
-                  <Link href="/update-password" style={{ textDecoration: 'none', color: 'inherit' }}>
-                    Update Personalien
-                  </Link>
-                </Typography>
-              </Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                <LockOpenIcon sx={{ marginRight: '10px' }} />
-                <Typography variant="body2">
-                  <Link href="/forgot-password" style={{ textDecoration: 'none', color: 'inherit' }}>
-                    Passwort zurücksetzen
-                  </Link>
-                </Typography>
-              </Box>
+        
+        <IconButton onClick={handleSettingsClick} sx={{ color: "black" }}>
+          <SettingsIcon />
+        </IconButton>
+        
+        <Popover
+          open={isSettingsOpen}
+          anchorEl={settingsAnchor}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'center',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'center',
+          }}
+          onClose={handleSettingsClose}
+          disableRestoreFocus
+          sx={{
+            '& .MuiPaper-root': {
+              minHeight: '250',
+              maxWidth: '350',
+              borderRadius: '8px',
+              padding: '10px',
+              backgroundColor: theme.palette.mode === 'dark' ? 'black' : 'white',
+            },
+          }}
+        >
+          <Box sx={{ padding: '10px' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+              <AccountCircleIcon sx={{ marginRight: '10px', color: 'black' }} />
+              <Typography variant="body2">
+                <Link href="/account-overview" style={{ textDecoration: 'none', color: 'inherit' }}>
+                  Account Übersicht
+                </Link>
+              </Typography>
             </Box>
-          </Popover>
-
+            <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+              <UpdateIcon sx={{ marginRight: '10px', color: 'black' }} />
+              <Typography variant="body2">
+                <Link href="/update-password" style={{ textDecoration: 'none', color: 'inherit' }}>
+                  Update Personalien
+                </Link>
+              </Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+              <LockOpenIcon sx={{ marginRight: '10px', color: 'black' }} />
+              <Typography variant="body2">
+                <Link href="/forgot-password" style={{ textDecoration: 'none', color: 'inherit' }}>
+                  Passwort zurücksetzen
+                </Link>
+              </Typography>
+            </Box>
+          </Box>
+        </Popover>
+        
         <IconButton
           onClick={logout}
           onMouseEnter={handleLogoutMouseEnter}
           onMouseLeave={handleLogoutMouseLeave}
-          sx={{
-            position: "relative",
-          }}
+          sx={{ position: "relative", color: "black" }}
         >
           <LogoutIcon />
           <span
@@ -201,6 +196,6 @@ const Topbar = () => {
       </Box>
     </Box>
   );
-};
+ }
 
 export default Topbar;

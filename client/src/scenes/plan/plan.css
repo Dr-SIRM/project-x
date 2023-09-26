@@ -10,27 +10,7 @@
     flex-direction: column;
     align-items: center;
   } 
-  
-  .gantt-controls button {
-    background-color: #3da58a;
-    border: none;
-    color: white;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    border-radius: 8px;
-    transition-duration: 0.4s;
-  }
-  
-  .gantt-controls button:hover {
-    background-color: white;
-    color: #3da58a;
-  }
-  
+ 
   .gantt-timeline {
     display: flex;
     justify-content: space-between;
@@ -81,13 +61,13 @@
   .gantt-bar {
     position: absolute;
     height: 100%;
-    background-color: #3da58a;
+    background-color: black;
   }
   
   .tooltip {
     visibility: hidden;
     background-color: black;
-    color: #fff;
+    color: black;
     text-align: center;
     border-radius: 6px;
     padding: 5px 10px;
@@ -112,6 +92,7 @@
   
   .date-display {
     font-weight: bold;
+    color: black;
   }
   
   .date-navigation {
@@ -139,6 +120,7 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
+  color: black
 }
 
 .weekdays {
@@ -158,7 +140,7 @@
 .weekday-box {
   flex: 1;
   padding: 10px;
-  border: 1px solid #ddd;
+  border: 1px solid black;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -169,11 +151,13 @@
   margin-bottom: 5px;
   font-size: 16px;  /* Or whatever size you prefer */
   font-weight: bold;  /* Optionally, to make it stand out more */
+  color: black;
 }
 
 
 .weekday-date {
   margin-bottom: 5px;
+  color: black;
 }
 
 .weekday-separator {
@@ -184,7 +168,7 @@
 }
 
 .worker-name {
-  background-color: #8bc2b3; /* Or any color you prefer */
+  background-color: black; /* Or any color you prefer */
   color: #fff;  /* Adjust the text color if needed, especially for legibility on colored backgrounds */
   padding: 4px 10px; /* Gives a little space around the name for better presentation */
   border-radius: 4px; /* Optional, to give the background a rounded appearance */

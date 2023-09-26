@@ -95,7 +95,7 @@ const Solver = ({ solver }) => {
         title="Solve"
         subtitle="Create your optimized shift plan!"
       />
-      <h2>TimeTab Solver</h2>
+      <Typography variant="h3">TimeTab Solver</Typography>
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -107,7 +107,7 @@ const Solver = ({ solver }) => {
         }) => (
           <form onSubmit={handleSubmit}>           
             <Box display="flex" justifyContent="end" mt="20px">
-              <Button type="submit" color="secondary" variant="contained">
+              <Button type="submit" color="primary" variant="contained">
                 Solve
               </Button>
             </Box>
@@ -119,7 +119,7 @@ const Solver = ({ solver }) => {
           <div key={index} style={{ display: "flex", alignItems: "center", marginTop: "10px" }}>
             {step.status === "loading" && <CircularProgress size={20} />}
             {step.status === "completed" && <CheckCircleIcon style={{ color: "green" }} />}
-            <Typography variant="body1" style={{ marginLeft: "10px" }}>{step.label}</Typography>
+            <Typography variant="body1" style={{ marginLeft: "10px", color: "black" }}>{step.label}</Typography>
           </div>
         ))}
       </div>

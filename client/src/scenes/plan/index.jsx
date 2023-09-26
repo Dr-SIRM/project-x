@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './plan.css';
-import { Box, IconButton, Button } from "@mui/material";
+import { Box, IconButton, Button, Typography } from "@mui/material";
 import Header from "../../components/Header";
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { ThreeDots } from "react-loader-spinner"; 
@@ -427,12 +427,11 @@ const handleExportToExcel = async () => {
     <Box m="20px">
       <Header
         title="Schichtplan"
-        subtitle=""
+        subtitle="Übersicht über die eingeplanten Schichten"
       />
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2>Übersicht über die eingeplanten Schichten</h2>
         <Button variant="outlined"
-                color="inherit"
+                color="primary"
                 size="small"
                 onClick={handleExportToExcel} 
                 sx={{
@@ -451,25 +450,25 @@ const handleExportToExcel = async () => {
                     color: 'white',
                     backgroundColor: '#2e7c67',
                   }
-                }}>Export to Excel</Button>
+                }}>Export zu Excel</Button>
         
       </div>
       <div className="gantt-container">
         <div>
           <div className="gantt-controls">
             <div className="view-controls">
-              <button onClick={() => setView('day')}>Tag</button>
-              <button onClick={() => setView('week')}>Woche</button>
+              <Button color="primary" variant="contained" sx={{ marginRight: '10px' }} onClick={() => setView('day')}>Tag</Button>
+              <Button color="primary" variant="contained" sx={{ marginRight: '10px' }} onClick={() => setView('week')}>Woche</Button>
             </div>
           </div>
           {view === 'day' && (
             <div className="date-navigation">
               <IconButton onClick={goToPrevDay} style={BUTTON_STYLE}>
-                <ChevronLeft />
+                <ChevronLeft style={{ color: 'black' }}/>
               </IconButton>
               <span className="date-display">{formatDateDisplay(currentDay)}</span>
               <IconButton onClick={goToNextDay} style={BUTTON_STYLE}>
-                <ChevronRight />
+                <ChevronRight style={{ color: 'black' }}/>
               </IconButton>
             </div>
           )}
@@ -494,11 +493,11 @@ const handleExportToExcel = async () => {
         <div className="week-view">
           <div className="date-navigation">
             <IconButton onClick={goToPrevWeek} style={BUTTON_STYLE}>
-              <ChevronLeft />
+              <ChevronLeft style={{ color: 'black' }} />
             </IconButton>
             <span className="date-display">Woche {getWeekNumber(currentDay)}</span>
             <IconButton onClick={goToNextWeek} style={BUTTON_STYLE}>
-              <ChevronRight />
+              <ChevronRight style={{ color: 'black' }} />
             </IconButton>
           </div>
           <div className="weekdays">

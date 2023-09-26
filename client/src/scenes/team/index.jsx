@@ -186,13 +186,17 @@ const Team = () => {
             border: "none",
           },
           "& .MuiDataGrid-cell": {
+            borderBottom: "1px solid black",
+            color: colors.primary[100],
+            backgroundColor: colors.grey[900],
             borderBottom: "none",
+            
           },
           "& .name-column--cell": {
-            color: colors.greenAccent[300],
+            color: colors.primary[100],
           },
           "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: colors.blueAccent[800],
+            backgroundColor: colors.primary[100],
             borderBottom: "none",
           },
           "& .MuiDataGrid-virtualScroller": {
@@ -200,7 +204,7 @@ const Team = () => {
           },
           "& .MuiDataGrid-footerContainer": {
             borderTop: "none",
-            backgroundColor: colors.blueAccent[800],
+            backgroundColor: colors.primary[100],
           },
           "& .MuiCheckbox-root": {
             color: `${colors.greenAccent[200]} !important`,

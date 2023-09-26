@@ -210,7 +210,7 @@ const Form = () => {
               {values.password !== values.password2 && touched.password2 }
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
-              <Button type="submit" color="secondary" variant="contained">
+              <Button type="submit" color="primary" variant="contained">
                 Create New User
               </Button>
             </Box>

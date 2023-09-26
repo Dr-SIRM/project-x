@@ -9,6 +9,7 @@ import { tokens } from "../../theme";
 import { ThreeDots } from "react-loader-spinner"; 
 import axios from 'axios';
 import Alert from '@mui/material/Alert';
+import { Padding } from "@mui/icons-material";
 
 
 
@@ -85,7 +86,8 @@ const Company = ({ company }) => {
         title="COMPANY"
         subtitle="Please update your company data whenever necessary. These are the basics for your optimized Scheduler."
       />
-      <h2>Firmen Information</h2>
+      <Typography variant="h4" paddingBottom={"10px"}>Firmen Information</Typography>
+      
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -263,7 +265,8 @@ const Company = ({ company }) => {
             </Box>
             <></>
             <></>
-            <h2>Öffnungszeiten</h2>
+            <Typography variant="h4" paddingBottom={"20px"} paddingTop={"30px"}>Öffnungszeiten</Typography>
+            
             <></>
             <></>
             <Box
@@ -478,10 +481,7 @@ const Company = ({ company }) => {
               ))}
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
-              <Button onClick={handleAddTime} color="primary" variant="contained" sx={{ marginRight: '10px' }}>
-                Add Time
-              </Button>
-              <Button type="submit" color="secondary" variant="contained">
+              <Button type="submit" color="primary" variant="contained">
                 Update
               </Button>
             </Box>

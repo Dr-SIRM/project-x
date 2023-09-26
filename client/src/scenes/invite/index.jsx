@@ -69,9 +69,8 @@ const Invite = ({ invite }) => {
     <Box m="20px">
       <Header
         title="Einladen"
-        subtitle=""
-      />
-      <h2>Lade dein Teammitglieder ein</h2>
+        subtitle="Lade dein Teammitglieder ein"
+      />  
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -99,12 +98,13 @@ const Invite = ({ invite }) => {
               display="grid"
               gap="30px"
               gridTemplateColumns="repeat(6, minmax(0, 1fr))"
+              paddingTop={"20px"}
               sx={{
                 "& > div": { gridColumn: isNonMobile ? undefined : "span 6" },
               }}
             >
               <Typography
-                color={colors.greenAccent[500]}
+                
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -135,7 +135,7 @@ const Invite = ({ invite }) => {
                 }}
               />
               <Typography
-                color={colors.greenAccent[500]}
+                
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -166,7 +166,7 @@ const Invite = ({ invite }) => {
                 }}
               />
               <Typography
-                color={colors.greenAccent[500]}
+                
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -197,7 +197,7 @@ const Invite = ({ invite }) => {
                 }}
               />
               <Typography
-                color={colors.greenAccent[500]}
+                
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -231,7 +231,7 @@ const Invite = ({ invite }) => {
                 <MenuItem value={'Temp'}>Teilzeit</MenuItem>
               </Select>
               <Typography
-                color={colors.greenAccent[500]}
+                
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -273,7 +273,7 @@ const Invite = ({ invite }) => {
                 <MenuItem value={'0.1'}>10%</MenuItem>
               </Select>
               <Typography
-                color={colors.greenAccent[500]}
+                
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -310,7 +310,7 @@ const Invite = ({ invite }) => {
             <></>
             
             <Box display="flex" justifyContent="end" mt="20px">
-              <Button type="submit" color="secondary" variant="contained">
+              <Button type="submit" color="primary" variant="contained">
                 Update
               </Button>
             </Box>

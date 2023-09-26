@@ -173,22 +173,22 @@ useEffect(() => {
             <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: '1rem' }}>
               <IconButton onClick={goToPreviousWeek} 
               sx={{
-                borderColor: 'white',
+                borderColor: 'black',
                 '&.MuiButtonOutlined': {
-                  borderColor: 'white',
+                  borderColor: 'black',
                 },
                 '&:hover': {
-                  borderColor: 'white',
+                  borderColor: 'black',
                 },
                 '&.MuiButtonText': {
                   borderColor: 'white',
-                  color: 'white',
+                  color: 'black',
                   backgroundColor: '#2e7c67',
                 }
               }}>
-                <ChevronLeft />
+                <ChevronLeft style={{ color: 'black' }} />
               </IconButton>
-              <Typography variant="h5" sx={{margin: '0 1rem'}}>
+              <Typography variant="h5" sx={{margin: '0 1rem' }}>
                 {
                   new Intl.DateTimeFormat('de', { 
                     weekday: 'short', 
@@ -200,12 +200,12 @@ useEffect(() => {
               </Typography>
               <IconButton onClick={goToNextWeek} 
               sx={{
-                borderColor: 'white',
+                borderColor: 'black',
                 '&.MuiButtonOutlined': {
-                  borderColor: 'white',
+                  borderColor: 'black',
                 },
                 '&:hover': {
-                  borderColor: 'white',
+                  borderColor: 'black',
                 },
                 '&.MuiButtonText': {
                   borderColor: 'white',
@@ -213,7 +213,7 @@ useEffect(() => {
                   backgroundColor: '#2e7c67',
                 }
               }}>
-                <ChevronRight />
+                <ChevronRight style={{ color: 'black' }} />
               </IconButton>
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', marginBottom: '1rem' }}>
@@ -224,12 +224,12 @@ useEffect(() => {
                 onClick={fetchTemplate1Data}
                 sx={{
                   marginRight: '0.2rem',
-                  borderColor: 'white',
+                  borderColor: 'black',
                   height: '20px',
                   minHeight: '20px',
                   fontSize: '10px',
                   '&.MuiButtonOutlined': {
-                    borderColor: 'white',
+                    borderColor: 'black',
                   },
                   '&:hover': {
                     borderColor: 'white',
@@ -250,12 +250,12 @@ useEffect(() => {
                 onClick={fetchTemplate2Data}
                 sx={{
                   marginRight: '0.2rem',
-                  borderColor: 'white',
+                  borderColor: 'black',
                   height: '20px',
                   minHeight: '20px',
                   fontSize: '10px',
                   '&.MuiButtonOutlined': {
-                    borderColor: 'white',
+                    borderColor: 'black',
                   },
                   '&:hover': {
                     borderColor: 'white',
@@ -276,12 +276,12 @@ useEffect(() => {
                 onClick={fetchTemplate3Data}
                 sx={{
                   marginRight: '0.2rem',
-                  borderColor: 'white',
+                  borderColor: 'black',
                   height: '20px',
                   minHeight: '20px',
                   fontSize: '10px',
                   '&.MuiButtonOutlined': {
-                    borderColor: 'white',
+                    borderColor: 'black',
                   },
                   '&:hover': {
                     borderColor: 'white',
@@ -303,7 +303,7 @@ useEffect(() => {
                 1. Trage deine Verfügbarkeiten unten ein<br />
                 2. Wähle einen Vorlagenamen aus der Drop-Down Liste<br />
                 3.Speicher deine Vorlage über den Save Template Knopf</>}>
-                <InfoOutlinedIcon color="inherit" />
+                <InfoOutlinedIcon style={{ color: 'black' }} />
               </Tooltip>
               </Box>
               <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', marginBottom: '1rem' }}>
@@ -346,7 +346,11 @@ useEffect(() => {
                   '.MuiInputBase-root': {
                     height: '20px', // explicitly set input field height
                     fontSize: '10px' // explicitly set font size
-                  }
+                  },
+                  '.MuiSelect-icon': { // Change color of icon to black
+                    color: 'black',
+                },
+                  
                 }}
               >
                 <MenuItem value={ 'Template 1' }>Template 1</MenuItem>

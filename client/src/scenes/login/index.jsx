@@ -90,7 +90,7 @@ const Login = () => {
           )}
           <Box mb={2} mt={2}>
             <Typography variant="body2" style={{ fontStyle: 'cursive' }}>
-              <Link href="/forget_password" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <Link href="/forget_password" style={{ textDecoration: 'none', color: 'black' }}>
                 Forgot Password?
               </Link>
             </Typography>

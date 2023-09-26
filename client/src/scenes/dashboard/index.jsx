@@ -77,7 +77,8 @@ const Dashboard = () => {
         {/* ROW 1 */}
         <Box
           gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
+          backgroundColor={colors.primary[100]}
+          borderRadius="15px"  
           display="flex"
           alignItems="center"
           justifyContent="center"
@@ -96,7 +97,8 @@ const Dashboard = () => {
         </Box>
         <Box
           gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
+          backgroundColor={colors.primary[100]}
+          borderRadius="15px"
           display="flex"
           alignItems="center"
           justifyContent="center"
@@ -115,7 +117,8 @@ const Dashboard = () => {
         </Box>
         <Box
           gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
+          backgroundColor={colors.primary[100]}
+          borderRadius="15px"
           display="flex"
           alignItems="center"
           justifyContent="center"
@@ -134,7 +137,8 @@ const Dashboard = () => {
         </Box>
         <Box
           gridColumn="span 3"
-          backgroundColor={colors.primary[400]}
+          backgroundColor={colors.primary[100]}
+          borderRadius="15px"
           display="flex"
           alignItems="center"
           justifyContent="center"
@@ -156,7 +160,8 @@ const Dashboard = () => {
         <Box
           gridColumn="span 8"
           gridRow="span 2"
-          backgroundColor={colors.primary[400]}
+          backgroundColor={colors.primary[100]}
+          borderRadius="15px"
         >
           <Box
             mt="25px"
@@ -196,7 +201,8 @@ const Dashboard = () => {
         <Box
           gridColumn="span 4"
           gridRow="span 2"
-          backgroundColor={colors.primary[400]}
+          backgroundColor={colors.primary[100]}
+          borderRadius="15px"
           overflow="auto"
         >
           <Box
@@ -248,7 +254,8 @@ const Dashboard = () => {
         <Box
           gridColumn="span 4"
           gridRow="span 2"
-          backgroundColor={colors.primary[400]}
+          backgroundColor={colors.primary[100]}
+          borderRadius="15px"
           p="30px"
         >
           <Typography variant="h5" fontWeight="600">
@@ -274,7 +281,8 @@ const Dashboard = () => {
         <Box
           gridColumn="span 4"
           gridRow="span 2"
-          backgroundColor={colors.primary[400]}
+          backgroundColor={colors.primary[100]}
+          borderRadius="15px"
         >
           <Typography
             variant="h5"
@@ -290,7 +298,8 @@ const Dashboard = () => {
         <Box
           gridColumn="span 4"
           gridRow="span 2"
-          backgroundColor={colors.primary[400]}
+          backgroundColor={colors.primary[100]}
+          borderRadius="15px"
           padding="30px"
         >
           <Typography
