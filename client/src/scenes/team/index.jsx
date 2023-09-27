@@ -200,7 +200,7 @@ const Team = () => {
             borderBottom: "none",
           },
           "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: colors.primary[400],
+            backgroundColor: colors.grey[900],
           },
           "& .MuiDataGrid-footerContainer": {
             borderTop: "none",

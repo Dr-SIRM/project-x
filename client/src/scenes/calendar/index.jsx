@@ -90,49 +90,62 @@ const Calendar = () => {
   return (
     <Box m="20px">
       <Header title="Calendar" subtitle="Full Calendar Interactive Page" />
-      {/* Adding the export button */}
+  
+      {/* Inline style to change the color of FullCalendar's header text */}
+      <style>{`
+        .fc-toolbar-title { 
+          color: black !important;
+        }
+        .fc-button { 
+          color: white !important; 
+          background-color: black !important;
+        }
+        .fc-col-header-cell { 
+          color: black !important; // Changing the column header (days) text color to black
+        }
+      `}</style>
+  
+      {/* Button to export events */}
       <Box mb="10px">
         <Button variant="outlined"
                 color="inherit"
                 size="small"
                 onClick={downloadICS} 
                 sx={{
-                  borderColor: 'white',
+                  borderColor: 'black',
                   height: '20px',
                   minHeight: '20px',
                   fontSize: '10px',
-                  '&.MuiButtonOutlined': {
-                    borderColor: 'white',
-                  },
                   '&:hover': {
                     borderColor: 'white',
                   },
                   '&.MuiButtonText': {
-                    borderColor: 'white',
                     color: 'white',
                     backgroundColor: '#2e7c67',
                   }
                 }}>Export zum Kalender</Button>
       </Box>
-
+  
       <Box display="flex" justifyContent="space-between">
-        {/* CALENDAR SIDEBAR */}
+        {/* Calendar Sidebar */}
         <Box
           flex="1 1 20%"
-          backgroundColor={colors.primary[400]}
+          backgroundColor={colors.primary[100]}
           p="15px"
           borderRadius="4px"
-          style={{ maxHeight: 'calc(8 * 60px + 10px)', overflowY: 'auto' }}  // Added these styles
+          style={{ maxHeight: 'calc(8 * 60px + 10px)', overflowY: 'auto' }}
         >
-          <Typography variant="h5">Events</Typography>
+          <Typography variant="h5" color={"white"}>Events</Typography>
           <List>
             {currentEvents.map((event) => (
               <ListItem
                 key={event.id}
                 sx={{
                   backgroundColor: colors.greenAccent[600],
+                  borderColor: colors.grey[900],
                   margin: "10px 0",
                   borderRadius: "2px",
+                  color: "white"
                 }}
               >
                 <ListItemText
@@ -151,17 +164,18 @@ const Calendar = () => {
             ))}
           </List>
         </Box>
-        {/* CALENDAR */}
+  
+        {/* Full Calendar */}
         <Box flex="1 1 100%" ml="15px">
           <FullCalendar
             slotLabelFormat={{ hour: '2-digit', minute: '2-digit', hour12: false }}
             timeFormat={{ hour: '2-digit', minute: '2-digit', hour12: false }}
             dayHeaderContent={({date}) => {
-              const day = date.getUTCDate();  // gets the day of the month
-              const month = date.getUTCMonth() + 1;  // gets the month (0-11, so we add 1)
-              const dayOfWeek = date.toLocaleString('default', { weekday: 'short' }); // gets the abbreviated day of the week
+              const day = date.getUTCDate();
+              const month = date.getUTCMonth() + 1;
+              const dayOfWeek = date.toLocaleString('default', { weekday: 'short' });
               return `${dayOfWeek} ${day}.${month < 10 ? '0' + month : month}`;
-          }}
+            }}
             height="75vh"
             plugins={[
               dayGridPlugin,
@@ -169,7 +183,6 @@ const Calendar = () => {
               interactionPlugin,
               listPlugin,
             ]}
-            
             headerToolbar={{
               left: "prev,next today",
               center: "title",
@@ -181,20 +194,17 @@ const Calendar = () => {
             selectMirror={false}
             dayMaxEvents={false}
             select={handleDateClick}
-                
-            
             events={currentEvents.map(event => ({
               ...event,
-              backgroundColor: "grey",  
+              backgroundColor: "black",
               borderColor: "black",
               textColor: "white"
-          }))}
-          
+            }))}
           />
         </Box>
       </Box>
     </Box>
   );
-};
+          }  
 
 export default Calendar;
