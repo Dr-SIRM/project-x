@@ -115,6 +115,16 @@ const Form = () => {
                   onBlur={handleBlur}
                   error={!!touched.employment && !!errors.employment}
                   helpertext={touched.employment && errors.employment}
+                  sx={{
+                    gridColumn: "span 2",
+                    '& .MuiFilledInput-input': {
+                      paddingTop: '10px',
+                      paddingBottom: '10px',
+                    },
+                    '& .MuiSelect-icon': { 
+                      color: 'black', 
+                    },
+                  }}
                 >
                   <MenuItem value="Perm">Vollzeit</MenuItem>
                   <MenuItem value="Temp">Teilzeit</MenuItem>
@@ -140,6 +150,16 @@ const Form = () => {
                   name="employment_level"
                   error={!!touched.employment_level && !!errors.employment_level}
                   renderValue={(selected) => `${selected}%`}
+                  sx={{
+                    gridColumn: "span 2",
+                    '& .MuiFilledInput-input': {
+                      paddingTop: '10px',
+                      paddingBottom: '10px',
+                    },
+                    '& .MuiSelect-icon': { 
+                      color: 'black', 
+                    },
+                  }}
                 >
                   {Array.from(Array(10).keys()).map((percentage) => {
                     const value = (percentage + 1) * 10;
@@ -175,6 +195,16 @@ const Form = () => {
                   onBlur={handleBlur}
                   error={!!touched.access_level && !!errors.access_level}
                   helpertext={touched.access_level && errors.access_level}
+                  sx={{
+                    gridColumn: "span 2",
+                    '& .MuiFilledInput-input': {
+                      paddingTop: '10px',
+                      paddingBottom: '10px',
+                    },
+                    '& .MuiSelect-icon': { 
+                      color: 'black', 
+                    },
+                  }}
                 >
                   <MenuItem value="Admin">Admin</MenuItem>
                   <MenuItem value="User">User</MenuItem>

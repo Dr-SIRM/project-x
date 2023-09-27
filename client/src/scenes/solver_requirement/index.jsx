@@ -175,8 +175,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Gewünschte min. Zeit pro Tag
@@ -206,8 +209,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Min. Zeit pro Tag
@@ -247,8 +253,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Max. Zeit pro Tag
@@ -278,8 +287,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Gewünschte max. Zeit pro Tag
@@ -319,8 +331,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Max. Zeit pro Woche
@@ -350,8 +365,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Toleranz gerechte Verteilung
@@ -391,8 +409,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Stunden Teiler
@@ -426,8 +447,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Solver Zeitraum
@@ -471,8 +495,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Nebenbedingung 1
@@ -519,8 +546,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Nebenbedingung 2
@@ -567,8 +597,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Nebenbedingung 3
@@ -615,8 +648,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Nebenbedingung 4
@@ -663,8 +699,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Nebenbedingung 5
@@ -711,8 +750,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Nebenbedingung 6
@@ -759,8 +801,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Nebenbedingung 7
@@ -807,8 +852,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Nebenbedingung 8
@@ -855,8 +903,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Nebenbedingung 9
@@ -903,8 +954,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Nebenbedingung 10
@@ -951,8 +1005,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Nebenbedingung 11
@@ -999,8 +1056,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Nebenbedingung 12

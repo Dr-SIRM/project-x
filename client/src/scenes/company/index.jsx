@@ -135,13 +135,15 @@ const Company = ({ company }) => {
               }}
             >
               <Typography
-                color={colors.greenAccent[500]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", // Center the text horizontally
                   height: "100%",
+                  padding: "0 8px", // Add padding to the sides of the text
+                  backgroundColor: "#f0f0f0", // You can set a light background color to distinguish it from other elements
                 }}
               >
                 Firmennamen
@@ -166,7 +168,6 @@ const Company = ({ company }) => {
                 }}
               />
               <Typography
-                color={colors.greenAccent[500]}
                 variant=""
                 sx={{
                   gridColumn: "span 4",
@@ -176,13 +177,15 @@ const Company = ({ company }) => {
                 }}
               ></Typography>
               <Typography
-                color={colors.greenAccent[500]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", // Center the text horizontally
                   height: "100%",
+                  padding: "0 8px", // Add padding to the sides of the text
+                  backgroundColor: "#f0f0f0", // You can set a light background color to distinguish it from other elements
                 }}
               >
                 Wochenstunden
@@ -208,7 +211,6 @@ const Company = ({ company }) => {
                 }}
               />
               <Typography
-                color={colors.greenAccent[500]}
                 variant=""
                 sx={{
                   gridColumn: "span 4",
@@ -218,13 +220,15 @@ const Company = ({ company }) => {
                 }}
               ></Typography>
               <Typography
-                color={colors.greenAccent[500]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", // Center the text horizontally
                   height: "100%",
+                  padding: "0 8px",
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Schichten
@@ -246,6 +250,9 @@ const Company = ({ company }) => {
                     paddingTop: '10px',
                     paddingBottom: '10px',
                   },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
+                  },
                 }}
                 >
                 <MenuItem value={ '1' }>1</MenuItem>
@@ -253,7 +260,6 @@ const Company = ({ company }) => {
                 <MenuItem value={ '3' }>3</MenuItem>
                 </Select>
               <Typography
-                color={colors.greenAccent[500]}
                 variant=""
                 sx={{
                   gridColumn: "span 4",
@@ -278,19 +284,18 @@ const Company = ({ company }) => {
               }}
             >
               <Typography
-                color={colors.greenAccent[500]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
                   alignItems: "center",
                   height: "100%",
+                  justifyContent: "center",
                 }}
               >
                 Wochentag
               </Typography>
               <Typography
-                color={colors.greenAccent[500]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -302,7 +307,6 @@ const Company = ({ company }) => {
                 Startzeit 1
               </Typography>
               <Typography
-                color={colors.greenAccent[500]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -314,7 +318,6 @@ const Company = ({ company }) => {
                 Endezeit 1
               </Typography>
               <Typography
-                color={colors.greenAccent[500]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -326,7 +329,6 @@ const Company = ({ company }) => {
                 Startzeit 2
               </Typography>
               <Typography
-                color={colors.greenAccent[500]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -339,7 +341,6 @@ const Company = ({ company }) => {
               </Typography>
 
               <Typography
-                color={colors.greenAccent[500]}
                 variant=""
                 sx={{
                   gridColumn: "span 1",
@@ -352,13 +353,16 @@ const Company = ({ company }) => {
               <>
                 <Typography
                   key={`number-${rowIndex}`}
-                  color={colors.greenAccent[500]}
+                  color={colors.primary[100]}
                   variant=""
                   sx={{
                     gridColumn: "span 1",
                     display: "flex",
                     alignItems: "center",
+                    justifyContent: "center", // Center the text horizontally
                     height: "100%",
+                    padding: "0 8px", // Add padding to the sides of the text
+                    backgroundColor: "#f0f0f0", // You can set a light background color to distinguish it from other elements
                   }}
                 >
                   {companyData && companyData.weekdays

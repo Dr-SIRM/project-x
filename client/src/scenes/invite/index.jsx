@@ -109,8 +109,11 @@ const Invite = ({ invite }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 E-Mail
@@ -140,8 +143,11 @@ const Invite = ({ invite }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Firma
@@ -171,8 +177,11 @@ const Invite = ({ invite }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Department
@@ -202,8 +211,11 @@ const Invite = ({ invite }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Anstellung
@@ -236,8 +248,11 @@ const Invite = ({ invite }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Anstellungsgrad
@@ -259,6 +274,9 @@ const Invite = ({ invite }) => {
                     paddingTop: '10px',
                     paddingBottom: '10px',
                   },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
+                  },
                 }}
               >
                 <MenuItem value={'1'}>100%</MenuItem>
@@ -278,8 +296,11 @@ const Invite = ({ invite }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Zugriffslevel
@@ -300,6 +321,9 @@ const Invite = ({ invite }) => {
                   '& .MuiFilledInput-input': {
                     paddingTop: '10px',
                     paddingBottom: '10px',
+                  },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
                   },
                 }}
               >

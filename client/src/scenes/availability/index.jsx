@@ -367,19 +367,18 @@ useEffect(() => {
       }}
     >
       <Typography
-        color={colors.greenAccent[500]}
         variant="h6"
         sx={{
           gridColumn: "span 1",
           display: "flex",
           alignItems: "center",
           height: "100%",
+          justifyContent: "center",
         }}
       >
         Wochentag
       </Typography>
       <Typography
-        color={colors.greenAccent[500]}
         variant="h6"
         sx={{
           gridColumn: "span 1",
@@ -391,7 +390,6 @@ useEffect(() => {
         Startzeit 1
       </Typography>
       <Typography
-        color={colors.greenAccent[500]}
         variant="h6"
         sx={{
           gridColumn: "span 1",
@@ -405,7 +403,6 @@ useEffect(() => {
       {additionalTimes >= 1 && (
         <>
           <Typography
-            color={colors.greenAccent[500]}
             variant="h6"
             sx={{
               gridColumn: "span 1",
@@ -417,7 +414,6 @@ useEffect(() => {
             Startzeit 2
           </Typography>
           <Typography
-            color={colors.greenAccent[500]}
             variant="h6"
             sx={{
               gridColumn: "span 1",
@@ -433,7 +429,6 @@ useEffect(() => {
       {additionalTimes >= 2 && (
         <>
           <Typography
-            color={colors.greenAccent[500]}
             variant="h6"
             sx={{
               gridColumn: "span 1",
@@ -445,7 +440,6 @@ useEffect(() => {
             Start Time 3
           </Typography>
           <Typography
-            color={colors.greenAccent[500]}
             variant="h6"
             sx={{
               gridColumn: "span 1",
@@ -467,13 +461,16 @@ useEffect(() => {
         >
           <Typography
             key={`number-${rowIndex}`}
-            color={colors.greenAccent[500]}
+            color={colors.primary[100]}
             variant=""
             sx={{
               gridColumn: "span 1",
               display: "flex",
               alignItems: "center",
+              justifyContent: "center", // Center the text horizontally
               height: "100%",
+              padding: "0 8px", // Add padding to the sides of the text
+              backgroundColor: "#f0f0f0", // You can set a light background color to distinguish it from other elements
             }}
           >
             {availabilityData && availabilityData.weekdays
