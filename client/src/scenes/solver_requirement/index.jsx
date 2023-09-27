@@ -435,6 +435,9 @@ const SolverReq = ({ solverreq }) => {
                     paddingTop: '10px',
                     paddingBottom: '10px',
                   },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
+                  },
                 }}
               >
                 <MenuItem value={ '1' }>1</MenuItem>
@@ -472,6 +475,9 @@ const SolverReq = ({ solverreq }) => {
                   '& .MuiFilledInput-input': {
                     paddingTop: '10px',
                     paddingBottom: '10px',
+                  },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
                   },
                 }}
               >
@@ -520,6 +526,9 @@ const SolverReq = ({ solverreq }) => {
                   '& .MuiFilledInput-input': {
                     paddingTop: '10px',
                     paddingBottom: '10px',
+                  },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
                   },
                 }}
               >
@@ -572,6 +581,9 @@ const SolverReq = ({ solverreq }) => {
                     paddingTop: '10px',
                     paddingBottom: '10px',
                   },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
+                  },
                 }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
@@ -622,6 +634,9 @@ const SolverReq = ({ solverreq }) => {
                   '& .MuiFilledInput-input': {
                     paddingTop: '10px',
                     paddingBottom: '10px',
+                  },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
                   },
                 }}
                 >
@@ -674,6 +689,9 @@ const SolverReq = ({ solverreq }) => {
                     paddingTop: '10px',
                     paddingBottom: '10px',
                   },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
+                  },
                 }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
@@ -724,6 +742,9 @@ const SolverReq = ({ solverreq }) => {
                   '& .MuiFilledInput-input': {
                     paddingTop: '10px',
                     paddingBottom: '10px',
+                  },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
                   },
                 }}
                 >
@@ -776,6 +797,9 @@ const SolverReq = ({ solverreq }) => {
                     paddingTop: '10px',
                     paddingBottom: '10px',
                   },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
+                  },
                 }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
@@ -826,6 +850,9 @@ const SolverReq = ({ solverreq }) => {
                   '& .MuiFilledInput-input': {
                     paddingTop: '10px',
                     paddingBottom: '10px',
+                  },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
                   },
                 }}
                 >
@@ -878,6 +905,9 @@ const SolverReq = ({ solverreq }) => {
                     paddingTop: '10px',
                     paddingBottom: '10px',
                   },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
+                  },
                 }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
@@ -928,6 +958,9 @@ const SolverReq = ({ solverreq }) => {
                   '& .MuiFilledInput-input': {
                     paddingTop: '10px',
                     paddingBottom: '10px',
+                  },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
                   },
                 }}
                 >
@@ -980,6 +1013,9 @@ const SolverReq = ({ solverreq }) => {
                     paddingTop: '10px',
                     paddingBottom: '10px',
                   },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
+                  },
                 }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
@@ -1031,6 +1067,9 @@ const SolverReq = ({ solverreq }) => {
                     paddingTop: '10px',
                     paddingBottom: '10px',
                   },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
+                  },
                 }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
@@ -1081,6 +1120,9 @@ const SolverReq = ({ solverreq }) => {
                   '& .MuiFilledInput-input': {
                     paddingTop: '10px',
                     paddingBottom: '10px',
+                  },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
                   },
                 }}
                 >
