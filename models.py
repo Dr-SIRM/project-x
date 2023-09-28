@@ -306,7 +306,9 @@ class SolverRequirement(db.Model, UserMixin):
     hour_devider = db.Column(db.Integer, index=True, unique=False)
     fair_distribution = db.Column(db.Integer, index=True, unique=False)
     week_timeframe = db.Column(db.Integer, index=True, unique=False)
-
+    subsequent_workingdays = db.Column(db.Integer, index=True, unique=False)
+    daily_deployment = db.Column(db.Integer, index=True, unique=False)
+    time_per_deployment = db.Column(db.Integer, index=True, unique=False)
     nb1 = db.Column(db.Integer, index=True, unique=False)
     nb2 = db.Column(db.Integer, index=True, unique=False)
     nb3 = db.Column(db.Integer, index=True, unique=False)
@@ -336,7 +338,7 @@ class SolverRequirement(db.Model, UserMixin):
 
     def __init__(self, id, company_name, weekly_hours, shifts, desired_min_time_day, desired_max_time_day, 
                  min_time_day, max_time_day, desired_max_time_week, max_time_week, hour_devider, 
-                 fair_distribution, week_timeframe, nb1, nb2, nb3, nb4, nb5, nb6, nb7, nb8, nb9, nb10, 
+                 fair_distribution, week_timeframe, subsequent_workingdays, daily_deployment, time_per_deployment, nb1, nb2, nb3, nb4, nb5, nb6, nb7, nb8, nb9, nb10, 
                  nb11, nb12, nb13, nb14, nb15, nb16, nb17, nb18, nb19, nb20, created_by, changed_by, 
                  creation_timestamp, update_timestamp):
         self.id = id
@@ -352,6 +354,9 @@ class SolverRequirement(db.Model, UserMixin):
         self.hour_devider = hour_devider
         self.fair_distribution = fair_distribution
         self.week_timeframe = week_timeframe
+        self.subsequent_workingdays = subsequent_workingdays
+        self.daily_deployment = daily_deployment
+        self.time_per_deployment = time_per_deployment
 
         self.nb1 = nb1
         self.nb2 = nb2
@@ -411,6 +416,7 @@ class SolverAnalysis(db.Model, UserMixin):
     self_min_anwesend = db.Column(db.Text)
     self_gerechte_verteilung = db.Column(db.Text)
     self_fair_distribution = db.Column(db.Text)
+
     solving_time = db.Column(db.Integer)
     lp_iteration = db.Column(db.Integer)
     violation_nb1 = db.Column(db.Integer)

@@ -18,7 +18,7 @@ delete_table = 'DROP TABLE template_time_requirement'
 #create_db = 'CREATE DATABASE IF NOT EXISTS projectx'
 #create_table = 'CREATE TABLE RegistrationToken'
 
-mycursor.execute(delete_table)
+mycursor.execute("ALTER TABLE solver_requirement ADD COLUMN time_per_deployment INTEGER;")
 
 
 # curl ifconfig.me
