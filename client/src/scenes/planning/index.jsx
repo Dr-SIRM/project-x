@@ -287,7 +287,7 @@ const TimeReq = ({ timereq }) => {
         <IconButton 
           onClick={goToPreviousWeek} 
           style={BUTTON_STYLE}>
-          <ChevronLeft style={{ color: 'black' }} />
+          <ChevronLeft style={{ color: '#2E2E2E' }} />
         </IconButton>
         <Typography variant="h5" sx={{margin: '0 1rem'}}>
           {
@@ -302,7 +302,7 @@ const TimeReq = ({ timereq }) => {
         <IconButton 
           onClick={goToNextWeek} 
           style={BUTTON_STYLE}>
-          <ChevronRight style={{ color: 'black' }}/>
+          <ChevronRight style={{ color: '#2E2E2E' }}/>
         </IconButton>
         </Box>
         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', marginBottom: '1rem' }}>

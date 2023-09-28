@@ -203,7 +203,7 @@ def react_update():
             # Convert the employment_level to its original range [0, 1] before saving
             employment_level_percentage = user_data.get('employment_level')
             if employment_level_percentage is not None:
-                user.employment_level = employment_level_percentage / 100.0
+                user.employment_level = int(employment_level_percentage) / 100
             
             user.department = user_data.get('department', user.department)
             user.changed_by = react_user
