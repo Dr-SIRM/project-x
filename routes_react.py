@@ -225,6 +225,29 @@ def react_update():
 
     return jsonify(user_dict)
 
+
+@app.route('/api/change/password', methods=["GET", "POST"])
+@jwt_required()
+def get_change_password():
+    react_user = get_jwt_identity()
+    user = User.query.filter_by(email=react_user).first()
+
+    if request.method == 'POST':
+        password_data = request.get_json()
+
+        if user:
+            if password_data['password'] != password_data['password2']:
+                return jsonify({'message': 'Password are not matching'}), 200
+            else:
+                hashed_password = generate_password_hash(password_data['password'])
+                user.password = hashed_password
+                user.changed_by = user.id
+                user.update_timestamp = datetime.datetime.now()
+                db.session.commit()
+
+    return jsonify({'message': 'Password succesfull updated!'}), 200
+
+
 def get_time_str(time_str):
     try:
         return datetime.datetime.strptime(time_str, '%H:%M:%S').time()
