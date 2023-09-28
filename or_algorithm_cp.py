@@ -18,6 +18,13 @@ from models import Timetable, User, SolverAnalysis
 
 # New 
 from ortools.sat.python import cp_model
+"""
+Der CP-SAT Solver arbeitet mit Boolescher Zufriedenheit (SAT, Satisfiability) 
+und Constraint Programming (CP) Techniken, um Diskretheit, Kombinatorik und 
+Bedingungen in den Problemen zu behandeln. Er ist speziell für Probleme entwickelt worden, 
+bei denen komplexe und kombinatorische Beschränkungen berücksichtigt werden müssen.
+"""
+
 
 """
 To-Do Liste:
@@ -45,7 +52,6 @@ Prio 1:
  To-Do's 
  -------------------------------
  - (*) Vorüberprüfungen fertigstellen und Daten an React geben
- - (*) NB9 mit 3 Schichten fertigbauen
 
  - gerechte_verteilung funktioniert noch nicht richtig, wenn ein MA fast keine Stunden availability eingibt. Das muss noch geändert werden.
  
@@ -60,8 +66,8 @@ Prio 1:
  - MA mit verschiedenen Profilen - Department (Koch, Service, ..)? Wie genau lösen wir das?
  - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden?
  - Der erstellte "divisor" in data_processing könnte als Attribut initialisiert werden, damit es nicht bei jeder Methode einzeln berechnet werden muss
+ - (*) NB9 mit 3 Schichten fertigbauen
  -------------------------------
-
 
  
 """
