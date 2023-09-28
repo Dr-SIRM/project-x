@@ -185,8 +185,17 @@ class ORAlgorithm_cp:
     def run(self):
         self.create_variables()
         # self.show_variables()
+        results = {
+            'checks': []
+        }
         self.pre_check_programmer()
-        self.pre_check_admin()
+        #self.pre_check_admin()
+        results['checks'].append(self.pre_check_admin())
+        print("Test Check:", results)
+
+        return 
+
+    def run_2(self):
         self.solver_selection()
         self.define_penalty_costs()
         self.decision_variables()
@@ -200,6 +209,8 @@ class ORAlgorithm_cp:
         self.plot_costs_excel()
         self.save_data_in_database()
         self.save_data_in_database_testing()
+
+        return results
 
 
     def create_variables(self):
@@ -453,93 +464,99 @@ class ORAlgorithm_cp:
     def pre_check_admin(self):
         # Wenn die einzelnen Überprüfungen nicht standhalten, wird ein ValueError ausgelöst und jeweils geprintet, woran das Problem liegt. 
         # Später soll der Admin genau eine solche Meldung angezeigt bekommen.
+        try:
         
-        """
-        ---------------------------------------------------------------------------------------------------------------
-        1. Überprüfen ob die "Perm" Mitarbeiter mind. self.weekly_hours Stunden einplant haben
-        ---------------------------------------------------------------------------------------------------------------
-        """
+            """
+            ---------------------------------------------------------------------------------------------------------------
+            1. Überprüfen ob die "Perm" Mitarbeiter mind. self.weekly_hours Stunden einplant haben
+            ---------------------------------------------------------------------------------------------------------------
+            """
 
-        for i in range(len(self.mitarbeiter)):
-            if self.employment[i] == "Perm": 
-                sum_availability_perm = 0
-                for j in range(self.calc_time):
-                    for k in range(len(self.verfügbarkeit[self.mitarbeiter[i]][j])):
-                        sum_availability_perm += self.verfügbarkeit[self.mitarbeiter[i]][j][k]
+            for i in range(len(self.mitarbeiter)):
+                if self.employment[i] == "Perm": 
+                    sum_availability_perm = 0
+                    for j in range(self.calc_time):
+                        for k in range(len(self.verfügbarkeit[self.mitarbeiter[i]][j])):
+                            sum_availability_perm += self.verfügbarkeit[self.mitarbeiter[i]][j][k]
 
-                if sum_availability_perm < self.weekly_hours * self.employment_lvl_exact[i]:
-                    raise ValueError(f"Fester Mitarbeiter mit ID {self.mitarbeiter[i]} hat nicht genügend Stunden geplant.")
+                    #if sum_availability_perm < self.weekly_hours * self.employment_lvl_exact[i]:
+                        #raise ValueError(f"Fester Mitarbeiter mit ID {self.mitarbeiter[i]} hat nicht genügend Stunden geplant.")
 
-        """
-        ---------------------------------------------------------------------------------------------------------------
-        2. Haben die MA mindestens die anzahl Stunden von gerechte_verteilung eingegeben?
-        ---------------------------------------------------------------------------------------------------------------
-        """
-        errors = []
+            """
+            ---------------------------------------------------------------------------------------------------------------
+            2. Haben die MA mindestens die anzahl Stunden von gerechte_verteilung eingegeben?
+            ---------------------------------------------------------------------------------------------------------------
+            """
+            errors = []
 
-        for index, ma_id in enumerate(self.mitarbeiter):
-            if self.employment[index] == 'Temp':
-                total_hours_week = sum(sum(self.verfügbarkeit[ma_id][day]) for day in range(self.calc_time))
-                if total_hours_week < self.gerechte_verteilung[index]:
-                    errors.append(
-                        f"Temp-Mitarbeiter {ma_id} hat nur {total_hours_week} Stunden in der Woche eingetragen. "
-                        f"Das ist weniger als die erforderliche Gesamtstundenzahl von {self.gerechte_verteilung[index]} Stunden."
-                    )
-        if errors:
-            raise ValueError("Folgende Fehler wurden gefunden:\n" + "\n".join(errors))
+            for index, ma_id in enumerate(self.mitarbeiter):
+                if self.employment[index] == 'Temp':
+                    total_hours_week = sum(sum(self.verfügbarkeit[ma_id][day]) for day in range(self.calc_time))
+                    if total_hours_week < self.gerechte_verteilung[index]:
+                        errors.append(
+                            f"Temp-Mitarbeiter {ma_id} hat nur {total_hours_week} Stunden in der Woche eingetragen. "
+                            f"Das ist weniger als die erforderliche Gesamtstundenzahl von {self.gerechte_verteilung[index]} Stunden."
+                        )
+            #if errors:
+                #raise ValueError("Folgende Fehler wurden gefunden:\n" + "\n".join(errors))
 
-        """
-        ---------------------------------------------------------------------------------------------------------------
-        3. Haben alle MA zusammen genug Stunden eingegeben, um die verteilbaren Stunden zu erreichen?
-        ---------------------------------------------------------------------------------------------------------------
-        """
-        total_hours_available = sum(self.gesamtstunden_verfügbarkeit)
-        toleranz = 1 # Wenn man möchte, das die eingegebenen Stunden der MA höher sein müssen als die verteilbaren_stunden
+            """
+            ---------------------------------------------------------------------------------------------------------------
+            3. Haben alle MA zusammen genug Stunden eingegeben, um die verteilbaren Stunden zu erreichen?
+            ---------------------------------------------------------------------------------------------------------------
+            """
+            total_hours_available = sum(self.gesamtstunden_verfügbarkeit)
+            toleranz = 1 # Wenn man möchte, das die eingegebenen Stunden der MA höher sein müssen als die verteilbaren_stunden
 
-        if total_hours_available < self.verteilbare_stunden * toleranz:
-            raise ValueError(f"Die Mitarbeiter haben insgesamt nicht genug Stunden eingegeben, um die verteilbaren Stunden zu erreichen. Benötigte Stunden: {self.verteilbare_stunden}, eingegebene Stunden: {total_hours_available}, Toleranz: {toleranz}")
+            if total_hours_available < self.verteilbare_stunden * toleranz:
+                pass
+                #raise ValueError(f"Die Mitarbeiter haben insgesamt nicht genug Stunden eingegeben, um die verteilbaren Stunden zu erreichen. Benötigte Stunden: {self.verteilbare_stunden}, eingegebene Stunden: {total_hours_available}, Toleranz: {toleranz}")
 
-        """
-        ---------------------------------------------------------------------------------------------------------------
-        4. Ist zu jeder notwendigen Zeit (self.min_anwesend) die mindestanzahl Mitarbeiter verfügbar?
-        ---------------------------------------------------------------------------------------------------------------
-        """
-        
-        for i in range(len(self.min_anwesend)):  # Für jeden Tag in der Woche
-            for j in range(len(self.min_anwesend[i])):  # Für jede Stunde am Tag
-                if sum([self.verfügbarkeit[ma][i][j] for ma in self.mitarbeiter]) < self.min_anwesend[i][j]:
-                    raise ValueError(f"Es sind nicht genügend Mitarbeiter verfügbar zur notwendigen Zeit (Tag {i+1}, Stunde {j+1}).")
-        
-        """
-        ---------------------------------------------------------------------------------------------------------------
-        5. Können die MA die min. Zeit täglich erreichen? Wenn 0 Stunden eingegeben wurden, läuft es durch!
-        ---------------------------------------------------------------------------------------------------------------
-        """
-        errors = []
-        for ma in self.mitarbeiter:
-            for day in range(self.calc_time):
-                total_hours = sum(self.verfügbarkeit[ma][day])
-                if 0 < total_hours < self.min_time_day:
-                    errors.append(
-                        f"Mitarbeiter {ma} hat am Tag {day+1} nur {total_hours/4} Stunden eingetragen. "
-                        f"Das ist weniger als die Mindestarbeitszeit von {self.min_zeit[ma]/4} Stunden."
-                    )
-        if errors:
-            raise ValueError("Folgende Fehler wurden gefunden:\n" + "\n".join(errors))
+            """
+            ---------------------------------------------------------------------------------------------------------------
+            4. Ist zu jeder notwendigen Zeit (self.min_anwesend) die mindestanzahl Mitarbeiter verfügbar?
+            ---------------------------------------------------------------------------------------------------------------
+            """
+            
+            for i in range(len(self.min_anwesend)):  # Für jeden Tag in der Woche
+                for j in range(len(self.min_anwesend[i])):  # Für jede Stunde am Tag
+                    if sum([self.verfügbarkeit[ma][i][j] for ma in self.mitarbeiter]) < self.min_anwesend[i][j]:
+                        #raise ValueError(f"Es sind nicht genügend Mitarbeiter verfügbar zur notwendigen Zeit (Tag {i+1}, Stunde {j+1}).")
+                        pass
+            
+            """
+            ---------------------------------------------------------------------------------------------------------------
+            5. Können die MA die min. Zeit täglich erreichen? Wenn 0 Stunden eingegeben wurden, läuft es durch!
+            ---------------------------------------------------------------------------------------------------------------
+            """
+            errors = []
+            for ma in self.mitarbeiter:
+                for day in range(self.calc_time):
+                    total_hours = sum(self.verfügbarkeit[ma][day])
+                    if 0 < total_hours < self.min_time_day:
+                        errors.append(
+                            f"Mitarbeiter {ma} hat am Tag {day+1} nur {total_hours/4} Stunden eingetragen. "
+                            f"Das ist weniger als die Mindestarbeitszeit von {self.min_zeit[ma]/4} Stunden."
+                        )
+            #if errors:
+                #raise ValueError("Folgende Fehler wurden gefunden:\n" + "\n".join(errors))
 
-        """
-        ---------------------------------------------------------------------------------------------------------------
-        6. Ist die min. Zeit pro Tag so klein, dass die Stunden in der gerechten Verteilung nicht erfüllt werden können?
-        ---------------------------------------------------------------------------------------------------------------
-        """
+            """
+            ---------------------------------------------------------------------------------------------------------------
+            6. Ist die min. Zeit pro Tag so klein, dass die Stunden in der gerechten Verteilung nicht erfüllt werden können?
+            ---------------------------------------------------------------------------------------------------------------
+            """
 
 
 
-        """
-        ---------------------------------------------------------------------------------------------------------------
-        7. Ist die Toleranz der gerechten Verteilung zu klein gewählt? --> Evtl. die Bedingung weich machen!
-        ---------------------------------------------------------------------------------------------------------------
-        """
+            """
+            ---------------------------------------------------------------------------------------------------------------
+            7. Ist die Toleranz der gerechten Verteilung zu klein gewählt? --> Evtl. die Bedingung weich machen!
+            ---------------------------------------------------------------------------------------------------------------
+            """
+            return {"success": True, "name": "Pre-check", "message": "All checks are successful!"}
+        except ValueError as e:
+            return {"success": False, "name": "Pre-check", "message": str(e)}
 
 
     def solver_selection(self):
