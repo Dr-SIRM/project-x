@@ -40,13 +40,11 @@ Prio 1:
  - (erl.) Opening Hour 2 einbauen
  - (erl.) Shifts aus Solver_req Datenbank rauslöschen und Daten nicht mehr ziehen
  - (erl.) Während des Solvings Daten ziehen --> Fragen gestellt
+ - (erl.) Die erste Vorüberprüfung funktioniert noch nicht, da auch ein Perm MA der 60% angestellt ist weekly_hours eingteilt werden muss.
 
  To-Do's 
  -------------------------------
- - (*) Phu fragen: Verschiedene Openinghours, time_req werden nicht richtig in die Datenbank gespühlt
- - (*) Solver Vorlage den anderen zeigen, Vorüberprüfungen fertigstellen und Daten an React geben
- - (*) Jeder MA muss vor dem Solven eingegeben haben, wann er arbeiten kann. Auch wenn es alles 0 sind.
- - (*) Die erste Vorüberprüfung funktioniert noch nicht, da auch ein Perm MA der 60% angestellt ist weekly_hours eingteilt werden muss.
+ - (*) Vorüberprüfungen fertigstellen und Daten an React geben
  - (*) NB9 mit 3 Schichten fertigbauen
 
  - gerechte_verteilung funktioniert noch nicht richtig, wenn ein MA fast keine Stunden availability eingibt. Das muss noch geändert werden.
@@ -55,15 +53,13 @@ Prio 1:
  - self.working_blocks in Solver Req einbauen und ziehen
  - self.max_consecutive_days in Solver Req einbauen und ziehen
 
- - start_time und end_time zwei und drei noch implementieren (noch warten bis über 00:00 Zeiten eingegeben werden können!)
 
- - Der erstellte "divisor" in data_processing könnte als Attribut initialisiert werden, damit es nicht bei jeder Methode einzeln berechnet werden muss
-
- 
- Fragen an die Runde (Juli 2023):
+ --- PRIO 2 ---
  -------------------------------
+ - start_time und end_time zwei und drei noch implementieren (noch warten bis über 00:00 Zeiten eingegeben werden können!)
  - MA mit verschiedenen Profilen - Department (Koch, Service, ..)? Wie genau lösen wir das?
  - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden?
+ - Der erstellte "divisor" in data_processing könnte als Attribut initialisiert werden, damit es nicht bei jeder Methode einzeln berechnet werden muss
  -------------------------------
 
 
@@ -456,13 +452,17 @@ class ORAlgorithm_cp:
         1. Überprüfen ob die "Perm" Mitarbeiter mind. self.weekly_hours Stunden einplant haben
         ---------------------------------------------------------------------------------------------------------------
         """
+
+        print(self.employment_lvl_exact) # [1.0, 0.6, 1.0, 0.8, 0.6, 0.2, 0.2, 0.2, 0.2, 0.2]
+
         for i in range(len(self.mitarbeiter)):
             if self.employment[i] == "Perm": 
                 sum_availability_perm = 0
                 for j in range(self.calc_time):
                     for k in range(len(self.verfügbarkeit[self.mitarbeiter[i]][j])):
                         sum_availability_perm += self.verfügbarkeit[self.mitarbeiter[i]][j][k]
-                if sum_availability_perm < self.weekly_hours:
+
+                if sum_availability_perm < self.weekly_hours * self.employment_lvl_exact[i]:
                     raise ValueError(f"Fester Mitarbeiter mit ID {self.mitarbeiter[i]} hat nicht genügend Stunden geplant.")
 
         """
