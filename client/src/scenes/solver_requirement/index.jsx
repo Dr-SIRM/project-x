@@ -80,6 +80,9 @@ const SolverReq = ({ solverreq }) => {
           hour_devider: String(solverData.hour_devider),
           fair_distribution: solverData.fair_distribution,
           week_timeframe: String(solverData.week_timeframe),
+          subsequent_workingdays: solverData.subsequent_workingdays,
+          daily_deployment: solverData.daily_deployment,
+          time_per_deployment: solverData.time_per_deployment,
           nb1: String(solverData.nb1),
           nb2: String(solverData.nb2),
           nb3: String(solverData.nb3),
@@ -521,7 +524,7 @@ const SolverReq = ({ solverreq }) => {
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.subsequent_workingdays}
-                name="week_timeframe"
+                name="subsequent_workingdays"
                 error={!!touched.subsequent_workingdays && !!errors.subsequent_workingdays}
                 helperText={touched.subsequent_workingdays && errors.subsequent_workingdays}
                 sx={{
@@ -568,7 +571,7 @@ const SolverReq = ({ solverreq }) => {
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.daily_deployment}
-                name="week_timeframe"
+                name="daily_deployment"
                 error={!!touched.daily_deployment && !!errors.daily_deployment}
                 helperText={touched.daily_deployment && errors.daily_deployment}
                 sx={{
@@ -615,7 +618,7 @@ const SolverReq = ({ solverreq }) => {
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.time_per_deployment}
-                name="week_timeframe"
+                name="time_per_deployment"
                 error={!!touched.time_per_deployment && !!errors.time_per_deployment}
                 helperText={touched.time_per_deployment && errors.time_per_deployment}
                 sx={{

@@ -494,7 +494,7 @@ def get_availability():
        
             # Delete all entries for the range in one operation
             for i in range(day_num):
-                data_deletion = TemplateAvailability.query.filter_by(email=user.email, template_name=availability_data['selectedTemplate']).delete()
+                data_deletion = TemplateAvailability.query.filter_by(email=user.email, template_name=availability_data['selectedTemplate'])
                 if data_deletion:
                         data_deletion.delete()
                         db.session.commit()
@@ -675,6 +675,9 @@ def solver_req():
         hour_devider = ""
         fair_distribution = ""
         week_timeframe = ""
+        subsequent_workingdays = ""
+        daily_deployment = ""
+        time_per_deployment = ""
         nb1 = ""
         nb2 = ""
         nb3 = ""
@@ -708,6 +711,9 @@ def solver_req():
         hour_devider = solver_requirement.hour_devider
         fair_distribution = solver_requirement.fair_distribution
         week_timeframe = solver_requirement.week_timeframe
+        subsequent_workingdays = solver_requirement.subsequent_workingdays
+        daily_deployment = solver_requirement.daily_deployment
+        time_per_deployment = solver_requirement.time_per_deployment
         nb1 = solver_requirement.nb1
         nb2 = solver_requirement.nb2
         nb3 = solver_requirement.nb3
@@ -732,6 +738,7 @@ def solver_req():
     #Submit Solver Requirements
     if request.method =='POST':
         solver_req_data = request.get_json()
+        print(solver_req_data)
         data_deletion = SolverRequirement.query.filter_by(company_name=user.company_name)
         if solver_requirement:
             data_deletion.delete()
@@ -753,6 +760,9 @@ def solver_req():
                                 hour_devider = solver_req_data['hour_devider'],
                                 fair_distribution = solver_req_data['fair_distribution'],
                                 week_timeframe = solver_req_data['week_timeframe'],
+                                subsequent_workingdays = solver_req_data['subsequent_workingdays'],
+                                daily_deployment = solver_req_data['daily_deployment'],
+                                time_per_deployment = solver_req_data['time_per_deployment'],
                                 nb1 = solver_req_data['nb1'],
                                 nb2 = solver_req_data['nb2'],
                                 nb3 = solver_req_data['nb3'],
@@ -800,6 +810,9 @@ def solver_req():
     "hour_devider": hour_devider,
     "fair_distribution": fair_distribution,
     "week_timeframe": week_timeframe,
+    "subsequent_workingdays": subsequent_workingdays,
+    "daily_deployment": daily_deployment,
+    "time_per_deployment": time_per_deployment,
     "nb1": nb1,
     "nb2": nb2,
     "nb3": nb3,
