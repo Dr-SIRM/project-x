@@ -14,6 +14,8 @@ body,
   display: flex;
   position: relative;
   justify-content: center; /* This will center children on the horizontal axis */
+  flex-direction: row; /* Ensure the children (Sidebar and Content) are in a row */
+  height: 100vh;
 }
 
 ::-webkit-scrollbar{
@@ -27,7 +29,7 @@ body,
 
 .sidebar {
   position: relative;
-  height: 173vh;  /* Make sidebar take up the full viewport height */
+  height: 180%;  /* Make sidebar take up the full viewport height */
 }
 
 /*Handle*/
@@ -38,4 +40,14 @@ body,
 /*Handle on Hover*/
 ::-webkit-scrollbar-track:hover{
   background: #555;
+}
+
+.footer {
+  margin-top: auto; /* Push Footer to the bottom */
+}
+
+.contentContainer {
+  flex-grow: 1; /* Ensure the content container takes up the remaining space */
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
 }

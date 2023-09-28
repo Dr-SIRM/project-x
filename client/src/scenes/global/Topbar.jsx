@@ -44,18 +44,6 @@ const Topbar = () => {
     setIsNotificationsOpen(false);
   };
 
-  const handleSettingsClick = (event) => {
-    setIsSettingsOpen(true);
-    setSettingsAnchor(event.currentTarget);
-  };
-
-  const handleSettingsClose = () => {
-    setIsSettingsOpen(false);
-  };
-  
-  
-  
-
   return (
     <Box
       display="flex"
@@ -110,62 +98,6 @@ const Topbar = () => {
             </Typography>
           </Box>
         </Popover>
-        
-        <IconButton onClick={handleSettingsClick} sx={{ color: "black" }}>
-          <SettingsIcon />
-        </IconButton>
-        
-        <Popover
-          open={isSettingsOpen}
-          anchorEl={settingsAnchor}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'center',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'center',
-          }}
-          onClose={handleSettingsClose}
-          disableRestoreFocus
-          sx={{
-            '& .MuiPaper-root': {
-              minHeight: '250',
-              maxWidth: '350',
-              borderRadius: '8px',
-              padding: '10px',
-              backgroundColor: theme.palette.mode === 'dark' ? 'black' : 'white',
-            },
-          }}
-        >
-          <Box sx={{ padding: '10px' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-              <AccountCircleIcon sx={{ marginRight: '10px', color: 'black' }} />
-              <Typography variant="body2">
-                <Link href="/account-overview" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  Account Übersicht
-                </Link>
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-              <UpdateIcon sx={{ marginRight: '10px', color: 'black' }} />
-              <Typography variant="body2">
-                <Link href="/update-password" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  Update Personalien
-                </Link>
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-              <LockOpenIcon sx={{ marginRight: '10px', color: 'black' }} />
-              <Typography variant="body2">
-                <Link href="/forgot-password" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  Passwort zurücksetzen
-                </Link>
-              </Typography>
-            </Box>
-          </Box>
-        </Popover>
-        
         <IconButton
           onClick={logout}
           onMouseEnter={handleLogoutMouseEnter}

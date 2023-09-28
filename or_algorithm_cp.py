@@ -18,6 +18,13 @@ from models import Timetable, User, SolverAnalysis
 
 # New 
 from ortools.sat.python import cp_model
+"""
+Der CP-SAT Solver arbeitet mit Boolescher Zufriedenheit (SAT, Satisfiability) 
+und Constraint Programming (CP) Techniken, um Diskretheit, Kombinatorik und 
+Bedingungen in den Problemen zu behandeln. Er ist speziell für Probleme entwickelt worden, 
+bei denen komplexe und kombinatorische Beschränkungen berücksichtigt werden müssen.
+"""
+
 
 """
 To-Do Liste:
@@ -45,7 +52,6 @@ Prio 1:
  To-Do's 
  -------------------------------
  - (*) Vorüberprüfungen fertigstellen und Daten an React geben
- - (*) NB9 mit 3 Schichten fertigbauen
 
  - gerechte_verteilung funktioniert noch nicht richtig, wenn ein MA fast keine Stunden availability eingibt. Das muss noch geändert werden.
  
@@ -60,10 +66,10 @@ Prio 1:
  - MA mit verschiedenen Profilen - Department (Koch, Service, ..)? Wie genau lösen wir das?
  - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden?
  - Der erstellte "divisor" in data_processing könnte als Attribut initialisiert werden, damit es nicht bei jeder Methode einzeln berechnet werden muss
+ - (*) NB9 mit 3 Schichten fertigbauen
  -------------------------------
 
-
-
+ 
 """
 
 class ORAlgorithm_cp:
@@ -145,6 +151,7 @@ class ORAlgorithm_cp:
         self.cost_expressions = []
 
         # Attribute der Methode "solve_problem"
+        self.best_values = []
         self.status = None
         self.solving_time_seconds = None
 
@@ -453,8 +460,6 @@ class ORAlgorithm_cp:
         ---------------------------------------------------------------------------------------------------------------
         """
 
-        print(self.employment_lvl_exact) # [1.0, 0.6, 1.0, 0.8, 0.6, 0.2, 0.2, 0.2, 0.2, 0.2]
-
         for i in range(len(self.mitarbeiter)):
             if self.employment[i] == "Perm": 
                 sum_availability_perm = 0
@@ -699,6 +704,7 @@ class ORAlgorithm_cp:
             for j in range(self.calc_time):
                 self.nb10_violation[i, j] = self.model.NewIntVar(0, INF, f'nb10_violation[{i}, {j}]')
 
+
     def objective_function(self):
         """
         Zielfunktion
@@ -848,9 +854,6 @@ class ORAlgorithm_cp:
         # -------------------------------------------------------------------------------------------------------
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
-
-                # Wenn die if Bedingung auskommentiert wird, dann wird die min und max Zeit im gleichen Masse verteilt, funktioniert aber noch nicht!
-                # if sum(self.verfügbarkeit[i][j]) >= self.min_zeit[i]:
 
                 sum_hour = sum(self.x[i, j, k] for k in range(len(self.verfügbarkeit[i][j])))
 
@@ -1211,12 +1214,15 @@ class ORAlgorithm_cp:
         """
         Problem lösen und Kosten ausgeben
         """
-        self.best_values = []
         self.last_best_value = None
         self.current_best_value = None
         self.last_read_time = 0
         self.stop_thread = False
+
+        # -----------------------------
+        # Nach wievielen Sekunden soll jeweils der aktuelle Bestwert in der Liste aufgenommen werden:
         self.best_test_time = 5
+        # -----------------------------
 
         start_time_solver = time.time()
 
@@ -1260,7 +1266,6 @@ class ORAlgorithm_cp:
         match = re.search(r'best:(\d+)', message)
         if match:
             self.last_best_value = int(match.group(1))
-
 
 
 
@@ -1345,7 +1350,6 @@ class ORAlgorithm_cp:
             return
 
         if self.status == cp_model.OPTIMAL or self.status == cp_model.FEASIBLE:
-            self.mitarbeiter_arbeitszeiten = {}
             for i in self.mitarbeiter:
                 self.mitarbeiter_arbeitszeiten[i] = [
                     [self.solver.Value(self.x[i, j, k]) for k in range(len(self.verfügbarkeit[i][j]))] 
@@ -1438,9 +1442,6 @@ class ORAlgorithm_cp:
         """
         In dieser Methode werden die besten Kosten nach X Sekunden als Liniendiagramm in einem Excel gespeichert
         """
-        print(self.best_test_time) # 5
-        print(self.hiring_costs) # 26000
-        print(self.best_values) # [54295, 47060, 34400, 29750, 29450, 29000, 28850, 27650, 27650, 27650, 27500, 27500, 26300, 26300, 26300, 26300, 26300, 26300, 26300, 26300, 26300, 26300, 26300, 26300]
 
         # Workbook erstellen
         wb = Workbook()
@@ -1650,4 +1651,4 @@ class ORAlgorithm_cp:
 
         # Änderungen in der Datenbank speichern
         db.session.commit()
-        print("end")
+        print("Daten erfolgreich in die Datenbank gespeichert.")

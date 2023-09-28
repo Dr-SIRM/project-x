@@ -46,7 +46,7 @@ const Login = () => {
     >
       <Button
       variant="contained"
-      href="/landing-page"
+      href="http://localhost:5173/landing-page"
       style={{
         position: 'absolute',
         top: '10px',
