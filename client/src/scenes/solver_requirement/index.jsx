@@ -175,8 +175,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Gewünschte min. Zeit pro Tag
@@ -206,8 +209,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Min. Zeit pro Tag
@@ -247,8 +253,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Max. Zeit pro Tag
@@ -278,8 +287,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Gewünschte max. Zeit pro Tag
@@ -319,8 +331,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Max. Zeit pro Woche
@@ -350,8 +365,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Toleranz gerechte Verteilung
@@ -391,8 +409,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Stunden Teiler
@@ -414,6 +435,9 @@ const SolverReq = ({ solverreq }) => {
                     paddingTop: '10px',
                     paddingBottom: '10px',
                   },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
+                  },
                 }}
               >
                 <MenuItem value={ '1' }>1</MenuItem>
@@ -426,8 +450,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Solver Zeitraum
@@ -448,6 +475,9 @@ const SolverReq = ({ solverreq }) => {
                   '& .MuiFilledInput-input': {
                     paddingTop: '10px',
                     paddingBottom: '10px',
+                  },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
                   },
                 }}
               >
@@ -471,8 +501,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Nebenbedingung 1
@@ -494,6 +527,9 @@ const SolverReq = ({ solverreq }) => {
                     paddingTop: '10px',
                     paddingBottom: '10px',
                   },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
+                  },
                 }}
               >
                 <MenuItem value={ '0' }>0</MenuItem>
@@ -519,8 +555,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Nebenbedingung 2
@@ -542,6 +581,9 @@ const SolverReq = ({ solverreq }) => {
                     paddingTop: '10px',
                     paddingBottom: '10px',
                   },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
+                  },
                 }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
@@ -567,8 +609,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Nebenbedingung 3
@@ -590,6 +635,9 @@ const SolverReq = ({ solverreq }) => {
                     paddingTop: '10px',
                     paddingBottom: '10px',
                   },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
+                  },
                 }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
@@ -615,8 +663,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Nebenbedingung 4
@@ -638,6 +689,9 @@ const SolverReq = ({ solverreq }) => {
                     paddingTop: '10px',
                     paddingBottom: '10px',
                   },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
+                  },
                 }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
@@ -663,8 +717,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Nebenbedingung 5
@@ -686,6 +743,9 @@ const SolverReq = ({ solverreq }) => {
                     paddingTop: '10px',
                     paddingBottom: '10px',
                   },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
+                  },
                 }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
@@ -711,8 +771,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Nebenbedingung 6
@@ -734,6 +797,9 @@ const SolverReq = ({ solverreq }) => {
                     paddingTop: '10px',
                     paddingBottom: '10px',
                   },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
+                  },
                 }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
@@ -759,8 +825,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Nebenbedingung 7
@@ -782,6 +851,9 @@ const SolverReq = ({ solverreq }) => {
                     paddingTop: '10px',
                     paddingBottom: '10px',
                   },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
+                  },
                 }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
@@ -807,8 +879,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Nebenbedingung 8
@@ -830,6 +905,9 @@ const SolverReq = ({ solverreq }) => {
                     paddingTop: '10px',
                     paddingBottom: '10px',
                   },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
+                  },
                 }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
@@ -855,8 +933,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Nebenbedingung 9
@@ -878,6 +959,9 @@ const SolverReq = ({ solverreq }) => {
                     paddingTop: '10px',
                     paddingBottom: '10px',
                   },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
+                  },
                 }}
                 >
                 <MenuItem value={ '0' }>0</MenuItem>
@@ -903,8 +987,11 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Nebenbedingung 10
@@ -926,53 +1013,8 @@ const SolverReq = ({ solverreq }) => {
                     paddingTop: '10px',
                     paddingBottom: '10px',
                   },
-                }}
-                >
-                <MenuItem value={ '0' }>0</MenuItem>
-                <MenuItem value={ '1' }>1</MenuItem>
-                <MenuItem value={ '2' }>2</MenuItem>
-                <MenuItem value={ '3' }>3</MenuItem>
-                <MenuItem value={ '4' }>4</MenuItem>
-                <MenuItem value={ '5' }>5</MenuItem>
-              </Select>
-              <Typography
-                color={colors.primary[100]}
-                variant=""
-                sx={{
-                  gridColumn: "span 1",
-                  display: "grid",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              ></Typography>
-              <Typography
-                color={colors.primary[100]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "right",
-                  height: "100%",
-                }}
-              >
-                Nebenbedingung 11
-              </Typography>
-              <Select
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.nb11}
-                name="nb11"
-                error={!!touched.nb11 && !!errors.nb11}
-                helperText={touched.nb11 && errors.nb11}
-                sx={{
-                  gridColumn: "span 1",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
                   },
                 }}
                 >
@@ -999,8 +1041,65 @@ const SolverReq = ({ solverreq }) => {
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
+                  justifyContent: "center", 
                   height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
+                }}
+              >
+                Nebenbedingung 11
+              </Typography>
+              <Select
+                fullWidth
+                variant="filled"
+                type="text"
+                label= ""
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.nb11}
+                name="nb11"
+                error={!!touched.nb11 && !!errors.nb11}
+                helperText={touched.nb11 && errors.nb11}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
+                  },
+                }}
+                >
+                <MenuItem value={ '0' }>0</MenuItem>
+                <MenuItem value={ '1' }>1</MenuItem>
+                <MenuItem value={ '2' }>2</MenuItem>
+                <MenuItem value={ '3' }>3</MenuItem>
+                <MenuItem value={ '4' }>4</MenuItem>
+                <MenuItem value={ '5' }>5</MenuItem>
+              </Select>
+              <Typography
+                color={colors.primary[100]}
+                variant=""
+                sx={{
+                  gridColumn: "span 1",
+                  display: "grid",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              ></Typography>
+              <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center", 
+                  height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
                 }}
               >
                 Nebenbedingung 12
@@ -1021,6 +1120,9 @@ const SolverReq = ({ solverreq }) => {
                   '& .MuiFilledInput-input': {
                     paddingTop: '10px',
                     paddingBottom: '10px',
+                  },
+                  '& .MuiSelect-icon': { 
+                    color: 'black', 
                   },
                 }}
                 >
