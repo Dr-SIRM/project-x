@@ -63,8 +63,6 @@ const SolverReq = ({ solverreq }) => {
         title="Solver Anforderungen"
         subtitle="Bestimme deinen Einsatzplan nach deinen Bedürfnissen!"
       />
-      <Typography variant="h4">Anforderungen</Typography>
-
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -112,7 +110,397 @@ const SolverReq = ({ solverreq }) => {
           handleChange,
           handleSubmit,
         }) => (
-          <form onSubmit={handleSubmit}>           
+          <form onSubmit={handleSubmit}>   
+          <br></br>
+          <Typography variant="h5">Mindestanforderungen</Typography>        
+            <br></br>
+            <Box
+              display="grid"
+              gap="30px"
+              gridTemplateColumns="repeat(10, minmax(0, 1fr))"
+              sx={{
+                "& > div": { gridColumn: isNonMobile ? undefined : "span 10" },
+              }}
+            >
+               <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 5",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  Gewünschte Mindestanzahl Arbeitsstunden pro Tag
+                </Typography>
+                <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label=''
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.desired_min_time_day}
+                name="desired_min_time_day"
+                error={!!touched.desired_min_time_day && !!errors.desired_min_time_day}
+                helperText={touched.desired_min_time_day && errors.desired_min_time_day}
+                sx={{
+                  gridColumn: "span 1",
+                  maxWidth: '50px',
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '0px',
+                    paddingBottom: '2px',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                }}
+                />
+                <Typography
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 3",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 5",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  Mindestanzahl Zeit pro Tag
+                </Typography>
+                <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label=''
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.min_time_day}
+                name="min_time_day"
+                error={!!touched.min_time_day && !!errors.min_time_day}
+                helperText={touched.min_time_day && errors.min_time_day}
+                sx={{
+                  gridColumn: "span 1",
+                  maxWidth: '50px',
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '0px',
+                    paddingBottom: '2px',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                }}
+                />
+                <Typography
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 3",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 5",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  Gewünschte maximale Arbeitszeit pro Tag
+                </Typography>
+                <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label=''
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.desired_max_time_day}
+                name="desired_max_time_day"
+                error={!!touched.desired_max_time_day && !!errors.desired_max_time_day}
+                helperText={touched.desired_max_time_day && errors.desired_max_time_day}
+                sx={{
+                  gridColumn: "span 1",
+                  maxWidth: '50px',
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '0px',
+                    paddingBottom: '2px',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                }}
+                />
+                <Typography
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 3",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 5",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  Maximale Arbeitszeit pro Tag
+                </Typography>
+                <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label=''
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.max_time_day}
+                name="max_time_day"
+                error={!!touched.max_time_day && !!errors.max_time_day}
+                helperText={touched.max_time_day && errors.max_time_day}
+
+                sx={{
+                  gridColumn: "span 1",
+                  maxWidth: '50px',
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '0px',
+                    paddingBottom: '2px',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                }}
+                />
+                <Typography
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 3",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 5",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  Maximale Zeit pro Woche
+                </Typography>
+                <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label=''
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.max_time_week}
+                name="max_time_week"
+                error={!!touched.max_time_week && !!errors.max_time_week}
+                helperText={touched.max_time_week && errors.max_time_week}
+                sx={{
+                  gridColumn: "span 1",
+                  maxWidth: '50px',
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '0px',
+                    paddingBottom: '2px',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                }}
+                />
+                <Typography
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 3",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 5",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                 Abweichungsgrad zur gerechten Verteilung
+                </Typography>
+                <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label=''
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.fair_distribution}
+                name="fair_distribution"
+                error={!!touched.fair_distribution && !!errors.fair_distribution}
+                helperText={touched.fair_distribution && errors.fair_distribution}
+                sx={{
+                  gridColumn: "span 1",
+                  maxWidth: '50px',
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '0px',
+                    paddingBottom: '2px',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                }}
+                />
+                <Typography
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 3",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 5",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  Stundeneinheit
+                </Typography>
+                <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label=''
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.hour_devider}
+                name="hour_devider"
+                error={!!touched.hour_devider && !!errors.hour_devider}
+                helperText={touched.hour_devider && errors.hour_devider}
+                sx={{
+                  gridColumn: "span 1",
+                  maxWidth: '50px',
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '0px',
+                    paddingBottom: '2px',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                }}
+                />
+                <Typography
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 3",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 5",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  Berechnungszeitraum
+                </Typography>
+                <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label=''
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.week_timeframe}
+                name="week_timeframe"
+                error={!!touched.week_timeframe && !!errors.week_timeframe}
+                helperText={touched.week_timeframe && errors.week_timeframe}
+                sx={{
+                  gridColumn: "span 1",
+                  maxWidth: '50px',
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '0px',
+                    paddingBottom: '2px',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                }}
+                />
+                <Typography
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 3",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+                
+            </Box>
             <br></br>
             <Box
               display="grid"
@@ -169,332 +557,6 @@ const SolverReq = ({ solverreq }) => {
                 "& > div": { gridColumn: isNonMobile ? undefined : "span 6" },
               }}
             >
-            <Typography
-                color={colors.primary[100]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center", 
-                  height: "100%",
-                  padding: "0 8px", 
-                  backgroundColor: "#f0f0f0", 
-                }}
-              >
-                Gewünschte min. Zeit pro Tag
-              </Typography>
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label=''
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.desired_min_time_day}
-                name="desired_min_time_day"
-                error={!!touched.desired_min_time_day && !!errors.desired_min_time_day}
-                helperText={touched.desired_min_time_day && errors.desired_min_time_day}
-                sx={{
-                  gridColumn: "span 1",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
-                  },
-                }}
-              />
-            <Typography
-                color={colors.primary[100]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center", 
-                  height: "100%",
-                  padding: "0 8px", 
-                  backgroundColor: "#f0f0f0", 
-                }}
-              >
-                Min. Zeit pro Tag
-              </Typography>
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.min_time_day}
-                name="min_time_day"
-                error={!!touched.min_time_day && !!errors.min_time_day}
-                helperText={touched.min_time_day && errors.min_time_day}
-                sx={{
-                  gridColumn: "span 1",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
-                  },
-                }}
-              />
-              <Typography
-                color={colors.primary[100]}
-                variant=""
-                sx={{
-                  gridColumn: "span 2",
-                  display: "grid",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              ></Typography>
-              <Typography
-                color={colors.primary[100]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center", 
-                  height: "100%",
-                  padding: "0 8px", 
-                  backgroundColor: "#f0f0f0", 
-                }}
-              >
-                Max. Zeit pro Tag
-              </Typography>
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.max_time_day}
-                name="max_time_day"
-                error={!!touched.max_time_day && !!errors.max_time_day}
-                helperText={touched.max_time_day && errors.max_time_day}
-                sx={{
-                  gridColumn: "span 1",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
-                  },
-                }}
-              />
-              <Typography
-                color={colors.primary[100]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center", 
-                  height: "100%",
-                  padding: "0 8px", 
-                  backgroundColor: "#f0f0f0", 
-                }}
-              >
-                Gewünschte max. Zeit pro Tag
-              </Typography>
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.desired_max_time_day}
-                name="desired_max_time_day"
-                error={!!touched.desired_max_time_day && !!errors.desired_max_time_day}
-                helperText={touched.desired_max_time_day && errors.desired_max_time_day}
-                sx={{
-                  gridColumn: "span 1",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
-                  },
-                }}
-              />
-              <Typography
-                color={colors.primary[100]}
-                variant=""
-                sx={{
-                  gridColumn: "span 2",
-                  display: "grid",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              ></Typography>
-              <Typography
-                color={colors.primary[100]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center", 
-                  height: "100%",
-                  padding: "0 8px", 
-                  backgroundColor: "#f0f0f0", 
-                }}
-              >
-                Max. Zeit pro Woche
-              </Typography>
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.max_time_week}
-                name="max_time_week"
-                error={!!touched.max_time_week && !!errors.max_time_week}
-                helperText={touched.max_time_week && errors.max_time_week}
-                sx={{
-                  gridColumn: "span 1",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
-                  },
-                }}
-              />
-              <Typography
-                color={colors.primary[100]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center", 
-                  height: "100%",
-                  padding: "0 8px", 
-                  backgroundColor: "#f0f0f0", 
-                }}
-              >
-                Toleranz gerechte Verteilung
-              </Typography>
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.fair_distribution}
-                name="fair_distribution"
-                error={!!touched.fair_distribution && !!errors.fair_distribution}
-                helperText={touched.fair_distribution && errors.fair_distribution}
-                sx={{
-                  gridColumn: "span 1",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
-                  },
-                }}
-              />
-              <Typography
-                color={colors.primary[100]}
-                variant=""
-                sx={{
-                  gridColumn: "span 2",
-                  display: "grid",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              ></Typography>
-              <Typography
-                color={colors.primary[100]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center", 
-                  height: "100%",
-                  padding: "0 8px", 
-                  backgroundColor: "#f0f0f0", 
-                }}
-              >
-                Stunden Teiler
-              </Typography>
-              <Select
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.hour_devider}
-                name="hour_devider"
-                error={!!touched.hour_devider && !!errors.hour_devider}
-                helperText={touched.hour_devider && errors.hour_devider}
-                sx={{
-                  gridColumn: "span 1",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
-                  },
-                  '& .MuiSelect-icon': { 
-                    color: 'black', 
-                  },
-                }}
-              >
-                <MenuItem value={ '1' }>1</MenuItem>
-                <MenuItem value={ '2' }>2</MenuItem>
-                <MenuItem value={ '4' }>4</MenuItem>
-                </Select>
-                <Typography
-                color={colors.primary[100]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center", 
-                  height: "100%",
-                  padding: "0 8px", 
-                  backgroundColor: "#f0f0f0", 
-                }}
-              >
-                Solver Zeitraum
-              </Typography>
-              <Select
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.week_timeframe}
-                name="week_timeframe"
-                error={!!touched.week_timeframe && !!errors.week_timeframe}
-                helperText={touched.week_timeframe && errors.week_timeframe}
-                sx={{
-                  gridColumn: "span 1",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
-                  },
-                  '& .MuiSelect-icon': { 
-                    color: 'black', 
-                  },
-                }}
-              >
-                <MenuItem value={ '1' }>1</MenuItem>
-                <MenuItem value={ '2' }>2</MenuItem>
-                <MenuItem value={ '4' }>4</MenuItem>
-                </Select>
-                <Typography
-                color={colors.primary[100]}
-                variant=""
-                sx={{
-                  gridColumn: "span 2",
-                  display: "grid",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              ></Typography>
               <Typography
                 color={colors.primary[100]}
                 variant="h6"

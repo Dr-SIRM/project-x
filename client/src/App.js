@@ -8,6 +8,7 @@ import Login from "./scenes/login";
 import Token_Registration from "./scenes/token_registration";
 import Registration from "./scenes/registration_supervisor";
 import ForgetPassword from "./scenes/forget_password";
+import ChangePassword from "./scenes/change_password";
 import Dashboard from "./scenes/dashboard";
 import Solver from "./scenes/solver";
 import SolverRequirement from "./scenes/solver_requirement";
@@ -67,7 +68,8 @@ function AppContent({ isSidebar, setIsSidebar }) {
           <Route path="/solver/requirement" element={<PrivateRoute component={SolverRequirement} accessLevels={["Super_Admin", "Admin"]} />} />
           <Route path="/availability" element={<PrivateRoute component={Availability} accessLevels={["Super_Admin", "Admin", "User"]} />} />
           <Route path="/Team" element={<PrivateRoute component={Team} accessLevels={["Super_Admin", "Admin", "User"]} />} />
-          <Route path="/Update" element={<PrivateRoute component={Update} accessLevels={["Super_Admin", "Admin", "User"]} />} />
+          <Route path="/update" element={<PrivateRoute component={Update} accessLevels={["Super_Admin", "Admin", "User"]} />} />
+          <Route path="/change/password" element={<PrivateRoute component={ChangePassword} accessLevels={["Super_Admin", "Admin", "User"]} />} />
           <Route path="/Invite" element={<PrivateRoute component={Invite} accessLevels={["Super_Admin", "Admin", "User"]} />} />
           <Route path="/company" element={<PrivateRoute component={Company} accessLevels={["Super_Admin", "Admin"]} />} />
           <Route path="/Bar" element={<PrivateRoute component={Bar} accessLevels={["Super_Admin", "Admin", "User"]} />} />
