@@ -184,7 +184,7 @@ class ORAlgorithm_cp:
 
     def run(self):
         self.create_variables()
-        # self.show_variables()
+        self.show_variables()
         self.pre_check_programmer()
         self.pre_check_admin()
         self.solver_selection()
@@ -302,6 +302,15 @@ class ORAlgorithm_cp:
 
         # -- 14 ------------------------------------------------------------------------------------------------------------
         # Eine Liste mit den Stunden wie sie gerecht verteilt werden
+
+        """
+        Zuerst wie jetzt gerechte Verteilungsliste erstellen, dann für jeden "Temp" MA überprüfen,
+        ob er die Stunden überhaupt eingegeben hat. Wenn ja, alles gut, wenn er unterschritten hat,
+        dann die eingegebenen Stunden bei gerechte Verteilung ersetzen und fehlende Stunden neu gerecht
+        den Mitarbeitern aufteilen.
+        
+        """
+
         list_gesamtstunden = []
         for i in range(len(self.mitarbeiter)):
             if self.gesamtstunden_verfügbarkeit[i] > self.weekly_hours * self.week_timeframe:
@@ -482,7 +491,7 @@ class ORAlgorithm_cp:
                 total_hours_week = sum(sum(self.verfügbarkeit[ma_id][day]) for day in range(self.calc_time))
                 if total_hours_week < self.gerechte_verteilung[index]:
                     errors.append(
-                        f"Temp-Mitarbeiter {ma_id} hat nur {total_hours_week} Stunden in der Woche eingetragen. "
+                        f"Temp-Mitarbeiter {ma_id} hat nur {total_hours_week / self.hour_devider} Stunden in der Woche eingetragen. "
                         f"Das ist weniger als die erforderliche Gesamtstundenzahl von {self.gerechte_verteilung[index]} Stunden."
                     )
         if errors:
