@@ -8,6 +8,7 @@ import Login from "./scenes/login";
 import Token_Registration from "./scenes/token_registration";
 import Registration from "./scenes/registration_supervisor";
 import ForgetPassword from "./scenes/forget_password";
+import ChangePassword from "./scenes/change_password";
 import Dashboard from "./scenes/dashboard";
 import Solver from "./scenes/solver";
 import SolverRequirement from "./scenes/solver_requirement";
@@ -25,6 +26,7 @@ import Geography from "./scenes/geography";
 import Calendar from "./scenes/calendar";
 import Planning from "./scenes/planning";
 import Plan from "./scenes/plan"
+import Footer from "./scenes/global/Footer";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
 
@@ -66,7 +68,8 @@ function AppContent({ isSidebar, setIsSidebar }) {
           <Route path="/solver/requirement" element={<PrivateRoute component={SolverRequirement} accessLevels={["Super_Admin", "Admin"]} />} />
           <Route path="/availability" element={<PrivateRoute component={Availability} accessLevels={["Super_Admin", "Admin", "User"]} />} />
           <Route path="/Team" element={<PrivateRoute component={Team} accessLevels={["Super_Admin", "Admin", "User"]} />} />
-          <Route path="/Update" element={<PrivateRoute component={Update} accessLevels={["Super_Admin", "Admin", "User"]} />} />
+          <Route path="/update" element={<PrivateRoute component={Update} accessLevels={["Super_Admin", "Admin", "User"]} />} />
+          <Route path="/change/password" element={<PrivateRoute component={ChangePassword} accessLevels={["Super_Admin", "Admin", "User"]} />} />
           <Route path="/Invite" element={<PrivateRoute component={Invite} accessLevels={["Super_Admin", "Admin", "User"]} />} />
           <Route path="/company" element={<PrivateRoute component={Company} accessLevels={["Super_Admin", "Admin"]} />} />
           <Route path="/Bar" element={<PrivateRoute component={Bar} accessLevels={["Super_Admin", "Admin", "User"]} />} />
@@ -78,6 +81,7 @@ function AppContent({ isSidebar, setIsSidebar }) {
           <Route path="/Calendar" element={<PrivateRoute component={Calendar} accessLevels={["Super_Admin", "Admin", "User"]} />} />
           <Route path="/Planning" element={<PrivateRoute component={Planning} accessLevels={["Super_Admin", "Admin"]} />} />
           <Route path="/Plan" element={<PrivateRoute component={Plan} accessLevels={["Super_Admin", "Admin"]} />} />
+          <Route path="/Footer" element={<PrivateRoute component={Footer} accessLevels={["Super_Admin", "Admin", "User"]} />} />
         </Routes>
       </main>
     </>

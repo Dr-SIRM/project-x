@@ -24,7 +24,7 @@ export const tokens = (mode) => ({
           500: "#141b2d",
           600: "#101624",
           700: "#0c101b",
-          800: "#080b12",
+          800: "#2E2E2E", //grey black
           900: "#040509",
         },
         greenAccent: {
@@ -129,7 +129,7 @@ export const themeSettings = (mode) => {
       ...(mode === "dark"
         ? {
             primary: {
-              main: colors.primary[100],
+              main: colors.primary[800],
             },
             secondary: {
               main: colors.greenAccent[500],
@@ -145,7 +145,7 @@ export const themeSettings = (mode) => {
           }
         : {
             primary: {
-              main: colors.primary[100],
+              main: colors.primary[800],
             },
             secondary: {
               main: colors.greenAccent[500],
@@ -164,14 +164,14 @@ export const themeSettings = (mode) => {
       MuiInputLabel: {
         styleOverrides: {
           root: { // this applies to the label element within the TextField
-            color: 'black', // Set the color of the label to black
+            color: '#2E2E2E', // Set the color of the label to black
           },
         },
       },
       MuiInputBase: { // For changing the text color of TextField
         styleOverrides: {
           input: { // This applies to the actual input element within the TextField
-            color: 'black', // Set the text color to black
+            color: '#2E2E2E', // Set the text color to black
             backgroundColor: colors.grey[200], // Keeping the background color to grey[200] as set before
           },
         },
@@ -180,15 +180,15 @@ export const themeSettings = (mode) => {
         styleOverrides: {
           underline: {
             '&:before': {
-              borderColor: 'black', // Set default border color to black
+              borderColor: '#2E2E2E', // Set default border color to black
             },
             '&:hover:not(.Mui-disabled):before': {
-              borderColor: 'black', // Set hover border color to black
+              borderColor: '#2E2E2E', // Set hover border color to black
             },
           },
           root: {
             '& .MuiFilledInput-input': {
-              borderColor: 'black', // Set border color of the input to black
+              borderColor: '#2E2E2E', // Set border color of the input to black
             }
           }
         },
@@ -202,7 +202,7 @@ export const themeSettings = (mode) => {
           },
           // If you want to also change the styles for specific variants or states, you can do it like this:
           outlined: {
-            color: 'black', // This will set the text color of all outlined Button components to black.
+            color: '#2E2E2E', // This will set the text color of all outlined Button components to black.
           },
         },
       },
@@ -212,13 +212,13 @@ export const themeSettings = (mode) => {
           root: {
 
             "& .MuiOutlinedInput-notchedOutline": {
-              borderColor: 'black', // Set default border color to black
+              borderColor: '#2E2E2E', // Set default border color to black
             },
             "&:hover .MuiOutlinedInput-notchedOutline": {
-              borderColor: 'black', // Set hover border color to black
+              borderColor: '#2E2E2E', // Set hover border color to black
             },
             "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-              borderColor: 'black', // Set focused border color to black
+              borderColor: '#2E2E2E', // Set focused border color to black
             },
             input: { // this applies to the actual input element within the TextField
               backgroundColor: colors.grey[200], // Set the background color to grey[100]
@@ -231,7 +231,7 @@ export const themeSettings = (mode) => {
     typography: {
       fontFamily: ["Poppins", "Roboto", "Sourse Sans Pro", "sans-serif"].join(","),
       fontSize: 12,
-      color: "black",
+      color: "#2E2E2E",
       h1: {
         fontFamily: ["Poppins", "Roboto", "Sourse Sans Pro", "sans-serif"].join(","),
         fontSize: 40,
@@ -241,28 +241,28 @@ export const themeSettings = (mode) => {
       h2: {
         fontFamily: ["Poppins", "Roboto", "Sourse Sans Pro", "sans-serif"].join(","),
         fontSize: 32,
-        color: "black",
+        color: "#2E2E2E",
         
       },
       h3: {
         fontFamily: ["Poppins", "Roboto", "Sourse Sans Pro", "sans-serif"].join(","),
         fontSize: 24,
-        color: "black",
+        color: "#2E2E2E",
       },
       h4: {
         fontFamily: ["Poppins", "Roboto","Sourse Sans Pro", "sans-serif"].join(","),
         fontSize: 20,
-        color: "black",
+        color: "#2E2E2E",
       },
       h5: {
         fontFamily: ["Poppins", "Roboto","Sourse Sans Pro", "sans-serif"].join(","),
         fontSize: 16,
-        color: "black",
+        color: "#2E2E2E",
       },
       h6: {
         fontFamily: ["Poppins", "Roboto", "Sourse Sans Pro", "sans-serif"].join(","),
         fontSize: 14,
-        color: "black",
+        color: "#2E2E2E",
       },
     },
   };

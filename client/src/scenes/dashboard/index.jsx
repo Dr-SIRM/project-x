@@ -77,7 +77,7 @@ const Dashboard = () => {
         {/* ROW 1 */}
         <Box
           gridColumn="span 3"
-          backgroundColor={colors.primary[100]}
+          backgroundColor={colors.primary[800]}
           borderRadius="15px"  
           display="flex"
           alignItems="center"
@@ -97,7 +97,7 @@ const Dashboard = () => {
         </Box>
         <Box
           gridColumn="span 3"
-          backgroundColor={colors.primary[100]}
+          backgroundColor={colors.primary[800]}
           borderRadius="15px"
           display="flex"
           alignItems="center"
@@ -117,7 +117,7 @@ const Dashboard = () => {
         </Box>
         <Box
           gridColumn="span 3"
-          backgroundColor={colors.primary[100]}
+          backgroundColor={colors.primary[800]}
           borderRadius="15px"
           display="flex"
           alignItems="center"
@@ -137,7 +137,7 @@ const Dashboard = () => {
         </Box>
         <Box
           gridColumn="span 3"
-          backgroundColor={colors.primary[100]}
+          backgroundColor={colors.primary[800]}
           borderRadius="15px"
           display="flex"
           alignItems="center"
@@ -160,7 +160,7 @@ const Dashboard = () => {
         <Box
           gridColumn="span 8"
           gridRow="span 2"
-          backgroundColor={colors.primary[100]}
+          backgroundColor={colors.primary[800]}
           borderRadius="15px"
         >
           <Box
@@ -201,7 +201,7 @@ const Dashboard = () => {
         <Box
           gridColumn="span 4"
           gridRow="span 2"
-          backgroundColor={colors.primary[100]}
+          backgroundColor={colors.primary[800]}
           borderRadius="15px"
           overflow="auto"
         >
@@ -254,7 +254,7 @@ const Dashboard = () => {
         <Box
           gridColumn="span 4"
           gridRow="span 2"
-          backgroundColor={colors.primary[100]}
+          backgroundColor={colors.primary[800]}
           borderRadius="15px"
           p="30px"
         >
@@ -281,7 +281,7 @@ const Dashboard = () => {
         <Box
           gridColumn="span 4"
           gridRow="span 2"
-          backgroundColor={colors.primary[100]}
+          backgroundColor={colors.primary[800]}
           borderRadius="15px"
         >
           <Typography
@@ -298,7 +298,7 @@ const Dashboard = () => {
         <Box
           gridColumn="span 4"
           gridRow="span 2"
-          backgroundColor={colors.primary[100]}
+          backgroundColor={colors.primary[800]}
           borderRadius="15px"
           padding="30px"
         >
