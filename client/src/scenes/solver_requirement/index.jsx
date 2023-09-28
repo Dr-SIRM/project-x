@@ -499,10 +499,155 @@ const SolverReq = ({ solverreq }) => {
                     height: "100%",
                   }}
                 ></Typography>
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 5",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  Maximale Arbeitstage in Folge
+                </Typography>
+                <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label=''
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.subsequent_workingdays}
+                name="week_timeframe"
+                error={!!touched.subsequent_workingdays && !!errors.subsequent_workingdays}
+                helperText={touched.subsequent_workingdays && errors.subsequent_workingdays}
+                sx={{
+                  gridColumn: "span 1",
+                  maxWidth: '50px',
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '0px',
+                    paddingBottom: '2px',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                }}
+                />
+                <Typography
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 3",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 5",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  Anzahl Arbeitseinsätze pro Tag
+                </Typography>
+                <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label=''
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.daily_deployment}
+                name="week_timeframe"
+                error={!!touched.daily_deployment && !!errors.daily_deployment}
+                helperText={touched.daily_deployment && errors.daily_deployment}
+                sx={{
+                  gridColumn: "span 1",
+                  maxWidth: '50px',
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '0px',
+                    paddingBottom: '2px',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                }}
+                />
+                <Typography
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 3",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 5",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  Mindestunden pro Arbeitsblock
+                </Typography>
+                <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label=''
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.time_per_deployment}
+                name="week_timeframe"
+                error={!!touched.time_per_deployment && !!errors.time_per_deployment}
+                helperText={touched.time_per_deployment && errors.time_per_deployment}
+                sx={{
+                  gridColumn: "span 1",
+                  maxWidth: '50px',
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '0px',
+                    paddingBottom: '2px',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                }}
+                />
+                <Typography
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 3",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
                 
             </Box>
             <br></br>
-            <Box
+            <br></br>
+            <Typography variant="h5">Zusatzanforderungen</Typography> 
+              <br></br>
+              <br></br>
+              <Box
               display="grid"
               gap="30px"
               gridTemplateColumns="repeat(10, minmax(0, 1fr))"
@@ -515,8 +660,8 @@ const SolverReq = ({ solverreq }) => {
                 checked={isChecked}
                 onChange={(e) => setIsChecked(e.target.checked)}
                 sx={{
-                  gridColumn: "span 1",
                   display: "flex",
+                  gridColumn: "span 1",
                   alignItems: "left",
                   height: "100%",
                 }}
@@ -525,52 +670,16 @@ const SolverReq = ({ solverreq }) => {
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 5",
-                  display: "flex",
-                  alignItems: "left",
-                  height: "100%",
-                }}
-              >
-                Gewünschte Mindestanzahl Arbeitsstunden pro Tag
-              </Typography>
-              <input
-                type="text"
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                disabled={!isChecked} // Disable textfield if checkbox isn't checked
-                sx={{
-                  gridColumn: "span 3",
-                  display: "flex",
-                  alignItems: "left",
-                  height: "100%",
-                }}
-              />
-              
-              </Box>
-              <br></br>
-              <br></br>
-              <Box
-              display="grid"
-              gap="30px"
-              gridTemplateColumns="repeat(6, minmax(0, 1fr))"
-              sx={{
-                "& > div": { gridColumn: isNonMobile ? undefined : "span 6" },
-              }}
-            >
-              <Typography
-                color={colors.primary[100]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
+                  gridColumn: "span 6",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center", 
+                  justifyContent: "left", 
                   height: "100%",
                   padding: "0 8px", 
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Nebenbedingung 1
+                Dürfen mehr Mitarbeiter pro Zeiteinheit eingeplant werden als nötig?
               </Typography>
               <Select
                 fullWidth
@@ -588,6 +697,7 @@ const SolverReq = ({ solverreq }) => {
                   '& .MuiFilledInput-input': {
                     paddingTop: '10px',
                     paddingBottom: '10px',
+                    textAlign: "center",
                   },
                   '& .MuiSelect-icon': { 
                     color: 'black', 
@@ -602,29 +712,40 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.primary[100]}
-                variant=""
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 2",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+                <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={(e) => setIsChecked(e.target.checked)}
                 sx={{
+                  display: "flex",
                   gridColumn: "span 1",
-                  display: "grid",
-                  alignItems: "center",
+                  alignItems: "left",
                   height: "100%",
                 }}
-              ></Typography>
+              />
               <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 1",
+                  gridColumn: "span 6",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center", 
+                  justifyContent: "left", 
                   height: "100%",
                   padding: "0 8px", 
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Nebenbedingung 2
+                Darf die maximale Arbietszeit pro Woche überschritten werden?
               </Typography>
               <Select
                 fullWidth
@@ -642,6 +763,7 @@ const SolverReq = ({ solverreq }) => {
                   '& .MuiFilledInput-input': {
                     paddingTop: '10px',
                     paddingBottom: '10px',
+                    textAlign: "center",
                   },
                   '& .MuiSelect-icon': { 
                     color: 'black', 
@@ -656,29 +778,40 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.primary[100]}
-                variant=""
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 2",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+                <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={(e) => setIsChecked(e.target.checked)}
                 sx={{
+                  display: "flex",
                   gridColumn: "span 1",
-                  display: "grid",
-                  alignItems: "center",
+                  alignItems: "left",
                   height: "100%",
                 }}
-              ></Typography>
+              />
               <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 1",
+                  gridColumn: "span 6",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center", 
+                  justifyContent: "left", 
                   height: "100%",
                   padding: "0 8px", 
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Nebenbedingung 3
+                Darf die minimale Arbeitzeit pro Tag unterschritten werden?
               </Typography>
               <Select
                 fullWidth
@@ -696,6 +829,7 @@ const SolverReq = ({ solverreq }) => {
                   '& .MuiFilledInput-input': {
                     paddingTop: '10px',
                     paddingBottom: '10px',
+                    textAlign: "center",
                   },
                   '& .MuiSelect-icon': { 
                     color: 'black', 
@@ -710,29 +844,39 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.primary[100]}
-                variant="h6"
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 2",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+                <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={(e) => setIsChecked(e.target.checked)}
                 sx={{
-                  gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "left",
                   height: "100%",
                 }}
-              ></Typography>
+              />
               <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 1",
+                  gridColumn: "span 6",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center", 
+                  justifyContent: "left", 
                   height: "100%",
                   padding: "0 8px", 
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Nebenbedingung 4
+                Darf die maximale Arbeitzeit pro Tag überschritten werden?
               </Typography>
               <Select
                 fullWidth
@@ -750,6 +894,7 @@ const SolverReq = ({ solverreq }) => {
                   '& .MuiFilledInput-input': {
                     paddingTop: '10px',
                     paddingBottom: '10px',
+                    textAlign: "center",
                   },
                   '& .MuiSelect-icon': { 
                     color: 'black', 
@@ -764,29 +909,39 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.primary[100]}
-                variant=""
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 2",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+                <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={(e) => setIsChecked(e.target.checked)}
                 sx={{
-                  gridColumn: "span 1",
-                  display: "grid",
-                  alignItems: "center",
+                  display: "flex",
+                  alignItems: "left",
                   height: "100%",
                 }}
-              ></Typography>
+              />
               <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 1",
+                  gridColumn: "span 6",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center", 
+                  justifyContent: "left", 
                   height: "100%",
                   padding: "0 8px", 
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Nebenbedingung 5
+                Darf die Arbeitstundenwoche bei Vollzeitangestellten Mitarbeiter unterschritten werden?
               </Typography>
               <Select
                 fullWidth
@@ -804,6 +959,7 @@ const SolverReq = ({ solverreq }) => {
                   '& .MuiFilledInput-input': {
                     paddingTop: '10px',
                     paddingBottom: '10px',
+                    textAlign: "center",
                   },
                   '& .MuiSelect-icon': { 
                     color: 'black', 
@@ -818,29 +974,39 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.primary[100]}
-                variant="h6"
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 2",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+                <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={(e) => setIsChecked(e.target.checked)}
                 sx={{
-                  gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "left",
                   height: "100%",
                 }}
-              ></Typography>
+              />
               <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 1",
+                  gridColumn: "span 6",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center", 
+                  justifyContent: "left", 
                   height: "100%",
                   padding: "0 8px", 
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Nebenbedingung 6
+                Darf die Arbeitstundenwoche bei Vollzeitangestellten Mitarbeiter überschritten werden?
               </Typography>
               <Select
                 fullWidth
@@ -858,6 +1024,7 @@ const SolverReq = ({ solverreq }) => {
                   '& .MuiFilledInput-input': {
                     paddingTop: '10px',
                     paddingBottom: '10px',
+                    textAlign: "center",
                   },
                   '& .MuiSelect-icon': { 
                     color: 'black', 
@@ -872,29 +1039,39 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.primary[100]}
-                variant=""
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 2",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+                <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={(e) => setIsChecked(e.target.checked)}
                 sx={{
-                  gridColumn: "span 1",
-                  display: "grid",
-                  alignItems: "center",
+                  display: "flex",
+                  alignItems: "left",
                   height: "100%",
                 }}
-              ></Typography>
+              />
               <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 1",
+                  gridColumn: "span 6",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center", 
+                  justifyContent: "left", 
                   height: "100%",
                   padding: "0 8px", 
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Nebenbedingung 7
+                Jeder Mitarbeiter soll in der gleichen Schicht innerhalb einer Woche arbeiten
               </Typography>
               <Select
                 fullWidth
@@ -912,6 +1089,7 @@ const SolverReq = ({ solverreq }) => {
                   '& .MuiFilledInput-input': {
                     paddingTop: '10px',
                     paddingBottom: '10px',
+                    textAlign: "center",
                   },
                   '& .MuiSelect-icon': { 
                     color: 'black', 
@@ -926,29 +1104,39 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.primary[100]}
-                variant="h6"
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 2",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+                <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={(e) => setIsChecked(e.target.checked)}
                 sx={{
-                  gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "left",
                   height: "100%",
                 }}
-              ></Typography>
+              />
               <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 1",
+                  gridColumn: "span 6",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center", 
+                  justifyContent: "left", 
                   height: "100%",
                   padding: "0 8px", 
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Nebenbedingung 8
+                Über mehrere Wochen sollen Mitarbeiter Wechselschichtig arbeiten
               </Typography>
               <Select
                 fullWidth
@@ -966,6 +1154,7 @@ const SolverReq = ({ solverreq }) => {
                   '& .MuiFilledInput-input': {
                     paddingTop: '10px',
                     paddingBottom: '10px',
+                    textAlign: "center",
                   },
                   '& .MuiSelect-icon': { 
                     color: 'black', 
@@ -980,29 +1169,39 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.primary[100]}
-                variant=""
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 2",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+                <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={(e) => setIsChecked(e.target.checked)}
                 sx={{
-                  gridColumn: "span 1",
-                  display: "grid",
-                  alignItems: "center",
+                  display: "flex",
+                  alignItems: "left",
                   height: "100%",
                 }}
-              ></Typography>
+              />
               <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 1",
+                  gridColumn: "span 6",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center", 
+                  justifyContent: "left", 
                   height: "100%",
                   padding: "0 8px", 
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Nebenbedingung 9
+                Pro Schicht muss eine Mindestanzahl an Stunden gearbeitet werden
               </Typography>
               <Select
                 fullWidth
@@ -1020,6 +1219,7 @@ const SolverReq = ({ solverreq }) => {
                   '& .MuiFilledInput-input': {
                     paddingTop: '10px',
                     paddingBottom: '10px',
+                    textAlign: "center",
                   },
                   '& .MuiSelect-icon': { 
                     color: 'black', 
@@ -1034,29 +1234,39 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.primary[100]}
-                variant="h6"
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 2",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+                <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={(e) => setIsChecked(e.target.checked)}
                 sx={{
-                  gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "left",
                   height: "100%",
                 }}
-              ></Typography>
+              />
               <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 1",
+                  gridColumn: "span 6",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center", 
+                  justifyContent: "left", 
                   height: "100%",
                   padding: "0 8px", 
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Nebenbedingung 10
+                Maximale Arbeitstage in Folge darf überschritten werden
               </Typography>
               <Select
                 fullWidth
@@ -1074,6 +1284,7 @@ const SolverReq = ({ solverreq }) => {
                   '& .MuiFilledInput-input': {
                     paddingTop: '10px',
                     paddingBottom: '10px',
+                    textAlign: "center",
                   },
                   '& .MuiSelect-icon': { 
                     color: 'black', 
@@ -1088,23 +1299,33 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.primary[100]}
-                variant=""
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 2",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+                <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={(e) => setIsChecked(e.target.checked)}
                 sx={{
-                  gridColumn: "span 1",
-                  display: "grid",
-                  alignItems: "center",
+                  display: "flex",
+                  alignItems: "left",
                   height: "100%",
                 }}
-              ></Typography>
+              />
               <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 1",
+                  gridColumn: "span 6",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center", 
+                  justifyContent: "left", 
                   height: "100%",
                   padding: "0 8px", 
                   backgroundColor: "#f0f0f0", 
@@ -1128,6 +1349,7 @@ const SolverReq = ({ solverreq }) => {
                   '& .MuiFilledInput-input': {
                     paddingTop: '10px',
                     paddingBottom: '10px',
+                    textAlign: "center",
                   },
                   '& .MuiSelect-icon': { 
                     color: 'black', 
@@ -1142,23 +1364,33 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.primary[100]}
-                variant=""
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 2",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+                <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={(e) => setIsChecked(e.target.checked)}
                 sx={{
-                  gridColumn: "span 1",
-                  display: "grid",
-                  alignItems: "center",
+                  display: "flex",
+                  alignItems: "left",
                   height: "100%",
                 }}
-              ></Typography>
+              />
               <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 1",
+                  gridColumn: "span 6",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center", 
+                  justifyContent: "left", 
                   height: "100%",
                   padding: "0 8px", 
                   backgroundColor: "#f0f0f0", 
@@ -1182,6 +1414,7 @@ const SolverReq = ({ solverreq }) => {
                   '& .MuiFilledInput-input': {
                     paddingTop: '10px',
                     paddingBottom: '10px',
+                    textAlign: "center",
                   },
                   '& .MuiSelect-icon': { 
                     color: 'black', 
@@ -1196,15 +1429,15 @@ const SolverReq = ({ solverreq }) => {
                 <MenuItem value={ '5' }>5</MenuItem>
               </Select>
               <Typography
-                color={colors.primary[100]}
-                variant=""
-                sx={{
-                  gridColumn: "span 1",
-                  display: "grid",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              ></Typography>
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 2",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
             <Button 
