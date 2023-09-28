@@ -645,9 +645,9 @@ def run_solver():
             # or_algo = ORAlgorithm(dp)
             # or_algo.run()
             or_algo_cp = ORAlgorithm_cp(dp)
-            or_algo_cp
-            #or_algo_cp.run()
-            print("Test Result:", or_algo_cp.run())
+            or_algo_cp.run()
+            or_algo_cp.run_2()
+
             
             return jsonify({'message': 'Solver successfully started'}), 200
         else:
@@ -994,6 +994,11 @@ def get_required_workforce():
     minutes = 60 / hour_divider
     day_num = 7   
     company_id = user.company_id
+
+    # BRAUCHT ES DIESE EXCELAUSGABE NOCH? Gery - 23.09.2023
+    get_excel()
+
+    
 
     # Fetch Opening Data
     all_opening_hours = OpeningHours.query.filter(
