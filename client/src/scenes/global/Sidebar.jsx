@@ -16,6 +16,14 @@ import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 import BusinessIcon from '@mui/icons-material/Business';
+import CalculateIcon from '@mui/icons-material/Calculate';
+import TuneIcon from '@mui/icons-material/Tune';
+import EventAvailableIcon from '@mui/icons-material/EventAvailable';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import GroupsIcon from '@mui/icons-material/Groups';
+import CalendarViewMonthIcon from '@mui/icons-material/CalendarViewMonth';
+import EventNoteIcon from '@mui/icons-material/EventNote';
+import SettingsIcon from '@mui/icons-material/Settings';
 import axios from 'axios';
 
 
@@ -168,7 +176,7 @@ const Sidebar = () => {
             <Item
               title="Solver"
               to="/solver"
-              icon={<HomeOutlinedIcon />}
+              icon={<CalculateIcon />}
               selected={selected}
               setSelected={setSelected}
               requiredAccessLevel={["Super_Admin", "Admin"]}
@@ -177,7 +185,7 @@ const Sidebar = () => {
             <Item
               title="Solver Req"
               to="/solver/requirement"
-              icon={<HomeOutlinedIcon />}
+              icon={<TuneIcon />}
               selected={selected}
               setSelected={setSelected}
               requiredAccessLevel={["Super_Admin", "Admin"]}
@@ -194,7 +202,7 @@ const Sidebar = () => {
             <Item
               title="Manage Team"
               to="/team"
-              icon={<PeopleOutlinedIcon />}
+              icon={<GroupsIcon />}
               selected={selected}
               setSelected={setSelected}
               requiredAccessLevel={["Super_Admin", "Admin"]}
@@ -203,18 +211,11 @@ const Sidebar = () => {
             <Item
               title="Einladen"
               to="/invite"
-              icon={<PeopleOutlinedIcon />}
+              icon={<GroupAddIcon />}
               selected={selected}
               setSelected={setSelected}
               requiredAccessLevel={["Super_Admin", "Admin"]}
               accessLevel={user.accessLevel}
-            />
-            <Item
-              title="Updaten"
-              to="/update"
-              icon={<PeopleOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
             />
             <Typography
               variant="h6"
@@ -224,18 +225,9 @@ const Sidebar = () => {
               Seiten
             </Typography>
             <Item
-              title="Neuer User"
-              to="/form"
-              icon={<PersonOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-              requiredAccessLevel={["Super_Admin"]}
-              accessLevel={user.accessLevel}
-            />
-            <Item
               title="Verfügbarkeit"
               to="/availability"
-              icon={<BusinessIcon />}
+              icon={<EventAvailableIcon />}
               selected={selected}
               setSelected={setSelected}
             />
@@ -258,7 +250,7 @@ const Sidebar = () => {
             <Item
               title="Planung"
               to="/planning"
-              icon={<CalendarTodayOutlinedIcon />}
+              icon={<EventNoteIcon />}
               selected={selected}
               setSelected={setSelected}
               requiredAccessLevel={["Super_Admin", "Admin"]}
@@ -267,7 +259,7 @@ const Sidebar = () => {
             <Item
               title="Schichtplan"
               to="/plan"
-              icon={<CalendarTodayOutlinedIcon />}
+              icon={<CalendarViewMonthIcon />}
               selected={selected}
               setSelected={setSelected}
             />
@@ -278,41 +270,36 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-
             <Typography
               variant="h6"
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              Charts
+              Account
             </Typography>
             <Item
-              title="Bar Chart"
-              to="/bar"
-              icon={<BarChartOutlinedIcon />}
+              title="Einstellungen"
+              to="/update"
+              icon={<SettingsIcon />}
               selected={selected}
               setSelected={setSelected}
             />
+            <Typography
+              variant="h6"
+              color={colors.grey[300]}
+              sx={{ m: "15px 0 5px 20px" }}
+              requiredAccessLevel={["Super_Admin"]}
+            >
+              Sonstiges
+            </Typography>
             <Item
-              title="Pie Chart"
-              to="/pie"
-              icon={<PieChartOutlineOutlinedIcon />}
+              title="Neuer User"
+              to="/form"
+              icon={<PersonOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
-            <Item
-              title="Line Chart"
-              to="/line"
-              icon={<TimelineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Geography Chart"
-              to="/geography"
-              icon={<MapOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
+              requiredAccessLevel={["Super_Admin"]}
+              accessLevel={user.accessLevel}
             />
           </Box>
           {!isCollapsed && (
