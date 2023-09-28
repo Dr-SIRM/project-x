@@ -420,6 +420,11 @@ class DataProcessing:
                     hour_devider,
                     fair_distribution,
                     week_timeframe,
+                       
+                    subsequent_workingdays,
+                    daily_deployment,
+                    time_per_deployment,
+
                     nb1, nb2, nb3, nb4, nb5,
                     nb6, nb7, nb8, nb9, nb10,
                     nb11, nb12, nb13, nb14, nb15,
@@ -445,15 +450,16 @@ class DataProcessing:
                     'hour_devider': row[10],
                     'fair_distribution': row[11],
                     'week_timeframe': row[12],
-                    'nb1': row[13], 'nb2': row[14], 'nb3': row[15], 'nb4': row[16], 'nb5': row[17],
-                    'nb6': row[18], 'nb7': row[19], 'nb8': row[20], 'nb9': row[21], 'nb10': row[22],
-                    'nb11': row[23], 'nb12': row[24], 'nb13': row[25], 'nb14': row[26], 'nb15': row[27],
-                    'nb16': row[28], 'nb17': row[29], 'nb18': row[30], 'nb19': row[31], 'nb20': row[32]
+                    'subsequent_workingdays': row[13],
+                    'daily_deployment': row[14],
+                    'time_per_deployment': row[15],
+                    'nb1': row[16], 'nb2': row[17], 'nb3': row[18], 'nb4': row[19], 'nb5': row[20],
+                    'nb6': row[21], 'nb7': row[22], 'nb8': row[23], 'nb9': row[24], 'nb10': row[25],
+                    'nb11': row[26], 'nb12': row[27], 'nb13': row[28], 'nb14': row[29], 'nb15': row[30],
+                    'nb16': row[31], 'nb17': row[32], 'nb18': row[33], 'nb19': row[34], 'nb20': row[35]
                 }
 
             self.solver_requirements = row_dict
-
-
     
     def pre_check_admin(self):
         """

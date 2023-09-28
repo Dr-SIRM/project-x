@@ -52,12 +52,9 @@ Prio 1:
  To-Do's 
  -------------------------------
  - (*) Vorüberprüfungen fertigstellen und Daten an React geben
-
+ - (*) pre_check_admin aus data_processing in or_algorithm einpflegen
  - gerechte_verteilung funktioniert noch nicht richtig, wenn ein MA fast keine Stunden availability eingibt. Das muss noch geändert werden.
  
- - self.min_working_hour_per_block in Solver Req einbauen und ziehen
- - self.working_blocks in Solver Req einbauen und ziehen
- - self.max_consecutive_days in Solver Req einbauen und ziehen
 
 
  --- PRIO 2 ---
@@ -105,11 +102,15 @@ class ORAlgorithm_cp:
         self.min_anwesend = []                              # 13
         self.gerechte_verteilung = []                       # 14
         self.fair_distribution = None                       # 15
+        self.subsequent_workingdays = None                  # 16
+        self.daily_deployment = None                        # 17
+        self.time_per_deployment = None                     # 18
 
         self.desired_max_time_day = None
         self.max_time_day = None
         self.desired_min_time_day = None
         self.min_time_day = None
+
 
         # Attribute der Methode "solver_selection"
         self.model = None
@@ -184,7 +185,7 @@ class ORAlgorithm_cp:
 
     def run(self):
         self.create_variables()
-        self.show_variables()
+        # self.show_variables()
         self.pre_check_programmer()
         self.pre_check_admin()
         self.solver_selection()
@@ -363,6 +364,31 @@ class ORAlgorithm_cp:
             self.fair_distribution = self.solver_requirements[key]
         self.fair_distribution = self.fair_distribution / 100      # Prozentumrechnung
 
+        # -- 16 ------------------------------------------------------------------------------------------------------------
+        # Maximale Arbeitstage in Folge
+        key = "subsequent_workingdays"
+        if key in self.solver_requirements:
+            self.subsequent_workingdays = self.solver_requirements[key]
+        print("?????", type(self.subsequent_workingdays))
+
+        # -- 17 ------------------------------------------------------------------------------------------------------------
+        # Anzahl Arbeitseinsätze pro Tag
+        key = "daily_deployment"
+        if key in self.solver_requirements:
+            self.daily_deployment = self.solver_requirements[key]
+        print(type(self.daily_deployment))
+
+        # -- 18 ------------------------------------------------------------------------------------------------------------
+        # Mindeststunden pro Arbeitsblock
+        key = "time_per_deployment"
+        if key in self.solver_requirements:
+            self.time_per_deployment = self.solver_requirements[key]
+        print(type(self.time_per_deployment))
+
+
+        
+        
+
 
     def show_variables(self):
         """
@@ -405,6 +431,10 @@ class ORAlgorithm_cp:
         print("13. self.min_anwesend: ", self.min_anwesend)
         print("14. self.gerechte_verteilung: ", self.gerechte_verteilung)
         print("15. self.fair_distribution: ", self.fair_distribution)
+        print("16. self.subsequent_workingdays: ", self.subsequent_workingdays)
+        print("17. self.daily_deployment: ", self.daily_deployment)
+        print("18. self.time_per_deployment: ", self.time_per_deployment)
+
 
 
     def pre_check_programmer(self):
@@ -879,8 +909,6 @@ class ORAlgorithm_cp:
         # NB 5 - Anzahl Arbeitsblöcke
         # -------------------------------------------------------------------------------------------------------
 
-        self.working_blocks = 1
-                
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 # Überprüfen, ob der Betrieb an diesem Tag geöffnet ist
@@ -893,7 +921,7 @@ class ORAlgorithm_cp:
                         self.model.Add(self.y[i, j, k] >= self.x[i, j, k] - self.x[i, j, k-1])
 
                     # Die Summe der y[i, j, k] für einen bestimmten Tag j sollte nicht größer als 1 sein
-                    self.model.Add(sum(self.y[i, j, k] for k in range(len(self.verfügbarkeit[i][j]))) <= self.working_blocks)
+                    self.model.Add(sum(self.y[i, j, k] for k in range(len(self.verfügbarkeit[i][j]))) <= self.daily_deployment)
 
         
         # -------------------------------------------------------------------------------------------------------
@@ -1150,35 +1178,35 @@ class ORAlgorithm_cp:
 
         """
         # HARTE NB
-        self.min_working_hour_per_block = 4 * self.hour_devider
+        self.time_per_deployment = 4 * self.hour_devider
 
-        if self.working_blocks == 2:
+        if self.self.daily_deployment == 2:
             for i in self.mitarbeiter:
                 for j in range(self.calc_time):
-                    for k in range(len(self.verfügbarkeit[i][j]) - self.min_working_hour_per_block + 1):
-                        # Wenn der MA in einem Block beginnt (y == 1), dann muss er für die nächsten min_working_hour_per_block-1 Stunden arbeiten (x == 1)
+                    for k in range(len(self.verfügbarkeit[i][j]) - self.time_per_deployment + 1):
+                        # Wenn der MA in einem Block beginnt (y == 1), dann muss er für die nächsten self.time_per_deployment-1 Stunden arbeiten (x == 1)
                         self.model.Add(self.y[i, j, k] <= self.x[i, j, k])
-                        for h in range(1, self.min_working_hour_per_block):
+                        for h in range(1, self.time_per_deployment):
                             if k + h < len(self.verfügbarkeit[i][j]):  # Überprüfen, um IndexOutOfBounds zu vermeiden
                                 self.model.Add(self.y[i, j, k] <= self.x[i, j, k + h])
 
-                        # Verhindern, dass in den letzten min_working_hour_per_block-1 Stunden des Tages ein neuer Block beginnt
-                        if len(self.verfügbarkeit[i][j]) >= self.min_working_hour_per_block:
-                            for h in range(1, self.min_working_hour_per_block):
+                        # Verhindern, dass in den letzten self.time_per_deployment-1 Stunden des Tages ein neuer Block beginnt
+                        if len(self.verfügbarkeit[i][j]) >= self.time_per_deployment:
+                            for h in range(1, self.time_per_deployment):
                                 last_hour = len(self.verfügbarkeit[i][j]) - h
                                 self.model.Add(self.y[i, j, last_hour] == 0)
         """
 
         # WEICHE NB
-        self.min_working_hour_per_block = 2 * self.hour_devider
+        self.time_per_deployment = 2 * self.hour_devider
 
-        if self.working_blocks == 2:
+        if self.daily_deployment == 2:
             for i in self.mitarbeiter:
                 for j in range(self.calc_time):
                     for k in range(len(self.verfügbarkeit[i][j])):
-                        if k < len(self.verfügbarkeit[i][j]) - self.min_working_hour_per_block + 1:
+                        if k < len(self.verfügbarkeit[i][j]) - self.time_per_deployment + 1:
                             working_conditions = [self.y[i, j, k] - self.x[i, j, k]]
-                            for h in range(1, self.min_working_hour_per_block):
+                            for h in range(1, self.time_per_deployment):
                                 if k + h < len(self.verfügbarkeit[i][j]):
                                     working_conditions.append(self.y[i, j, k] - self.x[i, j, k + h])
                             ct = sum(working_conditions) <= self.nb9_violation[i, j, k]
@@ -1188,8 +1216,8 @@ class ORAlgorithm_cp:
                         else:
                             # Verbleibende Stunden des Tages ermitteln
                             remaining_hours = len(self.verfügbarkeit[i][j]) - k
-                            # Anzahl der Stunden ermitteln, die fehlen, um min_working_hour_per_block zu erreichen
-                            missing_hours = self.min_working_hour_per_block - remaining_hours
+                            # Anzahl der Stunden ermitteln, die fehlen, um self.time_per_deployment zu erreichen
+                            missing_hours = self.time_per_deployment - remaining_hours
 
                             # Anzahl der Verstöße ist gleich der Anzahl der fehlenden Stunden
                             ct = self.y[i, j, k] * missing_hours == self.nb9_violation[i, j, k]
@@ -1201,20 +1229,18 @@ class ORAlgorithm_cp:
         # ***** Weiche Nebenbedingung 10 *****
         # -------------------------------------------------------------------------------------------------------
         
-        self.max_consecutive_days = 5
-
         for i in self.mitarbeiter:
-            for j in range(self.calc_time - self.max_consecutive_days):
+            for j in range(self.calc_time - self.subsequent_workingdays):
                 # Rollfenster-Technik:
-                consecutive_days = [self.a[i, j + k] for k in range(self.max_consecutive_days + 1)]
+                consecutive_days = [self.a[i, j + k] for k in range(self.subsequent_workingdays + 1)]
                 
                 # Erstellen Sie ein lineares Ausdruck-Objekt für die Summe der aufeinanderfolgenden Tage
                 sum_consecutive_days = sum(consecutive_days)
                 
-                # Summe der Arbeitstage soll nicht größer als self.max_consecutive_days sein
-                self.model.Add(sum_consecutive_days <= self.max_consecutive_days + self.nb10_violation[i, j])
+                # Summe der Arbeitstage soll nicht größer als self.subsequent_workingdays sein
+                self.model.Add(sum_consecutive_days <= self.subsequent_workingdays + self.nb10_violation[i, j])
                 # nb10_violation wird nur erhöht, wenn die Anzahl der aufeinanderfolgenden Arbeitstage das Limit überschreitet
-                self.model.Add(self.nb10_violation[i, j] >= sum_consecutive_days - self.max_consecutive_days)
+                self.model.Add(self.nb10_violation[i, j] >= sum_consecutive_days - self.subsequent_workingdays)
                 self.model.Add(self.nb10_violation[i, j] >= 0)
 
 
