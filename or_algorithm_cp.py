@@ -186,12 +186,15 @@ class ORAlgorithm_cp:
     def run(self):
         self.create_variables()
         # self.show_variables()
+        results = {
+            'checks': []
+        }
         self.pre_check_programmer()
         #self.pre_check_admin()
         results['checks'].append(self.pre_check_admin())
         print("Test Check:", results)
 
-        return 
+        return results
 
     def run_2(self):
         self.solver_selection()
@@ -207,8 +210,6 @@ class ORAlgorithm_cp:
         self.plot_costs_excel()
         self.save_data_in_database()
         self.save_data_in_database_testing()
-
-        return results
 
 
     def create_variables(self):
