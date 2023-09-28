@@ -11,12 +11,12 @@ from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font
 from openpyxl.utils import get_column_letter
 from openpyxl.chart import LineChart, Reference
+
 from data_processing import DataProcessing
 from app import app, db
 from sqlalchemy import text
 from models import Timetable, User, SolverAnalysis
 
-# New 
 from ortools.sat.python import cp_model
 """
 Der CP-SAT Solver arbeitet mit Boolescher Zufriedenheit (SAT, Satisfiability) 
