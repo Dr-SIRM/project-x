@@ -185,7 +185,7 @@ class ORAlgorithm_cp:
 
     def run(self):
         self.create_variables()
-        # self.show_variables()
+        self.show_variables()
         self.pre_check_programmer()
         self.pre_check_admin()
         self.solver_selection()
@@ -369,25 +369,19 @@ class ORAlgorithm_cp:
         key = "subsequent_workingdays"
         if key in self.solver_requirements:
             self.subsequent_workingdays = self.solver_requirements[key]
-        print("?????", type(self.subsequent_workingdays))
 
         # -- 17 ------------------------------------------------------------------------------------------------------------
         # Anzahl Arbeitseinsätze pro Tag
         key = "daily_deployment"
         if key in self.solver_requirements:
             self.daily_deployment = self.solver_requirements[key]
-        print(type(self.daily_deployment))
 
         # -- 18 ------------------------------------------------------------------------------------------------------------
         # Mindeststunden pro Arbeitsblock
         key = "time_per_deployment"
         if key in self.solver_requirements:
             self.time_per_deployment = self.solver_requirements[key]
-        print(type(self.time_per_deployment))
 
-
-        
-        
 
 
     def show_variables(self):
@@ -949,11 +943,11 @@ class ORAlgorithm_cp:
                 for week in range(1, self.week_timeframe + 1):
                     week_start = (week - 1) * (self.calc_time // self.week_timeframe)
                     week_end = week * (self.calc_time // self.week_timeframe)
-                    print(f'Week start for employee {ma} in week {week}: {week_start}')
-                    print(f'Week end for employee {ma} in week {week}: {week_end}')
+                    # print(f'Week start for employee {ma} in week {week}: {week_start}')
+                    # print(f'Week end for employee {ma} in week {week}: {week_end}')
 
                     total_hours_week = sum(self.x[ma, j, k] for j in range(week_start, week_end) for k in range(len(self.verfügbarkeit[ma][j])))
-                    print(f'Total hours for employee {ma} in week {week}: {total_hours_week}')
+                    # print(f'Total hours for employee {ma} in week {week}: {total_hours_week}')
 
                     # Prüfen, ob die Gesamtstunden kleiner als die vorgegebenen Arbeitsstunden sind (Unterschreitung)
                     self.model.Add(total_hours_week - self.weekly_hours <= self.nb5_min_violation[ma][week - 1])

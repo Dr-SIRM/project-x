@@ -228,8 +228,6 @@ class DataProcessing:
         self.laden_schliesst = self.laden_schliesst * self.week_timeframe
         self.opening_hours = self.opening_hours * self.week_timeframe
 
-        print("end_time: ", self.laden_schliesst)
-
 
         
     def get_time_req(self):
