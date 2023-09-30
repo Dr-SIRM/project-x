@@ -22,6 +22,7 @@ CORS(app)
 #SET SQLALCHEMY
 app.config["SECRET_KEY"] = "mysecret"
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:ProjectX2023.@projectx3.cj6fxzhtmztu.eu-central-1.rds.amazonaws.com/projectx3'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://PhuNguyen:ProjectX2023.@localhost/timetab'
 app.config['SQLALCHEMY_TRACK_MODIFICATION'] = False
 db.init_app(app)
 migrate = Migrate(app, db)
