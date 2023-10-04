@@ -54,7 +54,7 @@ Prio 1:
  -------------------------------
  - (*) Wenn min Zeit grösser als gewünschte, dann Fehler -> beheben!
  - (*) Vorüberprüfungen fertigstellen und Daten an React geben
- 
+
  - gerechte_verteilung funktioniert noch nicht richtig, wenn ein MA fast keine Stunden availability eingibt. Das muss noch geändert werden.
  
 
@@ -1027,7 +1027,7 @@ class ORAlgorithm_cp:
                     for k in range(1, len(self.verfügbarkeit[i][j])):
                         self.model.Add(self.y[i, j, k] >= self.x[i, j, k] - self.x[i, j, k-1])
 
-                    # Die Summe der y[i, j, k] für einen bestimmten Tag j sollte nicht größer als 1 sein
+                    # Die Summe der y[i, j, k] für einen bestimmten Tag j sollte nicht größer als daily_deployment sein
                     self.model.Add(sum(self.y[i, j, k] for k in range(len(self.verfügbarkeit[i][j]))) <= self.daily_deployment)
 
         
