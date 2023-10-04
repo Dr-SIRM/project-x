@@ -14,8 +14,8 @@ def create_excel_output(user_id):
     """
 
     # Achtung, start_date muss immer ein Montag sein!
-    start_date = "2023-09-25"
-    end_date = "2023-10-01"
+    start_date = "2023-10-09"
+    end_date = "2023-10-15"
 
     with app.app_context():
                 """

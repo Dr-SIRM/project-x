@@ -51,6 +51,7 @@ Prio 1:
 
  To-Do's 
  -------------------------------
+ - (*) Wenn min Zeit grösser als gewünschte, dann Fehler -> beheben!
  - (*) Vorüberprüfungen fertigstellen und Daten an React geben
  - (*) pre_check_admin aus data_processing in or_algorithm einpflegen
  - gerechte_verteilung funktioniert noch nicht richtig, wenn ein MA fast keine Stunden availability eingibt. Das muss noch geändert werden.
@@ -185,7 +186,7 @@ class ORAlgorithm_cp:
 
     def run(self):
         self.create_variables()
-        # self.show_variables()
+        self.show_variables()
 
     def pre_check(self):
         results = {
@@ -253,12 +254,12 @@ class ORAlgorithm_cp:
         key = "desired_min_time_day"
         if key in self.solver_requirements:
             self.desired_min_time_day = self.solver_requirements[key]
-        self.desired_min_time_day = self.desired_min_time_day * self.hour_devider      
+        self.desired_min_time_day = self.desired_min_time_day * self.hour_devider
 
         key = "min_time_day"
         if key in self.solver_requirements:
             self.min_time_day = self.solver_requirements[key]
-        self.min_time_day = self.min_time_day * self.hour_devider                  
+        self.min_time_day = self.min_time_day * self.hour_devider                 
 
         # Es wird weiterhin ein dict generiert, falls in Zukunft die min_time pro MA verschieden wird
         self.min_zeit = {ma: self.desired_min_time_day for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
