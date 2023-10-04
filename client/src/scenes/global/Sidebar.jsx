@@ -27,31 +27,6 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import axios from 'axios';
 
 
-const Item = ({ title, to, icon, selected, setSelected, requiredAccessLevel, accessLevel }) => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-
-  // Don't render the item if the user's access level is not included in the required access levels for the item
-  if (Array.isArray(requiredAccessLevel) && !requiredAccessLevel.includes(accessLevel)) {
-    return null;
-  } else if (typeof requiredAccessLevel === 'string' && requiredAccessLevel !== accessLevel) {
-    return null;
-  }
-  
-  return (
-    <MenuItem
-      active={selected === title}
-      style={{
-        color: colors.grey[100],
-      }}
-      onClick={() => setSelected(title)}
-      icon={icon}
-    >
-      <Typography>{title}</Typography>
-      <Link to={to} />
-    </MenuItem>
-  );
-};
 
 
 const Sidebar = () => {
@@ -91,7 +66,43 @@ const Sidebar = () => {
       });
   }, []);
 
+    const Item = ({ title, to, icon, selected, setSelected, requiredAccessLevel, accessLevel }) => {
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
+  
+    // Don't render the item if the user's access level is not included in the required access levels for the item
+    if (Array.isArray(requiredAccessLevel) && !requiredAccessLevel.includes(accessLevel)) {
+      return null;
+    } else if (typeof requiredAccessLevel === 'string' && requiredAccessLevel !== accessLevel) {
+      return null;
+    }
+    
+    
+    return (
+      <MenuItem
+        active={selected === title}
+        style={{
+          color: colors.grey[100],
+        }}
+        onClick={() => setSelected(title)}
+        icon={icon}
+      >
+        <Typography>{title}</Typography>
+        <Link to={to} />
+      </MenuItem>
+    );
+  };
 
+  const ConditionalTypography = ({ requiredAccessLevel, userAccessLevel, children, ...props }) => {
+    if (Array.isArray(requiredAccessLevel) && !requiredAccessLevel.includes(userAccessLevel)) {
+      return null; // Don't render anything if the user's access level is not in the requiredAccessLevel array
+    }
+    return <Typography {...props}>{children}</Typography>;
+  };
+  
+  
+
+  
   return (
     <Box
       sx={{
@@ -192,13 +203,15 @@ const Sidebar = () => {
               accessLevel={user.accessLevel}
             />
 
-            <Typography
+            <ConditionalTypography
               variant="h6"
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
+              requiredAccessLevel={["Super_Admin", "Admin"]}
+              userAccessLevel={user.accessLevel} 
             >
               Team
-            </Typography>
+            </ConditionalTypography>
             <Item
               title="Manage Team"
               to="/team"
@@ -284,14 +297,15 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-            <Typography
+            <ConditionalTypography
               variant="h6"
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
               requiredAccessLevel={["Super_Admin"]}
+              userAccessLevel={user.accessLevel} 
             >
               Sonstiges
-            </Typography>
+            </ConditionalTypography>
             <Item
               title="Neuer User"
               to="/form"
