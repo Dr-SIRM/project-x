@@ -1,19 +1,19 @@
 import pandas as pd
-import datetime
 import pymysql
 import time
+import datetime
 import math
 import re
 import threading
 import os
 
+from app import db, app, timedelta
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font
 from openpyxl.utils import get_column_letter
 from openpyxl.chart import LineChart, Reference
 
 from data_processing import DataProcessing
-from app import app, db
 from sqlalchemy import text
 from models import Timetable, User, SolverAnalysis
 
@@ -48,12 +48,13 @@ Prio 1:
  - (erl.) Shifts aus Solver_req Datenbank rauslöschen und Daten nicht mehr ziehen
  - (erl.) Während des Solvings Daten ziehen --> Fragen gestellt
  - (erl.) Die erste Vorüberprüfung funktioniert noch nicht, da auch ein Perm MA der 60% angestellt ist weekly_hours eingteilt werden muss.
-
+ - (erl) pre_check_admin aus data_processing in or_algorithm einpflegen
+ 
  To-Do's 
  -------------------------------
  - (*) Wenn min Zeit grösser als gewünschte, dann Fehler -> beheben!
  - (*) Vorüberprüfungen fertigstellen und Daten an React geben
- - (*) pre_check_admin aus data_processing in or_algorithm einpflegen
+ 
  - gerechte_verteilung funktioniert noch nicht richtig, wenn ein MA fast keine Stunden availability eingibt. Das muss noch geändert werden.
  
 
@@ -72,6 +73,9 @@ Prio 1:
 
 class ORAlgorithm_cp:
     def __init__(self, dp: DataProcessing):
+        self.start_date = dp.start_date
+        self.end_date = dp.end_date
+
         self.current_user_id = dp.current_user_id           # 100     
         self.user_availability = dp.user_availability       # 101
         self.opening_hours = dp.opening_hours               # 102
@@ -200,8 +204,9 @@ class ORAlgorithm_cp:
         results['checks'].append(self.pre_check_3())
         results['checks'].append(self.pre_check_4())
         results['checks'].append(self.pre_check_5())
-        # results['checks'].append(self.pre_check_6())
+        results['checks'].append(self.pre_check_6())
         # results['checks'].append(self.pre_check_7())
+        # results['checks'].append(self.pre_check_8())
 
         print("Test Check:", results)
 
@@ -505,11 +510,65 @@ class ORAlgorithm_cp:
 
 
     def pre_check_1(self):
-        # Wenn die einzelnen Überprüfungen nicht standhalten, wird ein ValueError ausgelöst und jeweils geprintet, woran das Problem liegt. 
-        # Später soll der Admin genau eine solche Meldung angezeigt bekommen.
         """
         ---------------------------------------------------------------------------------------------------------------
-        1. Überprüfen ob die "Perm" Mitarbeiter mind. self.weekly_hours Stunden einplant haben
+        1. Überprüfen, ob der Admin zu jeder Öffnungszeitstunde time_req eingegeben hat
+        ---------------------------------------------------------------------------------------------------------------
+        """
+        # Funktion um Zeitwerte umzurechnen ---------------------------------------------------------------------------
+        def time_to_int(t):
+            # Divisor basierend auf self.hour_devider erzeugen
+            divisor = 3600 / self.hour_devider
+
+            # Typ "timedelta"
+            if isinstance(t, timedelta):
+                total_seconds = t.total_seconds()  # oder t.seconds, je nachdem, welches Verhalten Sie bevorzugen
+            # Typ "time"
+            elif isinstance(t, time):
+                total_seconds = t.hour * 3600 + t.minute * 60 + t.second
+            # Typ "int" oder "float" (z.B. zur direkten Eingabe von Sekunden)
+            elif isinstance(t, (int, float)):
+                total_seconds = t
+            else:
+                raise ValueError("Invalid input type, must be datetime.timedelta, datetime.time, int or float")
+            
+            return int(total_seconds / divisor)
+        # -------------------------------------------------------------------------------------------------------------
+
+        try:
+            fehlende_stunden = []
+
+            # Erzeugt alle möglichen Daten innerhalb des Bereichs
+            start_date = datetime.datetime.strptime(self.start_date, "%Y-%m-%d").date()
+            end_date = datetime.datetime.strptime(self.end_date, "%Y-%m-%d").date()
+            date_range = [start_date + timedelta(days=x) for x in range((end_date-start_date).days + 1)]
+
+            for current_date in date_range:
+                # Wochentag als Index (0 = Montag, 1 = Dienstag, usw.) erhalten
+                weekday_index = current_date.weekday()
+
+                # Prüft, ob der Tag ein Arbeitstag ist (Basierend auf den Öffnungszeiten)
+                if self.laden_oeffnet[weekday_index] is not None and self.laden_schliesst[weekday_index] is not None:
+                    time_req_dict = self.time_req.get(current_date, {})
+
+                    for hour in range(time_to_int(self.laden_schliesst[weekday_index]) - time_to_int(self.laden_oeffnet[weekday_index])):
+                        if hour not in time_req_dict:
+                            fehlende_stunden.append((current_date, hour))
+            if fehlende_stunden:
+                error_message_lines = ["Für folgende Zeitfenster fehlen time_req-Werte:"]
+                for date, hour in fehlende_stunden:
+                    error_message_lines.append(f"Datum: {date}, Stunde: {hour}")
+                raise ValueError("\n".join(error_message_lines))
+                        
+            return {"success": True, "name": "Pre-check_1", "message": "All checks are successful!"}
+        except ValueError as e:
+            return {"success": False, "name": "Pre-check_1", "message": str(e)}
+
+
+    def pre_check_2(self):
+        """
+        ---------------------------------------------------------------------------------------------------------------
+        2. Überprüfen ob die "Perm" Mitarbeiter mind. self.weekly_hours Stunden einplant haben
         ---------------------------------------------------------------------------------------------------------------
         """
         try:
@@ -523,15 +582,15 @@ class ORAlgorithm_cp:
                     if sum_availability_perm < self.weekly_hours * self.employment_lvl_exact[i]:
                         raise ValueError(f"Fester Mitarbeiter mit ID {self.mitarbeiter[i]} hat nicht genügend Stunden geplant.")
                     
-            return {"success": True, "name": "Pre-check1", "message": "All checks are successful!"}
+            return {"success": True, "name": "Pre-check_2", "message": "All checks are successful!"}
         except ValueError as e:
-            return {"success": False, "name": "Pre-check1", "message": str(e)}
+            return {"success": False, "name": "Pre-check_2", "message": str(e)}
 
 
-    def pre_check_2(self):
+    def pre_check_3(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        2. Haben die MA mindestens die anzahl Stunden von gerechte_verteilung eingegeben?
+        3. Haben die MA mindestens die anzahl Stunden von gerechte_verteilung eingegeben?
         ---------------------------------------------------------------------------------------------------------------
         """
         try: 
@@ -548,14 +607,14 @@ class ORAlgorithm_cp:
             if errors:
                 raise ValueError("Folgende Fehler wurden gefunden:\n" + "\n".join(errors))
 
-            return {"success": True, "name": "Pre-check2", "message": "All checks are successful!"}
+            return {"success": True, "name": "Pre-check_3", "message": "All checks are successful!"}
         except ValueError as e:
-            return {"success": False, "name": "Pre-check2", "message": str(e)}
+            return {"success": False, "name": "Pre-check_3", "message": str(e)}
 
-    def pre_check_3(self):
+    def pre_check_4(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        3. Haben alle MA zusammen genug Stunden eingegeben, um die verteilbaren Stunden zu erreichen?
+        4. Haben alle MA zusammen genug Stunden eingegeben, um die verteilbaren Stunden zu erreichen?
         ---------------------------------------------------------------------------------------------------------------
         """
         try: 
@@ -566,15 +625,15 @@ class ORAlgorithm_cp:
                 pass
                 raise ValueError(f"Die Mitarbeiter haben insgesamt nicht genug Stunden eingegeben, um die verteilbaren Stunden zu erreichen. Benötigte Stunden: {self.verteilbare_stunden}, eingegebene Stunden: {total_hours_available}, Toleranz: {toleranz}")
             
-            return {"success": True, "name": "Pre-check3", "message": "All checks are successful!"}
+            return {"success": True, "name": "Pre-check_4", "message": "All checks are successful!"}
         except ValueError as e:
-            return {"success": False, "name": "Pre-check3", "message": str(e)}
+            return {"success": False, "name": "Pre-check_4", "message": str(e)}
 
 
-    def pre_check_4(self):
+    def pre_check_5(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        4. Ist zu jeder notwendigen Zeit (self.min_anwesend) die mindestanzahl Mitarbeiter verfügbar?
+        5. Ist zu jeder notwendigen Zeit (self.min_anwesend) die mindestanzahl Mitarbeiter verfügbar?
         ---------------------------------------------------------------------------------------------------------------
         """
         try: 
@@ -584,15 +643,15 @@ class ORAlgorithm_cp:
                         #raise ValueError(f"Es sind nicht genügend Mitarbeiter verfügbar zur notwendigen Zeit (Tag {i+1}, Stunde {j+1}).")
                         pass
             
-            return {"success": True, "name": "Pre-check4", "message": "All checks are successful!"}
+            return {"success": True, "name": "Pre-check_5", "message": "All checks are successful!"}
         except ValueError as e:
-            return {"success": False, "name": "Pre-check4", "message": str(e)}
+            return {"success": False, "name": "Pre-check_5", "message": str(e)}
         
         
-    def pre_check_5(self):
+    def pre_check_6(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        5. Können die MA die min. Zeit täglich erreichen? Wenn 0 Stunden eingegeben wurden, läuft es durch!
+        6. Können die MA die min. Zeit täglich erreichen? Wenn 0 Stunden eingegeben wurden, läuft es durch!
         ---------------------------------------------------------------------------------------------------------------
         """
         try:
@@ -608,12 +667,12 @@ class ORAlgorithm_cp:
             if errors:
                 raise ValueError("Folgende Fehler wurden gefunden:\n" + "\n".join(errors))
             
-            return {"success": True, "name": "Pre-check5", "message": "All checks are successful!"}
+            return {"success": True, "name": "Pre-check_6", "message": "All checks are successful!"}
         except ValueError as e:
-            return {"success": False, "name": "Pre-check5", "message": str(e)}
+            return {"success": False, "name": "Pre-check_6", "message": str(e)}
 
 
-    def pre_check_6(self):
+    def pre_check_7(self):
         """
         ---------------------------------------------------------------------------------------------------------------
         6. Ist die min. Zeit pro Tag so klein, dass die Stunden in der gerechten Verteilung nicht erfüllt werden können?
@@ -621,14 +680,13 @@ class ORAlgorithm_cp:
         """
 
 
-    def pre_check_7(self):
+    def pre_check_8(self):
         """
         ---------------------------------------------------------------------------------------------------------------
         7. Ist die Toleranz der gerechten Verteilung zu klein gewählt? --> Evtl. die Bedingung weich machen!
         ---------------------------------------------------------------------------------------------------------------
         """
             
-
 
     def solver_selection(self):
         """
