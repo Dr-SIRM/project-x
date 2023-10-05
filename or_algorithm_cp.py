@@ -796,6 +796,7 @@ class ORAlgorithm_cp:
         
         # Unendlichkeitssimulation
         INF = int(1e6)
+        # einschränken
         
         # NB1 violation variable
         for j in range(self.calc_time):
@@ -1035,6 +1036,9 @@ class ORAlgorithm_cp:
         # HARTE NB
         # NB 6 - Verteilungsgrad MA
         # -------------------------------------------------------------------------------------------------------
+        
+        # Evtl. auch bestrafen
+        
         verteilungsstunden = {ma: sum(self.x[ma, j, k] for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))) for ma in self.mitarbeiter}
 
         for i, ma in enumerate(self.mitarbeiter):
@@ -1341,7 +1345,7 @@ class ORAlgorithm_cp:
                 # Rollfenster-Technik:
                 consecutive_days = [self.a[i, j + k] for k in range(self.subsequent_workingdays + 1)]
                 
-                # Erstellen Sie ein lineares Ausdruck-Objekt für die Summe der aufeinanderfolgenden Tage
+                # Lineares Ausdruck-Objekt für die Summe der aufeinanderfolgenden Tage
                 sum_consecutive_days = sum(consecutive_days)
                 
                 # Summe der Arbeitstage soll nicht größer als self.subsequent_workingdays sein
