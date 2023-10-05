@@ -27,7 +27,7 @@ const Registration = ({ registration }) => {
   useEffect(() => {
     const fetchRegistration = async () => {
         try {
-          const response = await axios.get('https://timetab.ch/api/registration/admin', {
+          const response = await axios.get('http://timetab.ch/api/registration/admin', {
               headers: {
                   'Authorization': `Bearer ${token}`
               }
@@ -56,7 +56,7 @@ const Registration = ({ registration }) => {
   const handleFormSubmit = async (values) => {
     try {
       // Send the updated form values to the server for database update
-      await axios.post('https:timetab.ch/api/registration/admin', values, {
+      await axios.post('http://timetab.ch/api/registration/admin', values, {
     headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
