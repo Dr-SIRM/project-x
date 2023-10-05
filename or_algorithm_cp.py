@@ -1384,12 +1384,14 @@ class ORAlgorithm_cp:
                 self.last_read_time = current_time
 
         def add_best_value_to_list():
+            hiring_cost_min = self.verteilbare_stunden / self.hour_devider * 100
             while not self.stop_thread:
                 time.sleep(self.best_test_time)
                 if self.last_best_value is not None:
                     self.current_best_value = self.last_best_value
                 self.best_values.append(self.current_best_value)
-                print("------------------ NEUER WERT HINZUGEFÜGT: ", self.current_best_value, "------------------------")
+                gap_now = round(((1 - (hiring_cost_min / self.current_best_value))*100), 2)
+                print("------------------ NEUER WERT HINZUGEFÜGT: ", self.current_best_value, "GAP:", gap_now, "%", "------------------------")
 
         self.solver.parameters.log_search_progress = True
         self.solver.parameters.log_to_stdout = True
