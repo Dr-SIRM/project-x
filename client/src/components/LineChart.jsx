@@ -48,7 +48,7 @@ const LineChart = ({ isCustomLineColors = false, isDashboard = false }) => {
       xScale={{ type: "point" }}
       yScale={{
         type: "linear",
-        min: "auto",
+        min: "50",
         max: "auto",
         stacked: true,
         reverse: false,
