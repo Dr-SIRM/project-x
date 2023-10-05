@@ -796,12 +796,12 @@ class ORAlgorithm_cp:
         
         # Unendlichkeitssimulation
         INF = int(1e6)
-        # einschränken
+    
         
         # NB1 violation variable
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):
-                self.nb1_violation[j, k] = self.model.NewIntVar(0, INF, f'nb1_violation[{j}, {k}]')
+                self.nb1_violation[j, k] = self.model.NewIntVar(0, len(self.mitarbeiter), f'nb1_violation[{j}, {k}]')
 
         # NB2 violation variable
         diff_1 = self.max_time_week - self.weekly_hours
@@ -824,32 +824,32 @@ class ORAlgorithm_cp:
 
         # NB5 Mindestarbeitszeit Verletzungsvariable
         for i in self.mitarbeiter:
-            self.nb5_min_violation[i] = [self.model.NewIntVar(0, INF, f'nb5_min_violation[{i}][{week}]') for week in range(1, self.week_timeframe + 1)]
+            self.nb5_min_violation[i] = [self.model.NewIntVar(0, self.weekly_hours, f'nb5_min_violation[{i}][{week}]') for week in range(1, self.week_timeframe + 1)]
 
         # NB6 Höchstarbeitszeit Verletzungsvariable
         for i in self.mitarbeiter:
-            self.nb6_max_violation[i] = [self.model.NewIntVar(0, INF, f'nb6_max_violation[{i}][{week}]') for week in range(1, self.week_timeframe + 1)]
+            self.nb6_max_violation[i] = [self.model.NewIntVar(0, self.weekly_hours, f'nb6_max_violation[{i}][{week}]') for week in range(1, self.week_timeframe + 1)]
 
         # NB7 Innerhalb einer Woche die gleiche Schicht - Verletzungsvariable
         for i in self.mitarbeiter:
             for j in range(7):
-                self.nb7_violation[i, j] = self.model.NewIntVar(0, INF, f'nb7_violation[{i}, {j}]')
+                self.nb7_violation[i, j] = self.model.NewIntVar(0, 1, f'nb7_violation[{i}, {j}]')
 
         # NB8 Innerhalb der zweiten / vierten Woche die gleiche Schicht - Verletzungsvariable
         for i in self.mitarbeiter:
             for j in range(7, self.calc_time):
-                self.nb8_violation[i, j] = self.model.NewIntVar(0, INF, f'nb8_violation[{i}, {j}]')
+                self.nb8_violation[i, j] = self.model.NewIntVar(0, 1, f'nb8_violation[{i}, {j}]')
 
         # NB9 Minimale Arbeitsstunden pro Block - Verletzungsvariable
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
-                    self.nb9_violation[i, j, k] = self.model.NewIntVar(0, INF, f'nb9_violation[{i}, {j}, {k}]')
+                    self.nb9_violation[i, j, k] = self.model.NewIntVar(0, 1, f'nb9_violation[{i}, {j}, {k}]')
 
         # NB10 Max. Anzahl an Arbeitstagen in Folge
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
-                self.nb10_violation[i, j] = self.model.NewIntVar(0, INF, f'nb10_violation[{i}, {j}]')
+                self.nb10_violation[i, j] = self.model.NewIntVar(0, 1, f'nb10_violation[{i}, {j}]')
 
 
     def objective_function(self):
@@ -1320,6 +1320,7 @@ class ORAlgorithm_cp:
                             for h in range(1, self.time_per_deployment):
                                 if k + h < len(self.verfügbarkeit[i][j]):
                                     working_conditions.append(self.y[i, j, k] - self.x[i, j, k + h])
+                                    
                             ct = sum(working_conditions) <= self.nb9_violation[i, j, k]
                             self.model.Add(ct)
 
