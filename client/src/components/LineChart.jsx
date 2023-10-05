@@ -1,55 +1,15 @@
-import React, { useEffect, useState } from "react";
 import { ResponsiveLine } from "@nivo/line";
 import { useTheme } from "@mui/material";
 import { tokens } from "../theme";
-import axios from "axios";
+import { mockLineData as data } from "../data/mockData";
 
 const LineChart = ({ isCustomLineColors = false, isDashboard = false }) => {
-  const [chartData, setChartData] = useState([]);
-  const [error, setError] = useState(null);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const token = localStorage.getItem('session_token'); 
-
-  useEffect(() => {
-    const fetchChartData = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/dashboard',
-            {
-              headers: {
-                'Authorization': `Bearer ${token}`
-              }
-            });
-
-        // Format data as needed and set it to state
-        setChartData(formatData(response.data));
-      } catch (error) {
-        console.error("Error fetching data: ", error);
-        setError(error);
-      }
-    };
-
-    fetchChartData();
-  }, []);
-
-  const formatData = (data) => {
-    // Format your API data to the shape expected by ResponsiveLine
-    // This function will depend on your API response format
-    // Ensure this function returns the data in a shape that's 
-    // compatible with your charting library
-  };
-
-  if (error) {
-    return <p>Error loading data</p>;
-  }
-
-  if (chartData.length === 0) {
-    return <p>Loading data...</p>;
-  }
 
   return (
     <ResponsiveLine
-      data={chartData}
+      data={data}
       theme={{
         axis: {
           domain: {
@@ -83,7 +43,7 @@ const LineChart = ({ isCustomLineColors = false, isDashboard = false }) => {
           },
         },
       }}
-      colors={isDashboard ? { datum: "color" } : { scheme: "nivo" }}
+      colors={isDashboard ? { datum: "color" } : { scheme: "nivo" }} // added
       margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
       xScale={{ type: "point" }}
       yScale={{
@@ -102,17 +62,17 @@ const LineChart = ({ isCustomLineColors = false, isDashboard = false }) => {
         tickSize: 0,
         tickPadding: 5,
         tickRotation: 0,
-        legend: isDashboard ? undefined : "transportation",
+        legend: isDashboard ? undefined : "transportation", // added
         legendOffset: 36,
         legendPosition: "middle",
       }}
       axisLeft={{
         orient: "left",
-        tickValues: 5,
+        tickValues: 5, // added
         tickSize: 3,
         tickPadding: 5,
         tickRotation: 0,
-        legend: isDashboard ? undefined : "count",
+        legend: isDashboard ? undefined : "count", // added
         legendOffset: -40,
         legendPosition: "middle",
       }}
