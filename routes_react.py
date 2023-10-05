@@ -10,6 +10,7 @@ from app import app, mail
 from openpyxl import Workbook
 import io
 from excel_output import create_excel_output
+from sqlalchemy import func, extract
 
 
 
@@ -1201,6 +1202,7 @@ def get_required_workforce():
 
 
 from functools import wraps
+import logging
 
 @app.route('/api/schichtplanung', methods=['POST', 'GET'])
 @jwt_required()
@@ -1212,6 +1214,16 @@ def get_shift():
         return jsonify({"message": "User not found"}), 404
 
     current_company_name = current_user.company_name
+
+    DAY_MAP = {
+    'monday': 'montag',
+    'tuesday': 'dienstag',
+    'wednesday': 'mittwoch',
+    'thursday': 'donnerstag',
+    'friday': 'freitag',
+    'saturday': 'samstag',
+    'sunday': 'sonntag',
+}
 
     view = request.args.get('view')
     today = date.today()
@@ -1253,10 +1265,12 @@ def get_shift():
     opening_hours_data = {}
     for record in opening_hours_records:
         if record.start_time is not None and record.end_time is not None:
-            opening_hours_data[record.weekday.lower()] = {
+            german_day = DAY_MAP.get(record.weekday.lower(), record.weekday.lower())
+            opening_hours_data[german_day] = {
                 "start": record.start_time.strftime("%H:%M"),
                 "end": record.end_time.strftime("%H:%M")
             }
+    logging.debug(f"Opening hours data: {opening_hours_data}")
 
     if start_date and end_date:
         shift_records = Timetable.query.filter(
@@ -1314,7 +1328,7 @@ def get_worker_count():
     if not current_user:
         return jsonify({'error': 'User not found'}), 404
 
-    worker_count = User.query.filter_by(company_id=current_user.company_id).count()
+    worker_count = User.query.filter_by(company_name=current_user.company_name).count()
     
     start_time_count = Timetable.query.filter(
         (Timetable.company_name == current_user.company_name) & 
@@ -1324,6 +1338,46 @@ def get_worker_count():
     return jsonify({'worker_count': worker_count, 'start_time_count': start_time_count})
 
 
+
+
+""" @app.route('/api/dashboard', methods=['GET'])
+@jwt_required()
+def get_worker_count():
+    current_user_id = get_jwt_identity()
+    
+    current_user = User.query.filter_by(email=current_user_id).first()
+    if not current_user:
+        return jsonify({'error': 'User not found'}), 404
+
+    worker_count = User.query.filter_by(company_name=current_user.company_name).count()
+    start_date = datetime.datetime.now() - datetime.timedelta(days=14)
+
+    work_hours_by_day = (
+        db.session.query(
+            func.sum(
+                (func.hour(Timetable.end_time) * 3600 + func.minute(Timetable.end_time) * 60) -
+                (func.hour(Timetable.start_time) * 3600 + func.minute(Timetable.start_time) * 60)
+            ) / 3600,
+            Timetable.date
+        )
+        .filter(
+            (Timetable.company_name == current_user.company_name) & 
+            (Timetable.date >= start_date.date())
+        )
+        .group_by(Timetable.date)
+        .all()
+    )
+
+    work_hours_data = [
+        {"date": day.strftime("%Y-%m-%d"), "work_hours": hours}
+        for hours, day in work_hours_by_day
+    ]
+    
+    return jsonify({
+        'worker_count': worker_count, 
+        'work_hours_data': work_hours_data
+    })
+ """
 
 
 @app.route('/api/calendar', methods=['GET'])
