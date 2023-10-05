@@ -647,6 +647,7 @@ def run_solver():
             # or_algo.run()
             or_algo_cp = ORAlgorithm_cp(dp)
             or_algo_cp.run()
+            or_algo_cp.pre_check()
             or_algo_cp.run_2()
 
             
