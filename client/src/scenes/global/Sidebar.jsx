@@ -222,6 +222,16 @@ const Sidebar = () => {
               accessLevel={user.accessLevel}
             />
             <Item
+              title="User Management"
+              to="/user_management"
+              icon={<GroupsIcon />}
+              selected={selected}
+              setSelected={setSelected}
+              requiredAccessLevel={["Super_Admin", "Admin"]}
+              accessLevel={user.accessLevel}
+            />
+            
+            <Item
               title="Einladen"
               to="/invite"
               icon={<GroupAddIcon />}
