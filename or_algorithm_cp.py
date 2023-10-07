@@ -386,6 +386,34 @@ class ORAlgorithm_cp:
                 total_hours_assigned -= 1
         print("4. self.gerechte_verteilung: ", self.gerechte_verteilung)   
 
+        # Neue Prüfung und Anpassung auf Basis von self.gesamtstunden_verfügbarkeit
+        for i in range(len(self.gerechte_verteilung)):
+            if self.gerechte_verteilung[i] > self.gesamtstunden_verfügbarkeit[i]:
+                self.gerechte_verteilung[i] = self.gesamtstunden_verfügbarkeit[i]
+
+        print("5. self.gerechte_verteilung: ", self.gerechte_verteilung)  
+        # Erneute Überprüfung der gesamten zugewiesenen Stunden
+        total_hours_assigned = sum(self.gerechte_verteilung)
+        if total_hours_assigned < self.verteilbare_stunden:
+            # Erneute Verteilung der verbleibenden Stunden auf die Mitarbeiter
+            additional_hours = self.verteilbare_stunden - total_hours_assigned
+            print("additional_hours", additional_hours)
+
+            # Verteilung der zusätzlichen Stunden auf die Temp-Mitarbeiter
+            while additional_hours > 0 and any(self.gerechte_verteilung[i] < self.gesamtstunden_verfügbarkeit[i] for i in temp_employees):
+                for i in temp_employees:
+                    # Wenn das Hinzufügen einer Stunde nicht die maximale Verfügbarkeit überschreitet und es noch verbleibende Stunden gibt
+                    if self.gerechte_verteilung[i] < self.gesamtstunden_verfügbarkeit[i] and additional_hours > 0:
+                        self.gerechte_verteilung[i] += 1
+                        additional_hours -= 1
+                        total_hours_assigned += 1
+
+        # Abschließende Überprüfung und Ausgabe
+        print("6. self.gerechte_verteilung: ", self.gerechte_verteilung)  
+        print("Final total_hours_assigned: ", total_hours_assigned)
+        
+
+
         # -- 15 ------------------------------------------------------------------------------------------------------------
         # Toleranz der gerechten Verteilung
         key = "fair_distribution"
