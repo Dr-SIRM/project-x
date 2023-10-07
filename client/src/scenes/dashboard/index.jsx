@@ -16,6 +16,15 @@ import ProgressCircle from "../../components/ProgressCircle";
 import { AuthContext } from "../../AuthContext";
 import axios from 'axios';
 
+/* Mögliche Ideen fürs Dashboard
+- Anz gearbeitete Stunden diese Woche 
+- Anz MA
+- Eingeplante Schichten
+- Wer arbeitet gerade 
+- Schichtplan gesolved ja nein für 1 Woche 2 Wochen 3 Wochen 4 Wochen (Recent Transaction)
+- Digramm Tage/Stunden/ MA Stunden
+- Download button ausblenden
+*/
 
 
 const Dashboard = () => {
