@@ -336,23 +336,26 @@ class ORAlgorithm_cp:
         ob er die Stunden überhaupt eingegeben hat. Wenn ja, alles gut, wenn er unterschritten hat,
         dann die eingegebenen Stunden bei gerechte Verteilung ersetzen und fehlende Stunden neu gerecht
         den Mitarbeitern aufteilen.
-        
         """
 
+        # Braucht es nicht mehr (denke ich) - 07.10.2023
+        """
         list_gesamtstunden = []
         for i in range(len(self.mitarbeiter)):
-            if self.gesamtstunden_verfügbarkeit[i] > self.weekly_hours * self.week_timeframe:
+            if self.gesamtstunden_verfügbarkeit[i] >= self.weekly_hours * self.week_timeframe:
                 arbeitsstunden_MA = self.employment_lvl_exact[i] * self.weekly_hours * self.week_timeframe
             else:
                 arbeitsstunden_MA = self.employment_lvl_exact[i] * self.gesamtstunden_verfügbarkeit[i]
             list_gesamtstunden.append(int(arbeitsstunden_MA))
         print("list_gesamtstunden: ", list_gesamtstunden)
+        """
 
         # Berechnung der Arbeitsstunden für Perm und Temp Mitarbeiter
         total_hours_assigned = 0
         temp_employees = []
         self.gerechte_verteilung = [0 for _ in range(len(self.mitarbeiter))]  # Initialisiere die Liste mit Platzhaltern
         print("1. self.gerechte_verteilung: ", self.gerechte_verteilung)
+
         for i in range(len(self.mitarbeiter)):
             if self.employment[i] == "Perm":
                 allocated_hours = self.employment_lvl_exact[i] * self.weekly_hours * self.week_timeframe
@@ -371,7 +374,6 @@ class ORAlgorithm_cp:
 
         # Wenn die Rundung dazu geführt hat, dass total_hours_assigned die verteilbare_stunden überschreitet, werden die Stunden für Temp-Mitarbeiter angepasst
         total_hours_assigned = sum(self.gerechte_verteilung)
-        print("remaining_hours2: ", remaining_hours)
         if total_hours_assigned > self.verteilbare_stunden:
             # Sortieren der Temp-Mitarbeiter nach zugeteilten Stunden in absteigender Reihenfolge
             temp_employees.sort(key=lambda i: self.gerechte_verteilung[i], reverse=True)
@@ -383,6 +385,34 @@ class ORAlgorithm_cp:
                 self.gerechte_verteilung[i] -= 1
                 total_hours_assigned -= 1
         print("4. self.gerechte_verteilung: ", self.gerechte_verteilung)   
+
+        # Neue Prüfung und Anpassung auf Basis von self.gesamtstunden_verfügbarkeit
+        for i in range(len(self.gerechte_verteilung)):
+            if self.gerechte_verteilung[i] > self.gesamtstunden_verfügbarkeit[i]:
+                self.gerechte_verteilung[i] = self.gesamtstunden_verfügbarkeit[i]
+
+        print("5. self.gerechte_verteilung: ", self.gerechte_verteilung)  
+        # Erneute Überprüfung der gesamten zugewiesenen Stunden
+        total_hours_assigned = sum(self.gerechte_verteilung)
+        if total_hours_assigned < self.verteilbare_stunden:
+            # Erneute Verteilung der verbleibenden Stunden auf die Mitarbeiter
+            additional_hours = self.verteilbare_stunden - total_hours_assigned
+            print("additional_hours", additional_hours)
+
+            # Verteilung der zusätzlichen Stunden auf die Temp-Mitarbeiter
+            while additional_hours > 0 and any(self.gerechte_verteilung[i] < self.gesamtstunden_verfügbarkeit[i] for i in temp_employees):
+                for i in temp_employees:
+                    # Wenn das Hinzufügen einer Stunde nicht die maximale Verfügbarkeit überschreitet und es noch verbleibende Stunden gibt
+                    if self.gerechte_verteilung[i] < self.gesamtstunden_verfügbarkeit[i] and additional_hours > 0:
+                        self.gerechte_verteilung[i] += 1
+                        additional_hours -= 1
+                        total_hours_assigned += 1
+
+        # Abschließende Überprüfung und Ausgabe
+        print("6. self.gerechte_verteilung: ", self.gerechte_verteilung)  
+        print("Final total_hours_assigned: ", total_hours_assigned)
+        
+
 
         # -- 15 ------------------------------------------------------------------------------------------------------------
         # Toleranz der gerechten Verteilung
