@@ -56,11 +56,10 @@ To-Do Liste:
  - (*) Vorüberprüfungen fertigstellen und Daten an React geben
  - (*) Überprüfen, ob eigegebene werte bei Verletzungsvariabeln wirklich korrekt sind
 
-  - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden?
+  - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden??
 
 
  
-
  --- PRIO 2 ---
  -------------------------------
  - start_time und end_time zwei und drei noch implementieren (noch warten bis über 00:00 Zeiten eingegeben werden können!)
@@ -194,7 +193,7 @@ class ORAlgorithm_cp:
         self.create_variables()
         self.show_variables()
 
-
+    # Diese Methode kann später gelöscht werden, da auf die einzelnen pre_checks zugegriffen wird.
     def pre_check(self):
         results = {
             'checks': []
@@ -710,7 +709,7 @@ class ORAlgorithm_cp:
         6. Ist die min. Zeit pro Tag so klein, dass die Stunden in der gerechten Verteilung nicht erfüllt werden können?
         ---------------------------------------------------------------------------------------------------------------
         """
-
+        return None
 
     def pre_check_8(self):
         """
@@ -718,7 +717,8 @@ class ORAlgorithm_cp:
         7. Ist die Toleranz der gerechten Verteilung zu klein gewählt? --> Evtl. die Bedingung weich machen!
         ---------------------------------------------------------------------------------------------------------------
         """
-            
+        return None
+
 
     def solver_selection(self):
         """
@@ -826,9 +826,9 @@ class ORAlgorithm_cp:
         Verletzungsvariabeln für den CP-Solver
         """
         
-        # Unendlichkeitssimulation
+        # Unendlichkeitssimulation -> Soll möglichst vermieden werden!
         INF = int(1e6)
-    
+
         
         # NB1 violation variable
         for j in range(self.calc_time):
