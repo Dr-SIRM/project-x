@@ -54,6 +54,7 @@ Prio 1:
  -------------------------------
  - (*) Wenn min Zeit grösser als gewünschte, dann Fehler -> beheben!
  - (*) Vorüberprüfungen fertigstellen und Daten an React geben
+ - (*) Überprüfen, ob eigegebene werte bei Verletzungsvariabeln wirklich korrekt sind
 
  - gerechte_verteilung funktioniert noch nicht richtig, wenn ein MA fast keine Stunden availability eingibt. Das muss noch geändert werden.
  
@@ -1048,7 +1049,7 @@ class ORAlgorithm_cp:
             self.model.Add(verteilungsstunden[ma] <= upper_bound)
             self.model.Add(verteilungsstunden[ma] >= lower_bound)
         
-
+        
         # -------------------------------------------------------------------------------------------------------
         # WEICHE NB -- NEU 08.08.23 --
         # NB 7 - "Perm" Mitarbeiter zu employement_level fest einplanen
@@ -1067,13 +1068,14 @@ class ORAlgorithm_cp:
                     # print(f'Total hours for employee {ma} in week {week}: {total_hours_week}')
 
                     # Prüfen, ob die Gesamtstunden kleiner als die vorgegebenen Arbeitsstunden sind (Unterschreitung)
-                    self.model.Add(total_hours_week - self.weekly_hours <= self.nb5_min_violation[ma][week - 1])
+                    # Die Wochenstunden werden mit dem employment_lvl multipliziert und aufgerundet!
+                    self.model.Add(total_hours_week - round((self.weekly_hours * self.employment_lvl_exact[i]) + 0.5) >= -self.nb5_min_violation[ma][week - 1])
                     self.model.Add(self.nb5_min_violation[ma][week - 1] >= 0)
 
                     # Prüfen, ob die Gesamtstunden größer als die vorgegebenen Arbeitsstunden sind (Überschreitung)
-                    self.model.Add(self.weekly_hours - total_hours_week <= -self.nb6_max_violation[ma][week - 1])
+                    self.model.Add(round((self.weekly_hours * self.employment_lvl_exact[i]) + 0.5) - total_hours_week >= -self.nb6_max_violation[ma][week - 1])
                     self.model.Add(self.nb6_max_violation[ma][week - 1] >= 0)
-
+                    
         # -------------------------------------------------------------------------------------------------------
         # WEICHE NB
         # NB 8 - Innerhalb einer Woche immer gleiche Schichten
