@@ -25,9 +25,10 @@ const Registration = ({ registration }) => {
 
 
   useEffect(() => {
+    console.log("Component mounted/updated");
     const fetchRegistration = async () => {
         try {
-          const response = await axios.get('http://timetab.ch/api/registration/admin', {
+          const response = await axios.get('http://localhost:5000/api/registration/admin', {
               headers: {
                   'Authorization': `Bearer ${token}`
               }
@@ -43,8 +44,10 @@ const Registration = ({ registration }) => {
 
   const handleClose = () => {
     if (password === correctPassword) {
+      console.log("Password is correct");
       setOpen(false);
     } else {
+      console.log("Incorrect password");
       alert("Incorrect password"); // This is a basic alert, you might want to replace this with a more user-friendly message
     }
   };
@@ -56,7 +59,7 @@ const Registration = ({ registration }) => {
   const handleFormSubmit = async (values) => {
     try {
       // Send the updated form values to the server for database update
-      await axios.post('http://timetab.ch/api/registration/admin', values, {
+      await axios.post('http://localhost:5000/api/registration/admin', values, {
     headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -193,10 +196,9 @@ const Registration = ({ registration }) => {
                 label= ""
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.employment}
+                value={values.employment || ''}
                 name="employment"
                 error={!!touched.employment && !!errors.employment}
-                helperText={touched.employment && errors.employment}
                 sx={{ gridColumn: "span 2" }}
               >
                 <MenuItem value={'Perm'}>Festangestellt</MenuItem>
@@ -221,10 +223,9 @@ const Registration = ({ registration }) => {
                 label= ""
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.employment_level}
+                value={values.employment_level || ''}
                 name="employment_level"
                 error={!!touched.employment_level && !!errors.employment_level}
-                helperText={touched.employment_level && errors.employment_level}
                 sx={{ gridColumn: "span 2" }}
               >
                 <MenuItem value={'1'}>100%</MenuItem>
@@ -307,10 +308,9 @@ const Registration = ({ registration }) => {
                 label= ""
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.access_level}
+                value={values.access_level || ''}
                 name="access_level"
                 error={!!touched.access_level && !!errors.access_level}
-                helperText={touched.access_level && errors.access_level}
                 sx={{ gridColumn: "span 2" }}
               >
                 <MenuItem value={'User'}>User</MenuItem>

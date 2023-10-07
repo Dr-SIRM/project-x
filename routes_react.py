@@ -898,7 +898,6 @@ def get_registration():
     return jsonify({'message': 'Get Ready!'}), 200
 
 
-#api should maybe be named differently? as aleardy used
 @app.route('/api/registration/admin', methods = ['GET', 'POST'])
 def get_admin_registration():   
     if request.method =='POST':
