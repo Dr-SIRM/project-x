@@ -355,7 +355,7 @@ class ORAlgorithm_cp:
         temp_employees = []
         self.gerechte_verteilung = [0 for _ in range(len(self.mitarbeiter))]  # Initialisiere die Liste mit Platzhaltern
         print("1. self.gerechte_verteilung: ", self.gerechte_verteilung)
-        
+
         for i in range(len(self.mitarbeiter)):
             if self.employment[i] == "Perm":
                 allocated_hours = self.employment_lvl_exact[i] * self.weekly_hours * self.week_timeframe
@@ -374,7 +374,6 @@ class ORAlgorithm_cp:
 
         # Wenn die Rundung dazu geführt hat, dass total_hours_assigned die verteilbare_stunden überschreitet, werden die Stunden für Temp-Mitarbeiter angepasst
         total_hours_assigned = sum(self.gerechte_verteilung)
-        print("remaining_hours2: ", remaining_hours)
         if total_hours_assigned > self.verteilbare_stunden:
             # Sortieren der Temp-Mitarbeiter nach zugeteilten Stunden in absteigender Reihenfolge
             temp_employees.sort(key=lambda i: self.gerechte_verteilung[i], reverse=True)
