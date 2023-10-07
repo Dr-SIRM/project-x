@@ -29,8 +29,6 @@ bei denen komplexe und kombinatorische Beschränkungen berücksichtigt werden m�
 """
 To-Do Liste:
 
-Prio 1:
-
  - (erl.) NB6: Max. einen Arbeitsblock pro Tag
  - (erl.) die calc_time soll automatisch errechnet werden
  - (erl.) Als Key oder i für MA soll nicht mehr MA1, MA2 usw stehen, sondern die user_id (zB. 1002)
@@ -49,22 +47,24 @@ Prio 1:
  - (erl.) Während des Solvings Daten ziehen --> Fragen gestellt
  - (erl.) Die erste Vorüberprüfung funktioniert noch nicht, da auch ein Perm MA der 60% angestellt ist weekly_hours eingteilt werden muss.
  - (erl) pre_check_admin aus data_processing in or_algorithm einpflegen
+ - (erl) gerechte Verteilung angepasst
+ - (erl) Wenn min Zeit grösser als gewünschte, dann Fehler -> beheben!
  
  To-Do's 
  -------------------------------
- - (*) Wenn min Zeit grösser als gewünschte, dann Fehler -> beheben!
+
  - (*) Vorüberprüfungen fertigstellen und Daten an React geben
  - (*) Überprüfen, ob eigegebene werte bei Verletzungsvariabeln wirklich korrekt sind
 
- - gerechte_verteilung funktioniert noch nicht richtig, wenn ein MA fast keine Stunden availability eingibt. Das muss noch geändert werden.
- 
+  - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden?
 
+
+ 
 
  --- PRIO 2 ---
  -------------------------------
  - start_time und end_time zwei und drei noch implementieren (noch warten bis über 00:00 Zeiten eingegeben werden können!)
- - MA mit verschiedenen Profilen - Department (Koch, Service, ..)? Wie genau lösen wir das?
- - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden?
+ - MA mit verschiedenen Profilen - Department (Koch, Service, ..)
  - Der erstellte "divisor" in data_processing könnte als Attribut initialisiert werden, damit es nicht bei jeder Methode einzeln berechnet werden muss
  - (*) NB9 mit 3 Schichten fertigbauen
  -------------------------------
@@ -387,11 +387,12 @@ class ORAlgorithm_cp:
         print("4. self.gerechte_verteilung: ", self.gerechte_verteilung)   
 
         # Neue Prüfung und Anpassung auf Basis von self.gesamtstunden_verfügbarkeit
+        # Wenn gerechte Verteilung grösser als Gesamtstundenverfügbarkeit ist, dann den Wert überschreiben
         for i in range(len(self.gerechte_verteilung)):
             if self.gerechte_verteilung[i] > self.gesamtstunden_verfügbarkeit[i]:
                 self.gerechte_verteilung[i] = self.gesamtstunden_verfügbarkeit[i]
-
         print("5. self.gerechte_verteilung: ", self.gerechte_verteilung)  
+
         # Erneute Überprüfung der gesamten zugewiesenen Stunden
         total_hours_assigned = sum(self.gerechte_verteilung)
         if total_hours_assigned < self.verteilbare_stunden:
@@ -836,6 +837,9 @@ class ORAlgorithm_cp:
 
         # NB2 violation variable
         diff_1 = self.max_time_week - self.weekly_hours
+        # Damit wird sichergestellt, dass diff_1 nicht negativ werden kann.
+        if diff_1 < 0:
+            diff_1 = 0
         self.nb2_violation = {ma: {} for ma in self.mitarbeiter}
         for ma in self.mitarbeiter:
             for week in range(1, self.week_timeframe + 1):
@@ -843,12 +847,16 @@ class ORAlgorithm_cp:
 
         # NB3 Mindestarbeitszeit Verletzungsvariable
         diff_2 = self.desired_min_time_day - self.min_time_day
+        if diff_2 < 0:
+            diff_2 = 0
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 self.nb3_min_violation[i, j] = self.model.NewIntVar(0, diff_2, f'nb3_min_violation[{i}, {j}]')
 
         # NB4 Höchstarbeitszeit Verletzungsvariable
         diff_3 = self.max_time_day - self.desired_max_time_day
+        if diff_3 < 0:
+            diff_3 = 0
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 self.nb4_max_violation[i, j] = self.model.NewIntVar(0, diff_3, f'nb4_max_violation[{i}, {j}]')
