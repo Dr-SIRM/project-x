@@ -24,23 +24,7 @@ const Registration = ({ registration }) => {
   const correctPassword = "Ass&Titties"; // replace this with your password
 
 
-  useEffect(() => {
-    const fetchRegistration = async () => {
-        try {
-          const response = await axios.get('http://localhost:5000/api/registration/admin', {
-              headers: {
-                  'Authorization': `Bearer ${token}`
-              }
-          });
-          setregistrationData(response.data);
-        } catch (error) {
-          console.error('Error fetching Registration data:', error);
-        }
-    };
-
-    fetchRegistration();
-  }, []);
-
+ 
   const handleClose = () => {
     if (password === correctPassword) {
       console.log("Password is correct");

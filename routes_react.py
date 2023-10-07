@@ -626,35 +626,47 @@ def get_invite():
     return jsonify(invite_dict)
 
 
-@app.route('/api/solver', methods = ['GET', 'POST'])
+@app.route('/api/solver', methods=['GET', 'POST'])
 @jwt_required()
 def run_solver():
+    print("Request received", request.method)  # Log the type of request received
 
     react_user = get_jwt_identity()
     user = User.query.filter_by(email=react_user).first()
 
     if request.method == 'POST':
+        print("Headers:", request.headers)  # Log headers
+        solver_data = request.get_json()
+        print("JSON Payload:", solver_data)  # Log payload
+
         from data_processing import DataProcessing
         from or_algorithm import ORAlgorithm
         from or_algorithm_cp import ORAlgorithm_cp
 
-        solver_data = request.get_json()
         if 'solverButtonClicked' in solver_data and solver_data['solverButtonClicked']:
-            # Damit der Code threadsafe ist, wird jedesmal eine neue Instanz erstellt pro Anfrage!
             dp = DataProcessing(user.id)
             dp.run()
-            # or_algo = ORAlgorithm(dp)
-            # or_algo.run()
             or_algo_cp = ORAlgorithm_cp(dp)
+
             or_algo_cp.run()
-            or_algo_cp.pre_check()
+            for i in range(1, 2):
+                pre_check_result = getattr(or_algo_cp, f'pre_check_{i}')()
+                if not pre_check_result["success"]:
+                    print(f'Pre-check {i} failed: {pre_check_result["message"]}')  # Log failure
+                    return jsonify({'message': f'Pre-check {i} failed: {pre_check_result["message"]}'}), 400
+                
+            
             or_algo_cp.run_2()
 
-            
+            print("Solver successfully started")  # Log success
             return jsonify({'message': 'Solver successfully started'}), 200
         else:
+            print("Solver button was not clicked")  # Log if button wasn’t clicked
             return jsonify({'message': 'Solver button was not clicked'}), 200
+
+    print("Solver Go")  # Log for GET method
     return jsonify({'message': 'Solver Go'}), 200
+
 
 
 
@@ -899,7 +911,11 @@ def get_registration():
 
 
 @app.route('/api/registration/admin', methods = ['GET', 'POST'])
-def get_admin_registration():   
+def get_admin_registration():
+    print(request.headers)
+    print(request.method)
+    print(request.path)
+    print(request.json)
     if request.method =='POST':
         admin_registration_data = request.get_json()
         if admin_registration_data['password'] != admin_registration_data['password2']:
