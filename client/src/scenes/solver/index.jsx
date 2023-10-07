@@ -9,6 +9,7 @@ import { tokens } from "../../theme";
 import axios from 'axios';
 import CircularProgress from "@mui/material/CircularProgress";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 
 
 
@@ -47,46 +48,45 @@ const Solver = ({ solver }) => {
 
   
   const handleFormSubmit = async (values) => {
-    setLoadingSteps(prev => [{...prev[0], status: "loading"}, ...prev.slice(1)]);
-        
-        setTimeout(() => {
-            setLoadingSteps(prev => [{...prev[0], status: "completed"}, {...prev[1], status: "loading"}, ...prev.slice(2)]);
-            
-            // Simulate Data loading
-            setTimeout(() => {
-                setLoadingSteps(prev => [prev[0], {...prev[1], status: "completed"}, {...prev[2], status: "loading"}, ...prev.slice(3)]);
-                
-                // Simulate Database opened
-                setTimeout(() => {
-                    setLoadingSteps(prev => [prev[0], prev[1], {...prev[2], status: "completed"}, {...prev[3], status: "loading"}, prev[4]]);
-                    
-                    // Simulate Solution saved
-                    setTimeout(() => {
-                        setLoadingSteps(prev => [prev[0], prev[1], prev[2], {...prev[3], status: "completed"}, {...prev[4], status: "loading"}]);
-                        
-                        // Simulate Completion
-                        setTimeout(() => {
-                            setLoadingSteps(prev => [...prev.slice(0, 4), {...prev[4], status: "completed"}]);
-                            
-                            setShowSuccessNotification(true);
-                        }, 3000);
-                    }, 3000);
-                }, 3000);
-            }, 3000);
-        }, 3000);
     try {
-      // Send the updated form values to the server for database update
-      await axios.post('http://localhost:5000/api/solver', { ...values, solverButtonClicked: true }, {
-    headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
+        console.log('Submitting form with values:', values);  // Log values being sent
+        setLoadingSteps(prev => [{...prev[0], status: "loading"}, ...prev.slice(1)]);
+        
+        const response = await axios.post('http://localhost:5000/api/solver', { ...values, solverButtonClicked: true }, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        console.log('Response from server:', response.data);  // Log server response
+
+        if(response.data.message === 'Solver successfully started') {
+            // Update all steps to "completed"
+            setLoadingSteps(prev => prev.map(step => ({...step, status: "completed"})));
+            setShowSuccessNotification(true);
+        } else {
+            // Update the steps based on the failed pre-check (if needed).
+            // Example: If pre-check 2 failed, steps 0 and 1 will be "completed", step 2 "error", and others "null".
+            const failedStep = response.data.message.match(/Pre-check (\d) failed/)?.[1];
+            if (failedStep) {
+                setLoadingSteps(prev => prev.map((step, index) => {
+                    return index < failedStep - 1 
+                        ? {...step, status: "completed"}
+                        : index === failedStep - 1 
+                            ? {...step, status: "error", errorMessage: response.data.message}
+                            : step;
+                }));
+            }
+            setShowErrorNotification(true);
         }
-    });
     } catch (error) {
       console.error('Error updating solver details:', error);
-      setShowErrorNotification(true);
+      console.error('Error details:', error.response?.data);  // Log error response from server
+        setShowErrorNotification(true);
     }
-  };
+};
+
 
 
   return (
@@ -115,14 +115,22 @@ const Solver = ({ solver }) => {
         )}
       </Formik>
       <div>
-        {loadingSteps.map((step, index) => (
-          <div key={index} style={{ display: "flex", alignItems: "center", marginTop: "10px" }}>
-            {step.status === "loading" && <CircularProgress size={20} />}
-            {step.status === "completed" && <CheckCircleIcon style={{ color: "green" }} />}
-            <Typography variant="body1" style={{ marginLeft: "10px", color: "black" }}>{step.label}</Typography>
-          </div>
-        ))}
-      </div>
+            {loadingSteps.map((step, index) => (
+                <div key={index} style={{ display: "flex", alignItems: "center", marginTop: "10px" }}>
+                    {step.status === "loading" && <CircularProgress size={20} />}
+                    {step.status === "completed" && <CheckCircleIcon style={{ color: "green" }} />}
+                    {step.status === "error" && <ErrorOutlineIcon style={{ color: "red" }} />}
+                    <Typography variant="body1" style={{ marginLeft: "10px", color: "black" }}>
+                        {step.label}
+                    </Typography>
+                    {step.status === "error" && (
+                        <Typography variant="body2" style={{ marginLeft: "10px", color: "red" }}>
+                            {step.errorMessage}
+                        </Typography>
+                    )}
+                </div>
+            ))}
+        </div>
       <Snackbar
         open={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
