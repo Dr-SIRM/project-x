@@ -25,7 +25,6 @@ const Registration = ({ registration }) => {
 
 
   useEffect(() => {
-    console.log("Component mounted/updated");
     const fetchRegistration = async () => {
         try {
           const response = await axios.get('http://localhost:5000/api/registration/admin', {
