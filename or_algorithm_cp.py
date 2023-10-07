@@ -336,23 +336,26 @@ class ORAlgorithm_cp:
         ob er die Stunden überhaupt eingegeben hat. Wenn ja, alles gut, wenn er unterschritten hat,
         dann die eingegebenen Stunden bei gerechte Verteilung ersetzen und fehlende Stunden neu gerecht
         den Mitarbeitern aufteilen.
-        
         """
 
+        # Braucht es nicht mehr (denke ich) - 07.10.2023
+        """
         list_gesamtstunden = []
         for i in range(len(self.mitarbeiter)):
-            if self.gesamtstunden_verfügbarkeit[i] > self.weekly_hours * self.week_timeframe:
+            if self.gesamtstunden_verfügbarkeit[i] >= self.weekly_hours * self.week_timeframe:
                 arbeitsstunden_MA = self.employment_lvl_exact[i] * self.weekly_hours * self.week_timeframe
             else:
                 arbeitsstunden_MA = self.employment_lvl_exact[i] * self.gesamtstunden_verfügbarkeit[i]
             list_gesamtstunden.append(int(arbeitsstunden_MA))
         print("list_gesamtstunden: ", list_gesamtstunden)
+        """
 
         # Berechnung der Arbeitsstunden für Perm und Temp Mitarbeiter
         total_hours_assigned = 0
         temp_employees = []
         self.gerechte_verteilung = [0 for _ in range(len(self.mitarbeiter))]  # Initialisiere die Liste mit Platzhaltern
         print("1. self.gerechte_verteilung: ", self.gerechte_verteilung)
+        
         for i in range(len(self.mitarbeiter)):
             if self.employment[i] == "Perm":
                 allocated_hours = self.employment_lvl_exact[i] * self.weekly_hours * self.week_timeframe
