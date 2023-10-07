@@ -911,7 +911,11 @@ def get_registration():
 
 
 @app.route('/api/registration/admin', methods = ['GET', 'POST'])
-def get_admin_registration():   
+def get_admin_registration():
+    print(request.headers)
+    print(request.method)
+    print(request.path)
+    print(request.json)
     if request.method =='POST':
         admin_registration_data = request.get_json()
         if admin_registration_data['password'] != admin_registration_data['password2']:

@@ -5,6 +5,7 @@ import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import axios from 'axios';
+import { API_BASE_URL } from "../../config";
 
 
 const Form = () => {
@@ -14,7 +15,7 @@ const Form = () => {
 
   const handleFormSubmit = (values, { resetForm }) => {
     axios
-      .post('http://localhost:5000/api/registration/admin', values)
+      .post(`${API_BASE_URL}/api/registration/admin`, values)
       .then((response) => {
         console.log(response.data);
         setShowSuccessNotification(true);

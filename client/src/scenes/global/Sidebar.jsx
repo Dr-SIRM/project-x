@@ -25,6 +25,7 @@ import CalendarViewMonthIcon from '@mui/icons-material/CalendarViewMonth';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import SettingsIcon from '@mui/icons-material/Settings';
 import axios from 'axios';
+import { API_BASE_URL } from "../../config";
 
 
 
@@ -44,7 +45,7 @@ const Sidebar = () => {
   });
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/current_react_user', {
+    axios.get(`${API_BASE_URL}/api/current_react_user`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

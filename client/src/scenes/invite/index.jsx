@@ -8,6 +8,7 @@ import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import { ThreeDots } from "react-loader-spinner"; 
 import axios from 'axios';
+import { API_BASE_URL } from "../../config";
 
 
 
@@ -25,7 +26,7 @@ const Invite = ({ invite }) => {
     const fetchInvite = async () => {
       setIsLoading(true);
         try {
-          const response = await axios.get('http://localhost:5000/api/invite', {
+          const response = await axios.get(`${API_BASE_URL}/api/invite`, {
               headers: {
                   'Authorization': `Bearer ${token}`
               }
@@ -45,7 +46,7 @@ const Invite = ({ invite }) => {
   const handleFormSubmit = async (values) => {
     try {
       // Send the updated form values to the server for database update
-      await axios.post('http://localhost:5000/api/invite', values, {
+      await axios.post(`${API_BASE_URL}/api/invite`, values, {
     headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',

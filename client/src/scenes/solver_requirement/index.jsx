@@ -7,6 +7,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import axios from 'axios';
+import { API_BASE_URL } from "../../config";
 
 
 
@@ -25,7 +26,7 @@ const SolverReq = ({ solverreq }) => {
   useEffect(() => {
     const fetchSolver = async () => {
         try {
-          const response = await axios.get('http://localhost:5000/api/solver/requirement', {
+          const response = await axios.get(`${API_BASE_URL}/api/solver/requirement`, {
               headers: {
                   'Authorization': `Bearer ${token}`
               }
@@ -43,7 +44,7 @@ const SolverReq = ({ solverreq }) => {
   const handleFormSubmit = async (values) => {
     try {
       // Send the updated form values to the server for database update
-      await axios.post('http://localhost:5000/api/solver/requirement', { ...values }, {
+      await axios.post(`${API_BASE_URL}/api/solver/requirement`, { ...values }, {
     headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',

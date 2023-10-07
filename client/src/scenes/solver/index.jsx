@@ -10,6 +10,7 @@ import axios from 'axios';
 import CircularProgress from "@mui/material/CircularProgress";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import { API_BASE_URL } from "../../config";
 
 
 
@@ -32,7 +33,7 @@ const Solver = ({ solver }) => {
   useEffect(() => {
     const fetchSolver = async () => {
         try {
-          const response = await axios.get('http://localhost:5000/api/solver', {
+          const response = await axios.get(`${API_BASE_URL}/api/solver`, {
               headers: {
                   'Authorization': `Bearer ${token}`
               }
@@ -52,7 +53,7 @@ const Solver = ({ solver }) => {
         console.log('Submitting form with values:', values);  // Log values being sent
         setLoadingSteps(prev => [{...prev[0], status: "loading"}, ...prev.slice(1)]);
         
-        const response = await axios.post('http://localhost:5000/api/solver', { ...values, solverButtonClicked: true }, {
+        const response = await axios.post(`${API_BASE_URL}/api/solver`, { ...values, solverButtonClicked: true }, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',

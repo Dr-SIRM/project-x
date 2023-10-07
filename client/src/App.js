@@ -53,15 +53,13 @@ function AppContent({ isSidebar, setIsSidebar }) {
 
   return (
     <>
-      <Routes>
-          <Route path="/forget_password" element={<ForgetPassword />} />
-          <Route path="/token_registration" element={<Token_Registration />} />
-          <Route path="/registration/admin" element={<Registration />} />
-      </Routes>
       {isAuthenticated && isSidebar && <Sidebar />}
       <main className="content">
         {isAuthenticated && <Topbar />}
         <Routes>
+          <Route path="/forget_password" element={<ForgetPassword />} />
+          <Route path="/token_registration" element={<Token_Registration />} />
+          <Route path="/registration/admin" element={<Registration />} />
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<PrivateRoute component={Dashboard} accessLevels={["Super_Admin", "Admin", "User"]} />} />

@@ -14,6 +14,7 @@ import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
 import ProgressCircle from "../../components/ProgressCircle";
 import { AuthContext } from "../../AuthContext";
+import { API_BASE_URL } from "../../config";
 import axios from 'axios';
 
 /* Mögliche Ideen fürs Dashboard
@@ -37,7 +38,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/dashboard',
+            const response = await axios.get(`${API_BASE_URL}/api/dashboard`,
             {
               headers: {
                 'Authorization': `Bearer ${token}`

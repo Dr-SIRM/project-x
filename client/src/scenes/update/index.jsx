@@ -6,6 +6,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import { ThreeDots } from "react-loader-spinner"; 
 import axios from 'axios';
+import { API_BASE_URL } from "../../config";
 
 
 
@@ -21,7 +22,7 @@ const Update = () => {
     const fetchUser = async () => {
       setIsLoading(true);
         try {
-          const response = await axios.get('http://localhost:5000/api/update', {
+          const response = await axios.get(`${API_BASE_URL}/api/update`, {
               headers: {
                   'Authorization': `Bearer ${token}`
               }
@@ -41,7 +42,7 @@ const Update = () => {
   const handleFormSubmit = async (values) => {
     try {
       // Send the updated form values to the server for database update
-      await axios.post('http://localhost:5000/api/update', values, {
+      await axios.post(`${API_BASE_URL}/api/update`, values, {
     headers: {
         'Authorization': `Bearer ${token}`
         }

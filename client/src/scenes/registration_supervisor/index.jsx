@@ -7,6 +7,7 @@ import Header from "../../components/Header";
 import { Select, MenuItem } from "@mui/material";
 import { tokens } from "../../theme";
 import axios from 'axios';
+import { API_BASE_URL } from "../../config";
 
 
 
@@ -24,23 +25,7 @@ const Registration = ({ registration }) => {
   const correctPassword = "Ass&Titties"; // replace this with your password
 
 
-  useEffect(() => {
-    const fetchRegistration = async () => {
-        try {
-          const response = await axios.get('http://localhost:5000/api/registration/admin', {
-              headers: {
-                  'Authorization': `Bearer ${token}`
-              }
-          });
-          setregistrationData(response.data);
-        } catch (error) {
-          console.error('Error fetching Registration data:', error);
-        }
-    };
-
-    fetchRegistration();
-  }, []);
-
+ 
   const handleClose = () => {
     if (password === correctPassword) {
       console.log("Password is correct");
@@ -58,7 +43,7 @@ const Registration = ({ registration }) => {
   const handleFormSubmit = async (values) => {
     try {
       // Send the updated form values to the server for database update
-      await axios.post('http://localhost:5000/api/registration/admin', values, {
+      await axios.post(`${API_BASE_URL}/api/registration/admin`, values, {
     headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',

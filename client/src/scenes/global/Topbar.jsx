@@ -12,6 +12,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import UpdateIcon from '@mui/icons-material/Update';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import { AuthContext } from "../../AuthContext";
+import { API_BASE_URL } from "../../config";
 
 const Topbar = () => {
   const theme = useTheme();

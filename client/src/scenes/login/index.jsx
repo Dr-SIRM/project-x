@@ -4,6 +4,7 @@ import Header from "../../components/Header";
 import { useNavigate } from 'react-router-dom';
 import { tokens } from "../../theme";
 import { AuthContext } from "../../AuthContext";
+import { API_BASE_URL } from "../../config";
 
 const Login = () => {
   const { login, error, setError } = useContext(AuthContext); // Fetch error and setError from the context
