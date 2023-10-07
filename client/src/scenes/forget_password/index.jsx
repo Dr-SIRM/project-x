@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Box, Typography, TextField, Button, Alert, useTheme, Link, CircularProgress } from '@mui/material';
 import Header from "../../components/Header";
 import axios from "axios";
+import { API_BASE_URL } from "../../config";
 
 function ForgetPassword() {
   const [email, setEmail] = useState("");
@@ -12,7 +13,7 @@ function ForgetPassword() {
     e.preventDefault();
 
     try {
-      const response = await axios.post("/api/forget_password", { email });
+      const response = await axios.post(`${API_BASE_URL}/api/forget_password`, { email });
 
       if (response.data) {
         setMessage(response.data.message);

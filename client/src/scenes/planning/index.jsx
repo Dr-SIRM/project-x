@@ -12,6 +12,7 @@ import { ThreeDots } from "react-loader-spinner";
 import axios from 'axios';
 import Tooltip from '@mui/material/Tooltip';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { API_BASE_URL } from "../../config";
 
 const BUTTON_STYLE = {
   borderColor: "white",
@@ -127,7 +128,7 @@ const TimeReq = ({ timereq }) => {
     const fetchTimeReqData = async () => {
       setIsLoading(true);
         try {
-          const response = await axios.get('http://localhost:5000/api/requirement/workforce?week_adjustment=' + weekAdjustment, {
+          const response = await axios.get(`${API_BASE_URL}/api/requirement/workforce?week_adjustment=` + weekAdjustment, {
               headers: {
                   'Authorization': `Bearer ${token}`
               }
@@ -257,7 +258,7 @@ const TimeReq = ({ timereq }) => {
       payload["template_name"] = selectedTemplate;
       // Send the updated form values to the server for database update
       console.log("Final payload before sending to server:", payload);
-      await axios.post('http://localhost:5000/api/requirement/workforce?week_adjustment=' + weekAdjustment, payload, {
+      await axios.post(`${API_BASE_URL}/api/requirement/workforce?week_adjustment=` + weekAdjustment, payload, {
     headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',

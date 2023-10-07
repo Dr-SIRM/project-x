@@ -8,6 +8,7 @@ import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import Header from "../../components/Header";
 import { ThreeDots } from "react-loader-spinner"; 
 import axios from "axios";
+import { API_BASE_URL } from "../../config";
 
 
 
@@ -23,7 +24,7 @@ const Team = () => {
     const fetchUser = async () => {
       setIsLoading(true);
       try {
-        const response = await axios.get('http://localhost:5000/api/users', {
+        const response = await axios.get(`${API_BASE_URL}/api/users`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -58,7 +59,7 @@ const Team = () => {
 
     try {
         // Send the modified data to the server
-        await axios.put(`http://localhost:5000/api/users/update/${id}`, sendData, {
+        await axios.put(`${API_BASE_URL}/api/users/update/${id}`, sendData, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

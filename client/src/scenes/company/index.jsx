@@ -10,6 +10,7 @@ import { ThreeDots } from "react-loader-spinner";
 import axios from 'axios';
 import Alert from '@mui/material/Alert';
 import { Padding } from "@mui/icons-material";
+import { API_BASE_URL } from "../../config";
 
 
 
@@ -28,7 +29,7 @@ const Company = ({ company }) => {
     const fetchCompany = async () => {
       setIsLoading(true);
         try {
-          const response = await axios.get('http://localhost:5000/api/company', {
+          const response = await axios.get(`${API_BASE_URL}/api/company`, {
               headers: {
                   'Authorization': `Bearer ${token}`
               }
@@ -55,7 +56,7 @@ const Company = ({ company }) => {
 
     try {
       // Send the updated form values to the server for database update
-      await axios.post('http://localhost:5000/api/company', values, {
+      await axios.post(`${API_BASE_URL}/api/company`, values, {
     headers: {
         'Authorization': `Bearer ${token}`
         }

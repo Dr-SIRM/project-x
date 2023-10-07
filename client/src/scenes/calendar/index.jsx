@@ -5,6 +5,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import { API_BASE_URL } from "../../config";
 import listPlugin from "@fullcalendar/list";
 import {
   Box,
@@ -28,7 +29,7 @@ const Calendar = () => {
     const fetchCalendar = async () => {
 
         try {
-          const response = await axios.get('http://localhost:5000/api/calendar', {
+          const response = await axios.get(`${API_BASE_URL}/api/calendar`, {
               headers: {
                   'Authorization': `Bearer ${token}`
               }

@@ -7,6 +7,7 @@ import { Select, MenuItem } from "@mui/material";
 import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import axios from 'axios';
+import { API_BASE_URL } from "../../config";
 
 
 
@@ -25,7 +26,7 @@ const Token_Registration = ({ token_registration }) => {
   const handleFormSubmit = async (values) => {
     try {
       // Send the updated form values to the server for database update
-      await axios.post('http://localhost:5000/api/token_registration', values, {
+      await axios.post(`${API_BASE_URL}/api/token_registration`, values, {
     headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
