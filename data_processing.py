@@ -4,6 +4,9 @@ from dateutil.relativedelta import relativedelta
 from collections import defaultdict
 from collections import OrderedDict
 from app import app, db, timedelta
+from models import User, Availability, TimeReq, Company, OpeningHours, Timetable, \
+    TemplateAvailability, TemplateTimeRequirement, RegistrationToken, PasswordReset, \
+    SolverRequirement, SolverAnalysis
 
 class DataProcessing:
     def __init__(self, current_user_id):
@@ -42,27 +45,16 @@ class DataProcessing:
         In dieser Methode wird das aktuelle Datum gezogen, anschliessend der nächste Montag gefunden.
         Ebenfalls werden die zwei Werte "week_timeframe" und "hour_devider" aus der Datenbank gezogen.
         """
-        with app.app_context():
-            # Hole den company_name des aktuellen Benutzers
-            sql = text("""
-                SELECT company_name
-                FROM user
-                WHERE id = :current_user_id
-            """)
-            result = db.session.execute(sql, {"current_user_id": self.current_user_id})
-            company_name = result.fetchone()[0]
-            
-            # Hole die Solver-Anforderungen für das Unternehmen
-            sql = text("""
-                SELECT week_timeframe, hour_devider
-                FROM solver_requirement
-                WHERE company_name = :company_name
-            """)
-            result = db.session.execute(sql, {"company_name": company_name})
-            week_timeframe, hour_devider = result.fetchone()
 
-            self.week_timeframe = week_timeframe
-            self.hour_devider = hour_devider
+        # company_name filtern aus der Datenkbank
+        user = User.query.filter_by(id=self.current_user_id).first()
+        company_name = user.company_name
+
+        # week_timeframe und hour_devider filtern aus der Datenkbank
+        solver_req = SolverRequirement.query.filter_by(company_name=company_name).first()
+        self.week_timeframe = solver_req.week_timeframe
+        self.hour_devider = solver_req.hour_devider
+
 
         # Holen Sie sich das heutige Datum
         today = datetime.today()
@@ -119,16 +111,11 @@ class DataProcessing:
 
         print(f"Admin mit der User_id: {self.current_user_id} hat den Solve Button gedrückt.")
 
+        # company_name filtern aus der Datenkbank
+        user = User.query.filter_by(id=self.current_user_id).first()
+        company_name = user.company_name
+
         with app.app_context():
-            
-            # Hole den company_name des aktuellen Benutzers
-            sql = text("""
-                SELECT company_name
-                FROM user
-                WHERE id = :current_user_id
-            """)
-            result = db.session.execute(sql, {"current_user_id": self.current_user_id})
-            company_name = result.fetchone()[0]
             
             # Verfügbarkeiten für alle Benutzer mit demselben company_name abrufen
             sql = text("""
@@ -142,6 +129,9 @@ class DataProcessing:
             result = db.session.execute(sql, {"company_name": company_name, "start_date": self.start_date, "end_date": self.end_date})
             # fetchall = alle Zeilen der Datenbank werden abgerufen und in einem Tupel gespeichert
             times = result.fetchall()
+
+            print("TIMES:", times)
+
 
             # Dictionarie erstellen mit user_id als Key:
             user_availability = defaultdict(list)
