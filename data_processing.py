@@ -117,6 +117,7 @@ class DataProcessing:
             user_availability[user_id] = sorted(availabilities, key=lambda x: x[0])
 
         self.user_availability = user_availability
+        print("user_availability:", self.user_availability)
 
 
 
