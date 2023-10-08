@@ -56,7 +56,6 @@ To-Do Liste:
  - (*) Vorüberprüfungen fertigstellen und Daten an React geben
  - (*) self.subsequent_workingdays_max in die Datenbank einpflegen und ziehen
 
-
   - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden??
 
 
