@@ -1,5 +1,5 @@
 const { createProxyMiddleware } = require("http-proxy-middleware");
-import { API_BASE_URL } from "../../config";
+const { API_BASE_URL } = require("./config");
 
 module.exports = function (app) {
   app.use(
