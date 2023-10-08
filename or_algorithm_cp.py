@@ -49,7 +49,10 @@ To-Do Liste:
  - (erl) gerechte Verteilung angepasst
  - (erl) Wenn min Zeit grösser als gewünschte, dann Fehler -> beheben!
  - (erl) Überprüfen, ob eigegebene werte bei Verletzungsvariabeln wirklich korrekt sind
+ - (erl) NB11 und 12 implementieren
+ - (erl) Bei den max. Arbeitstagen eine obere schranke einbauen (harte NB 10)
  
+
  To-Do's 
  -------------------------------
 
@@ -200,6 +203,7 @@ class ORAlgorithm_cp:
     def run(self):
         self.create_variables()
         self.show_variables()
+        self.pre_check_programmer()
 
     # Diese Methode kann später gelöscht werden, da auf die einzelnen pre_checks zugegriffen wird.
     def pre_check(self):
@@ -253,7 +257,7 @@ class ORAlgorithm_cp:
                 date, binary_list = day_availability
                 self.verfügbarkeit[self.mitarbeiter[i]].append(binary_list)
 
-        # -- 3 --
+        # -- 3 ------------------------------------------------------------------------------------------------------------
         # Kosten für jeden MA noch gleich, ebenfalls die max Zeit bei allen gleich
         self.kosten = {ma: 100 for ma in self.mitarbeiter}  # Kosten pro Stunde
 
@@ -336,19 +340,7 @@ class ORAlgorithm_cp:
             self.min_anwesend.append(list(values.values()))
 
         # -- 14 ------------------------------------------------------------------------------------------------------------
-        # Eine Liste mit den Stunden wie sie gerecht verteilt werden
-
-        # Braucht es nicht mehr (denke ich) - 07.10.2023
-        """
-        list_gesamtstunden = []
-        for i in range(len(self.mitarbeiter)):
-            if self.gesamtstunden_verfügbarkeit[i] >= self.weekly_hours * self.week_timeframe:
-                arbeitsstunden_MA = self.employment_lvl_exact[i] * self.weekly_hours * self.week_timeframe
-            else:
-                arbeitsstunden_MA = self.employment_lvl_exact[i] * self.gesamtstunden_verfügbarkeit[i]
-            list_gesamtstunden.append(int(arbeitsstunden_MA))
-        print("list_gesamtstunden: ", list_gesamtstunden)
-        """
+        # gerechte_verteilung -> eine Liste mit den Stunden wie sie gerecht verteilt werden
 
         # Berechnung der Arbeitsstunden für Perm und Temp Mitarbeiter
         total_hours_assigned = 0
@@ -486,7 +478,6 @@ class ORAlgorithm_cp:
         print("16. self.subsequent_workingdays: ", self.subsequent_workingdays)
         print("17. self.daily_deployment: ", self.daily_deployment)
         print("18. self.time_per_deployment: ", self.time_per_deployment)
-
 
 
     def pre_check_programmer(self):
@@ -1391,7 +1382,7 @@ class ORAlgorithm_cp:
         # -------------------------------------------------------------------------------------------------------
 
         # Diese Variable noch in der Datenbank implementieren
-        self.subsequent_workingdays_max = 5
+        self.subsequent_workingdays_max = 4
 
         for i in self.mitarbeiter:
             for j in range(self.calc_time - self.subsequent_workingdays_max):
@@ -1491,6 +1482,13 @@ class ORAlgorithm_cp:
                 self.best_values.append(self.current_best_value)
                 gap_now = round(((1 - (hiring_cost_min / self.current_best_value))*100), 2)
                 print("------------------ NEUER WERT HINZUGEFÜGT: ", self.current_best_value, "GAP:", gap_now, "%", "------------------------")
+
+                # Überprüfen, ob der Gap weniger als 1% beträgt, wenn ja, solver stoppen
+                if gap_now < 1:
+                    print("Gap unter 1%, stoppe den Solver.")
+                    self.solver.StopSearch()
+                    self.stop_thread = True  # Thread in diesem Fall sofort stoppen.
+
 
         self.solver.parameters.log_search_progress = True
         self.solver.parameters.log_to_stdout = True
