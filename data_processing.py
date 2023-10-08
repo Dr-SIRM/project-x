@@ -157,7 +157,8 @@ class DataProcessing:
         
         return int(total_seconds / divisor)
 
-
+    def time_to_timedelta(self, t):
+        return timedelta(hours=t.hour, minutes=t.minute, seconds=t.second)
 
     def get_opening_hours(self):
         """ In dieser Funktion werden die Öffnungszeiten (7 Tage) der jeweiligen Company aus der Datenbank gezogen. """
@@ -178,7 +179,7 @@ class DataProcessing:
 
         opening = OpeningHours.query.filter_by(company_name=company_name).order_by(weekday_order).all()
 
-        times = [(record.weekday, self.time_to_int(record.start_time), self.time_to_int(record.end_time), self.time_to_int(record.end_time2)) for record in opening]
+        times = [(record.weekday, self.time_to_timedelta(record.start_time), self.time_to_timedelta(record.end_time), self.time_to_timedelta(record.end_time2)) for record in opening]
 
         print("Opening Times:", times)
 
