@@ -178,9 +178,18 @@ class DataProcessing:
 
         opening = OpeningHours.query.filter_by(company_name=company_name).order_by(weekday_order).all()
 
-        times = [(record.weekday, self.time_to_int(record.start_time), self.time_to_int(record.end_time), self.time_to_int(record.end_time2)) for record in opening]
+        times = [
+            (
+                record.weekday,
+                self.time_to_int(record.start_time),
+                self.time_to_int(record.end_time),
+                self.time_to_int(record.end_time2)
+            ) for record in opening
+        ]
 
         print("Opening Times:", times)
+
+        
 
 
 
