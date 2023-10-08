@@ -1,4 +1,3 @@
-import pymysql
 from sqlalchemy import text
 from datetime import datetime, time
 from dateutil.relativedelta import relativedelta
