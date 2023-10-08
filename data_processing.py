@@ -50,6 +50,7 @@ class DataProcessing:
         user = User.query.filter_by(id=self.current_user_id).first()
         company_name = user.company_name
 
+
         # week_timeframe und hour_devider filtern aus der Datenkbank
         solver_req = SolverRequirement.query.filter_by(company_name=company_name).first()
         self.week_timeframe = solver_req.week_timeframe
@@ -114,6 +115,19 @@ class DataProcessing:
         # company_name filtern aus der Datenkbank
         user = User.query.filter_by(id=self.current_user_id).first()
         company_name = user.company_name
+
+        users = User.query.filter_by(company_name=company_name).all()
+        user_ids = [user.user_id for user in users]
+
+        availability = Availability.query.filter(
+            Availability.user_id.in_(user_ids),
+            Availability.start_date == self.start_date,
+            Availability.end_date == self.end_date
+        ).all()
+
+        times = [(record.user_id, record.start_date, record.end_date) for record in availability]
+
+        print("New times:", times)
 
         with app.app_context():
             
