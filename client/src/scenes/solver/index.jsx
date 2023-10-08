@@ -23,11 +23,12 @@ const Solver = ({ solver }) => {
   const [solverData, setsolverData] = useState({});
   const token = localStorage.getItem('session_token'); // Get the session token from local storage
   const [loadingSteps, setLoadingSteps] = useState([
-    { label: "Button initiated", status: null },
-    { label: "Data loading", status: null },
-    { label: "Database opened", status: null },
-    { label: "Solution saved", status: null },
-    { label: "Completion", status: null }
+    { label: "Button initiated Pre Check 1", status: null },
+    { label: "Data loading Pre Check 2", status: null },
+    { label: "Database opened Pre Check 3", status: null },
+    { label: "Solution saved Pre Check 4", status: null },
+    { label: "Completion Pre Check 5", status: null },
+    { label: "Completion Pre Check 6", status: null }
   ]);
 
   useEffect(() => {
