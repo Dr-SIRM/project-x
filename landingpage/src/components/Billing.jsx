@@ -14,13 +14,10 @@ const Billing = () => (
 
     <div className={layout.sectionInfo}>
       <h2 className={styles.heading2}>
-        Easily control your <br className="sm:block hidden" /> billing &
-        invoicing
+      Steuern Sie ganz einfach <br className="sm:block hidden" /> Ihre Arbeitszeitplanung
       </h2>
       <p className={`${styles.paragraph} max-w-[470px] mt-5`}>
-        Elit enim sed massa etiam. Mauris eu adipiscing ultrices ametodio
-        aenean neque. Fusce ipsum orci rhoncus aliporttitor integer platea
-        placerat.
+      Mit Timetab, Ihrem Wegweiser zur effizienten Schichtplanung, wird die Erstellung und Management von Arbeitsplänen spielend leicht. Unsere benutzerfreundliche und technologisch fortschrittliche Lösung sorgt für konfliktfreie, gesetzeskonforme und personalisierte Schichtpläne. Optimieren Sie Ihre Teams, während Sie sich voll und ganz auf das Wachstum Ihres Geschäfts konzentrieren. Lassen Sie Timetab für Sie arbeiten und erleben Sie eine reibungslose, automatisierte Personalplanung.
       </p>
 
     </div>
