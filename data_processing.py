@@ -211,6 +211,7 @@ class DataProcessing:
         
         # Erstellen eines Dictionaries mit Datum und Stunde als Schlüssel:
         time_req_dict_2 = defaultdict(dict)
+        py_time_req_dict_2 = dict(time_req_dict_2)
         for record in time_reqs:
             date = record.date
             start_time = self.time_to_timedelta(record.start_time)
@@ -261,6 +262,7 @@ class DataProcessing:
 
         # Generiert automatisch einen Standardwert für nicht vorhandene Schlüssel.
         binary_availability = defaultdict(list)
+        py_binary_availability = dict(binary_availability)
 
         for user_id, availabilities in self.user_availability.items():
             for date, start_time, end_time in availabilities:
@@ -301,6 +303,7 @@ class DataProcessing:
 
         # Dictionarie erstellen mit user_id als Key:
         self.user_employment = defaultdict(str, {user.id: user.employment for user in users})
+        py_user_employment = dict(self.user)
 
 
 

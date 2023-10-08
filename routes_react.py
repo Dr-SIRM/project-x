@@ -640,7 +640,6 @@ def run_solver():
         print("JSON Payload:", solver_data)  # Log payload
 
         from data_processing import DataProcessing
-        from or_algorithm import ORAlgorithm
         from or_algorithm_cp import ORAlgorithm_cp
 
         if 'solverButtonClicked' in solver_data and solver_data['solverButtonClicked']:
@@ -1012,10 +1011,6 @@ def get_required_workforce():
     day_num = 7   
     company_id = user.company_id
 
-    # BRAUCHT ES DIESE EXCELAUSGABE NOCH? Gery - 23.09.2023
-    get_excel()
-
-    
 
     # Fetch Opening Data
     all_opening_hours = OpeningHours.query.filter(
