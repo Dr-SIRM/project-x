@@ -49,12 +49,12 @@ To-Do Liste:
  - (erl) pre_check_admin aus data_processing in or_algorithm einpflegen
  - (erl) gerechte Verteilung angepasst
  - (erl) Wenn min Zeit grösser als gewünschte, dann Fehler -> beheben!
+ - (erl) Überprüfen, ob eigegebene werte bei Verletzungsvariabeln wirklich korrekt sind
  
  To-Do's 
  -------------------------------
 
  - (*) Vorüberprüfungen fertigstellen und Daten an React geben
- - (*) Überprüfen, ob eigegebene werte bei Verletzungsvariabeln wirklich korrekt sind
 
   - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden??
 
@@ -329,13 +329,6 @@ class ORAlgorithm_cp:
 
         # -- 14 ------------------------------------------------------------------------------------------------------------
         # Eine Liste mit den Stunden wie sie gerecht verteilt werden
-
-        """
-        Zuerst wie jetzt gerechte Verteilungsliste erstellen, dann für jeden "Temp" MA überprüfen,
-        ob er die Stunden überhaupt eingegeben hat. Wenn ja, alles gut, wenn er unterschritten hat,
-        dann die eingegebenen Stunden bei gerechte Verteilung ersetzen und fehlende Stunden neu gerecht
-        den Mitarbeitern aufteilen.
-        """
 
         # Braucht es nicht mehr (denke ich) - 07.10.2023
         """
@@ -706,7 +699,7 @@ class ORAlgorithm_cp:
     def pre_check_7(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        6. Ist die min. Zeit pro Tag so klein, dass die Stunden in der gerechten Verteilung nicht erfüllt werden können?
+        7. Ist die min. Zeit pro Tag so klein, dass die Stunden in der gerechten Verteilung nicht erfüllt werden können?
         ---------------------------------------------------------------------------------------------------------------
         """
         return None
@@ -714,7 +707,7 @@ class ORAlgorithm_cp:
     def pre_check_8(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        7. Ist die Toleranz der gerechten Verteilung zu klein gewählt? --> Evtl. die Bedingung weich machen!
+        8. Ist die Toleranz der gerechten Verteilung zu klein gewählt? --> Evtl. die Bedingung weich machen!
         ---------------------------------------------------------------------------------------------------------------
         """
         return None
