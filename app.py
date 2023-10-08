@@ -15,8 +15,7 @@ from collections.abc import Mapping as ABCMapping
 #Config
 #----------------------------------------------------------------------------------
 
-app = Flask(__name__, template_folder='template')
-CORS(app)
+
 
 
 #SET SQLALCHEMY
