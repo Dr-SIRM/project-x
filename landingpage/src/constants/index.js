@@ -11,11 +11,11 @@ export const navLinks = [
   },
   {
     id: "product",
-    title: "Product",
+    title: "Produkt",
   },
   {
     id: "clients",
-    title: "Clients",
+    title: "Kunden",
   },
 ];
 
@@ -23,23 +23,23 @@ export const features = [
   {
     id: "feature-1",
     icon: star,
-    title: "Rewards",
+    title: "Effizienz",
     content:
-      "The best credit cards offer some tantalizing combinations of promotions and prizes",
+      "TimeTab minimiert den manuellen Aufwand und automatisiert die Erstellung von Schichtplänen, sodass Sie wertvolle Zeit sparen.",
   },
   {
     id: "feature-2",
     icon: shield,
-    title: "100% Secured",
+    title: "Mitarbeiterzufriedenheit",
     content:
-      "We take proactive steps make sure your information and transactions are secure.",
+      "Durch Berücksichtigung individueller Präferenzen und Verfügbarkeiten bei der automatisierten Schichtplanung trägt unser Tool dazu bei, die Zufriedenheit und Motivation Ihrer Mitarbeiter zu steigern.",
   },
   {
     id: "feature-3",
     icon: send,
-    title: "Balance Transfer",
+    title: "Zuverlässigkeit",
     content:
-      "A balance transfer credit card can save you a lot of money in interest charges.",
+      " Mit intelligenten Algorithmen werden Fehler vermieden und eine verlässliche, bedarfsgerechte Personalzuordnung sichergestellt.",
   },
 ];
 
@@ -73,18 +73,18 @@ export const feedback = [
 export const stats = [
   {
     id: "stats-1",
-    title: "User Active",
-    value: "3800+",
+    title: "Schneller als die manuelle Planung",
+    value: "20X ",
   },
   {
     id: "stats-2",
-    title: "Stat",
-    value: "2",
+    title: "Steigerung der Mitarbeiterzufriedenheit",
+    value: "25%",
   },
   {
     id: "stats-3",
-    title: "Transaction",
-    value: "$230M+",
+    title: "Reduzierung von Planungsfehlern",
+    value: "95%",
   },
 ];
 
