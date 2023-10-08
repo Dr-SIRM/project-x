@@ -1,4 +1,4 @@
-from sqlalchemy import text
+from sqlalchemy import text, case
 from datetime import datetime, time
 from dateutil.relativedelta import relativedelta
 from collections import defaultdict
@@ -117,46 +117,26 @@ class DataProcessing:
         company_name = user.company_name
 
         users = User.query.filter_by(company_name=company_name).all()
-        user_ids = [user.user_id for user in users]
+        user_ids = [user.id for user in users]
 
         availability = Availability.query.filter(
             Availability.user_id.in_(user_ids),
-            Availability.start_date == self.start_date,
-            Availability.end_date == self.end_date
+            Availability.date.between(self.start_date, self.end_date)
         ).all()
 
-        times = [(record.user_id, record.start_date, record.end_date) for record in availability]
+        times = [(record.id, record.date, record.start_time, record.end_time) for record in availability]
 
-        print("New times:", times)
+        
+        # Dictionarie erstellen mit user_id als Key:
+        user_availability = defaultdict(list)
+        for user_id, date, start_time, end_time in times:
+            user_availability[user_id].append((date, start_time, end_time))
 
-        with app.app_context():
-            
-            # Verfügbarkeiten für alle Benutzer mit demselben company_name abrufen
-            sql = text("""
-                SELECT a.user_id, a.date, a.start_time, a.end_time
-                FROM availability a
-                JOIN user u ON a.user_id = u.id
-                WHERE u.company_name = :company_name
-                AND a.date BETWEEN :start_date AND :end_date
-            """)
-            # execute = rohe Mysql Abfrage.
-            result = db.session.execute(sql, {"company_name": company_name, "start_date": self.start_date, "end_date": self.end_date})
-            # fetchall = alle Zeilen der Datenbank werden abgerufen und in einem Tupel gespeichert
-            times = result.fetchall()
+        # Sortieren der Einträge in der Liste für jeden Benutzer nach Datum
+        for user_id, availabilities in user_availability.items():
+            user_availability[user_id] = sorted(availabilities, key=lambda x: x[0])
 
-            print("TIMES:", times)
-
-
-            # Dictionarie erstellen mit user_id als Key:
-            user_availability = defaultdict(list)
-            for user_id, date, start_time, end_time in times:
-                user_availability[user_id].append((date, start_time, end_time))
-
-            # Sortieren der Einträge in der Liste für jeden Benutzer nach Datum
-            for user_id, availabilities in user_availability.items():
-                user_availability[user_id] = sorted(availabilities, key=lambda x: x[0])
-
-            self.user_availability = user_availability
+        self.user_availability = user_availability
 
 
     def time_to_int(self, t):
@@ -182,25 +162,27 @@ class DataProcessing:
     def get_opening_hours(self):
         """ In dieser Funktion werden die Öffnungszeiten (7 Tage) der jeweiligen Company aus der Datenbank gezogen. """
         
-        with app.app_context():
-            # Abfrage, um den company_name des aktuellen Benutzers zu erhalten
-            sql = text("""
-                SELECT company_name
-                FROM user
-                WHERE id = :current_user_id
-            """)
-            result = db.session.execute(sql, {"current_user_id": self.current_user_id})
-            company_name = result.fetchone()[0]
+        # company_name filtern aus der Datenkbank
+        user = User.query.filter_by(id=self.current_user_id).first()
+        company_name = user.company_name
 
-            # Abfrage, um die Öffnungszeiten der Firma basierend auf dem company_name abzurufen
-            sql = text("""
-                SELECT weekday, start_time, end_time, end_time2
-                FROM opening_hours
-                WHERE company_name = :company_name
-                ORDER BY FIELD(weekday, 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag')
-            """)
-            result = db.session.execute(sql, {"company_name": company_name})
-            times = result.fetchall()
+        weekday_order = case(
+            *[(OpeningHours.weekday == "Montag", 1),
+            (OpeningHours.weekday == "Dienstag", 2),
+            (OpeningHours.weekday == "Mittwoch", 3),
+            (OpeningHours.weekday == "Donnerstag", 4),
+            (OpeningHours.weekday == "Freitag", 5),
+            (OpeningHours.weekday == "Samstag", 6),
+            (OpeningHours.weekday == "Sonntag", 7)]
+        )
+
+        opening = OpeningHours.query.filter_by(company_name=company_name).order_by(weekday_order).all()
+
+        times = [(record.weekday, self.time_to_int(record.start_time), self.time_to_int(record.end_time), self.time_to_int(record.end_time2)) for record in opening]
+
+        print("Opening Times:", times)
+
+
 
         # Initialisiere leere Listen für die Öffnungs- und Schließzeiten
         self.laden_oeffnet = [None] * 7
