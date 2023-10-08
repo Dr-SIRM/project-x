@@ -79,25 +79,6 @@ class DataProcessing:
         # Zeitraum selbst manipulieren
         # self.start_date = "2023-08-07"
         # self.end_date = "2023-08-13"
-        # Gute Daten zum testsolven
-        # self.start_date = "2023-07-31"
-        # self.end_date = "2023-08-04"
-
-        # Alles voll availability 3-MA 1 Woche
-        # self.start_date = "2023-07-10"
-        # self.end_date = "2023-07-16"
-
-        # Alles voll availability 3-MA 2 Wochen
-        # self.start_date = "2023-07-17"
-        # self.end_date = "2023-07-30"
-
-        # Alles voll availability 3-MA 4 Wochen
-        # self.start_date = "2023-07-03"
-        # self.end_date = "2023-07-30"
-
-        # usecase_1
-        # self.start_date = "2023-08-28"
-        # self.end_date = "2023-09-10"
 
         print(self.start_date)
         print(self.end_date)
@@ -124,9 +105,8 @@ class DataProcessing:
             Availability.date.between(self.start_date, self.end_date)
         ).all()
 
-        times = [(record.id, record.date, record.start_time, record.end_time) for record in availability]
+        times = [(record.user_id, record.date, self.time_to_timedelta(record.start_time), self.time_to_timedelta(record.end_time)) for record in availability]
 
-        
         # Dictionarie erstellen mit user_id als Key:
         user_availability = defaultdict(list)
         for user_id, date, start_time, end_time in times:
@@ -137,6 +117,7 @@ class DataProcessing:
             user_availability[user_id] = sorted(availabilities, key=lambda x: x[0])
 
         self.user_availability = user_availability
+
 
 
     def time_to_int(self, t):
@@ -157,10 +138,10 @@ class DataProcessing:
         
         return int(total_seconds / divisor)
     
-
-
     def time_to_timedelta(self, t):
         return timedelta(hours=t.hour, minutes=t.minute, seconds=t.second)
+
+
 
     def get_opening_hours(self):
         """ In dieser Funktion werden die Öffnungszeiten (7 Tage) der jeweiligen Company aus der Datenbank gezogen. """
@@ -182,12 +163,6 @@ class DataProcessing:
         opening = OpeningHours.query.filter_by(company_name=company_name).order_by(weekday_order).all()
 
         times = [(record.weekday, self.time_to_timedelta(record.start_time), self.time_to_timedelta(record.end_time), self.time_to_timedelta(record.end_time2)) for record in opening]
-
-        print("Opening Times:", times)
-
-        
-
-
 
         # Initialisiere leere Listen für die Öffnungs- und Schließzeiten
         self.laden_oeffnet = [None] * 7
@@ -216,98 +191,68 @@ class DataProcessing:
         self.laden_schliesst = self.laden_schliesst * self.week_timeframe
         self.opening_hours = self.opening_hours * self.week_timeframe
 
-
         
+
     def get_time_req(self):
         """ In dieser Funktion werden die benötigten Mitarbeiter für jede Stunde jedes Tages abgerufen """
-        with app.app_context():
-            # Hole den company_name des aktuellen Benutzers
-            sql = text("""
-                SELECT company_name
-                FROM user
-                WHERE id = :current_user_id
-            """)
-            result = db.session.execute(sql, {"current_user_id": self.current_user_id})
-            company_name = result.fetchone()[0]
 
-            # Anforderungen für das Unternehmen mit demselben company_name abrufen
-            sql = text("""
-                SELECT t.date, t.start_time, t.worker
-                FROM time_req t
-                WHERE t.company_name = :company_name
-                AND t.date BETWEEN :start_date AND :end_date
-            """)
-            result = db.session.execute(sql, {"company_name": company_name, "start_date": self.start_date, "end_date": self.end_date})
-            time_reqs = result.fetchall()
+        # company_name filtern aus der Datenkbank
+        user = User.query.filter_by(id=self.current_user_id).first()
+        company_name = user.company_name
 
-            # Bestimme den Divisor basierend auf self.hour_devider
-            divisor = 3600 / self.hour_devider
+        # Anforderungen für das Unternehmen mit demselben company_name abrufen
+        time_reqs = TimeReq.query.filter(
+            TimeReq.company_name == company_name,
+            TimeReq.date.between(self.start_date, self.end_date)
+        ).all()
 
-            # Erstellen eines Dictionaries mit Datum und Stunde als Schlüssel:
-            time_req_dict_2 = defaultdict(dict)
-            for date, start_time, worker in time_reqs:
-                weekday_index = date.weekday()
-                if (self.laden_oeffnet[weekday_index] <= start_time < self.laden_schliesst[weekday_index]):
-                    start_hour = int(start_time.total_seconds() // divisor) - int(self.laden_oeffnet[weekday_index].total_seconds() // divisor)
-                    if start_hour < 0:
-                        start_hour = 0
-                    time_req_dict_2[date][start_hour] = worker
+        # Bestimme den Divisor basierend auf self.hour_devider
+        divisor = 3600 / self.hour_devider
+        
+        # Erstellen eines Dictionaries mit Datum und Stunde als Schlüssel:
+        time_req_dict_2 = defaultdict(dict)
+        for record in time_reqs:
+            date = record.date
+            start_time = self.time_to_timedelta(record.start_time)
+            worker = record.worker
+            
+            weekday_index = date.weekday()
+            if (self.laden_oeffnet[weekday_index] <= start_time < self.laden_schliesst[weekday_index]):
+                start_hour = int(start_time.total_seconds() // divisor) - int(self.laden_oeffnet[weekday_index].total_seconds() // divisor)
+                if start_hour < 0:
+                    start_hour = 0
+                time_req_dict_2[date][start_hour] = worker
+                
+        # Umwandeln des Strings in ein datetime.date-Objekt
+        current_date = datetime.strptime(self.start_date, '%Y-%m-%d').date()
+        
+        # Füge fehlende Tage hinzu
+        while current_date <= datetime.strptime(self.end_date, '%Y-%m-%d').date():
+            if current_date not in time_req_dict_2:
+                time_req_dict_2[current_date] = {}
+            current_date += timedelta(days=1)
+        
+        # Sortiere das Wörterbuch nach Datum
+        self.time_req = OrderedDict(sorted(time_req_dict_2.items()))
 
-            # Umwandeln des Strings in ein datetime.date-Objekt
-            current_date = datetime.strptime(self.start_date, '%Y-%m-%d').date()
-
-            # Füge fehlende Tage hinzu
-            while current_date <= datetime.strptime(self.end_date, '%Y-%m-%d').date():
-                if current_date not in time_req_dict_2:
-                    time_req_dict_2[current_date] = {}
-                current_date += timedelta(days=1)
-
-            # Sortiere das Wörterbuch nach Datum
-            self.time_req = OrderedDict(sorted(time_req_dict_2.items()))
 
 
     def get_shift_weeklyhours_emp_lvl(self):
         """ In dieser Funktion wird als Key die user_id verwendet und die shift, employment_level und weekly_hours aus der Datenbank gezogen """
-        with app.app_context():
-            # Hole den Firmennamen des aktuellen Benutzers
-            sql = text("""
-                SELECT company_name
-                FROM user
-                WHERE id = :current_user_id
-            """)
-            result = db.session.execute(sql, {"current_user_id": self.current_user_id})
-            company_name = result.fetchone()[0]
 
-            # Hole die Schichten für die Firma des aktuellen Benutzers
-            sql = text("""
-                SELECT shifts
-                FROM company
-                WHERE company_name = :company_name
-            """)
-            result = db.session.execute(sql, {"company_name": company_name})
-            company_shifts = result.fetchone()[0]
+        # company_name filtern aus der Datenkbank
+        user = User.query.get(self.current_user_id)
+        company_name = user.company_name
 
-            # Hole die weekly_hours für die Firma des aktuellen Benutzers
-            sql = text("""
-                SELECT weekly_hours
-                FROM company
-                WHERE company_name = :company_name
-            """)
-            result = db.session.execute(sql, {"company_name": company_name})
-            weekly_hours = result.fetchone()[0]
+        # Hole die Schichten und die weekly_hours für die Firma des aktuellen Benutzers in einer einzelnen Abfrage
+        company = Company.query.filter_by(company_name=company_name).first()
+        
+        self.company_shifts = company.shifts
+        self.weekly_hours = company.weekly_hours
 
-            # Hole das employment_level für jeden Benutzer, der in der gleichen Firma arbeitet wie der aktuelle Benutzer
-            sql = text("""
-                SELECT id, employment_level
-                FROM user
-                WHERE company_name = :company_name
-            """)
-            result = db.session.execute(sql, {"company_name": company_name})
-            employment_lvl = {user_id: employment_level for user_id, employment_level in result.fetchall()}
-
-        self.company_shifts = company_shifts
-        self.weekly_hours = weekly_hours
-        self.employment_lvl = employment_lvl
+        # Hole das employment_level für jeden Benutzer, der in der gleichen Firma arbeitet wie der aktuelle Benutzer
+        users = User.query.filter_by(company_name=company_name).all()
+        self.employment_lvl = {user.id: user.employment_level for user in users}
 
 
 
@@ -345,108 +290,64 @@ class DataProcessing:
 
 
     def get_employment(self):
-            """ In der folgenden Methode holen wir die Beschäftigung jedes Benutzers und fügen sie in eine Liste ein """
-            with app.app_context():
-                            
-                # Hole den company_name des aktuellen Benutzers
-                sql = text("""
-                    SELECT company_name
-                    FROM user
-                    WHERE id = :current_user_id
-                """)
-                result = db.session.execute(sql, {"current_user_id": self.current_user_id})
-                company_name = result.fetchone()[0]
-                
-                # Hole das employment_level für jeden Benutzer, der in der gleichen Firma arbeitet wie der aktuelle Benutzer
-                sql = text("""
-                    SELECT id, employment
-                    FROM user
-                    WHERE company_name = :company_name
-                """)
+        """ In der folgenden Methode holen wir die Beschäftigung jedes Benutzers und fügen sie in eine Liste ein """
 
-                # execute = rohe Mysql Abfrage.
-                result = db.session.execute(sql, {"company_name": company_name})
-                # fetchall = alle Zeilen der Datenbank werden abgerufen und in einem Tupel gespeichert
-                employment_data = result.fetchall()
+        # company_name filtern aus der Datenkbank
+        user = User.query.get(self.current_user_id)
+        company_name = user.company_name
 
-                # Dictionarie erstellen mit user_id als Key:
-                user_employment = defaultdict(str)
-                for user_id, employment in employment_data:
-                    user_employment[user_id] = employment
+        # Hole das employment_level für jeden Benutzer, der in der gleichen Firma arbeitet wie der aktuelle Benutzer
+        users = User.query.filter_by(company_name=company_name).all()
 
-                self.user_employment = user_employment
+        # Dictionarie erstellen mit user_id als Key:
+        self.user_employment = defaultdict(str, {user.id: user.employment for user in users})
 
 
 
     def get_solver_requirement(self):
         """ In dieser Methode werden die Anforderungen des Solvers für das Unternehmen gezogen """
-        with app.app_context():
-            # Hole den company_name des aktuellen Benutzers
-            sql = text("""
-                SELECT company_name
-                FROM user
-                WHERE id = :current_user_id
-            """)
-            result = db.session.execute(sql, {"current_user_id": self.current_user_id})
-            company_name = result.fetchone()[0]
-            
-            # Hole die Solver-Anforderungen für das Unternehmen
-            sql = text("""
-                SELECT 
-                    id,
-                    company_name,
-                    weekly_hours,
-                    shifts,
-                    desired_min_time_day,
-                    desired_max_time_day,
-                    min_time_day,
-                    max_time_day,
-                    desired_max_time_week,
-                    max_time_week,
-                    hour_devider,
-                    fair_distribution,
-                    week_timeframe,
-                       
-                    subsequent_workingdays,
-                    daily_deployment,
-                    time_per_deployment,
 
-                    nb1, nb2, nb3, nb4, nb5,
-                    nb6, nb7, nb8, nb9, nb10,
-                    nb11, nb12, nb13, nb14, nb15,
-                    nb16, nb17, nb18, nb19, nb20
-                FROM solver_requirement
-                WHERE company_name = :company_name
-            """)
-            result = db.session.execute(sql, {"company_name": company_name})
-            solver_requirements = result.fetchall()
+        # company_name filtern aus der Datenkbank
+        user = User.query.get(self.current_user_id)
+        company_name = user.company_name
 
-            for row in solver_requirements:
-                row_dict = {
-                    'id': row[0],
-                    'company_name': row[1],
-                    'weekly_hours': row[2],
-                    'shifts': row[3],
-                    'desired_min_time_day': row[4],
-                    'desired_max_time_day': row[5],
-                    'min_time_day': row[6],
-                    'max_time_day': row[7],
-                    'desired_max_time_week': row[8],
-                    'max_time_week': row[9],
-                    'hour_devider': row[10],
-                    'fair_distribution': row[11],
-                    'week_timeframe': row[12],
-                    'subsequent_workingdays': row[13],
-                    'daily_deployment': row[14],
-                    'time_per_deployment': row[15],
-                    'nb1': row[16], 'nb2': row[17], 'nb3': row[18], 'nb4': row[19], 'nb5': row[20],
-                    'nb6': row[21], 'nb7': row[22], 'nb8': row[23], 'nb9': row[24], 'nb10': row[25],
-                    'nb11': row[26], 'nb12': row[27], 'nb13': row[28], 'nb14': row[29], 'nb15': row[30],
-                    'nb16': row[31], 'nb17': row[32], 'nb18': row[33], 'nb19': row[34], 'nb20': row[35]
-                }
-
-            self.solver_requirements = row_dict
-
-
-
+        solver_requirement = SolverRequirement.query.filter_by(company_name=company_name).first()
         
+        self.solver_requirements = {
+            'id': solver_requirement.id,
+            'company_name': solver_requirement.company_name,
+            'weekly_hours': solver_requirement.weekly_hours,
+            'shifts': solver_requirement.shifts,
+            'desired_min_time_day': solver_requirement.desired_min_time_day,
+            'desired_max_time_day': solver_requirement.desired_max_time_day,
+            'min_time_day': solver_requirement.min_time_day,
+            'max_time_day': solver_requirement.max_time_day,
+            'desired_max_time_week': solver_requirement.desired_max_time_week,
+            'max_time_week': solver_requirement.max_time_week,
+            'hour_devider': solver_requirement.hour_devider,
+            'fair_distribution': solver_requirement.fair_distribution,
+            'week_timeframe': solver_requirement.week_timeframe,
+            'subsequent_workingdays': solver_requirement.subsequent_workingdays,
+            'daily_deployment': solver_requirement.daily_deployment,
+            'time_per_deployment': solver_requirement.time_per_deployment,
+            'nb1': solver_requirement.nb1,
+            'nb2': solver_requirement.nb2,
+            'nb3': solver_requirement.nb3,
+            'nb4': solver_requirement.nb4,
+            'nb5': solver_requirement.nb5,
+            'nb6': solver_requirement.nb6,
+            'nb7': solver_requirement.nb7,
+            'nb8': solver_requirement.nb8,
+            'nb9': solver_requirement.nb9,
+            'nb10': solver_requirement.nb10,
+            'nb11': solver_requirement.nb11,
+            'nb12': solver_requirement.nb12,
+            'nb13': solver_requirement.nb13,
+            'nb14': solver_requirement.nb14,
+            'nb15': solver_requirement.nb15,
+            'nb16': solver_requirement.nb16,
+            'nb17': solver_requirement.nb17,
+            'nb18': solver_requirement.nb18,
+            'nb19': solver_requirement.nb19,
+            'nb20': solver_requirement.nb20
+        }
