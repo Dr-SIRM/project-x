@@ -8,6 +8,7 @@ from models import User, Availability, TimeReq, Company, OpeningHours, Timetable
     TemplateAvailability, TemplateTimeRequirement, RegistrationToken, PasswordReset, \
     SolverRequirement, SolverAnalysis
 
+
 class DataProcessing:
     def __init__(self, current_user_id):
         # Attribute
@@ -50,12 +51,10 @@ class DataProcessing:
         user = User.query.filter_by(id=self.current_user_id).first()
         company_name = user.company_name
 
-
         # week_timeframe und hour_devider filtern aus der Datenkbank
         solver_req = SolverRequirement.query.filter_by(company_name=company_name).first()
         self.week_timeframe = solver_req.week_timeframe
         self.hour_devider = solver_req.hour_devider
-
 
         # Holen Sie sich das heutige Datum
         today = datetime.today()
