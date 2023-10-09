@@ -56,8 +56,9 @@ To-Do Liste:
  To-Do's 
  -------------------------------
 
- - (*) Vorüberprüfungen fertigstellen und Daten an React geben
+ - (*) Vorüberprüfungen sauber beschreiben damit es vernünftig angezeigt wird. Stoppt der Solver wenn es einen Fehler auslöst??
  - (*) self.subsequent_workingdays_max in die Datenbank einpflegen und ziehen
+ - (*) Wenn Montag ist, wird für diese Woche gesolvt statt für nächste Woche. -> Evtl. Solvingzeitraum anwählen können?
  - (*) excel_output Daten anderst ziehen
 
   - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden??
