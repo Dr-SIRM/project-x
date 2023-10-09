@@ -51,6 +51,8 @@ To-Do Liste:
  - (erl) Überprüfen, ob eigegebene werte bei Verletzungsvariabeln wirklich korrekt sind
  - (erl) NB11 und 12 implementieren
  - (erl) Bei den max. Arbeitstagen eine obere schranke einbauen (harte NB 10)
+ - (erl) excel_output Daten anderst ziehen
+ - (erl) Wenn Montag ist, wird für diese Woche gesolvt statt für nächste Woche
  
 
  To-Do's 
@@ -58,8 +60,6 @@ To-Do Liste:
 
  - (*) Vorüberprüfungen sauber beschreiben damit es vernünftig angezeigt wird. Stoppt der Solver wenn es einen Fehler auslöst??
  - (*) self.subsequent_workingdays_max in die Datenbank einpflegen und ziehen
- - (*) Wenn Montag ist, wird für diese Woche gesolvt statt für nächste Woche. -> Evtl. Solvingzeitraum anwählen können?
- - (*) excel_output Daten anderst ziehen
 
   - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden??
 
@@ -70,6 +70,7 @@ To-Do Liste:
  - start_time und end_time zwei und drei noch implementieren (noch warten bis über 00:00 Zeiten eingegeben werden können!)
  - MA mit verschiedenen Profilen - Department (Koch, Service, ..)
  - Der erstellte "divisor" in data_processing könnte als Attribut initialisiert werden, damit es nicht bei jeder Methode einzeln berechnet werden muss
+ - Solvingzeitraum selbst anwählen können
  - (*) NB9 mit 3 Schichten fertigbauen
  -------------------------------
 

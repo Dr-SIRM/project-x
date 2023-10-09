@@ -61,7 +61,8 @@ class DataProcessing:
         today = datetime.today()
 
         # Finden Sie den nächsten Montag
-        next_monday = today + timedelta(days=(0-today.weekday() + 7) % 7)
+        # next_monday = today + timedelta(days=(0-today.weekday() + 7) % 7)
+        next_monday = today + timedelta(days=-today.weekday(), weeks=1)
 
         # Berechnen Sie das Enddatum basierend auf week_timeframe
         if self.week_timeframe == 1:
