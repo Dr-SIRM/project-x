@@ -627,7 +627,13 @@ def get_invite():
     return jsonify(invite_dict)
 
 
-@app.route('/api/solver', methods=['GET', 'POST'])
+from flask_socketio import SocketIO
+socketio = SocketIO(app, cors_allowed_origins="*") 
+from data_processing import DataProcessing
+from or_algorithm import ORAlgorithm
+from or_algorithm_cp import ORAlgorithm_cp
+
+@app.route('/api/solver', methods=['POST'])
 @jwt_required()
 def run_solver():
     print("Request received", request.method)  # Log the type of request received
@@ -635,37 +641,36 @@ def run_solver():
     react_user = get_jwt_identity()
     user = User.query.filter_by(email=react_user).first()
 
-    if request.method == 'POST':
-        print("Headers:", request.headers)  # Log headers
-        solver_data = request.get_json()
-        print("JSON Payload:", solver_data)  # Log payload
+    solver_data = request.get_json()
+    print("JSON Payload:", solver_data)  # Log payload
 
-        from data_processing import DataProcessing
-        from or_algorithm_cp import ORAlgorithm_cp
+    if 'solverButtonClicked' in solver_data and solver_data['solverButtonClicked']:
+        dp = DataProcessing(user.id)
+        dp.run()
+        or_algo_cp = ORAlgorithm_cp(dp)
 
-        if 'solverButtonClicked' in solver_data and solver_data['solverButtonClicked']:
-            dp = DataProcessing(user.id)
-            dp.run()
-            or_algo_cp = ORAlgorithm_cp(dp)
+        or_algo_cp.run()
+        for i in range(1, 7):  # Assuming you have 6 pre-checks
+            pre_check_result = getattr(or_algo_cp, f'pre_check_{i}')()
+            socketio.emit('pre_check_update', {
+                'pre_check_number': i,
+                'status': 'completed' if pre_check_result["success"] else 'error',
+                'message': pre_check_result["message"]
+            })
 
-            or_algo_cp.run()
-            for i in range(1, 2):
-                pre_check_result = getattr(or_algo_cp, f'pre_check_{i}')()
-                if not pre_check_result["success"]:
-                    print(f'Pre-check {i} failed: {pre_check_result["message"]}')  # Log failure
-                    return jsonify({'message': f'Pre-check {i} failed: {pre_check_result["message"]}'}), 400
-                
-            
-            or_algo_cp.run_2()
+            if not pre_check_result["success"]:
+                return jsonify({'message': f'Pre-check {i} failed: {pre_check_result["message"]}'}), 400
 
-            print("Solver successfully started")  # Log success
-            return jsonify({'message': 'Solver successfully started'}), 200
-        else:
-            print("Solver button was not clicked")  # Log if button wasn’t clicked
-            return jsonify({'message': 'Solver button was not clicked'}), 200
+        or_algo_cp.run_2()
 
-    print("Solver Go")  # Log for GET method
-    return jsonify({'message': 'Solver Go'}), 200
+        print("Solver successfully started")  # Log success
+        return jsonify({'message': 'Solver successfully started'}), 200
+    else:
+        print("Solver button was not clicked")  # Log if button wasn’t clicked
+        return jsonify({'message': 'Solver button was not clicked'}), 200
+
+if __name__ == '__main__':
+    socketio.run(app, host='0.0.0.0', port=5000)  # Adjust host and port as needed
 
 
 
@@ -1012,6 +1017,10 @@ def get_required_workforce():
     day_num = 7   
     company_id = user.company_id
 
+    # BRAUCHT ES DIESE EXCELAUSGABE NOCH? Gery - 23.09.2023
+    get_excel()
+
+    
 
     # Fetch Opening Data
     all_opening_hours = OpeningHours.query.filter(

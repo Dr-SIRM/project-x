@@ -6,81 +6,106 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
 from openpyxl.utils import get_column_letter
 from app import app, db, timedelta
-from sqlalchemy import text
+from sqlalchemy import text, case
+from models import User, Availability, TimeReq, Company, OpeningHours, Timetable, \
+    TemplateAvailability, TemplateTimeRequirement, RegistrationToken, PasswordReset, \
+    SolverRequirement, SolverAnalysis
+
+
+def time_to_timedelta(t):
+    return timedelta(hours=t.hour, minutes=t.minute, seconds=t.second)
+
 
 def create_excel_output(user_id):
     """
     In dieser Funktion werden relevante gesolvte Daten aus der Datenbank gezogen und eine Excelausgabe daraus generiert.
     """
 
+
     # Achtung, start_date muss immer ein Montag sein!
     start_date = "2023-10-09"
     end_date = "2023-10-15"
 
-    with app.app_context():
-                """
-                COMPANY INFOS ZIEHEN ---------------------------------------------------------------
-                """
-                # Hole den company_name des aktuellen Benutzers
-                sql = text("""
-                    SELECT company_name
-                    FROM user
-                    WHERE id = :current_user_id
-                """)
-                result = db.session.execute(sql, {"current_user_id": user_id})
-                company_name = result.fetchone()[0]
+    """
+    COMPANY INFOS ZIEHEN ---------------------------------------------------------------
+    """
+    # Hole den company_name des aktuellen Benutzers
+    user = User.query.filter_by(id=user_id).first()
+    company_name = user.company_name
 
-                # ----------------------------------------------------------------------------------
+    # ----------------------------------------------------------------------------------
 
-                # Abfrage, um die Öffnungszeiten der Firma basierend auf dem company_name abzurufen
-                sql = text("""
-                    SELECT weekday, start_time, end_time, end_time2
-                    FROM opening_hours
-                    WHERE company_name = :company_name
-                    ORDER BY FIELD(weekday, 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag')
-                """)
-                result = db.session.execute(sql, {"company_name": company_name})
-                times = result.fetchall()
+    # Definieren Sie eine case Bedingung, um die Tage der Woche in der richtigen Reihenfolge zu sortieren
+    weekday_order = case(
+        (OpeningHours.weekday == "Montag", 1),
+        (OpeningHours.weekday == "Dienstag", 2),
+        (OpeningHours.weekday == "Mittwoch", 3),
+        (OpeningHours.weekday == "Donnerstag", 4),
+        (OpeningHours.weekday == "Freitag", 5),
+        (OpeningHours.weekday == "Samstag", 6),
+        (OpeningHours.weekday == "Sonntag", 7),
+        else_=100 
+    )
 
-                # ----------------------------------------------------------------------------------
+    # Öffnungszeiten basierend auf dem company_name abrufen und nach Wochentagen sortieren
+    opening = OpeningHours.query.filter_by(company_name=company_name).order_by(weekday_order).all()
 
-                # Abfrage, um hour_devider abzurufen
-                sql = text("""
-                    SELECT hour_devider
-                    FROM solver_requirement
-                    WHERE company_name = :company_name
-                """)
-                result = db.session.execute(sql, {"company_name": company_name})
-                hour_devider = result.fetchone()[0] # Um nur einen Wert zuzuschreiben
+    # Konvertieren Sie die Zeiten in time_delta und speichern Sie sie zusammen mit dem Wochentag in einer Liste
+    times = [
+        (record.weekday, 
+        time_to_timedelta(record.start_time), 
+        time_to_timedelta(record.end_time), 
+        time_to_timedelta(record.end_time2)) 
+        for record in opening
+    ]
 
-                """
-                USER INFOS ZIEHEN ------------------------------------------------------------------
-                """
+    # ----------------------------------------------------------------------------------
 
-                # Abfrage, um die user Informationen abzurufen
-                sql = text("""
-                    SELECT id, first_name, last_name, employment, email, employment_level
-                    FROM user
-                    WHERE company_name = :company_name
-                """)
-                result = db.session.execute(sql, {"company_name": company_name})
-                company_users = result.fetchall()
-                print(company_users)
+    # Abfrage, um hour_devider abzurufen
+    solver_requirement = SolverRequirement.query.filter_by(company_name=company_name).first()
+    hour_devider = solver_requirement.hour_devider if solver_requirement else None
 
-                # ----------------------------------------------------------------------------------
- 
-                # Abfrage, um die Tiemtable Infos der User abzurufen
-                sql = text("""
-                    SELECT email, date, start_time, end_time, start_time2, end_time2
-                    FROM timetable
-                    WHERE company_name = :company_name
-                    AND timetable.date BETWEEN :start_date AND :end_date
-                """)
 
-                result = db.session.execute(sql, {"company_name": company_name, "start_date": start_date, "end_date": end_date})
-                # fetchall = alle Zeilen der Datenbank werden abgerufen und in einem Tupel gespeichert
-                data_timetable = result.fetchall()
-                print(data_timetable)
+    """
+    USER INFOS ZIEHEN ------------------------------------------------------------------
+    """
+
+    # Abfrage, um die User-Informationen abzurufen
+    company_users = User.query.filter_by(company_name=company_name).with_entities(
+        User.id, User.first_name, User.last_name, User.employment, 
+        User.email, User.employment_level
+    ).all()
+
+    # ----------------------------------------------------------------------------------
+
+    # Abfrage, um die Timetable-Informationen abzurufen
+    data_timetable = (
+        Timetable.query.filter_by(company_name=company_name)
+        .filter(Timetable.date.between(start_date, end_date))
+        .with_entities(
+            Timetable.email,
+            Timetable.date,
+            Timetable.start_time,
+            Timetable.end_time,
+            Timetable.start_time2,
+            Timetable.end_time2,
+        )
+        .all()
+    )
+
+    # Konvertieren Sie die Zeiten in timedelta und speichern Sie sie in einer Liste
+    data_timetable = [
+        (
+            email, 
+            date, 
+            time_to_timedelta(start_time), 
+            time_to_timedelta(end_time), 
+            time_to_timedelta(start_time2) if start_time2 is not None else None, 
+            time_to_timedelta(end_time2) if end_time2 is not None else None
+        ) 
+        for email, date, start_time, end_time, start_time2, end_time2 in data_timetable
+    ]
+
 
 
     # Excel erstellen und befüllen ----------------------------------------------------------------------------------------------
