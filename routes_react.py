@@ -1017,10 +1017,7 @@ def get_required_workforce():
     day_num = 7   
     company_id = user.company_id
 
-    # BRAUCHT ES DIESE EXCELAUSGABE NOCH? Gery - 23.09.2023
-    get_excel()
-
-    
+   
 
     # Fetch Opening Data
     all_opening_hours = OpeningHours.query.filter(
