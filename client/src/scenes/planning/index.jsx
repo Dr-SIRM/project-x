@@ -57,11 +57,23 @@ const TimeReq = ({ timereq }) => {
 
   // Helper function to check if the current time is within the operating hours and break time
   const isTimeWithinRange = (current, opening, startBreak, endBreak, closing) => {
-    if (closing === 0 || closing === '') {
-      return current >= opening && current <= closing;
+    if (closing < opening) {
+      if (closing === null || closing === undefined) {
+        // If there's a break:
+        return current >= opening || current < closing;
+      } else {
+        // No break
+        return (current >= opening && current < startBreak) || (current >= endBreak && current <= closing);
+      }
+    } 
+    else {
+      if (closing === null || closing === undefined) {
+        return current >= opening && current <= closing;
+      }
+        return (current >= opening && current < startBreak) || (current >= endBreak && current <= closing);
     }
-      return (current >= opening && current < startBreak) || (current >= endBreak && current <= closing);
   };
+
 
   /// Define Click and Drag Function
   useEffect(() => {
@@ -494,6 +506,7 @@ const TimeReq = ({ timereq }) => {
                   }}>
 
                 {Array.from({ length: timereqData.daily_slots }).map((_, btnIndex) => {
+                  console.log("Slots:", timereqData.daily_slots)
 
                   const timereqKey = `${columnIndex}-${btnIndex}`;
                   const timereqValue = slotEmployeeCounts[timereqKey] || '';

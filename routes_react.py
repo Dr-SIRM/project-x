@@ -300,6 +300,7 @@ def get_company():
 
     if request.method == 'POST':
         company_data = request.get_json()
+        print(request.json)
 
         # Delete existing company data
         OpeningHours.query.filter_by(company_name=user.company_name).delete()
@@ -328,10 +329,10 @@ def get_company():
             entry4 = request.json.get(f'day_{i}_3')
             
             if entry1:
-                new_entry1 = get_time_str(entry1)
-                new_entry2 = get_time_str(entry2)
-                new_entry3 = get_time_str(entry3)
-                new_entry4 = get_time_str(entry4)
+                new_entry1 = get_time_str(entry1) if entry1 else None
+                new_entry2 = get_time_str(entry2) if entry2 else None
+                new_entry3 = get_time_str(entry3) if entry3 else None
+                new_entry4 = get_time_str(entry4) if entry4 else None
 
                 new_weekday = weekdays[i]
                 
@@ -1016,10 +1017,7 @@ def get_required_workforce():
     day_num = 7   
     company_id = user.company_id
 
-    # BRAUCHT ES DIESE EXCELAUSGABE NOCH? Gery - 23.09.2023
-    get_excel()
-
-    
+   
 
     # Fetch Opening Data
     all_opening_hours = OpeningHours.query.filter(
@@ -1035,22 +1033,48 @@ def get_required_workforce():
         weekday = weekdays.get(i)
         closing = opening_hours_dict.get(weekday)
         slot = 24
-        
+
         if closing:
-            if closing.end_time2.strftime("%H:%M") == "00:00":
-                if closing.end_time < closing.start_time:
-                    hour = closing.end_time.hour
-                    minute = closing.end_time.minute / 60 if closing.end_time.minute != 0 else 0
-                    slot += hour + minute
+            if closing.end_time == None:
+                pass
             else:
-                if closing.end_time2 < closing.start_time:
-                    hour = closing.end_time2.hour
-                    minute = closing.end_time2.minute / 60 if closing.end_time2.minute != 0 else 0
-                    slot += hour + minute
-                    
-        closing_times.append(slot)
+                if closing.end_time2 == None:
+                    if closing.end_time < closing.start_time:
+                        hour = closing.end_time.hour
+                        minute = closing.end_time.minute / 60 if closing.end_time.minute != 0 else 0
+                        slot += hour + minute
+                else:
+                    if closing.end_time2 < closing.start_time:
+                        hour = closing.end_time2.hour
+                        minute = closing.end_time2.minute / 60 if closing.end_time2.minute != 0 else 0
+                        slot += hour + minute
+                        
+            closing_times.append(slot)
 
     daily_slots = max(closing_times) * hour_divider
+    print(closing_times)
+    print(daily_slots)
+
+    # Calculation Min Working Day
+    opening_times = []
+    for i in range(day_num):
+        weekday = weekdays.get(i)
+        opening = opening_hours_dict.get(weekday)
+        slot = 0
+
+        if opening:
+            if opening.start_time == None:
+                pass
+            else:
+                hour = opening.start_time.hour
+                minute = opening.start_time.minute / 60 if opening.start_time.minute != 0 else 0
+                slot += hour + minute
+                        
+            opening_times.append(slot)
+    
+    print(opening_times)
+    min_opening = min(opening_times)* hour_divider
+    print(min_opening)
 
     # Week with adjustments
     monday = today - datetime.timedelta(days=today.weekday())
@@ -1058,16 +1082,15 @@ def get_required_workforce():
     week_start = monday + datetime.timedelta(days=week_adjustment)
 
     slot_dict = {}
-    for i in range(daily_slots):
-        if i > full_day:
-            i -= full_day
-        else:
-            pass
-        quarter_hour = i / hour_divider
-        quarter_minute = (i % hour_divider) * minutes  # Remainder gives the quarter in the hour
+    for i in range(min_opening, daily_slots):
+        effective_hour = i % full_day  # This will wrap around the time after 24
+        quarter_hour = effective_hour / hour_divider
+        quarter_minute = (effective_hour % hour_divider) * minutes  # Remainder gives the quarter in the hour
+        
         formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
         slot_dict[i] = formatted_time
     
+    print(slot_dict)
     # Pre-fetch all TimeReq for the given date range and company name
     end_date = week_start + datetime.timedelta(days=day_num)
     all_time_reqs = TimeReq.query.filter(
@@ -1111,9 +1134,11 @@ def get_required_workforce():
             opening_dict[str(new_i) + '&0'] = opening.start_time.strftime("%H:%M") if opening.start_time else None
             opening_dict[str(new_i) + '&1'] = opening.end_time.strftime("%H:%M") if opening.end_time else None
             
-            if opening.end_time2.strftime("%H:%M") != "00:00":
+            if opening.end_time2 != None:
                 opening_dict[str(new_i) + '&2'] = opening.start_time2.strftime("%H:%M") if opening.start_time2 else None
                 opening_dict[str(new_i) + '&3'] = opening.end_time2.strftime("%H:%M") if opening.end_time2 else None
+
+    print(opening_dict)
 
     #Submit the required FTE per hour
     if request.method == 'POST':
