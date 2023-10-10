@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef  } from 'react';
 import { Box, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
@@ -41,44 +41,57 @@ const Team = () => {
     fetchUser();
   }, []);
   
-    
-  const handleEditRowsModelChange = async (params) => {
-    console.log("handleEditRowsModelChange called", params);
+  const editingCellIdRef = useRef(null);  // Create a ref to store the id of the cell being edited
 
-    const id = params.model[0].id;
-    const field = params.model[0].field;
-    const newValue = params.model[0].value;
+  const handleCellEditStart = (params) => {
+    editingCellIdRef.current = params.id;  // Store the id of the cell being edited
+  };
 
-    // Prepare the data to be sent to the server
-    let sendData = {[field]: newValue};
+  const handleCellEditStop = async (params) => {
+    const id = params.id;
+    const field = params.field;
 
-    // Check if the edited field is 'employment_level' and modify the data accordingly
-    if (field === 'employment_level') {
-        sendData[field] = newValue / 100;  // Convert percentage back to a value between 0 and 1
-    }
+    // Retrieve the new value from the DOM
+    const inputElement = document.querySelector(`[data-id='${id}'] input`);
+    console.log('Input Element:', inputElement);
+    if (inputElement) {
+        const newValue = inputElement.value;
 
-    try {
-        // Send the modified data to the server
-        await axios.put(`${API_BASE_URL}/api/users/update/${id}`, sendData, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
+        console.log('New value:', newValue);  // Log the new value to the console for debugging
 
-        const updatedUsers = users.map(user => {
-            if (user.id === id) {
-                return { ...user, [field]: newValue };
-            }
-            return user;
-        });
-        setUsers(updatedUsers);
-    } catch (error) {
-        console.error('Error updating user:', error);
+        // Prepare the data to be sent to the server
+        let sendData = {[field]: newValue};
+
+        // Check if the edited field is 'employment_level' and modify the data accordingly
+        if (field === 'employment_level') {
+            sendData[field] = parseFloat(newValue) / 100;  // Convert percentage back to a value between 0 and 1
+        }
+
+        try {
+            // Send the modified data to the server
+            await axios.put(`${API_BASE_URL}/api/users/update/${id}`, sendData, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            // Re-fetch the data from the server
+            const response = await axios.get(`${API_BASE_URL}/api/users`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            console.log('Server Response:', response);
+            setUsers(response.data);  // Update the users state with the fresh data from the server
+
+        } catch (error) {
+            console.error('Error updating user:', error);
+        }
+    } else {
+        console.error('Could not find input element for edited cell');
     }
 };
 
-  
-  
 
 
   if (isLoading) {
@@ -213,12 +226,15 @@ const Team = () => {
         }}
       >        
         <DataGrid
-          checkboxSelection
-          rows={users}
-          columns={columns}
-          onEditCellChange={() => console.log('Edit cell change')}
-          onCellClick={() => console.log('Cell clicked')}
+        
+        rows={users}
+        columns={columns}
+        onCellEditStart={handleCellEditStart}  // Set the onCellEditStart prop
+        onCellEditStop={handleCellEditStop}   // Adjusted to call your function
+        onCellClick={(params) => console.log('Cell clicked', params)}
       />
+
+
 
       </Box>
     </Box>
