@@ -48,11 +48,11 @@ const Company = ({ company }) => {
   
   const handleFormSubmit = async (values) => {
     
-    Object.keys(values).forEach((key) => {
-      if (values[key] === '' || values[key] === undefined) {
-        values[key] = '00:00';
-      }
-    });
+    // Object.keys(values).forEach((key) => {
+    //   if (values[key] === '' || values[key] === undefined) {
+    //     values[key] = '00:00';
+    //   }
+    // });
 
     try {
       // Send the updated form values to the server for database update
