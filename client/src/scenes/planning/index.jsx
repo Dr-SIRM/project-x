@@ -50,27 +50,31 @@ const TimeReq = ({ timereq }) => {
   const navigate = useNavigate();
 
   const convertTimeToMinutes = (timeStr) => {
-    if (!timeStr) return 0;
+    if (!timeStr) return undefined;
     const [hour, minute] = timeStr.split(":");
     return parseInt(hour) * 60 + parseInt(minute);
   };
 
   // Helper function to check if the current time is within the operating hours and break time
   const isTimeWithinRange = (current, opening, startBreak, endBreak, closing) => {
-    if (closing < opening) {
-      if (closing === null || closing === undefined) {
-        // If there's a break:
-        return current >= opening || current < closing;
-      } else {
-        // No break
-        return (current >= opening && current < startBreak) || (current >= endBreak && current <= closing);
+    if (current === undefined || current === null) {
+      return false;
+    }
+    else{
+      if (closing < opening || startBreak < opening) {
+        if (closing === null || closing === undefined) {
+          return (current >= opening ) || (current < startBreak);
+        } 
+        else {
+          return (current >= opening && current < startBreak) || (current >= endBreak && current <= 1440) || (current < closing);
+        }
+      } 
+      else {
+        if (closing === null || closing === undefined) {
+          return current >= opening && current <= startBreak;
+        }
+          return (current >= opening && current < startBreak) || (current >= endBreak && current <= closing);
       }
-    } 
-    else {
-      if (closing === null || closing === undefined) {
-        return current >= opening && current <= closing;
-      }
-        return (current >= opening && current < startBreak) || (current >= endBreak && current <= closing);
     }
   };
 
@@ -129,7 +133,7 @@ const TimeReq = ({ timereq }) => {
     const newEmployeeCount = { ...employeeCount };
 
     // Update only the value for the given columnIndex
-    newEmployeeCount[columnIndex] = 0;
+    newEmployeeCount[columnIndex] = undefined;
 
     // Update state
     setEmployeeCount(newEmployeeCount);
@@ -506,7 +510,6 @@ const TimeReq = ({ timereq }) => {
                   }}>
 
                 {Array.from({ length: timereqData.daily_slots }).map((_, btnIndex) => {
-                  console.log("Slots:", timereqData.daily_slots)
 
                   const timereqKey = `${columnIndex}-${btnIndex}`;
                   const timereqValue = slotEmployeeCounts[timereqKey] || '';
@@ -516,6 +519,7 @@ const TimeReq = ({ timereq }) => {
                   const endBreakTimeMinutes = convertTimeToMinutes(endBreak[columnIndex]);
                   const closingTimeMinutes = convertTimeToMinutes(closingHours[columnIndex]) - 1;
 
+                  console.log(`Time: ${currentTimeMinutes}, Opening: ${openingTimeMinutes}, Break: ${startBreakTimeMinutes}, Clsoing: ${closingTimeMinutes}`);
                   // Check if the current time is within the opening and closing hours
                   if (isTimeWithinRange(currentTimeMinutes, openingTimeMinutes, startBreakTimeMinutes, endBreakTimeMinutes, closingTimeMinutes)) {
                     const isSelected = selectedButtons.includes(`${columnIndex}-${btnIndex}`);
