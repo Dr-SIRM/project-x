@@ -201,12 +201,7 @@ def react_update():
             user.last_name = user_data.get('last_name', user.last_name)
             user.email = user_data.get('email', user.email)
             
-            # Convert the employment_level to its original range [0, 1] before saving
-            employment_level_percentage = user_data.get('employment_level')
-            if employment_level_percentage is not None:
-                user.employment_level = int(employment_level_percentage) / 100
             
-            user.department = user_data.get('department', user.department)
             user.changed_by = react_user
             user.update_timestamp = datetime.datetime.now()
 
@@ -1007,7 +1002,11 @@ def get_temp_timereq_dict(template_name, day_num, daily_slots, hour_divider, min
     return temp_timereq_dict
 
 def is_within_opening_hours(time, opening, closing):
-    return opening <= time < closing
+    if closing >= opening:
+        return opening <= time < closing
+    else:
+        # If closing time is before opening time, it means the closing is on the next day
+        return opening <= time or time < closing
 
 
 
@@ -1021,7 +1020,7 @@ def get_required_workforce():
     today = datetime.date.today()
     solverreq = SolverRequirement.query.filter_by(company_name=user.company_name).first()
     hour_divider = solverreq.hour_devider
-    full_day = (24 * hour_divider) - 1
+    full_day = (24 * hour_divider) -1
     minutes = 60 / hour_divider
     day_num = 7   
     company_id = user.company_id
@@ -1092,7 +1091,7 @@ def get_required_workforce():
 
     slot_dict = {}
     for i in range(min_opening, daily_slots):
-        effective_hour = i % full_day  # This will wrap around the time after 24
+        effective_hour = i % (full_day + 1) # This will wrap around the time after 24
         quarter_hour = effective_hour / hour_divider
         quarter_minute = (effective_hour % hour_divider) * minutes  # Remainder gives the quarter in the hour
         
@@ -1113,8 +1112,8 @@ def get_required_workforce():
     timereq_dict = {}
     for i in range(day_num):
         for hour in range(daily_slots):
-            if hour > full_day:
-                hour -= full_day
+            if hour >= 24 * hour_divider:
+                hour -= 24 * hour_divider
             new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
             quarter_hour = hour // hour_divider
             quarter_minute = (hour % hour_divider) * minutes
@@ -1167,36 +1166,61 @@ def get_required_workforce():
             # Create new TimeReq entries
             new_records = []
             for i in range(day_num):
-                new_date = new_dates[i]
-                weekday = weekdays.get(i)
-                opening_details = opening_hours_dict.get(weekday)
-
                 for quarter in range(daily_slots):
-                    quarter_hour = quarter / hour_divider
-                    quarter_minute = (quarter % hour_divider) * minutes
-                    formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
-                    capacity = workforce_data.get(f'worker_{i}_{formatted_time}', 0)
-                    
-                    time = f'{formatted_time}:00'
-                    new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+                    weekday = weekdays.get(i)
+                    opening_details = opening_hours_dict.get(weekday)
+                    hours = opening_details.start_time.hour
+                    minutes = opening_details.start_time.minute
+                    total_hours = hours * hour_divider + minutes
+                    print(total_hours)
+                    if quarter < (total_hours):
+                        pass
+                    else:
+                        if quarter >= full_day +1:
+                            quarter -= full_day + 1
 
-                    if opening_details:
-                        if not (is_within_opening_hours(new_time, opening_details.start_time, opening_details.end_time) or
-                                (opening_details.start_time2 and opening_details.end_time2 and 
-                                is_within_opening_hours(new_time, opening_details.start_time2, opening_details.end_time2))):
-                            capacity = 0
+                            if i+1 < day_num:
+                                new_date = new_dates[i+1]
+                                weekday = weekdays.get(i+1)
+                                opening_details = opening_hours_dict.get(weekday)
+                            else:
+                                new_date = new_dates[i] + datetime.timedelta(days=1)
+                                weekday = weekdays.get(i)
+                                opening_details = opening_hours_dict.get(weekday)
+                        else:
+                            new_date = new_dates[i]
+                            weekday = weekdays.get(i)
+                            opening_details = opening_hours_dict.get(weekday)
+        
+                        quarter_hour = quarter / hour_divider
+                        quarter_minute = (quarter % hour_divider) * minutes
+                        formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+                        capacity = workforce_data.get(f'worker_{i}_{formatted_time}', 0)
 
-                    new_record = TimeReq(
-                        id=None,
-                        company_name=user.company_name,
-                        date=new_date,
-                        start_time=new_time,
-                        worker=capacity,
-                        created_by=company_id,
-                        changed_by=company_id,
-                        creation_timestamp=creation_date
-                    )
-                    new_records.append(new_record)
+                        print(i, quarter, capacity)
+                        
+                        time = f'{formatted_time}:00'
+                        new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+
+                        if opening_details:
+                            if not (is_within_opening_hours(new_time, opening_details.start_time, opening_details.end_time) or
+                                    (opening_details.start_time2 and opening_details.end_time2 and 
+                                    is_within_opening_hours(new_time, opening_details.start_time2, opening_details.end_time2))):
+                                capacity = 0
+
+                        print(new_date, new_time, capacity)
+
+                        new_record = TimeReq(
+                            id=None,
+                            company_name=user.company_name,
+                            date=new_date,
+                            start_time=new_time,
+                            worker=capacity,
+                            created_by=company_id,
+                            changed_by=company_id,
+                            creation_timestamp=creation_date
+                        )
+                        new_records.append(new_record)
 
             db.session.bulk_save_objects(new_records)
             db.session.commit()
