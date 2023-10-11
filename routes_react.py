@@ -662,7 +662,8 @@ def run_solver():
             })
 
             if not pre_check_result["success"]:
-                errors.append(f'Pre-check {i} failed: {pre_check_result["message"]}')
+                errors.append(f'Pre-check {i} failed: {pre_check_result["message"]}\n')
+
         
         # Wenn Fehler während der Überprüfungen aufgetreten sind, werden diese hier gesendet.
         if errors:

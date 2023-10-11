@@ -84,21 +84,25 @@ const Solver = () => {
                 )}
             </Formik>
             <div>
-                {loadingSteps.map((step, index) => (
-                    <div key={index} style={{ display: "flex", alignItems: "center", marginTop: "10px" }}>
+            {loadingSteps.map((step, index) => (
+                <div key={index} style={{ marginTop: "10px", display: "flex", alignItems: "flex-start" }}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                         {step.status === "loading" && <CircularProgress size={20} />}
                         {step.status === "completed" && <CheckCircleIcon style={{ color: "green" }} />}
                         {step.status === "error" && <ErrorOutlineIcon style={{ color: "red" }} />}
-                        <Typography variant="body1" style={{ marginLeft: "10px", color: "black" }}>
+                    </div>
+                    <div style={{ marginLeft: "10px" }}>
+                        <Typography variant="body1" style={{ color: "black" }}>
                             {step.label}
                         </Typography>
                         {step.status === "error" && (
-                            <Typography variant="body2" style={{ marginLeft: "10px", color: "red" }}>
-                                {step.errorMessage}
+                            <Typography variant="body2" style={{ color: "red", marginTop: "5px" }}>
+                                <span dangerouslySetInnerHTML={{ __html: step.errorMessage.replace(/\n/g, '<br />') }} />
                             </Typography>
                         )}
                     </div>
-                ))}
+                </div>
+            ))}
             </div>
             <Snackbar
                 open={showSuccessNotification}
