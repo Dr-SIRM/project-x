@@ -91,8 +91,10 @@ class DataProcessing:
 
 
     def get_availability(self):
-        """ In dieser Funktion wird user_id, date, start_time, end_time aus der Availability Entität gezogen
-            und in einer Liste gespeichert. Key ist user_id """
+        """ In dieser Funktion wird user_id, date, start_time, end_time,
+        start_time2, end_time2, start_time3, und end_time3 aus der
+        Availability Entität gezogen und in einer Liste gespeichert.
+        Key ist user_id """
 
         print(f"Admin mit der User_id: {self.current_user_id} hat den Solve Button gedrückt.")
 
@@ -108,28 +110,21 @@ class DataProcessing:
             Availability.date.between(self.start_date, self.end_date)
         ).all()
 
+        times = [(record.user_id, record.date,
+              self.time_to_timedelta(record.start_time), self.time_to_timedelta(record.end_time),
+              self.time_to_timedelta(record.start_time2), self.time_to_timedelta(record.end_time2),
+              self.time_to_timedelta(record.start_time3), self.time_to_timedelta(record.end_time3))
+             for record in availability]
 
-
-
-        # Hier alles Zeiten ziehen (steht in der Datenbank neu auch NULL ??)
-
-
-
-
-        times = [(record.user_id, record.date, self.time_to_timedelta(record.start_time), self.time_to_timedelta(record.end_time)) for record in availability]
-
-        # Dictionarie erstellen mit user_id als Key:
         user_availability = defaultdict(list)
-        for user_id, date, start_time, end_time in times:
-            user_availability[user_id].append((date, start_time, end_time))
-        print("USER AVAILABILITY 1:", user_availability)
+        for user_id, date, st1, et1, st2, et2, st3, et3 in times:
+            user_availability[user_id].append((date, st1, et1, st2, et2, st3, et3))
 
-        # Sortieren der Einträge in der Liste für jeden Benutzer nach Datum
         for user_id, availabilities in user_availability.items():
             user_availability[user_id] = sorted(availabilities, key=lambda x: x[0])
-        print("USER AVAILABILITY 2:", user_availability)
 
         self.user_availability = user_availability
+        print("USER AVAILABILITY:", self.user_availability)
 
 
 
@@ -325,7 +320,7 @@ class DataProcessing:
         binary_availability = defaultdict(list)
 
         for user_id, availabilities in self.user_availability.items():
-            for date, start_time, end_time in availabilities:
+            for date, st1, et1, st2, et2, st3, et3 in availabilities:
                 # Wochentag als Index (0 = Montag, 1 = Dienstag, usw.) erhalten
                 weekday_index = date.weekday()
 
@@ -338,16 +333,23 @@ class DataProcessing:
                 # Bestimme den Divisor basierend auf self.hour_devider
                 divisor = 3600 / self.hour_devider
 
-                # Werte werden auf 1 gesetzt, wenn der Mitarbeiter arbeiten kann.
-                start_hour = int(start_time.total_seconds() / divisor) - int(self.laden_oeffnet[weekday_index].total_seconds() / divisor)
-                end_hour = int(end_time.total_seconds() / divisor) - int(self.laden_oeffnet[weekday_index].total_seconds() / divisor)
-                for i in range(start_hour, end_hour):
-                    if 0 <= i < len(binary_list):
-                        binary_list[i] = 1
+                # Eine Hilfsfunktion, um die Binärliste für verschiedene Zeitspannen zu aktualisieren.
+                def update_binary_list(start_time, end_time):
+                    start_hour = int(start_time.total_seconds() / divisor) - int(self.laden_oeffnet[weekday_index].total_seconds() / divisor)
+                    end_hour = int(end_time.total_seconds() / divisor) - int(self.laden_oeffnet[weekday_index].total_seconds() / divisor)
+                    for i in range(start_hour, end_hour):
+                        if 0 <= i < len(binary_list):
+                            binary_list[i] = 1
+
+                # Werte werden auf 1 gesetzt, wenn der Mitarbeiter während jedes Zeitfensters arbeiten kann.
+                update_binary_list(st1, et1)
+                update_binary_list(st2, et2)
+                update_binary_list(st3, et3)
 
                 binary_availability[user_id].append((date, binary_list))
 
         self.binary_availability = binary_availability
+        print("BINARY AVAILABILITY:", self.binary_availability)
 
 
 
