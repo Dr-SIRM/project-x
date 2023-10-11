@@ -1,5 +1,7 @@
 import styles from "./style";
 import { Billing, Business, CardDeal, Clients, CTA, Footer, Navbar, Stats, Testimonials, Hero } from "./components";
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+
 
 const App = () => (
   <div className="bg-primary w-full overflow-hidden">
@@ -21,8 +23,8 @@ const App = () => (
         <Business />
         <Billing />
         <CardDeal />
-        <Testimonials />
-        <Clients />
+{/*         <Testimonials />
+        <Clients /> */}
         <CTA />
         <Footer />
       </div>

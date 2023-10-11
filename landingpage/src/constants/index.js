@@ -4,20 +4,31 @@ export const navLinks = [
   {
     id: "home",
     title: "Home",
+    path: "/home", // Internal link
   },
   {
     id: "features",
     title: "Features",
+    path: "/features", // Internal link
   },
   {
     id: "product",
     title: "Produkt",
+    path: "/product", // Internal link
   },
   {
-    id: "clients",
-    title: "Kunden",
+    id: "conditions",
+    title: "Konditionen",
+    path: "/conditions", // Internal link
+  },
+  {
+    id: "login",
+    title: "Login",
+    href: "http://localhost:3000", // External link
   },
 ];
+
+
 
 export const features = [
   {

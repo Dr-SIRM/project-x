@@ -54,26 +54,23 @@ To-Do Liste:
  - (erl) Bei den max. Arbeitstagen eine obere schranke einbauen (harte NB 10)
  - (erl) excel_output Daten anderst ziehen
  - (erl) Wenn Montag ist, wird für diese Woche gesolvt statt für nächste Woche
+ - (erl) Vorüberprüfungen sauber beschreiben damit es vernünftig angezeigt wird.
+ - (erl) get_availability und binaere_liste anpassen 
+ - (erl) start_time und end_time zwei und drei noch implementieren
  
 
  To-Do's 
  -------------------------------
- - (*) TimeReq in data_processing anpassen, soabld Phu Planung fertiggestellt hat.
- - (*) get_availability und binaere_liste anpassen (Einträge NULL wenn nichts eingegeben??)
- - (*) Vorüberprüfungen sauber beschreiben damit es vernünftig angezeigt wird. Stoppt der Solver wenn es einen Fehler auslöst??
-
+ - (*) TimeReq in data_processing anpassen, soabld Phu Planung fertiggestellt hat. Wenn man gar keine time_req eingegeben hat, hällt dann Vorüberprüfung 1 stand?
 
  - (*) MA mit verschiedenen Profilen - Department (Koch, Service, ..)
-
  - (*) self.subsequent_workingdays_max in die Datenbank einpflegen und ziehen
-
-  - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden??
 
 
  
  --- PRIO 2 ---
  -------------------------------
- - start_time und end_time zwei und drei noch implementieren (noch warten bis über 00:00 Zeiten eingegeben werden können!)
+ - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden??
  - Solvingzeitraum selbst anwählen können
  - (*) NB9 mit 3 Schichten fertigbauen
  -------------------------------
@@ -130,7 +127,8 @@ class ORAlgorithm_cp:
 
         # Attribute der Methode "solver_selection"
         self.model = None
-        self.solver = None              
+        self.solver = None
+        self.gap_to_stop = None              
 
         # Attribute der Methode "define_penalty_costs"
         self.penalty_cost_nb1 = None
@@ -736,7 +734,8 @@ class ORAlgorithm_cp:
         self.model = cp_model.CpModel()
         self.solver = cp_model.CpSolver()
         
-        self.solver.parameters.max_time_in_seconds = 500
+        self.solver.parameters.max_time_in_seconds = 500 # Der Solver stoppt nach 500s
+        self.gap_to_stop = 1                             # Der Solver stoppt unter diesem GAP
         # self.solver.parameters.num_search_workers = 4 # Anzahl Kerne --> noch genau testen was das optimum ist (CPU-Auslastung beachten!)
 
 
@@ -1462,6 +1461,43 @@ class ORAlgorithm_cp:
             self.model.Add(self.nb11_min_violation[ma] >= 0)
             self.model.Add(self.nb12_max_violation[ma] >= 0)
 
+        """
+        # -------------------------------------------------------------------------------------------------------
+        # HARTE NB (11.10.2023)
+        # NB 13 - Mindestanzahl MA mit bestimmten Skills zu jeder Stunde an jedem Tag anwesend
+        # -------------------------------------------------------------------------------------------------------
+        for s in self.skills:  # Iterieren Sie über alle Skills
+            for j in range(self.calc_time):
+                for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):  # Annahme: Alle MA haben gleiche Öffnungszeiten
+                    
+                    # Erstellen Sie eine Liste von Indikatorvariablen, ob MA den Skill s hat
+                    has_skill = [self.has_skill[i][s] for i in self.mitarbeiter]
+                    
+                    # Erstellen Sie die Nebenbedingung für Skill s, Zeitpunkt j, k
+                    required_skill_count = self.required_skills[s][j][k]  # Ermitteln Sie die benötigte Anzahl für Skill s zur Zeit j, k
+                    self.model.Add(
+                        sum(self.x[i, j, k] * has_skill[i] for i in self.mitarbeiter) >= required_skill_count
+                    )
+
+        Ein paar Hinweise dazu:
+        self.skills: Eine Liste von allen Skills.
+        self.has_skill: Ein Dictionary, das für jeden Mitarbeiter (i) und jeden Skill (s) anzeigt, ob der Mitarbeiter diesen Skill hat. Zum Beispiel: self.has_skill[i][s] = 1, wenn Mitarbeiter i Skill s hat, sonst 0.
+        self.required_skills: Ein Dictionary, das für jeden Skill (s) und jeden Zeitslot (j, k) die erforderliche Anzahl an Mitarbeitern mit diesem Skill angibt. Beispiel: self.required_skills[s][j][k] gibt die erforderliche Anzahl für Skill s zur Zeit j, k zurück.
+        """
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     def solve_problem(self):
@@ -1501,7 +1537,7 @@ class ORAlgorithm_cp:
                 print("------------------ NEUER WERT HINZUGEFÜGT: ", self.current_best_value, "GAP:", gap_now, "%", "------------------------")
 
                 # Überprüfen, ob der Gap weniger als 1% beträgt, wenn ja, solver stoppen
-                if gap_now < 1:
+                if gap_now < self.gap_to_stop:
                     print("Gap unter 1%, stoppe den Solver.")
                     self.solver.StopSearch()
                     self.stop_thread = True  # Thread in diesem Fall sofort stoppen.

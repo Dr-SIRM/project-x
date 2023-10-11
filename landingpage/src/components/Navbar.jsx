@@ -13,24 +13,22 @@ const Navbar = () => {
       <ul className="list-none sm:flex hidden justify-end items-center flex-1">
         {navLinks.map((nav, index) => (
           <li
-            key={nav.id}
-            className={`font-poppins font-normal cursor-pointer text-[16px] ${
-              active === nav.title ? "text-white" : "text-dimWhite"
-            } ${index === navLinks.length - 1 ? "mr-0" : "mr-10"}`}
-            onClick={() => setActive(nav.title)}
-          >
-            <a href={`#${nav.id}`}>{nav.title}</a>
-          </li>
+          key={nav.id}
+          className={`font-poppins font-normal cursor-pointer text-[16px] ${
+            active === nav.title ? "text-white" : "text-dimWhite"
+          } ${
+            nav.title === "Login" ? "login-link" : "" // Add a class for the "Login" link
+          } ${index === navLinks.length - 1 ? "mr-0" : "mr-10"}`}
+          onClick={() => {
+            setActive(nav.title);
+            if (nav.title === "Login" && nav.href) {
+              window.location.href = nav.href; // Redirect to the href URL for Login
+            }
+          }}
+        >
+          <a href={`#${nav.id}`}>{nav.title}</a>
+        </li>
         ))}
-        {window.innerWidth >= 640 && (
-          <li
-            key="login"
-            className="font-poppins font-normal cursor-pointer text-[16px] text-dimWhite"
-            onClick={() => window.location.href = 'http://localhost:3000'}
-          >
-            <a>Login</a>
-          </li>
-        )}
       </ul>
 
       <div className="sm:hidden flex flex-1 justify-end items-center">
@@ -53,18 +51,16 @@ const Navbar = () => {
                 className={`font-poppins font-medium cursor-pointer text-[16px] ${
                   active === nav.title ? "text-white" : "text-dimWhite"
                 } ${index === navLinks.length - 1 ? "mb-0" : "mb-4"}`}
-                onClick={() => setActive(nav.title)}
+                onClick={() => {
+                  setActive(nav.title);
+                  if (nav.title === "Login" && nav.href) {
+                    window.location.href = nav.href; // Redirect to the href URL for Login
+                  }
+                }}
               >
                 <a href={`#${nav.id}`}>{nav.title}</a>
               </li>
             ))}
-            <li
-              key="login"
-              className="font-poppins font-medium cursor-pointer text-[16px] text-dimWhite"
-              onClick={() => window.location.href = 'http://localhost:3000'}
-            >
-              <a>Login</a>
-            </li>
           </ul>
         </div>
       </div>
