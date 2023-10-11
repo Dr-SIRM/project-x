@@ -105,19 +105,28 @@ class DataProcessing:
             Availability.date.between(self.start_date, self.end_date)
         ).all()
 
+
+
+
+        # Hier alles Zeiten ziehen (steht in der Datenbank neu auch NULL ??)
+
+
+
+
         times = [(record.user_id, record.date, self.time_to_timedelta(record.start_time), self.time_to_timedelta(record.end_time)) for record in availability]
 
         # Dictionarie erstellen mit user_id als Key:
         user_availability = defaultdict(list)
         for user_id, date, start_time, end_time in times:
             user_availability[user_id].append((date, start_time, end_time))
+        print("USER AVAILABILITY 1:", user_availability)
 
         # Sortieren der Einträge in der Liste für jeden Benutzer nach Datum
         for user_id, availabilities in user_availability.items():
             user_availability[user_id] = sorted(availabilities, key=lambda x: x[0])
+        print("USER AVAILABILITY 2:", user_availability)
 
         self.user_availability = user_availability
-        print("user_availability:", self.user_availability)
 
 
 
@@ -140,6 +149,8 @@ class DataProcessing:
         return int(total_seconds / divisor)
     
     def time_to_timedelta(self, t):
+        if t is None:
+            return timedelta(hours=0, minutes=0, seconds=0)
         return timedelta(hours=t.hour, minutes=t.minute, seconds=t.second)
 
 
@@ -163,7 +174,33 @@ class DataProcessing:
 
         opening = OpeningHours.query.filter_by(company_name=company_name).order_by(weekday_order).all()
 
-        times = [(record.weekday, self.time_to_timedelta(record.start_time), self.time_to_timedelta(record.end_time), self.time_to_timedelta(record.end_time2)) for record in opening]
+        # Dictionary mit den Öffnungszeiten für einfachere Abfragen
+        opening_dict = {record.weekday: record for record in opening}
+
+        # Standardliste von Wochentagen
+        weekdays = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
+        
+        # "times" für jeden Wochentag, Werte aus der Datenbank, wenn verfügbar, sonst timedelta(0)
+        times = []
+        for day in weekdays:
+            if day in opening_dict:
+                record = opening_dict[day]
+                start_time = self.time_to_timedelta(record.start_time)
+                end_time = self.time_to_timedelta(record.end_time)
+                end_time2 = self.time_to_timedelta(record.end_time2)
+
+                # Logik zur Bestimmung der Schließzeit hinzufügen
+                if end_time2.total_seconds() == 0: 
+                    # Wenn end_time2 nicht gesetzt ist, verwende end_time
+                    close_time = end_time
+                else:
+                    # Wenn end_time2 gesetzt ist, wird es immer verwendet, unabhängig von der Uhrzeit
+                    close_time = end_time2
+                    
+                times.append((record.weekday, start_time, end_time, close_time))
+            else:
+                times.append((day, timedelta(0), timedelta(0), timedelta(0)))
+
 
         # Initialisiere leere Listen für die Öffnungs- und Schließzeiten
         self.laden_oeffnet = [None] * 7
@@ -180,14 +217,26 @@ class DataProcessing:
             'Sonntag': 6
         }
 
-        for weekday, start_time, end_time, end_time2 in times:
+        for weekday, start_time, end_time, close_time in times:
             index = weekday_indices[weekday]
             self.laden_oeffnet[index] = start_time
-            # Wenn end_time2 größer als end_time ist, wird end_time2 verwendet. Ansonsten end_time.
-            self.laden_schliesst[index] = end_time2 if end_time2 > end_time else end_time
+            self.laden_schliesst[index] = close_time
 
         # Berechne die Öffnungszeiten für jeden Wochentag und speichere sie in einer Liste
-        self.opening_hours = [(self.time_to_int(self.laden_schliesst[i]) - self.time_to_int(self.laden_oeffnet[i])) for i in range(7)]
+        self.opening_hours = []
+        for i in range(7):
+            # Wenn die Schließzeit vor der Öffnungszeit liegt, werden 24 Stunden (86400 Sekunden) zur Schließzeit dazuaddiert
+            if self.laden_schliesst[i] < self.laden_oeffnet[i]:
+                corrected_close_time = self.laden_schliesst[i] + timedelta(seconds=86400) 
+            else:
+                corrected_close_time = self.laden_schliesst[i]
+            # Berechne die Öffnungszeit als Differenz zwischen der korrigierten Schließzeit und der Öffnungszeit
+            self.opening_hours.append(self.time_to_int(corrected_close_time) - self.time_to_int(self.laden_oeffnet[i]))
+
+        print("OPENING HOURS:", self.opening_hours)
+        print("LADEN OEFFNET:", self.laden_oeffnet)
+        print("LADEN SCHLIESST:", self.laden_schliesst)
+
         self.laden_oeffnet = self.laden_oeffnet * self.week_timeframe
         self.laden_schliesst = self.laden_schliesst * self.week_timeframe
         self.opening_hours = self.opening_hours * self.week_timeframe
@@ -212,14 +261,21 @@ class DataProcessing:
         
         # Erstellen eines Dictionaries mit Datum und Stunde als Schlüssel:
         time_req_dict_2 = defaultdict(dict)
-        py_time_req_dict_2 = dict(time_req_dict_2)
         for record in time_reqs:
             date = record.date
             start_time = self.time_to_timedelta(record.start_time)
             worker = record.worker
             
             weekday_index = date.weekday()
-            if (self.laden_oeffnet[weekday_index] <= start_time < self.laden_schliesst[weekday_index]):
+            
+            # Prüfen, ob die Öffnungszeit am selben Tag bleibt oder in den nächsten Tag übergeht
+            if self.laden_schliesst[weekday_index] < self.laden_oeffnet[weekday_index]:
+                corrected_close_time = self.laden_schliesst[weekday_index] + timedelta(seconds=86400)
+            else:
+                corrected_close_time = self.laden_schliesst[weekday_index]
+
+            # Wenn die Schicht während der Öffnungszeiten stattfindet
+            if (self.laden_oeffnet[weekday_index] <= start_time < corrected_close_time):
                 start_hour = int(start_time.total_seconds() // divisor) - int(self.laden_oeffnet[weekday_index].total_seconds() // divisor)
                 if start_hour < 0:
                     start_hour = 0
@@ -236,6 +292,7 @@ class DataProcessing:
         
         # Sortiere das Wörterbuch nach Datum
         self.time_req = OrderedDict(sorted(time_req_dict_2.items()))
+        print("TIME REQ:", self.time_req)
 
 
 
@@ -263,7 +320,6 @@ class DataProcessing:
 
         # Generiert automatisch einen Standardwert für nicht vorhandene Schlüssel.
         binary_availability = defaultdict(list)
-        py_binary_availability = dict(binary_availability)
 
         for user_id, availabilities in self.user_availability.items():
             for date, start_time, end_time in availabilities:

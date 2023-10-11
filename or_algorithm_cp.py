@@ -58,8 +58,10 @@ To-Do Liste:
 
  To-Do's 
  -------------------------------
+ - (*) TimeReq in data_processing anpassen, soabld Phu Planung fertiggestellt hat.
  - (*) MA mit verschiedenen Profilen - Department (Koch, Service, ..)
  - (*) Vorüberprüfungen sauber beschreiben damit es vernünftig angezeigt wird. Stoppt der Solver wenn es einen Fehler auslöst??
+ 
  - (*) self.subsequent_workingdays_max in die Datenbank einpflegen und ziehen
 
   - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden??
