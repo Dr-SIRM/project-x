@@ -7,21 +7,24 @@ import { io } from "socket.io-client";
 import { API_BASE_URL } from "../../config";
 import axios from "axios";
 
+// Arrow Function in JawaScript
 const Solver = () => {
     const [loadingSteps, setLoadingSteps] = useState([
-        { label: "Button initiated Pre Check 1", status: null },
-        { label: "Data loading Pre Check 2", status: null },
-        { label: "Database opened Pre Check 3", status: null },
-        { label: "Solution saved Pre Check 4", status: null },
-        { label: "Completion Pre Check 5", status: null },
-        { label: "Completion Pre Check 6", status: null }
+        { label: "1. Überprüfen, ob der Admin zu jeder Öffnungszeitstunde time_req eingegeben hat", status: null },
+        { label: "2. Überprüfen ob die Vollzeit Mitarbeiter mind. self.weekly_hours Stunden einplant haben", status: null },
+        { label: "3. Haben die Mitarbeiter mindestens die anzahl Stunden von gerechte_verteilung eingegeben?", status: null },
+        { label: "4. Haben alle MA zusammen genug Stunden eingegeben, um die verteilbaren Stunden zu erreichen?", status: null },
+        { label: "5. Ist zu jeder notwendigen Zeit (self.min_anwesend) die mindestanzahl Mitarbeiter verfügbar?", status: null },
+        { label: "6. Können die MA die min. Zeit täglich erreichen? Wenn 0 Stunden eingegeben wurden, läuft es durch!", status: null }
     ]);
     const [showSuccessNotification, setShowSuccessNotification] = useState(false);
     const [showErrorNotification, setShowErrorNotification] = useState(false);
 
+    // "Hook" in react, wir dazu genutzt, Nebeneffekte in funktionalen Komponenten zu verwalten
     useEffect(() => {
         const socket = io(API_BASE_URL);
 
+        // "pre_check_update" muss in routes_react und hier gleich sein, um sicherzustellen, das die kommunikation funktioniert
         socket.on("pre_check_update", (update) => {
             setLoadingSteps(prev => prev.map((step, index) => {
                 if (index === update.pre_check_number - 1) {
@@ -50,7 +53,7 @@ const Solver = () => {
               }
           });
   
-          if (response.data.message === 'Solver successfully started') {
+          if (response.data.message === 'Der Solver wurde erfolgreich gestartet!') {
               setShowSuccessNotification(true);
           } else {
               setShowErrorNotification(true);
@@ -100,7 +103,7 @@ const Solver = () => {
             <Snackbar
                 open={showSuccessNotification}
                 onClose={() => setShowSuccessNotification(false)}
-                message="Solver Successfully Started!"
+                message="Der Solver wurde erfolgreich gestartet!"
                 autoHideDuration={3000}
                 sx={{
                     backgroundColor: "green !important",
@@ -115,7 +118,7 @@ const Solver = () => {
             <Snackbar
                 open={showErrorNotification}
                 onClose={() => setShowErrorNotification(false)}
-                message="Error occurred - Solver Stopped!"
+                message="Der Solver wurde gestoppt!"
                 autoHideDuration={3000}
                 sx={{
                     backgroundColor: "red !important",

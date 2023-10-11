@@ -650,6 +650,9 @@ def run_solver():
         or_algo_cp = ORAlgorithm_cp(dp)
 
         or_algo_cp.run()
+    
+        errors = []  # Eine Liste um alle Fehler zu speichern
+        
         for i in range(1, 7):  # Assuming you have 6 pre-checks
             pre_check_result = getattr(or_algo_cp, f'pre_check_{i}')()
             socketio.emit('pre_check_update', {
@@ -659,8 +662,13 @@ def run_solver():
             })
 
             if not pre_check_result["success"]:
-                return jsonify({'message': f'Pre-check {i} failed: {pre_check_result["message"]}'}), 400
+                errors.append(f'Pre-check {i} failed: {pre_check_result["message"]}')
+        
+        # Wenn Fehler während der Überprüfungen aufgetreten sind, werden diese hier gesendet.
+        if errors:
+            return jsonify({'message': errors}), 400
 
+        # Wenn keine Fehler aufgetreten sind, wird der Algorithmus weiter durchgeführt.
         or_algo_cp.run_2()
 
         print("Solver successfully started")  # Log success

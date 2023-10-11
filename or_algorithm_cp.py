@@ -59,8 +59,11 @@ To-Do Liste:
  To-Do's 
  -------------------------------
  - (*) TimeReq in data_processing anpassen, soabld Phu Planung fertiggestellt hat.
- - (*) MA mit verschiedenen Profilen - Department (Koch, Service, ..)
+ - (*) get_availability und binaere_liste anpassen (Einträge NULL wenn nichts eingegeben??)
  - (*) Vorüberprüfungen sauber beschreiben damit es vernünftig angezeigt wird. Stoppt der Solver wenn es einen Fehler auslöst??
+
+
+ - (*) MA mit verschiedenen Profilen - Department (Koch, Service, ..)
  
  - (*) self.subsequent_workingdays_max in die Datenbank einpflegen und ziehen
 
