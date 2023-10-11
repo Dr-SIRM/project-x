@@ -132,7 +132,7 @@ const Team = () => {
         const employment = params.row.employment;
         return employment === "Perm" ? "Vollzeit" : employment === "Temp" ? "Teilzeit" : employment;
       },
-      editable: true,
+      editable: false,
     },  
     {
       field: "employment_level",
