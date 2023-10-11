@@ -105,16 +105,26 @@ class DataProcessing:
             Availability.date.between(self.start_date, self.end_date)
         ).all()
 
+
+
+
+        # Hier alles Zeiten ziehen (steht in der Datenbank neu auch NULL ??)
+
+
+
+
         times = [(record.user_id, record.date, self.time_to_timedelta(record.start_time), self.time_to_timedelta(record.end_time)) for record in availability]
 
         # Dictionarie erstellen mit user_id als Key:
         user_availability = defaultdict(list)
         for user_id, date, start_time, end_time in times:
             user_availability[user_id].append((date, start_time, end_time))
+        print("USER AVAILABILITY 1:", user_availability)
 
         # Sortieren der Einträge in der Liste für jeden Benutzer nach Datum
         for user_id, availabilities in user_availability.items():
             user_availability[user_id] = sorted(availabilities, key=lambda x: x[0])
+        print("USER AVAILABILITY 2:", user_availability)
 
         self.user_availability = user_availability
 
