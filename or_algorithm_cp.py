@@ -59,9 +59,12 @@ To-Do Liste:
  To-Do's 
  -------------------------------
  - (*) TimeReq in data_processing anpassen, soabld Phu Planung fertiggestellt hat.
- - (*) MA mit verschiedenen Profilen - Department (Koch, Service, ..)
+ - (*) get_availability und binaere_liste anpassen (Einträge NULL wenn nichts eingegeben??)
  - (*) Vorüberprüfungen sauber beschreiben damit es vernünftig angezeigt wird. Stoppt der Solver wenn es einen Fehler auslöst??
- 
+
+
+ - (*) MA mit verschiedenen Profilen - Department (Koch, Service, ..)
+
  - (*) self.subsequent_workingdays_max in die Datenbank einpflegen und ziehen
 
   - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden??
@@ -97,6 +100,7 @@ class ORAlgorithm_cp:
         self.solver_requirements = dp.solver_requirements   # 111
         self.week_timeframe = dp.week_timeframe             # 112
         self.hour_devider = dp.hour_devider                 # 113
+        self.user_names = dp.user_names                     # 114
 
         # Attribute der Methode "create_variables"
         self.mitarbeiter = None                             # 1
@@ -457,6 +461,7 @@ class ORAlgorithm_cp:
         print("111. solver_requirements: ", self.solver_requirements)
         print("112. week_timeframe: ", self.week_timeframe)
         print("113. self.hour_devider: ", self.hour_devider)
+        print("114. self.user_names: ", self.user_names)
         print()
         
         print("Attribute der Methode create_variables:")
@@ -539,7 +544,8 @@ class ORAlgorithm_cp:
     def pre_check_1(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        1. Überprüfen, ob der Admin zu jeder Öffnungszeitstunde time_req eingegeben hat
+        1. Vorüberprüfung: Haben Sie in jeder Stunde eingegeben, wieviele Mitarbeiter benötigt werden?
+        Überprüfen, ob der Admin zu jeder Öffnungszeitstunde time_req eingegeben hat
         ---------------------------------------------------------------------------------------------------------------
         """
         # Funktion um Zeitwerte umzurechnen ---------------------------------------------------------------------------
@@ -582,7 +588,7 @@ class ORAlgorithm_cp:
                         if hour not in time_req_dict:
                             fehlende_stunden.append((current_date, hour))
             if fehlende_stunden:
-                error_message_lines = ["Für folgende Zeitfenster fehlen time_req-Werte:"]
+                error_message_lines = ["Für folgende Zeitfenster haben Sie noch keine Mitarbeiter eingeplant:"]
                 for date, hour in fehlende_stunden:
                     error_message_lines.append(f"Datum: {date}, Stunde: {hour}")
                 raise ValueError("\n".join(error_message_lines))
@@ -595,7 +601,8 @@ class ORAlgorithm_cp:
     def pre_check_2(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        2. Überprüfen ob die "Perm" Mitarbeiter mind. self.weekly_hours Stunden einplant haben
+        2. Vorüberprüfung: Stehen die Vollzeit Mitarbeiter mindestens die Wochenarbeitsstunden zur Verfügung?
+        Überprüfen ob die "Perm" Mitarbeiter mind. self.weekly_hours Stunden einplant haben
         ---------------------------------------------------------------------------------------------------------------
         """
         try:
@@ -617,7 +624,8 @@ class ORAlgorithm_cp:
     def pre_check_3(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        3. Haben die MA mindestens die anzahl Stunden von gerechte_verteilung eingegeben?
+        3. Vorüberprüfung: Haben die Mitarbeiter mindestens die anzahl Stunden welche sie eingeteilt werden eingegeben?
+        Haben die MA mindestens die anzahl Stunden von gerechte_verteilung eingegeben?
         ---------------------------------------------------------------------------------------------------------------
         """
         try: 
@@ -641,7 +649,8 @@ class ORAlgorithm_cp:
     def pre_check_4(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        4. Haben alle MA zusammen genug Stunden eingegeben, um die verteilbaren Stunden zu erreichen?
+        4. Vorüberprüfung: Haben alle Mitarbeiter zusammen genug Stunden eingeplant, um ihre Planung zu erfüllen?
+        Haben alle MA zusammen genug Stunden eingegeben, um die verteilbaren Stunden zu erreichen?
         ---------------------------------------------------------------------------------------------------------------
         """
         try: 
@@ -660,7 +669,8 @@ class ORAlgorithm_cp:
     def pre_check_5(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        5. Ist zu jeder notwendigen Zeit (self.min_anwesend) die mindestanzahl Mitarbeiter verfügbar?
+        5. Vorüberprüfung: Stehen zu jeder Zeit mindestens die Anzahl Mitarbeiter zur Verfügung, die Sie benötigten?
+        Ist zu jeder notwendigen Zeit (self.min_anwesend) die mindestanzahl Mitarbeiter verfügbar?
         ---------------------------------------------------------------------------------------------------------------
         """
         try: 
@@ -678,19 +688,22 @@ class ORAlgorithm_cp:
     def pre_check_6(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        6. Können die MA die min. Zeit täglich erreichen? Wenn 0 Stunden eingegeben wurden, läuft es durch!
+        6. Vorüberprüfung: Haben die Mitarbeiter pro Tag mindestens die mindest Areitszeit pro Tag eingegeben? (bei 0 Stunden wird es ignoriert)
+        Können die MA die min. Zeit täglich erreichen? Wenn 0 Stunden eingegeben wurden, läuft es durch!
         ---------------------------------------------------------------------------------------------------------------
         """
         try:
             errors = []
-            for ma in self.mitarbeiter:
+            for i, ma in enumerate(self.mitarbeiter):
                 for day in range(self.calc_time):
                     total_hours = sum(self.verfügbarkeit[ma][day])
                     if 0 < total_hours < self.min_time_day:
                         errors.append(
-                            f"Mitarbeiter {ma} hat am Tag {day+1} nur {total_hours/4} Stunden eingetragen. "
-                            f"Das ist weniger als die Mindestarbeitszeit von {self.min_zeit[ma]/4} Stunden."
+                            f"{' '.join(self.user_names[i])} hat am Tag {day+1} nur {int(total_hours / self.hour_devider)} Stunden eingetragen. "
+                            f"Das ist weniger als die Mindestarbeitszeit von {int(self.min_time_day / self.hour_devider)} Stunden."
                         )
+
+
             if errors:
                 raise ValueError("Folgende Fehler wurden gefunden:\n" + "\n".join(errors))
             

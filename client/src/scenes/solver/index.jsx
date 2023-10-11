@@ -7,21 +7,24 @@ import { io } from "socket.io-client";
 import { API_BASE_URL } from "../../config";
 import axios from "axios";
 
+// Arrow Function in JawaScript
 const Solver = () => {
     const [loadingSteps, setLoadingSteps] = useState([
-        { label: "Button initiated Pre Check 1", status: null },
-        { label: "Data loading Pre Check 2", status: null },
-        { label: "Database opened Pre Check 3", status: null },
-        { label: "Solution saved Pre Check 4", status: null },
-        { label: "Completion Pre Check 5", status: null },
-        { label: "Completion Pre Check 6", status: null }
+        { label: "1. Vorüberprüfung: Haben Sie in jeder Stunde eingegeben, wieviele Mitarbeiter benötigt werden?", status: null },
+        { label: "2. Vorüberprüfung: Stehen die Vollzeit Mitarbeiter mindestens die Wochenarbeitsstunden zur Verfügung?", status: null },
+        { label: "3. Vorüberprüfung: Haben die Mitarbeiter mindestens die anzahl Stunden welche sie eingeteilt werden eingegeben?", status: null },
+        { label: "4. Vorüberprüfung: Haben alle Mitarbeiter zusammen genug Stunden eingeplant, um ihre Planung zu erfüllen?", status: null },
+        { label: "5. Vorüberprüfung: Stehen zu jeder Zeit mindestens die Anzahl Mitarbeiter zur Verfügung, die Sie benötigten?", status: null },
+        { label: "6. Vorüberprüfung: Haben die Mitarbeiter pro Tag mindestens die mindest Areitszeit pro Tag eingegeben? (bei 0 Stunden wird es ignoriert)", status: null }
     ]);
     const [showSuccessNotification, setShowSuccessNotification] = useState(false);
     const [showErrorNotification, setShowErrorNotification] = useState(false);
 
+    // "Hook" in react, wir dazu genutzt, Nebeneffekte in funktionalen Komponenten zu verwalten
     useEffect(() => {
         const socket = io(API_BASE_URL);
 
+        // "pre_check_update" muss in routes_react und hier gleich sein, um sicherzustellen, das die kommunikation funktioniert
         socket.on("pre_check_update", (update) => {
             setLoadingSteps(prev => prev.map((step, index) => {
                 if (index === update.pre_check_number - 1) {
@@ -50,7 +53,7 @@ const Solver = () => {
               }
           });
   
-          if (response.data.message === 'Solver successfully started') {
+          if (response.data.message === 'Der Solver wurde erfolgreich gestartet!') {
               setShowSuccessNotification(true);
           } else {
               setShowErrorNotification(true);
@@ -81,26 +84,30 @@ const Solver = () => {
                 )}
             </Formik>
             <div>
-                {loadingSteps.map((step, index) => (
-                    <div key={index} style={{ display: "flex", alignItems: "center", marginTop: "10px" }}>
+            {loadingSteps.map((step, index) => (
+                <div key={index} style={{ marginTop: "10px", display: "flex", alignItems: "flex-start" }}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                         {step.status === "loading" && <CircularProgress size={20} />}
                         {step.status === "completed" && <CheckCircleIcon style={{ color: "green" }} />}
                         {step.status === "error" && <ErrorOutlineIcon style={{ color: "red" }} />}
-                        <Typography variant="body1" style={{ marginLeft: "10px", color: "black" }}>
+                    </div>
+                    <div style={{ marginLeft: "10px" }}>
+                        <Typography variant="body1" style={{ color: "black" }}>
                             {step.label}
                         </Typography>
                         {step.status === "error" && (
-                            <Typography variant="body2" style={{ marginLeft: "10px", color: "red" }}>
-                                {step.errorMessage}
+                            <Typography variant="body2" style={{ color: "red", marginTop: "5px" }}>
+                                <span dangerouslySetInnerHTML={{ __html: step.errorMessage.replace(/\n/g, '<br />') }} />
                             </Typography>
                         )}
                     </div>
-                ))}
+                </div>
+            ))}
             </div>
             <Snackbar
                 open={showSuccessNotification}
                 onClose={() => setShowSuccessNotification(false)}
-                message="Solver Successfully Started!"
+                message="Der Solver wurde erfolgreich gestartet!"
                 autoHideDuration={3000}
                 sx={{
                     backgroundColor: "green !important",
@@ -115,7 +122,7 @@ const Solver = () => {
             <Snackbar
                 open={showErrorNotification}
                 onClose={() => setShowErrorNotification(false)}
-                message="Error occurred - Solver Stopped!"
+                message="Der Solver wurde gestoppt!"
                 autoHideDuration={3000}
                 sx={{
                     backgroundColor: "red !important",
