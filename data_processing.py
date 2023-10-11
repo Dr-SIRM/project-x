@@ -27,6 +27,8 @@ class DataProcessing:
         self.user_employment = None
         self.solver_requirements = None
         self.binary_availability = None
+        self.user_names = None
+
         
         
     def run(self):
@@ -39,6 +41,7 @@ class DataProcessing:
         self.binaere_liste()
         self.get_employment()
         self.get_solver_requirement()
+        self.user_name_list()
 
 
     def solving_period(self):
@@ -411,3 +414,23 @@ class DataProcessing:
             'nb19': solver_requirement.nb19,
             'nb20': solver_requirement.nb20
         }
+
+
+    def user_name_list(self):
+        """ In dieser Funktion werden alle user Vor- und Nachnamen der company geozgen und in einer Liste gespeichert """
+
+        # Eine Liste mit allen ids der user erstellen (Reihenfolge gleich wie später)
+        user_ids = [user_id for user_id in self.binary_availability]
+
+        # Liste für alle Vor- und Nachnamen der User
+        self.user_names = []
+
+        for user_id in user_ids:
+            # user mit bestimmter ID aus der Datenbank abrufen
+            user = User.query.filter_by(id=user_id).first()
+            
+            # Überprüfen, ob ein Benutzer gefunden wurde
+            if user is not None:
+                self.user_names.append((user.first_name, user.last_name))
+            else:
+                self.user_names.append((None, None))
