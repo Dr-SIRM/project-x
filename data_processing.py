@@ -335,11 +335,38 @@ class DataProcessing:
 
                 # Eine Hilfsfunktion, um die Binärliste für verschiedene Zeitspannen zu aktualisieren.
                 def update_binary_list(start_time, end_time):
+                    # Wenn die Endzeit vor der Startzeit liegt, füge 24 Stunden zur Endzeit hinzu.
+                    if end_time < start_time:
+                        end_time += timedelta(seconds=86400)
+                    
+                    # Behandlung der Zeiten, die über Mitternacht hinausgehen
+                    if start_time < self.laden_oeffnet[weekday_index]:
+                        start_time += timedelta(seconds=86400)
+                        end_time += timedelta(seconds=86400)
+
+                    # Berechne die Stundenindizes für Start- und Endzeit.
                     start_hour = int(start_time.total_seconds() / divisor) - int(self.laden_oeffnet[weekday_index].total_seconds() / divisor)
                     end_hour = int(end_time.total_seconds() / divisor) - int(self.laden_oeffnet[weekday_index].total_seconds() / divisor)
+
+                    if user_id == 129:
+                        print(f"\nDebugging for user_id {user_id}, date {date}:")
+                        print(f"    time window: {start_time} to {end_time}")
+                        print(f"    start_time.total_seconds(): {start_time.total_seconds()}")
+                        print(f"    end_time.total_seconds(): {end_time.total_seconds()}")
+                        print(f"    divisor: {divisor}")
+                        print(f"    self.laden_oeffnet[{weekday_index}].total_seconds(): {self.laden_oeffnet[weekday_index].total_seconds()}")
+                        print(f"    Calculated start_hour: {start_hour}")
+                        print(f"    Calculated end_hour: {end_hour}")
+
+                    # Überprüfung und Korrektur von Zeiten, die außerhalb der Geschäftszeiten liegen.
+                    if start_hour < 0: start_hour = 0
+                    if end_hour > num_hours: end_hour = num_hours
+
+                    # Aktualisiere die Binärliste.
                     for i in range(start_hour, end_hour):
                         if 0 <= i < len(binary_list):
                             binary_list[i] = 1
+
 
                 # Werte werden auf 1 gesetzt, wenn der Mitarbeiter während jedes Zeitfensters arbeiten kann.
                 update_binary_list(st1, et1)
