@@ -62,7 +62,7 @@ const TimeReq = ({ timereq }) => {
     }
     else{
       if (closing < opening || startBreak < opening) {
-        if (closing === null || closing === undefined) {
+        if (closing === null || closing === undefined || isNaN(closing)) {
           return (current >= opening ) || (current < startBreak);
         } 
         else {
