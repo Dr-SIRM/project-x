@@ -17,6 +17,11 @@ export const navLinks = [
     id: "clients",
     title: "Kunden",
   },
+  {
+    id: "login", // You can use a unique ID for the "Login" link
+    title: "Login",
+    href: "http://localhost:3000", // Provide the custom href for the Login link
+  },
 ];
 
 export const features = [
