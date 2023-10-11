@@ -124,7 +124,6 @@ class DataProcessing:
             user_availability[user_id] = sorted(availabilities, key=lambda x: x[0])
 
         self.user_availability = user_availability
-        print("USER AVAILABILITY:", self.user_availability)
 
 
 
@@ -230,10 +229,6 @@ class DataProcessing:
                 corrected_close_time = self.laden_schliesst[i]
             # Berechne die Öffnungszeit als Differenz zwischen der korrigierten Schließzeit und der Öffnungszeit
             self.opening_hours.append(self.time_to_int(corrected_close_time) - self.time_to_int(self.laden_oeffnet[i]))
-
-        print("OPENING HOURS:", self.opening_hours)
-        print("LADEN OEFFNET:", self.laden_oeffnet)
-        print("LADEN SCHLIESST:", self.laden_schliesst)
 
         self.laden_oeffnet = self.laden_oeffnet * self.week_timeframe
         self.laden_schliesst = self.laden_schliesst * self.week_timeframe
@@ -348,6 +343,7 @@ class DataProcessing:
                     start_hour = int(start_time.total_seconds() / divisor) - int(self.laden_oeffnet[weekday_index].total_seconds() / divisor)
                     end_hour = int(end_time.total_seconds() / divisor) - int(self.laden_oeffnet[weekday_index].total_seconds() / divisor)
 
+                    """
                     if user_id == 129:
                         print(f"\nDebugging for user_id {user_id}, date {date}:")
                         print(f"    time window: {start_time} to {end_time}")
@@ -357,6 +353,7 @@ class DataProcessing:
                         print(f"    self.laden_oeffnet[{weekday_index}].total_seconds(): {self.laden_oeffnet[weekday_index].total_seconds()}")
                         print(f"    Calculated start_hour: {start_hour}")
                         print(f"    Calculated end_hour: {end_hour}")
+                    """
 
                     # Überprüfung und Korrektur von Zeiten, die außerhalb der Geschäftszeiten liegen.
                     if start_hour < 0: start_hour = 0
@@ -376,7 +373,6 @@ class DataProcessing:
                 binary_availability[user_id].append((date, binary_list))
 
         self.binary_availability = binary_availability
-        print("BINARY AVAILABILITY:", self.binary_availability)
 
 
 
