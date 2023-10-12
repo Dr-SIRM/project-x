@@ -55,21 +55,16 @@ To-Do Liste:
  - (erl) excel_output Daten anderst ziehen
  - (erl) Wenn Montag ist, wird für diese Woche gesolvt statt für nächste Woche
  - (erl) Vorüberprüfungen sauber beschreiben damit es vernünftig angezeigt wird.
+ - (erl) get_availability und binaere_liste anpassen 
+ - (erl) start_time und end_time zwei und drei noch implementieren
  
 
  To-Do's 
  -------------------------------
- - (*) TimeReq in data_processing anpassen, soabld Phu Planung fertiggestellt hat.
- - (*) get_availability und binaere_liste anpassen (Einträge NULL wenn nichts eingegeben??)
- - (*) start_time und end_time zwei und drei noch implementieren (noch warten bis über 00:00 Zeiten eingegeben werden können!)
+ - (*) TimeReq in data_processing anpassen, soabld Phu Planung fertiggestellt hat. Wenn man gar keine time_req eingegeben hat, hällt dann Vorüberprüfung 1 stand?
 
- - (*) Vorüberprüfungen sauber beschreiben damit es vernünftig angezeigt wird. Stoppt der Solver wenn es einen Fehler auslöst??
-
- - (*) Sollte der Solver trotzdem weiterlaufen, wenn die Vorüberprüfungen nicht alle i.O sind? Evtl. mit einer weiter Taste bestätigen?
  - (*) MA mit verschiedenen Profilen - Department (Koch, Service, ..)
-
  - (*) self.subsequent_workingdays_max in die Datenbank einpflegen und ziehen
-
 
 
  
@@ -1466,13 +1461,29 @@ class ORAlgorithm_cp:
             self.model.Add(self.nb11_min_violation[ma] >= 0)
             self.model.Add(self.nb12_max_violation[ma] >= 0)
 
-
+        """
         # -------------------------------------------------------------------------------------------------------
-        # HARTE NB (XX.XX.2023)
-        # NB 13 - Skills
+        # HARTE NB (11.10.2023)
+        # NB 13 - Mindestanzahl MA mit bestimmten Skills zu jeder Stunde an jedem Tag anwesend
         # -------------------------------------------------------------------------------------------------------
+        for s in self.skills:  # Iterieren Sie über alle Skills
+            for j in range(self.calc_time):
+                for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):  # Annahme: Alle MA haben gleiche Öffnungszeiten
+                    
+                    # Erstellen Sie eine Liste von Indikatorvariablen, ob MA den Skill s hat
+                    has_skill = [self.has_skill[i][s] for i in self.mitarbeiter]
+                    
+                    # Erstellen Sie die Nebenbedingung für Skill s, Zeitpunkt j, k
+                    required_skill_count = self.required_skills[s][j][k]  # Ermitteln Sie die benötigte Anzahl für Skill s zur Zeit j, k
+                    self.model.Add(
+                        sum(self.x[i, j, k] * has_skill[i] for i in self.mitarbeiter) >= required_skill_count
+                    )
 
-        
+        Ein paar Hinweise dazu:
+        self.skills: Eine Liste von allen Skills.
+        self.has_skill: Ein Dictionary, das für jeden Mitarbeiter (i) und jeden Skill (s) anzeigt, ob der Mitarbeiter diesen Skill hat. Zum Beispiel: self.has_skill[i][s] = 1, wenn Mitarbeiter i Skill s hat, sonst 0.
+        self.required_skills: Ein Dictionary, das für jeden Skill (s) und jeden Zeitslot (j, k) die erforderliche Anzahl an Mitarbeitern mit diesem Skill angibt. Beispiel: self.required_skills[s][j][k] gibt die erforderliche Anzahl für Skill s zur Zeit j, k zurück.
+        """
 
 
 

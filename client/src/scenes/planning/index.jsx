@@ -273,7 +273,6 @@ const TimeReq = ({ timereq }) => {
       payload["button"] = buttonName;
       payload["template_name"] = selectedTemplate;
       // Send the updated form values to the server for database update
-      console.log("Final payload before sending to server:", payload);
       await axios.post(`${API_BASE_URL}/api/requirement/workforce?week_adjustment=` + weekAdjustment, payload, {
     headers: {
         'Authorization': `Bearer ${token}`,
@@ -281,7 +280,6 @@ const TimeReq = ({ timereq }) => {
         }
     });
       setShowSuccessNotification(true);
-      console.log("Sending this data to server:", payload);
     } catch (error) {
       setShowErrorNotification(true);
     }
@@ -519,7 +517,6 @@ const TimeReq = ({ timereq }) => {
                   const endBreakTimeMinutes = convertTimeToMinutes(endBreak[columnIndex]);
                   const closingTimeMinutes = convertTimeToMinutes(closingHours[columnIndex]) - 1;
 
-                  console.log(`Time: ${currentTimeMinutes}, Opening: ${openingTimeMinutes}, Break: ${startBreakTimeMinutes}, Clsoing: ${closingTimeMinutes}`);
                   // Check if the current time is within the opening and closing hours
                   if (isTimeWithinRange(currentTimeMinutes, openingTimeMinutes, startBreakTimeMinutes, endBreakTimeMinutes, closingTimeMinutes)) {
                     const isSelected = selectedButtons.includes(`${columnIndex}-${btnIndex}`);

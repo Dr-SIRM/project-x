@@ -136,22 +136,6 @@ const Update = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Pensum"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.employment_level}
-                name="employment_level"
-                error={!!touched.employment_level && !!errors.employment_level}
-                helpertext={touched.employment_level && errors.employment_level}
-                InputProps={{
-                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
-                }}
-                sx={{ gridColumn: "span 2" }}
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
                 label="Department"
                 onBlur={handleBlur}
                 onChange={handleChange}
