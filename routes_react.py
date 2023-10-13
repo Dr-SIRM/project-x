@@ -986,12 +986,19 @@ def get_temp_timereq_dict(template_name, day_num, daily_slots, hour_divider, min
     for i in range(day_num):
         for hour in range(daily_slots):
             if hour > full_day:
-                hour -= full_day
-            quarter_hour = int(hour / hour_divider)
-            quarter_minute = int((hour % hour_divider) * minutes)
-            formatted_time = f'{quarter_hour:02d}:{quarter_minute:02d}'
-            time = f'{formatted_time}:00'
-            new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+                hour -= full_day + 1
+                quarter_hour = hour // hour_divider
+                quarter_minute = (hour % hour_divider) * minutes
+                formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+                time = f'{formatted_time}:00'
+                new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+                hour += full_day + 1
+            else:
+                quarter_hour = hour // hour_divider
+                quarter_minute = (hour % hour_divider) * minutes
+                formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+                time = f'{formatted_time}:00'
+                new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
 
             # Use lookup instead of database query
             worker_count = temp_lookup.get((str(i), new_time))
@@ -1060,8 +1067,6 @@ def get_required_workforce():
             closing_times.append(slot)
 
     daily_slots = max(closing_times) * hour_divider
-    print(closing_times)
-    print(daily_slots)
 
     # Calculation Min Working Day
     opening_times = []
@@ -1080,9 +1085,7 @@ def get_required_workforce():
                         
             opening_times.append(slot)
     
-    print(opening_times)
     min_opening = min(opening_times)* hour_divider
-    print(min_opening)
 
     # Week with adjustments
     monday = today - datetime.timedelta(days=today.weekday())
@@ -1112,14 +1115,22 @@ def get_required_workforce():
     timereq_dict = {}
     for i in range(day_num):
         for hour in range(daily_slots):
-            if hour >= 24 * hour_divider:
-                hour -= 24 * hour_divider
-            new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
-            quarter_hour = hour // hour_divider
-            quarter_minute = (hour % hour_divider) * minutes
-            formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
-            time = f'{formatted_time}:00'
-            new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+            if hour >= full_day +1:
+                hour -= full_day + 1
+                new_date = monday + datetime.timedelta(days=i+1) + datetime.timedelta(days=week_adjustment)
+                quarter_hour = hour // hour_divider
+                quarter_minute = (hour % hour_divider) * minutes
+                formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+                time = f'{formatted_time}:00'
+                new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+                hour += full_day + 1
+            else:
+                new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+                quarter_hour = hour // hour_divider
+                quarter_minute = (hour % hour_divider) * minutes
+                formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+                time = f'{formatted_time}:00'
+                new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
             
             # Use dictionary for quick lookup
             worker_count = time_req_lookup.get((new_date, new_time), 0)
@@ -1127,7 +1138,6 @@ def get_required_workforce():
             if worker_count != 0:
                 new_i = i + 1  # (Is this variable used?)
                 timereq_dict[f"{i}-{hour}"] = worker_count
-
 
 
     # Opening Dictionary
@@ -1146,7 +1156,6 @@ def get_required_workforce():
                 opening_dict[str(new_i) + '&2'] = opening.start_time2.strftime("%H:%M") if opening.start_time2 else None
                 opening_dict[str(new_i) + '&3'] = opening.end_time2.strftime("%H:%M") if opening.end_time2 else None
 
-    print(opening_dict)
 
     #Submit the required FTE per hour
     if request.method == 'POST':
@@ -1172,7 +1181,6 @@ def get_required_workforce():
                     hours = opening_details.start_time.hour
                     minutes = opening_details.start_time.minute
                     total_hours = hours * hour_divider + minutes
-                    print(total_hours)
                     if quarter < (total_hours):
                         pass
                     else:
@@ -1197,7 +1205,6 @@ def get_required_workforce():
                         formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
                         capacity = workforce_data.get(f'worker_{i}_{formatted_time}', 0)
 
-                        print(i, quarter, capacity)
                         
                         time = f'{formatted_time}:00'
                         new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
@@ -1208,7 +1215,6 @@ def get_required_workforce():
                                     is_within_opening_hours(new_time, opening_details.start_time2, opening_details.end_time2))):
                                 capacity = 0
 
-                        print(new_date, new_time, capacity)
 
                         new_record = TimeReq(
                             id=None,
@@ -1236,9 +1242,15 @@ def get_required_workforce():
                 db.session.commit()
             for i in range(day_num):
                 for quarter in range(daily_slots): # There are 96 quarters in a day
-                    quarter_hour = quarter / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
-                    quarter_minute = (quarter % hour_divider) * minutes  # Remainder gives the quarter in the hour
-                    formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+                    if quarter >= full_day +1:
+                        quarter -= full_day + 1
+                        quarter_hour = quarter / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
+                        quarter_minute = (quarter % hour_divider) * minutes  # Remainder gives the quarter in the hour
+                        formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+                    else:
+                        quarter_hour = quarter / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
+                        quarter_minute = (quarter % hour_divider) * minutes  # Remainder gives the quarter in the hour
+                        formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
                     capacity = workforce_data.get(f'worker_{i}_{formatted_time}')
                     if capacity:
                         time = f'{formatted_time}:00'
