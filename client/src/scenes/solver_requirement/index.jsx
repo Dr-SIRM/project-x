@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { useTheme, Box, Button, TextField, Snackbar, Typography } from "@mui/material";
+import { useTheme, Box, Button, TextField, Snackbar, Typography, ToggleButtonGroup, ToggleButton } from "@mui/material";
 import { Select, MenuItem } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -685,36 +685,40 @@ const SolverReq = ({ solverreq }) => {
               >
                 Dürfen mehr Mitarbeiter pro Zeiteinheit eingeplant werden als nötig?
               </Typography>
-              <Select
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
+              <ToggleButtonGroup
                 value={values.nb1}
-                name="nb1"
-                error={!!touched.nb1 && !!errors.nb1}
-                helperText={touched.nb1 && errors.nb1}
+                exclusive
+                onChange={(_, newValue) => handleChange({
+                  target: { value: newValue, name: 'nb1' }
+                })}
+                onBlur={handleBlur}
                 sx={{
-                  gridColumn: "span 1",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
-                    textAlign: "center",
-                  },
-                  '& .MuiSelect-icon': { 
-                    color: 'black', 
-                  },
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
                 }}
               >
-                <MenuItem value={ '0' }>0</MenuItem>
-                <MenuItem value={ '1' }>1</MenuItem>
-                <MenuItem value={ '2' }>2</MenuItem>
-                <MenuItem value={ '3' }>3</MenuItem>
-                <MenuItem value={ '4' }>4</MenuItem>
-                <MenuItem value={ '5' }>5</MenuItem>
-              </Select>
+                {[0, 1, 2, 3, 4, 5].map((value) => (
+                  <ToggleButton 
+                    key={value} 
+                    value={value.toString()} 
+                    aria-label={value.toString()}
+                    sx={{
+                      borderColor: 'gray',
+                      borderWidth: 1,
+                      borderStyle: 'solid',
+                      color: 'black',  // Ensuring text color is black
+                      '&.Mui-selected': {
+                        backgroundColor: 'lightblue',
+                        color: 'white',  // Ensuring selected text color is white
+                      }
+                    }}
+                  >
+                    {value}
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
               <Typography
                   color={colors.primary[100]}
                   variant=""
