@@ -654,11 +654,58 @@ const SolverReq = ({ solverreq }) => {
               <Box
               display="grid"
               gap="30px"
-              gridTemplateColumns="repeat(10, minmax(0, 1fr))"
+              gridTemplateColumns="repeat(18, minmax(0, 1fr))"
               sx={{
-                "& > div": { gridColumn: isNonMobile ? undefined : "span 10" },
+                "& > div": { gridColumn: isNonMobile ? undefined : "span 18" },
               }}
             >
+              <Typography
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 10",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+                <Typography
+                color={colors.primary[100]}
+                variant=""
+                sx={{
+                  gridColumn: "span 2",
+                  display: "grid",
+                  alignItems: "left",
+                  textAlign: "left",
+                  height: "100%",
+                }}
+              >
+                Egal
+              </Typography>
+              <Typography
+                color={colors.primary[100]}
+                variant=""
+                sx={{
+                  gridColumn: "span 2",
+                  display: "grid",
+                  alignItems: "right",
+                  textAlign: "right",
+                  height: "100%",
+                }}
+              >
+                Gar Nicht
+              </Typography>
+              <Typography
+                color={colors.primary[100]}
+                variant=""
+                sx={{
+                  gridColumn: "span 4",
+                  display: "grid",
+                  alignItems: "right",
+                  height: "100%",
+                }}
+              ></Typography>
+              {/* New Line */}
               <input
                 type="checkbox"
                 checked={isChecked}
@@ -674,7 +721,7 @@ const SolverReq = ({ solverreq }) => {
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 6",
+                  gridColumn: "span 9",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "left", 
@@ -693,6 +740,7 @@ const SolverReq = ({ solverreq }) => {
                 })}
                 onBlur={handleBlur}
                 sx={{
+                  gridColumn: "span 4",
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
@@ -723,12 +771,13 @@ const SolverReq = ({ solverreq }) => {
                   color={colors.primary[100]}
                   variant=""
                   sx={{
-                    gridColumn: "span 2",
+                    gridColumn: "span 4",
                     display: "grid",
                     alignItems: "center",
                     height: "100%",
                   }}
                 ></Typography>
+                {/* New Line */}
                 <input
                 type="checkbox"
                 checked={isChecked}
@@ -744,7 +793,7 @@ const SolverReq = ({ solverreq }) => {
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 6",
+                  gridColumn: "span 9",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "left", 
@@ -755,46 +804,52 @@ const SolverReq = ({ solverreq }) => {
               >
                 Darf die maximale Arbietszeit pro Woche überschritten werden?
               </Typography>
-              <Select
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
+              <ToggleButtonGroup
                 value={values.nb2}
-                name="nb2"
-                error={!!touched.nb2 && !!errors.nb2}
-                helperText={touched.nb2 && errors.nb2}
+                exclusive
+                onChange={(_, newValue) => handleChange({
+                  target: { value: newValue, name: 'nb2' }
+                })}
+                onBlur={handleBlur}
                 sx={{
-                  gridColumn: "span 1",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
-                    textAlign: "center",
-                  },
-                  '& .MuiSelect-icon': { 
-                    color: 'black', 
-                  },
+                  gridColumn: "span 4",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
                 }}
-                >
-                <MenuItem value={ '0' }>0</MenuItem>
-                <MenuItem value={ '1' }>1</MenuItem>
-                <MenuItem value={ '2' }>2</MenuItem>
-                <MenuItem value={ '3' }>3</MenuItem>
-                <MenuItem value={ '4' }>4</MenuItem>
-                <MenuItem value={ '5' }>5</MenuItem>
-              </Select>
+              >
+                {[0, 1, 2, 3, 4, 5].map((value) => (
+                  <ToggleButton 
+                    key={value} 
+                    value={value.toString()} 
+                    aria-label={value.toString()}
+                    sx={{
+                      borderColor: 'gray',
+                      borderWidth: 1,
+                      borderStyle: 'solid',
+                      color: 'black',  // Ensuring text color is black
+                      '&.Mui-selected': {
+                        backgroundColor: 'lightblue',
+                        color: 'white',  // Ensuring selected text color is white
+                      }
+                    }}
+                  >
+                    {value}
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
               <Typography
                   color={colors.primary[100]}
                   variant=""
                   sx={{
-                    gridColumn: "span 2",
+                    gridColumn: "span 4",
                     display: "grid",
                     alignItems: "center",
                     height: "100%",
                   }}
                 ></Typography>
+                {/* New Line */}
                 <input
                 type="checkbox"
                 checked={isChecked}
@@ -810,7 +865,7 @@ const SolverReq = ({ solverreq }) => {
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 6",
+                  gridColumn: "span 9",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "left", 
@@ -821,46 +876,52 @@ const SolverReq = ({ solverreq }) => {
               >
                 Darf die minimale Arbeitzeit pro Tag unterschritten werden?
               </Typography>
-              <Select
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
+              <ToggleButtonGroup
                 value={values.nb3}
-                name="nb3"
-                error={!!touched.nb3 && !!errors.nb3}
-                helperText={touched.nb3 && errors.nb3}
+                exclusive
+                onChange={(_, newValue) => handleChange({
+                  target: { value: newValue, name: 'nb3' }
+                })}
+                onBlur={handleBlur}
                 sx={{
-                  gridColumn: "span 1",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
-                    textAlign: "center",
-                  },
-                  '& .MuiSelect-icon': { 
-                    color: 'black', 
-                  },
+                  gridColumn: "span 4",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
                 }}
-                >
-                <MenuItem value={ '0' }>0</MenuItem>
-                <MenuItem value={ '1' }>1</MenuItem>
-                <MenuItem value={ '2' }>2</MenuItem>
-                <MenuItem value={ '3' }>3</MenuItem>
-                <MenuItem value={ '4' }>4</MenuItem>
-                <MenuItem value={ '5' }>5</MenuItem>
-              </Select>
+              >
+                {[0, 1, 2, 3, 4, 5].map((value) => (
+                  <ToggleButton 
+                    key={value} 
+                    value={value.toString()} 
+                    aria-label={value.toString()}
+                    sx={{
+                      borderColor: 'gray',
+                      borderWidth: 1,
+                      borderStyle: 'solid',
+                      color: 'black',  // Ensuring text color is black
+                      '&.Mui-selected': {
+                        backgroundColor: 'lightblue',
+                        color: 'white',  // Ensuring selected text color is white
+                      }
+                    }}
+                  >
+                    {value}
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
               <Typography
                   color={colors.primary[100]}
                   variant=""
                   sx={{
-                    gridColumn: "span 2",
+                    gridColumn: "span 4",
                     display: "grid",
                     alignItems: "center",
                     height: "100%",
                   }}
                 ></Typography>
+                {/* New Line */}
                 <input
                 type="checkbox"
                 checked={isChecked}
@@ -875,7 +936,7 @@ const SolverReq = ({ solverreq }) => {
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 6",
+                  gridColumn: "span 9",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "left", 
@@ -886,46 +947,52 @@ const SolverReq = ({ solverreq }) => {
               >
                 Darf die maximale Arbeitzeit pro Tag überschritten werden?
               </Typography>
-              <Select
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
+              <ToggleButtonGroup
                 value={values.nb4}
-                name="nb4"
-                error={!!touched.nb4 && !!errors.nb4}
-                helperText={touched.nb4 && errors.nb4}
+                exclusive
+                onChange={(_, newValue) => handleChange({
+                  target: { value: newValue, name: 'nb4' }
+                })}
+                onBlur={handleBlur}
                 sx={{
-                  gridColumn: "span 1",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
-                    textAlign: "center",
-                  },
-                  '& .MuiSelect-icon': { 
-                    color: 'black', 
-                  },
+                  gridColumn: "span 4",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
                 }}
-                >
-                <MenuItem value={ '0' }>0</MenuItem>
-                <MenuItem value={ '1' }>1</MenuItem>
-                <MenuItem value={ '2' }>2</MenuItem>
-                <MenuItem value={ '3' }>3</MenuItem>
-                <MenuItem value={ '4' }>4</MenuItem>
-                <MenuItem value={ '5' }>5</MenuItem>
-              </Select>
+              >
+                {[0, 1, 2, 3, 4, 5].map((value) => (
+                  <ToggleButton 
+                    key={value} 
+                    value={value.toString()} 
+                    aria-label={value.toString()}
+                    sx={{
+                      borderColor: 'gray',
+                      borderWidth: 1,
+                      borderStyle: 'solid',
+                      color: 'black',  // Ensuring text color is black
+                      '&.Mui-selected': {
+                        backgroundColor: 'lightblue',
+                        color: 'white',  // Ensuring selected text color is white
+                      }
+                    }}
+                  >
+                    {value}
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
               <Typography
                   color={colors.primary[100]}
                   variant=""
                   sx={{
-                    gridColumn: "span 2",
+                    gridColumn: "span 4",
                     display: "grid",
                     alignItems: "center",
                     height: "100%",
                   }}
                 ></Typography>
+                {/* New Line */}
                 <input
                 type="checkbox"
                 checked={isChecked}
@@ -940,7 +1007,7 @@ const SolverReq = ({ solverreq }) => {
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 6",
+                  gridColumn: "span 9",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "left", 
@@ -951,46 +1018,52 @@ const SolverReq = ({ solverreq }) => {
               >
                 Darf die Arbeitstundenwoche bei Vollzeitangestellten Mitarbeiter unterschritten werden?
               </Typography>
-              <Select
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
+              <ToggleButtonGroup
                 value={values.nb5}
-                name="nb5"
-                error={!!touched.nb5 && !!errors.nb5}
-                helperText={touched.nb5 && errors.nb5}
+                exclusive
+                onChange={(_, newValue) => handleChange({
+                  target: { value: newValue, name: 'nb5' }
+                })}
+                onBlur={handleBlur}
                 sx={{
-                  gridColumn: "span 1",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
-                    textAlign: "center",
-                  },
-                  '& .MuiSelect-icon': { 
-                    color: 'black', 
-                  },
+                  gridColumn: "span 4",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
                 }}
-                >
-                <MenuItem value={ '0' }>0</MenuItem>
-                <MenuItem value={ '1' }>1</MenuItem>
-                <MenuItem value={ '2' }>2</MenuItem>
-                <MenuItem value={ '3' }>3</MenuItem>
-                <MenuItem value={ '4' }>4</MenuItem>
-                <MenuItem value={ '5' }>5</MenuItem>
-              </Select>
+              >
+                {[0, 1, 2, 3, 4, 5].map((value) => (
+                  <ToggleButton 
+                    key={value} 
+                    value={value.toString()} 
+                    aria-label={value.toString()}
+                    sx={{
+                      borderColor: 'gray',
+                      borderWidth: 1,
+                      borderStyle: 'solid',
+                      color: 'black',  // Ensuring text color is black
+                      '&.Mui-selected': {
+                        backgroundColor: 'lightblue',
+                        color: 'white',  // Ensuring selected text color is white
+                      }
+                    }}
+                  >
+                    {value}
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
               <Typography
                   color={colors.primary[100]}
                   variant=""
                   sx={{
-                    gridColumn: "span 2",
+                    gridColumn: "span 4",
                     display: "grid",
                     alignItems: "center",
                     height: "100%",
                   }}
                 ></Typography>
+                {/* New Line */}
                 <input
                 type="checkbox"
                 checked={isChecked}
@@ -1005,7 +1078,7 @@ const SolverReq = ({ solverreq }) => {
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 6",
+                  gridColumn: "span 9",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "left", 
@@ -1016,46 +1089,52 @@ const SolverReq = ({ solverreq }) => {
               >
                 Darf die Arbeitstundenwoche bei Vollzeitangestellten Mitarbeiter überschritten werden?
               </Typography>
-              <Select
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
+              <ToggleButtonGroup
                 value={values.nb6}
-                name="nb6"
-                error={!!touched.nb6 && !!errors.nb6}
-                helperText={touched.nb6 && errors.nb6}
+                exclusive
+                onChange={(_, newValue) => handleChange({
+                  target: { value: newValue, name: 'nb6' }
+                })}
+                onBlur={handleBlur}
                 sx={{
-                  gridColumn: "span 1",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
-                    textAlign: "center",
-                  },
-                  '& .MuiSelect-icon': { 
-                    color: 'black', 
-                  },
+                  gridColumn: "span 4",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
                 }}
-                >
-                <MenuItem value={ '0' }>0</MenuItem>
-                <MenuItem value={ '1' }>1</MenuItem>
-                <MenuItem value={ '2' }>2</MenuItem>
-                <MenuItem value={ '3' }>3</MenuItem>
-                <MenuItem value={ '4' }>4</MenuItem>
-                <MenuItem value={ '5' }>5</MenuItem>
-              </Select>
+              >
+                {[0, 1, 2, 3, 4, 5].map((value) => (
+                  <ToggleButton 
+                    key={value} 
+                    value={value.toString()} 
+                    aria-label={value.toString()}
+                    sx={{
+                      borderColor: 'gray',
+                      borderWidth: 1,
+                      borderStyle: 'solid',
+                      color: 'black',  // Ensuring text color is black
+                      '&.Mui-selected': {
+                        backgroundColor: 'lightblue',
+                        color: 'white',  // Ensuring selected text color is white
+                      }
+                    }}
+                  >
+                    {value}
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
               <Typography
                   color={colors.primary[100]}
                   variant=""
                   sx={{
-                    gridColumn: "span 2",
+                    gridColumn: "span 4",
                     display: "grid",
                     alignItems: "center",
                     height: "100%",
                   }}
                 ></Typography>
+                {/* New Line */}
                 <input
                 type="checkbox"
                 checked={isChecked}
@@ -1070,7 +1149,7 @@ const SolverReq = ({ solverreq }) => {
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 6",
+                  gridColumn: "span 9",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "left", 
@@ -1081,46 +1160,52 @@ const SolverReq = ({ solverreq }) => {
               >
                 Jeder Mitarbeiter soll in der gleichen Schicht innerhalb einer Woche arbeiten
               </Typography>
-              <Select
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
+              <ToggleButtonGroup
                 value={values.nb7}
-                name="nb7"
-                error={!!touched.nb7 && !!errors.nb7}
-                helperText={touched.nb7 && errors.nb7}
+                exclusive
+                onChange={(_, newValue) => handleChange({
+                  target: { value: newValue, name: 'nb7' }
+                })}
+                onBlur={handleBlur}
                 sx={{
-                  gridColumn: "span 1",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
-                    textAlign: "center",
-                  },
-                  '& .MuiSelect-icon': { 
-                    color: 'black', 
-                  },
+                  gridColumn: "span 4",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
                 }}
-                >
-                <MenuItem value={ '0' }>0</MenuItem>
-                <MenuItem value={ '1' }>1</MenuItem>
-                <MenuItem value={ '2' }>2</MenuItem>
-                <MenuItem value={ '3' }>3</MenuItem>
-                <MenuItem value={ '4' }>4</MenuItem>
-                <MenuItem value={ '5' }>5</MenuItem>
-              </Select>
+              >
+                {[0, 1, 2, 3, 4, 5].map((value) => (
+                  <ToggleButton 
+                    key={value} 
+                    value={value.toString()} 
+                    aria-label={value.toString()}
+                    sx={{
+                      borderColor: 'gray',
+                      borderWidth: 1,
+                      borderStyle: 'solid',
+                      color: 'black',  // Ensuring text color is black
+                      '&.Mui-selected': {
+                        backgroundColor: 'lightblue',
+                        color: 'white',  // Ensuring selected text color is white
+                      }
+                    }}
+                  >
+                    {value}
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
               <Typography
                   color={colors.primary[100]}
                   variant=""
                   sx={{
-                    gridColumn: "span 2",
+                    gridColumn: "span 4",
                     display: "grid",
                     alignItems: "center",
                     height: "100%",
                   }}
                 ></Typography>
+                {/* New Line */}
                 <input
                 type="checkbox"
                 checked={isChecked}
@@ -1135,7 +1220,7 @@ const SolverReq = ({ solverreq }) => {
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 6",
+                  gridColumn: "span 9",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "left", 
@@ -1146,46 +1231,52 @@ const SolverReq = ({ solverreq }) => {
               >
                 Über mehrere Wochen sollen Mitarbeiter Wechselschichtig arbeiten
               </Typography>
-              <Select
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
+              <ToggleButtonGroup
                 value={values.nb8}
-                name="nb8"
-                error={!!touched.nb8 && !!errors.nb8}
-                helperText={touched.nb8 && errors.nb8}
+                exclusive
+                onChange={(_, newValue) => handleChange({
+                  target: { value: newValue, name: 'nb8' }
+                })}
+                onBlur={handleBlur}
                 sx={{
-                  gridColumn: "span 1",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
-                    textAlign: "center",
-                  },
-                  '& .MuiSelect-icon': { 
-                    color: 'black', 
-                  },
+                  gridColumn: "span 4",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
                 }}
-                >
-                <MenuItem value={ '0' }>0</MenuItem>
-                <MenuItem value={ '1' }>1</MenuItem>
-                <MenuItem value={ '2' }>2</MenuItem>
-                <MenuItem value={ '3' }>3</MenuItem>
-                <MenuItem value={ '4' }>4</MenuItem>
-                <MenuItem value={ '5' }>5</MenuItem>
-              </Select>
+              >
+                {[0, 1, 2, 3, 4, 5].map((value) => (
+                  <ToggleButton 
+                    key={value} 
+                    value={value.toString()} 
+                    aria-label={value.toString()}
+                    sx={{
+                      borderColor: 'gray',
+                      borderWidth: 1,
+                      borderStyle: 'solid',
+                      color: 'black',  // Ensuring text color is black
+                      '&.Mui-selected': {
+                        backgroundColor: 'lightblue',
+                        color: 'white',  // Ensuring selected text color is white
+                      }
+                    }}
+                  >
+                    {value}
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
               <Typography
                   color={colors.primary[100]}
                   variant=""
                   sx={{
-                    gridColumn: "span 2",
+                    gridColumn: "span 4",
                     display: "grid",
                     alignItems: "center",
                     height: "100%",
                   }}
                 ></Typography>
+                {/* New Line */}
                 <input
                 type="checkbox"
                 checked={isChecked}
@@ -1200,7 +1291,7 @@ const SolverReq = ({ solverreq }) => {
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 6",
+                  gridColumn: "span 9",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "left", 
@@ -1211,46 +1302,52 @@ const SolverReq = ({ solverreq }) => {
               >
                 Pro Schicht muss eine Mindestanzahl an Stunden gearbeitet werden
               </Typography>
-              <Select
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
+              <ToggleButtonGroup
                 value={values.nb9}
-                name="nb9"
-                error={!!touched.nb9 && !!errors.nb9}
-                helperText={touched.nb9 && errors.nb9}
+                exclusive
+                onChange={(_, newValue) => handleChange({
+                  target: { value: newValue, name: 'nb9' }
+                })}
+                onBlur={handleBlur}
                 sx={{
-                  gridColumn: "span 1",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
-                    textAlign: "center",
-                  },
-                  '& .MuiSelect-icon': { 
-                    color: 'black', 
-                  },
+                  gridColumn: "span 4",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
                 }}
-                >
-                <MenuItem value={ '0' }>0</MenuItem>
-                <MenuItem value={ '1' }>1</MenuItem>
-                <MenuItem value={ '2' }>2</MenuItem>
-                <MenuItem value={ '3' }>3</MenuItem>
-                <MenuItem value={ '4' }>4</MenuItem>
-                <MenuItem value={ '5' }>5</MenuItem>
-              </Select>
+              >
+                {[0, 1, 2, 3, 4, 5].map((value) => (
+                  <ToggleButton 
+                    key={value} 
+                    value={value.toString()} 
+                    aria-label={value.toString()}
+                    sx={{
+                      borderColor: 'gray',
+                      borderWidth: 1,
+                      borderStyle: 'solid',
+                      color: 'black',  // Ensuring text color is black
+                      '&.Mui-selected': {
+                        backgroundColor: 'lightblue',
+                        color: 'white',  // Ensuring selected text color is white
+                      }
+                    }}
+                  >
+                    {value}
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
               <Typography
                   color={colors.primary[100]}
                   variant=""
                   sx={{
-                    gridColumn: "span 2",
+                    gridColumn: "span 4",
                     display: "grid",
                     alignItems: "center",
                     height: "100%",
                   }}
                 ></Typography>
+                {/* New Line */}
                 <input
                 type="checkbox"
                 checked={isChecked}
@@ -1265,7 +1362,7 @@ const SolverReq = ({ solverreq }) => {
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 6",
+                  gridColumn: "span 9",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "left", 
@@ -1276,46 +1373,52 @@ const SolverReq = ({ solverreq }) => {
               >
                 Maximale Arbeitstage in Folge darf überschritten werden
               </Typography>
-              <Select
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
+              <ToggleButtonGroup
                 value={values.nb10}
-                name="nb10"
-                error={!!touched.nb10 && !!errors.nb10}
-                helperText={touched.nb10 && errors.nb10}
+                exclusive
+                onChange={(_, newValue) => handleChange({
+                  target: { value: newValue, name: 'nb10' }
+                })}
+                onBlur={handleBlur}
                 sx={{
-                  gridColumn: "span 1",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
-                    textAlign: "center",
-                  },
-                  '& .MuiSelect-icon': { 
-                    color: 'black', 
-                  },
+                  gridColumn: "span 4",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
                 }}
-                >
-                <MenuItem value={ '0' }>0</MenuItem>
-                <MenuItem value={ '1' }>1</MenuItem>
-                <MenuItem value={ '2' }>2</MenuItem>
-                <MenuItem value={ '3' }>3</MenuItem>
-                <MenuItem value={ '4' }>4</MenuItem>
-                <MenuItem value={ '5' }>5</MenuItem>
-              </Select>
+              >
+                {[0, 1, 2, 3, 4, 5].map((value) => (
+                  <ToggleButton 
+                    key={value} 
+                    value={value.toString()} 
+                    aria-label={value.toString()}
+                    sx={{
+                      borderColor: 'gray',
+                      borderWidth: 1,
+                      borderStyle: 'solid',
+                      color: 'black',  // Ensuring text color is black
+                      '&.Mui-selected': {
+                        backgroundColor: 'lightblue',
+                        color: 'white',  // Ensuring selected text color is white
+                      }
+                    }}
+                  >
+                    {value}
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
               <Typography
                   color={colors.primary[100]}
                   variant=""
                   sx={{
-                    gridColumn: "span 2",
+                    gridColumn: "span 4",
                     display: "grid",
                     alignItems: "center",
                     height: "100%",
                   }}
                 ></Typography>
+                {/* New Line */}
                 <input
                 type="checkbox"
                 checked={isChecked}
@@ -1330,7 +1433,7 @@ const SolverReq = ({ solverreq }) => {
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 6",
+                  gridColumn: "span 9",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "left", 
@@ -1341,46 +1444,52 @@ const SolverReq = ({ solverreq }) => {
               >
                 Nebenbedingung 11
               </Typography>
-              <Select
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
+              <ToggleButtonGroup
                 value={values.nb11}
-                name="nb11"
-                error={!!touched.nb11 && !!errors.nb11}
-                helperText={touched.nb11 && errors.nb11}
+                exclusive
+                onChange={(_, newValue) => handleChange({
+                  target: { value: newValue, name: 'nb11' }
+                })}
+                onBlur={handleBlur}
                 sx={{
-                  gridColumn: "span 1",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
-                    textAlign: "center",
-                  },
-                  '& .MuiSelect-icon': { 
-                    color: 'black', 
-                  },
+                  gridColumn: "span 4",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
                 }}
-                >
-                <MenuItem value={ '0' }>0</MenuItem>
-                <MenuItem value={ '1' }>1</MenuItem>
-                <MenuItem value={ '2' }>2</MenuItem>
-                <MenuItem value={ '3' }>3</MenuItem>
-                <MenuItem value={ '4' }>4</MenuItem>
-                <MenuItem value={ '5' }>5</MenuItem>
-              </Select>
+              >
+                {[0, 1, 2, 3, 4, 5].map((value) => (
+                  <ToggleButton 
+                    key={value} 
+                    value={value.toString()} 
+                    aria-label={value.toString()}
+                    sx={{
+                      borderColor: 'gray',
+                      borderWidth: 1,
+                      borderStyle: 'solid',
+                      color: 'black',  // Ensuring text color is black
+                      '&.Mui-selected': {
+                        backgroundColor: 'lightblue',
+                        color: 'white',  // Ensuring selected text color is white
+                      }
+                    }}
+                  >
+                    {value}
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
               <Typography
                   color={colors.primary[100]}
                   variant=""
                   sx={{
-                    gridColumn: "span 2",
+                    gridColumn: "span 4",
                     display: "grid",
                     alignItems: "center",
                     height: "100%",
                   }}
                 ></Typography>
+                {/* New Line */}
                 <input
                 type="checkbox"
                 checked={isChecked}
@@ -1395,7 +1504,7 @@ const SolverReq = ({ solverreq }) => {
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 6",
+                  gridColumn: "span 9",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "left", 
@@ -1406,41 +1515,46 @@ const SolverReq = ({ solverreq }) => {
               >
                 Nebenbedingung 12
               </Typography>
-              <Select
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
+              <ToggleButtonGroup
                 value={values.nb12}
-                name="nb12"
-                error={!!touched.nb12 && !!errors.nb12}
-                helperText={touched.nb12 && errors.nb12}
+                exclusive
+                onChange={(_, newValue) => handleChange({
+                  target: { value: newValue, name: 'nb12' }
+                })}
+                onBlur={handleBlur}
                 sx={{
-                  gridColumn: "span 1",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
-                    textAlign: "center",
-                  },
-                  '& .MuiSelect-icon': { 
-                    color: 'black', 
-                  },
+                  gridColumn: "span 4",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  height: "100%",
                 }}
-                >
-                <MenuItem value={ '0' }>0</MenuItem>
-                <MenuItem value={ '1' }>1</MenuItem>
-                <MenuItem value={ '2' }>2</MenuItem>
-                <MenuItem value={ '3' }>3</MenuItem>
-                <MenuItem value={ '4' }>4</MenuItem>
-                <MenuItem value={ '5' }>5</MenuItem>
-              </Select>
+              >
+                {[0, 1, 2, 3, 4, 5].map((value) => (
+                  <ToggleButton 
+                    key={value} 
+                    value={value.toString()} 
+                    aria-label={value.toString()}
+                    sx={{
+                      borderColor: 'gray',
+                      borderWidth: 1,
+                      borderStyle: 'solid',
+                      color: 'black',  // Ensuring text color is black
+                      '&.Mui-selected': {
+                        backgroundColor: 'lightblue',
+                        color: 'white',  // Ensuring selected text color is white
+                      }
+                    }}
+                  >
+                    {value}
+                  </ToggleButton>
+                ))}
+              </ToggleButtonGroup>
               <Typography
                   color={colors.primary[100]}
                   variant=""
                   sx={{
-                    gridColumn: "span 2",
+                    gridColumn: "span 4",
                     display: "grid",
                     alignItems: "center",
                     height: "100%",
