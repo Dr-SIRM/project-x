@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Button, TextField, InputAdornment, Snackbar  } from "@mui/material";
+import { Box, Button, TextField, InputAdornment, Typography, useTheme, Snackbar  } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -7,10 +7,13 @@ import Header from "../../components/Header";
 import { ThreeDots } from "react-loader-spinner"; 
 import axios from 'axios';
 import { API_BASE_URL } from "../../config";
+import { tokens } from "../../theme";
 
 
 
 const Update = () => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
@@ -136,13 +139,26 @@ const Update = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Department"
+                label= "Password"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.department}
-                name="department"
-                error={!!touched.department && !!errors.department}
-                helpertext={touched.department && errors.department}
+                value={values.password}
+                name="password"
+                error={!!touched.password && !!errors.password}
+                helperText={touched.password && errors.password}
+                sx={{ gridColumn: "span 2" }}
+              />
+              <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label= "Repeat Password"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.password2}
+                name="password2"
+                error={!!touched.password2 && !!errors.password2}
+                helperText={touched.password2 && errors.password2}
                 sx={{ gridColumn: "span 2" }}
               />
              
@@ -195,8 +211,11 @@ const checkoutSchema = yup.object().shape({
   first_name: yup.string().required('First name is required'),
   last_name: yup.string().required('Last name is required'),
   email: yup.string().email('Invalid email').required('Email is required'),
-  employment_level: yup.number().required('Employment level is required').min(1, 'Must be at least 1%').max(100, 'Cannot be more than 100%'),
-  department: yup.string().required('Department is required'),
+  password: yup.string().required("required"),
+  password2: yup
+  .string()
+  .oneOf([yup.ref("password"), null], "Passwords must match")
+  .required("required"),
 });
 
 export default Update;

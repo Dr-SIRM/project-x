@@ -200,6 +200,11 @@ def react_update():
             user.first_name = user_data.get('first_name', user.first_name)
             user.last_name = user_data.get('last_name', user.last_name)
             user.email = user_data.get('email', user.email)
+            if user_data['password'] != user_data['password2']:
+                return jsonify({'message': 'Password are not matching'}), 200
+            else:
+                hashed_password = generate_password_hash(user_data['password'])
+                user.password = hashed_password
             
             
             user.changed_by = react_user
@@ -207,16 +212,13 @@ def react_update():
 
             db.session.commit()
             return 'Success', 200
-
-    # Convert the employment_level to a percentage before sending it to the frontend
-    employment_level_percentage = user.employment_level * 100
+        
 
     user_dict = {
         'first_name': user.first_name,
         'last_name': user.last_name,
         'email': user.email,
-        'employment_level': employment_level_percentage,
-        'department': user.department,
+        'password': user.password,
     }
 
     return jsonify(user_dict)
