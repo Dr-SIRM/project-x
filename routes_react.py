@@ -407,6 +407,7 @@ def get_availability():
     day_num = 7
     company_id = user.company_id
     solverreq = SolverRequirement.query.filter_by(company_name=user.company_name).first()
+    opening = OpeningHours.query.filter_by(company_name=user.company_name).first()
 
     # Week with adjustments
     monday = today - datetime.timedelta(days=today.weekday())
@@ -460,6 +461,21 @@ def get_availability():
                 for j in range(6):
                     entry = request.json.get(f'day_{i}_{j}')
                     new_entry[f'entry{j + 1}'] = get_time_str(entry)
+                    if new_entry['entry1']:
+                        availability_hours = new_entry['entry1'].hour
+                        availability_minutes = new_entry['entry1'].minute
+                        total_availability_start = availability_hours * solverreq.hour_devider + availability_minutes
+                        opening_hours = opening.start_time.hour
+                        opening_minutes = opening.start_time.minute
+                        total_opening_start = opening_hours * solverreq.hour_devider + opening_minutes
+                        if total_availability_start == 0:
+                            new_entry[f'entry{j + 1}'] = get_time_str(entry)
+                        elif total_availability_start < total_opening_start:
+                            new_entry['entry1'] = opening.start_time
+                        else:
+                            new_entry[f'entry{j + 1}'] = get_time_str(entry)
+
+
 
                 # Create a new Availability instance and add to list
                 data = Availability(
@@ -925,10 +941,6 @@ def get_registration():
 
 @app.route('/api/registration/admin', methods = ['GET', 'POST'])
 def get_admin_registration():
-    print(request.headers)
-    print(request.method)
-    print(request.path)
-    print(request.json)
     if request.method =='POST':
         admin_registration_data = request.get_json()
         if admin_registration_data['password'] != admin_registration_data['password2']:
@@ -1105,7 +1117,6 @@ def get_required_workforce():
         formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
         slot_dict[i] = formatted_time
     
-    print(slot_dict)
     # Pre-fetch all TimeReq for the given date range and company name
     end_date = week_start + datetime.timedelta(days=day_num)
     all_time_reqs = TimeReq.query.filter(
