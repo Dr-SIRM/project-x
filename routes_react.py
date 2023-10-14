@@ -406,6 +406,7 @@ def get_availability():
     weekdays = {0:'Montag', 1:'Dienstag', 2:'Mittwoch', 3:'Donnerstag', 4:'Freitag', 5:'Samstag', 6:'Sonntag'}
     day_num = 7
     company_id = user.company_id
+    solverreq = SolverRequirement.query.filter_by(company_name=user.company_name).first()
 
     # Week with adjustments
     monday = today - datetime.timedelta(days=today.weekday())
@@ -538,6 +539,7 @@ def get_availability():
         'day_num': day_num,
         'temp_dict': temp_dict,
         'week_start': week_start,
+        'hour_divider': solverreq.hour_devider,
         'template1_dict': get_temp_availability_dict("Template 1", user.email, day_num, weekdays),
         'template2_dict': get_temp_availability_dict("Template 2", user.email, day_num, weekdays),
         'template3_dict': get_temp_availability_dict("Template 3", user.email, day_num, weekdays),

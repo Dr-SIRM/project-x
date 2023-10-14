@@ -66,6 +66,9 @@ useEffect(() => {
   }
 }, [availabilityData]);
 
+  const hourDivider = availabilityData.hourDivider;
+  const step = 3600 / hourDivider;
+
 
   const handleAddTime = () => {
     if (additionalTimes < 2) {
@@ -484,6 +487,7 @@ useEffect(() => {
               fullWidth
               variant="filled"
               type="time"
+              inputProps={{ step }}
               onBlur={handleBlur}
               onChange={handleChange}
               value={values[`day_${rowIndex}_${columnIndex}`] === '00:00' ? '' : values[`day_${rowIndex}_${columnIndex}`]}
