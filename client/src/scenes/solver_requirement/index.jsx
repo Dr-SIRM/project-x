@@ -680,7 +680,7 @@ const SolverReq = ({ solverreq }) => {
                   height: "100%",
                 }}
               >
-                Egal
+                Ja, ist mir egal
               </Typography>
               <Typography
                 color={colors.primary[100]}
@@ -693,7 +693,7 @@ const SolverReq = ({ solverreq }) => {
                   height: "100%",
                 }}
               >
-                Gar Nicht
+                Nein lieber nicht
               </Typography>
               <Typography
                 color={colors.primary[100]}
