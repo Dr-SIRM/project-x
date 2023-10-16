@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { close, logo, menu } from "../assets";
 import { navLinks } from "../constants";
+import { Link } from 'react-router-dom';
+
 
 const Navbar = () => {
   const [active, setActive] = useState("Home");
@@ -13,21 +15,20 @@ const Navbar = () => {
       <ul className="list-none sm:flex hidden justify-end items-center flex-1">
         {navLinks.map((nav, index) => (
           <li
-          key={nav.id}
-          className={`font-poppins font-normal cursor-pointer text-[16px] ${
-            active === nav.title ? "text-white" : "text-dimWhite"
-          } ${
-            nav.title === "Login" ? "login-link" : "" // Add a class for the "Login" link
-          } ${index === navLinks.length - 1 ? "mr-0" : "mr-10"}`}
-          onClick={() => {
-            setActive(nav.title);
-            if (nav.title === "Login" && nav.href) {
-              window.location.href = nav.href; // Redirect to the href URL for Login
-            }
-          }}
-        >
-          <a href={`#${nav.id}`}>{nav.title}</a>
-        </li>
+            key={nav.id}
+            className={`font-poppins font-normal cursor-pointer text-[16px] ${
+              active === nav.title ? "text-white" : "text-dimWhite"
+            } ${
+              nav.title === "Login" ? "login-link" : ""
+            } ${index === navLinks.length - 1 ? "mr-0" : "mr-10"}`}
+            onClick={() => setActive(nav.title)}
+          >
+            {nav.href ? (
+              <a href={nav.href} target="_blank" rel="noopener noreferrer">{nav.title}</a>
+            ) : (
+              <Link to={nav.path}>{nav.title}</Link>
+            )}
+          </li>
         ))}
       </ul>
 
@@ -51,14 +52,13 @@ const Navbar = () => {
                 className={`font-poppins font-medium cursor-pointer text-[16px] ${
                   active === nav.title ? "text-white" : "text-dimWhite"
                 } ${index === navLinks.length - 1 ? "mb-0" : "mb-4"}`}
-                onClick={() => {
-                  setActive(nav.title);
-                  if (nav.title === "Login" && nav.href) {
-                    window.location.href = nav.href; // Redirect to the href URL for Login
-                  }
-                }}
+                onClick={() => setActive(nav.title)}
               >
-                <a href={`#${nav.id}`}>{nav.title}</a>
+                {nav.href ? (
+                  <a href={nav.href} target="_blank" rel="noopener noreferrer">{nav.title}</a>
+                ) : (
+                  <Link to={nav.path}>{nav.title}</Link>
+                )}
               </li>
             ))}
           </ul>
