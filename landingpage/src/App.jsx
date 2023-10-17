@@ -1,5 +1,5 @@
 import styles from "./style";
-import { Billing, Business, CardDeal, Clients, CTA, Footer, Navbar, Stats, Testimonials, Hero, Conditions } from "./components";
+import { Billing, Business, CardDeal, Clients, CTA, Footer, Navbar, Stats, Testimonials, Hero, Conditions, Product } from "./components";
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 const App = () => (
@@ -42,15 +42,14 @@ const App = () => (
           </div>
         } />
 
-        <Route path="/clients" element={
+        <Route path="/product" element={
           <div className={`bg-primary ${styles.paddingX} ${styles.flexCenter}`}>
             <div className={`${styles.boxWidth}`}>
-              <Clients />
+              <Product />
             </div>
           </div>
         } />
 
-        {/* Add other routes as needed */}
       </Routes>
     </div>
   </Router>

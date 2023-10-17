@@ -10,6 +10,7 @@ import Testimonials from "./Testimonials";
 import Hero from "./Hero";
 import Conditions from "./Conditions";
 import Home from "./Home";
+import Product from "./Product"
 
 export {
   Navbar,
@@ -24,4 +25,5 @@ export {
   Hero,
   Conditions,
   Home,
+  Product
 };
