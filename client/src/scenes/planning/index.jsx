@@ -214,7 +214,6 @@ const TimeReq = ({ timereq }) => {
         }
       });
     });
-
     setSlotEmployeeCounts(updatedCounts);
   };
 
@@ -231,7 +230,7 @@ const TimeReq = ({ timereq }) => {
 
         if (isTimeWithinRange(currentTimeMinutes, openingTimeMinutes, startBreakTimeMinutes, endBreakTimeMinutes, closingTimeMinutes)) {
           const key = `${columnIndex}-${btnIndex}`;
-          updatedCounts[key] = timereqData.template1_dict[key];
+          updatedCounts[key] = timereqData.template2_dict[key];
         }
       });
     });
@@ -252,7 +251,7 @@ const TimeReq = ({ timereq }) => {
 
         if (isTimeWithinRange(currentTimeMinutes, openingTimeMinutes, startBreakTimeMinutes, endBreakTimeMinutes, closingTimeMinutes)) {
           const key = `${columnIndex}-${btnIndex}`;
-          updatedCounts[key] = timereqData.template1_dict[key];
+          updatedCounts[key] = timereqData.template3_dict[key];
         }
       });
     });
@@ -262,17 +261,21 @@ const TimeReq = ({ timereq }) => {
 
   const handleFormSubmit = async (buttonName) => {
     try {
+      console.log(slotEmployeeCounts)
       const payload = {};
       Object.entries(slotEmployeeCounts).forEach(([key, count]) => {
-        const [columnIndex, btnIndex] = key.split('-');
-        const dayNum = columnIndex; // Assuming columnIndex starts from 0
-        const currentTime = timereqData.slots_dict[parseInt(btnIndex)];
-        const newKey = `worker_${dayNum}_${currentTime}`;
-        payload[newKey] = count.toString();
+        if (count !== undefined) { // Check if count is not undefined
+            const [columnIndex, btnIndex] = key.split('-');
+            const dayNum = columnIndex; // Assuming columnIndex starts from 0
+            const currentTime = timereqData.slots_dict[parseInt(btnIndex)];
+            const newKey = `worker_${dayNum}_${currentTime}`;
+            payload[newKey] = count.toString();
+          }
       });
       payload["button"] = buttonName;
       payload["template_name"] = selectedTemplate;
       // Send the updated form values to the server for database update
+      console.log("Final payload before sending to server:", payload);
       await axios.post(`${API_BASE_URL}/api/requirement/workforce?week_adjustment=` + weekAdjustment, payload, {
     headers: {
         'Authorization': `Bearer ${token}`,
@@ -280,6 +283,7 @@ const TimeReq = ({ timereq }) => {
         }
     });
       setShowSuccessNotification(true);
+      console.log("Sending this data to server:", payload);
     } catch (error) {
       setShowErrorNotification(true);
     }
