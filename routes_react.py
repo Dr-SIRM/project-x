@@ -169,20 +169,81 @@ def update_user(user_id):
         db.session.close()
 
 
-@app.route('/api/new_user', methods=['POST'])
+@app.route('/api/new_user', methods=['GET', 'POST'])
+@jwt_required()
 def new_user():
-    data = request.json
-    user = User(first_name=data['first_name'],
-                last_name=data['last_name'],
-                email=data['email'],
-                employment_level=data['employment_level'],
-                company_name=data['company_name'],
-                department=data['department'],
-                access_level=data['access_level'])
-    db.session.add(user)
-    db.session.commit()
+    react_user = get_jwt_identity()
+    user = User.query.filter_by(email=react_user).first()
 
-    return {'success': True}
+    departments = (
+        Company.query
+        .filter_by(company_name=user.company_name)
+        .with_entities(
+            Company.department,
+            Company.department2,
+            Company.department3,
+            Company.department4,
+            Company.department5,
+            Company.department6,
+            Company.department7,
+            Company.department8,
+            Company.department9,
+            Company.department10
+        )
+        .first()
+    )
+
+    # Flatten the list of departments and filter out None values
+    department_list = [department for department in departments if department is not None]
+    print(department_list)
+
+    if request.method =='POST':
+        admin_registration_data = request.get_json()
+        if admin_registration_data['password'] != admin_registration_data['password2']:
+            return jsonify({'message': 'Password are not matching'}), 200
+        else:
+            creation_date = datetime.datetime.now()
+            last = User.query.order_by(User.id.desc()).first()
+            hash = generate_password_hash(admin_registration_data['password'])
+            if last is None:
+                new_id = 1
+            else:
+                new_id = last.id + 1
+
+            last_company_id = User.query.filter_by(company_name=admin_registration_data['company_name']).order_by(User.company_id.desc()).first()
+            if last_company_id is None:
+                new_company_id = 10000
+            else:
+                new_company_id = last_company_id.company_id + 1
+
+            data = User(id = new_id, 
+                        company_id = new_company_id, 
+                        first_name = admin_registration_data['first_name'],
+                        last_name = admin_registration_data['last_name'], 
+                        employment = admin_registration_data['employment'], 
+                        employment_level = admin_registration_data['employment_level'],
+                        company_name = admin_registration_data['company_name'], 
+                        department = admin_registration_data['department'],
+                        access_level = admin_registration_data['access_level'], 
+                        email = admin_registration_data['email'], 
+                        password = hash,
+                        created_by = new_company_id, 
+                        changed_by = new_company_id, 
+                        creation_timestamp = creation_date
+                        )
+
+            try:
+                db.session.add(data)
+                db.session.commit()
+                return jsonify({'message': 'Successful Registration'}), 200
+            except:
+                db.session.rollback()
+                return jsonify({'message': 'Registration went wrong!'}), 200
+    
+    user_dict={
+    'department_list': department_list,
+    }
+    return jsonify(user_dict)
 
 @app.route('/api/update', methods=["GET", "POST"])
 @jwt_required()
@@ -269,10 +330,31 @@ def get_company():
         company_name = user.company_name
         shift = ''
         weekly_hour = ''
+        department = ''
+        department2 = ''
+        department3 = ''
+        department4 = ''
+        department5 = ''
+        department6 = ''
+        department7 = ''
+        department8 = ''
+        department9 = ''
+        department10 = ''
     else:
         company_name = company.company_name
         shift = company.shifts
         weekly_hour = company.weekly_hours
+        department = company.department
+        department2 = company.department2
+        department3 = company.department3
+        department4 = company.department4
+        department5 = company.department5
+        department6 = company.department6
+        department7 = company.department7
+        department8 = company.department8
+        department9 = company.department9
+        department10 = company.department10
+
 
     # Fetch Opening Data
     all_opening_hours = OpeningHours.query.filter(
@@ -310,6 +392,16 @@ def get_company():
             company_name=company_data['company_name'],
             weekly_hours=company_data['weekly_hours'],
             shifts=company_data['shifts'],
+            department=company_data['department'],
+            department2=company_data['department2'],
+            department3=company_data['department3'],
+            department4=None,
+            department5=None,
+            department6=None,
+            department7=None,
+            department8=None,
+            department9=None,
+            department10=None,
             created_by=company_id,
             changed_by=company_id,
             creation_timestamp=creation_date
@@ -359,6 +451,16 @@ def get_company():
         'company_name': company_name,
         'shifts': shift,
         'weekly_hours': weekly_hour,
+        'department' : department,
+        'department2' : department2,
+        'department3' : department3,
+        'department4' : department4,
+        'department5' : department5,
+        'department6' : department6,
+        'department7' : department7,
+        'department8' : department8,
+        'department9' : department9,
+        'department10' : department10,
         'weekdays': weekdays,
         'day_num': day_num,
         'opening_dict': opening_dict, 
@@ -941,6 +1043,32 @@ def get_registration():
 
 @app.route('/api/registration/admin', methods = ['GET', 'POST'])
 def get_admin_registration():
+
+    react_user = get_jwt_identity()
+    user = User.query.filter_by(email=react_user).first()
+
+    departments = (
+        Company.query
+        .filter_by(company_name=user.company)
+        .with_entities(
+            Company.department,
+            Company.department2,
+            Company.department3,
+            Company.department4,
+            Company.department5,
+            Company.department6,
+            Company.department7,
+            Company.department8,
+            Company.department9,
+            Company.department10
+        )
+        .all()
+    )
+
+    # Flatten the list of departments and filter out None values
+    department_list = [department for department in departments if department is not None]
+    print(department_list)
+
     if request.method =='POST':
         admin_registration_data = request.get_json()
         if admin_registration_data['password'] != admin_registration_data['password2']:
@@ -984,7 +1112,10 @@ def get_admin_registration():
                 db.session.rollback()
                 return jsonify({'message': 'Registration went wrong!'}), 200
     
-    return jsonify({'message': 'Get Ready!'}), 200
+    user_dict={
+    'department_list': department_list,
+    }
+    return jsonify(user_dict)
                 
 
 def get_temp_timereq_dict(template_name, day_num, daily_slots, hour_divider, minutes, company_name, full_day):
@@ -1174,7 +1305,6 @@ def get_required_workforce():
 
     #Submit the required FTE per hour
     if request.method == 'POST':
-        print(request.json)
         button = request.json.get("button", None)
         if button == "Submit":
             workforce_data = request.get_json()

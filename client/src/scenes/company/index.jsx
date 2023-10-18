@@ -97,6 +97,16 @@ const Company = ({ company }) => {
           company_name: companyData.company_name, // Use companyData values as defaults
           weekly_hours: companyData.weekly_hours,
           shifts: companyData.shifts,
+          department: companyData.department,
+          department2: companyData.department2,
+          department3: companyData.department3,
+          department4: companyData.department4,
+          department5: companyData.department5,
+          department6: companyData.department6,
+          department7: companyData.department7,
+          department8: companyData.department8,
+          department9: companyData.department9,
+          department10: companyData.department10,
           ...Array.from({ length: companyData.day_num }).reduce((acc, _, rowIndex) => {
             acc[`day_${rowIndex}_0`] = companyData.opening_dict[`${rowIndex + 1}&0`];
             acc[`day_${rowIndex}_1`] = companyData.opening_dict[`${rowIndex + 1}&1`];
@@ -169,9 +179,42 @@ const Company = ({ company }) => {
                 }}
               />
               <Typography
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center", // Center the text horizontally
+                  height: "100%",
+                  padding: "0 8px", // Add padding to the sides of the text
+                  backgroundColor: "#f0f0f0", // You can set a light background color to distinguish it from other elements
+                }}
+              >
+                Abteilung 1
+              </Typography>
+              <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label= ""
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.department}
+                name="department"
+                error={!!touched.department && !!errors.department}
+                helperText={touched.department && errors.department}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
+              />
+              <Typography
                 variant=""
                 sx={{
-                  gridColumn: "span 4",
+                  gridColumn: "span 2",
                   display: "grid",
                   alignItems: "center",
                   height: "100%",
@@ -212,9 +255,42 @@ const Company = ({ company }) => {
                 }}
               />
               <Typography
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center", // Center the text horizontally
+                  height: "100%",
+                  padding: "0 8px", // Add padding to the sides of the text
+                  backgroundColor: "#f0f0f0", // You can set a light background color to distinguish it from other elements
+                }}
+              >
+                Abteilung 2
+              </Typography>
+              <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label= ""
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.department2}
+                name="department2"
+                error={!!touched.department2 && !!errors.department2}
+                helperText={touched.department2 && errors.department2}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
+              />
+              <Typography
                 variant=""
                 sx={{
-                  gridColumn: "span 4",
+                  gridColumn: "span 2",
                   display: "grid",
                   alignItems: "center",
                   height: "100%",
@@ -260,10 +336,43 @@ const Company = ({ company }) => {
                 <MenuItem value={ '2' }>2</MenuItem>
                 <MenuItem value={ '3' }>3</MenuItem>
                 </Select>
+                <Typography
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center", // Center the text horizontally
+                  height: "100%",
+                  padding: "0 8px", // Add padding to the sides of the text
+                  backgroundColor: "#f0f0f0", // You can set a light background color to distinguish it from other elements
+                }}
+              >
+                Abteilung 3
+              </Typography>
+              <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label= ""
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.department3}
+                name="department3"
+                error={!!touched.department3 && !!errors.department3}
+                helperText={touched.department3 && errors.department3}
+                sx={{
+                  gridColumn: "span 1",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
+              />
               <Typography
                 variant=""
                 sx={{
-                  gridColumn: "span 4",
+                  gridColumn: "span 2",
                   display: "grid",
                   alignItems: "center",
                   height: "100%",

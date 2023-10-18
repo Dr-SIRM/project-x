@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Box, Button, TextField, MenuItem, Select, FormControl, InputLabel, Snackbar  } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -12,19 +12,47 @@ const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
+  const [userData, setuserData] = useState({});
+  const [isLoading, setIsLoading] = useState(true); 
+  const token = localStorage.getItem('session_token');
+  const [department_list, setDepartmentList] = useState([]);
 
-  const handleFormSubmit = (values, { resetForm }) => {
-    axios
-      .post(`${API_BASE_URL}/api/registration/admin`, values)
-      .then((response) => {
-        console.log(response.data);
-        setShowSuccessNotification(true);
-        resetForm();
-      })
-      .catch((error) => {
-        console.error(error);
-        setShowErrorNotification(true);
+  useEffect(() => {
+    const fetchUser = async () => {
+      setIsLoading(true);
+        try {
+          const response = await axios.get(`${API_BASE_URL}/api/new_user`, {
+              headers: {
+                  'Authorization': `Bearer ${token}`
+              }
+          });
+          setuserData(response.data);
+          console.log(response.data)
+          console.log(userData)
+          setIsLoading(false);
+        } catch (error) {
+          console.error('Error fetching user details:', error);
+          setIsLoading(false);
+        }
+    };
+
+    fetchUser();
+  }, []);
+
+  const handleFormSubmit = async (values, { resetForm }) => {
+    try {
+      // Send the updated form values to the server for database update
+      await axios.post(`${API_BASE_URL}/api/new_user`, values, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
+      setShowSuccessNotification(true);
+      resetForm();
+    } catch (error) {
+      console.error(error);
+      setShowErrorNotification(true);
+    }
   };
 
   return (
@@ -185,6 +213,36 @@ const Form = () => {
                 helpertext={touched.department && errors.department}
                 sx={{ gridColumn: "span 4" }}
               />
+              <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 4" }}>
+                <InputLabel id="department-label">Abteilung</InputLabel>
+                <Select
+                  labelId="department-label"
+                  id="department"
+                  name="department"
+                  value={values.department}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.department && !!errors.department}
+                  helpertext={touched.department && errors.department}
+                  sx={{
+                    gridColumn: "span 2",
+                    '& .MuiFilledInput-input': {
+                      paddingTop: '10px',
+                      paddingBottom: '10px',
+                    },
+                    '& .MuiSelect-icon': { 
+                      color: 'black', 
+                    },
+                  }}
+                >
+                  <MenuItem value="">Wählen Sie eine Abteilung</MenuItem>
+                  {department_list.map((department) => (
+                    <MenuItem key={department} value={department}>
+                      {department}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
               <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 4" }}>
                 <InputLabel id="access_level-label">Access Level</InputLabel>
                 <Select

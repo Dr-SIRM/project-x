@@ -18,6 +18,15 @@ class User(db.Model, UserMixin):
     employment_level = db.Column(db.Float, index=True, unique=False)
     company_name = db.Column(db.String(200), index=True, unique=False)
     department = db.Column(db.String(200), index=True, unique=False)
+    department2 = db.Column(db.String(200), index=True, unique=False)
+    department3 = db.Column(db.String(200), index=True, unique=False)
+    department4 = db.Column(db.String(200), index=True, unique=False)
+    department5 = db.Column(db.String(200), index=True, unique=False)
+    department6 = db.Column(db.String(200), index=True, unique=False)
+    department7 = db.Column(db.String(200), index=True, unique=False)
+    department8 = db.Column(db.String(200), index=True, unique=False)
+    department9 = db.Column(db.String(200), index=True, unique=False)
+    department10 = db.Column(db.String(200), index=True, unique=False)
     access_level = db.Column(db.String(200), index=True, unique=False)
     created_by = db.Column(db.Integer, index=True, unique=False)
     changed_by = db.Column(db.Integer, index=True, unique=False)
@@ -26,6 +35,7 @@ class User(db.Model, UserMixin):
 
 
     def __init__(self, id, company_id, first_name, last_name, employment, email, password, employment_level, company_name, department,
+                 department2, department3, department4, department5, department6, department7, department8, department9, department10,
                  access_level, created_by, changed_by, creation_timestamp):
         self.id = id
         self.company_id = company_id
@@ -37,6 +47,15 @@ class User(db.Model, UserMixin):
         self.employment_level = employment_level
         self.company_name = company_name
         self.department = department
+        self.department2 = department2
+        self.department3 = department3
+        self.department4 = department4
+        self.department5 = department5
+        self.department6 = department6
+        self.department7 = department7
+        self.department8 = department8
+        self.department9 = department9
+        self.department10 = department10
         self.access_level = access_level
         self.created_by = created_by
         self.changed_by = changed_by
@@ -108,16 +127,38 @@ class Company(db.Model, UserMixin):
     company_name = db.Column(db.String(200), primary_key=True)
     weekly_hours = db.Column(db.Integer)
     shifts = db.Column(db.Integer)
+    department = db.Column(db.String(200), index=True, unique=False)
+    department2 = db.Column(db.String(200), index=True, unique=False)
+    department3 = db.Column(db.String(200), index=True, unique=False)
+    department4 = db.Column(db.String(200), index=True, unique=False)
+    department5 = db.Column(db.String(200), index=True, unique=False)
+    department6 = db.Column(db.String(200), index=True, unique=False)
+    department7 = db.Column(db.String(200), index=True, unique=False)
+    department8 = db.Column(db.String(200), index=True, unique=False)
+    department9 = db.Column(db.String(200), index=True, unique=False)
+    department10 = db.Column(db.String(200), index=True, unique=False)
+
     created_by = db.Column(db.Integer, index=True, unique=False)
     changed_by = db.Column(db.Integer, index=True, unique=False)
     creation_timestamp = db.Column(db.DateTime)
     update_timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
 
-    def __init__(self, id, company_name, weekly_hours, shifts, created_by, changed_by, creation_timestamp):
+    def __init__(self, id, company_name, weekly_hours, shifts, department, department2, department3, department4, 
+                 department5, department6, department7, department8, department9, department10, created_by, changed_by, creation_timestamp):
         self.id = id
         self.company_name = company_name
         self.weekly_hours = weekly_hours
         self.shifts = shifts
+        self.department = department
+        self.department2 = department2
+        self.department3 = department3
+        self.department4 = department4
+        self.department5 = department5
+        self.department6 = department6
+        self.department7 = department7
+        self.department8 = department8
+        self.department9 = department9
+        self.department10 = department10
         self.created_by = created_by
         self.changed_by = changed_by
         self.creation_timestamp = creation_timestamp
