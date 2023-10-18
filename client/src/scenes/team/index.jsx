@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef  } from 'react';
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography, useTheme, Select, MenuItem } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
@@ -63,9 +63,10 @@ const Team = () => {
         let sendData = {[field]: newValue};
 
         // Check if the edited field is 'employment_level' and modify the data accordingly
-        if (field === 'employment_level') {
-            sendData[field] = parseFloat(newValue) / 100;  // Convert percentage back to a value between 0 and 1
-        }
+          if (field === 'employment_level') {
+            sendData[field] = parseFloat(newValue);  
+          }
+
 
         try {
             // Send the modified data to the server
@@ -90,6 +91,53 @@ const Team = () => {
     } else {
         console.error('Could not find input element for edited cell');
     }
+};
+
+const handleEmploymentLevelChange = async (event, id) => {
+  const newValue = event.target.value 
+
+  try {
+      // Send the modified data to the server
+      await axios.put(`${API_BASE_URL}/api/users/update/${id}`, { employment_level: newValue }, {
+          headers: {
+              'Authorization': `Bearer ${token}`
+          }
+      });
+
+      // Re-fetch the data from the server
+      const response = await axios.get(`${API_BASE_URL}/api/users`, {
+          headers: {
+              'Authorization': `Bearer ${token}`
+          }
+      });
+      setUsers(response.data);  // Update the users state with the fresh data from the server
+
+  } catch (error) {
+      console.error('Error updating user:', error);
+  }
+};
+
+const handleEmploymentChange = async (event, id) => {
+  const newValue = event.target.value === "Vollzeit" ? "Perm" : "Temp";
+
+  try {
+    // Send the modified data to the server
+    await axios.put(`${API_BASE_URL}/api/users/update/${id}`, { employment: newValue }, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    // Re-fetch the data from the server
+    const response = await axios.get(`${API_BASE_URL}/api/users`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    setUsers(response.data);  // Update the users state with the fresh data from the server
+  } catch (error) {
+    console.error('Error updating user:', error);
+  }
 };
 
 
@@ -128,26 +176,71 @@ const Team = () => {
       field: "employment",
       headerName: "Anstellung",
       flex: 1,
-      valueGetter: (params) => {
-        const employment = params.row.employment;
-        return employment === "Perm" ? "Vollzeit" : employment === "Temp" ? "Teilzeit" : employment;
-      },
       editable: false,
+      renderCell: (params) => (
+        <Select
+          value={params.value === "Perm" ? "Vollzeit" : "Teilzeit"}
+          onChange={(event) => handleEmploymentChange(event, params.id)}
+          sx={{
+            width: '100%',
+            backgroundColor: 'white !important',
+            '& .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+          }}
+        >
+          <MenuItem value="Vollzeit">Vollzeit</MenuItem>
+          <MenuItem value="Teilzeit">Teilzeit</MenuItem>
+        </Select>
+      ),
     },  
     {
       field: "employment_level",
       headerName: "Anstellungsgrad",
       flex: 1,
+      editable: false,
+      renderCell: (params) => (
+        <Select
+          value={params.value * 100}
+          onChange={(event) => handleEmploymentLevelChange(event, params.id)}
+          sx={{
+            width: '100%',
+            border: 'none',
+            backgroundColor: 'white !important',  
+            '& .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+          }}
+        >
+          {[10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((value) => (
+            <MenuItem key={value} value={value}>
+              {value}%
+            </MenuItem>
+          ))}
+        </Select>
+      ),
       valueFormatter: (params) => {
-          const employment_level = params.value;
-          const isValidNumber = !isNaN(employment_level);
-          const modifiedValue = isValidNumber ? `${employment_level * 100}%` : "";
-          return modifiedValue;
+        const employment_level = params.value;
+        const isValidNumber = !isNaN(employment_level);
+        const modifiedValue = isValidNumber ? `${employment_level * 100}%` : "";
+        return modifiedValue;
       },
-      valueParser: (value) => {
-          return parseFloat(value) / 100;
-      },
-  },
+    },
+    
+    
+  
   
     {
       field: "department",
@@ -202,8 +295,7 @@ const Team = () => {
             borderBottom: "1px solid black",
             color: colors.primary[100],
             backgroundColor: colors.grey[900],
-            borderBottom: "none",
-            
+            borderBottom: "none",    
           },
           "& .name-column--cell": {
             color: colors.primary[100],
@@ -224,17 +316,13 @@ const Team = () => {
           },
         }}
       >        
-        <DataGrid
-        
+        <DataGrid        
         rows={users}
         columns={columns}
         onCellEditStart={handleCellEditStart}  // Set the onCellEditStart prop
         onCellEditStop={handleCellEditStop}   // Adjusted to call your function
         onCellClick={(params) => console.log('Cell clicked', params)}
       />
-
-
-
       </Box>
     </Box>
   );
