@@ -138,7 +138,6 @@ const Team = () => {
       field: "employment_level",
       headerName: "Anstellungsgrad",
       flex: 1,
-      editable: true,
       valueFormatter: (params) => {
           const employment_level = params.value;
           const isValidNumber = !isNaN(employment_level);
