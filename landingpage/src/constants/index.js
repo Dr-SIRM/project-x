@@ -7,11 +7,6 @@ export const navLinks = [
     path: "/home", // Internal link
   },
   {
-    id: "features",
-    title: "Features",
-    path: "/features", // Internal link
-  },
-  {
     id: "product",
     title: "Produkt",
     path: "/product", // Internal link
@@ -20,6 +15,11 @@ export const navLinks = [
     id: "conditions",
     title: "Konditionen",
     path: "/conditions", // Internal link
+  },
+  {
+    id: "features",
+    title: "Über uns",
+    path: "/features", // Internal link
   },
   {
     id: "login",
