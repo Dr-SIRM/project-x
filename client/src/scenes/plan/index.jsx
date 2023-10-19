@@ -435,7 +435,7 @@ const handleExportToExcel = async () => {
                 size="small"
                 onClick={handleExportToExcel} 
                 sx={{
-                  borderColor: 'white',
+                  borderColor: 'black',
                   height: '20px',
                   minHeight: '20px',
                   fontSize: '10px',
@@ -473,7 +473,7 @@ const handleExportToExcel = async () => {
             </div>
           )}
         </div>
-        {view === 'day' && ( // This line ensures timeline is only shown for 'day' view
+        {view === 'day' && ( 
           <>
             <div className="gantt-timeline">
               {getTimelineLabels().map((label, index) => (
@@ -515,9 +515,6 @@ const handleExportToExcel = async () => {
           </div>
         </div>
       )}
-
-
-
     </Box>
   );
 }  
