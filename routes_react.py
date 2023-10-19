@@ -10,7 +10,7 @@ from app import app, mail
 from openpyxl import Workbook
 import io
 from excel_output import create_excel_output
-from sqlalchemy import func, extract
+from sqlalchemy import func, extract, and_
 
 
 
@@ -1557,24 +1557,85 @@ def get_shift():
 
     return jsonify(response)
 
+import locale
 
 @app.route('/api/dashboard', methods=['POST', 'GET'])
 @jwt_required()
-def get_worker_count():
+def get_dashboard_data():
     current_user_id = get_jwt_identity()
     
     current_user = User.query.filter_by(email=current_user_id).first()
     if not current_user:
         return jsonify({'error': 'User not found'}), 404
 
+    # Existing data fetching
     worker_count = User.query.filter_by(company_name=current_user.company_name).count()
-    
     start_time_count = Timetable.query.filter(
         (Timetable.company_name == current_user.company_name) & 
-        (Timetable.start_time != None)  # assuming start_time can be NULL, change this condition accordingly if it can't be
+        (Timetable.start_time != None)
     ).count()
 
-    return jsonify({'worker_count': worker_count, 'start_time_count': start_time_count})
+    # Fetching upcoming shifts (assuming today's date is represented by datetime.now().date())
+    upcoming_shifts_query = Timetable.query.filter(
+        (Timetable.company_name == current_user.company_name) &
+        (Timetable.date >= datetime.datetime.now().date()) &
+        (Timetable.date < datetime.datetime.now().date() + datetime.timedelta(days=7))  # Adjust this timeframe as needed
+    ).order_by(Timetable.date, Timetable.start_time).all()
+
+    # Set the locale to German temporarily
+    locale.setlocale(locale.LC_TIME, "de_DE.UTF-8")
+    # Formatting the upcoming shifts data for JSON serialization
+    upcoming_shifts = [{
+        'name': f'{shift.first_name} {shift.last_name}',
+        'day': shift.date.strftime('%A'),  # Displaying day name
+        'shifts': [
+            {'start': shift.start_time.strftime('%H:%M'), 'end': shift.end_time.strftime('%H:%M')} if shift.start_time and shift.end_time else None,
+            {'start': shift.start_time2.strftime('%H:%M'), 'end': shift.end_time2.strftime('%H:%M')} if shift.start_time2 and shift.end_time2 else None,
+            {'start': shift.start_time3.strftime('%H:%M'), 'end': shift.end_time3.strftime('%H:%M')} if shift.start_time3 and shift.end_time3 else None
+        ]
+    } for shift in upcoming_shifts_query]
+
+    # Remove any None values from the shifts lists
+    for shift in upcoming_shifts:
+        shift['shifts'] = [s for s in shift['shifts'] if s]
+
+    # Determine the start and end dates of the current week
+    today = datetime.datetime.now().date()
+    start_of_week = today - datetime.timedelta(days=today.weekday())
+    end_of_week = start_of_week + datetime.timedelta(days=6)
+
+    # Fetching hours worked data
+    hours_worked_query = (
+        db.session.query(
+            Timetable.date,
+            func.sum(
+                (
+                    (func.hour(Timetable.end_time) - func.hour(Timetable.start_time)) * 60 +
+                    (func.minute(Timetable.end_time) - func.minute(Timetable.start_time))
+                ) / 60
+            ).label('hours_worked')
+        )
+        .filter(
+            and_(
+                Timetable.company_name == current_user.company_name,
+                Timetable.date >= start_of_week,
+                Timetable.date <= end_of_week
+            )
+        )
+        .group_by(Timetable.date)
+        .all()
+    )
+
+    # Format the data for JSON serialization
+    hours_worked_data = [{"date": item.date.strftime('%A'), "hours_worked": item.hours_worked} for item in hours_worked_query]
+ 
+    print(hours_worked_data)
+    return jsonify({
+        'worker_count': worker_count,
+        'start_time_count': start_time_count,
+        'upcoming_shifts': upcoming_shifts,
+        'hours_worked_over_time': hours_worked_data,
+    })
 
 
 
