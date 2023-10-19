@@ -102,6 +102,7 @@ class Availability(db.Model, UserMixin):
 class TimeReq(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     company_name = db.Column(db.String(200), index=True, unique=False)
+    department = db.Column(db.String(200), index=True, unique=False)
     date = db.Column(db.Date, index=True)
     start_time = db.Column(db.Time)
     worker = db.Column(db.Integer)
@@ -110,9 +111,10 @@ class TimeReq(db.Model, UserMixin):
     creation_timestamp = db.Column(db.DateTime)
     update_timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
 
-    def __init__(self, company_name, id, date, start_time, worker, created_by, changed_by, creation_timestamp):
+    def __init__(self, company_name, department, id, date, start_time, worker, created_by, changed_by, creation_timestamp):
         self.id = id
         self.company_name = company_name
+        self.department = department
         self.date = date
         self.start_time = start_time
         self.worker = worker

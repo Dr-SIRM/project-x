@@ -1303,6 +1303,27 @@ def get_required_workforce():
                 opening_dict[str(new_i) + '&2'] = opening.start_time2.strftime("%H:%M") if opening.start_time2 else None
                 opening_dict[str(new_i) + '&3'] = opening.end_time2.strftime("%H:%M") if opening.end_time2 else None
 
+    #List of Departments
+    departments = (
+        Company.query
+        .filter_by(company_name=user.company_name)
+        .with_entities(
+            Company.department,
+            Company.department2,
+            Company.department3,
+            Company.department4,
+            Company.department5,
+            Company.department6,
+            Company.department7,
+            Company.department8,
+            Company.department9,
+            Company.department10
+        )
+        .first()
+    )
+
+    department_list = [department for department in departments if department is not None]
+    print(department_list)
 
     #Submit the required FTE per hour
     if request.method == 'POST':
@@ -1379,6 +1400,7 @@ def get_required_workforce():
                             new_record = TimeReq(
                                 id=None,
                                 company_name=user.company_name,
+                                department=workforce_data['department'],
                                 date=new_date,
                                 start_time=new_time,
                                 worker=capacity,
@@ -1440,6 +1462,7 @@ def get_required_workforce():
         'hour_divider': hour_divider,
         'daily_slots': daily_slots,
         'minutes': minutes,
+        'department_list': department_list,
         'template1_dict': get_temp_timereq_dict("Template 1", day_num, daily_slots, hour_divider, minutes, user.company_name, full_day),
         'template2_dict': get_temp_timereq_dict("Template 2", day_num, daily_slots, hour_divider, minutes, user.company_name, full_day),
         'template3_dict': get_temp_timereq_dict("Template 3", day_num, daily_slots, hour_divider, minutes, user.company_name, full_day),

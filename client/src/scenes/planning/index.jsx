@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTheme, Box, Button, TextField, Snackbar, Typography, ButtonGroup, IconButton } from "@mui/material";
-import { Select, MenuItem } from "@mui/material";
+import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { useNavigate  } from 'react-router-dom';
 import { Formik } from "formik";
@@ -47,7 +47,9 @@ const TimeReq = ({ timereq }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [slotEmployeeCounts, setSlotEmployeeCounts] = useState(null);
   const [selectedTemplate, setSelectedTemplate] = useState('');
+  const [selectedDepartment, setSelectedDepartment] = useState('');
   const navigate = useNavigate();
+  const [department_list, setDepartmentList] = useState([]);
 
   const convertTimeToMinutes = (timeStr) => {
     if (!timeStr) return undefined;
@@ -152,6 +154,7 @@ const TimeReq = ({ timereq }) => {
 
           const data = response.data;
           setTimeReqData(data);
+          setDepartmentList(response.data.department_list);
           setSlotEmployeeCounts({});
           setSlotEmployeeCounts(prevState => {
             return {
@@ -274,6 +277,7 @@ const TimeReq = ({ timereq }) => {
       });
       payload["button"] = buttonName;
       payload["template_name"] = selectedTemplate;
+      payload["department"] = selectedDepartment;
       // Send the updated form values to the server for database update
       console.log("Final payload before sending to server:", payload);
       await axios.post(`${API_BASE_URL}/api/requirement/workforce?week_adjustment=` + weekAdjustment, payload, {
@@ -302,6 +306,38 @@ const TimeReq = ({ timereq }) => {
         title="Time Requirement"
         subtitle="Plan your workforce on weekly base and ensure minimal costs!"
       />
+      <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', marginBottom: '1rem' }}>
+        <FormControl fullWidth variant="filled"sx={{ width: '250px' }}>
+          <InputLabel id="department-label">Abteilung</InputLabel>
+          <Select
+            labelId="department-label"
+            id="department"
+            name="department"
+            value={selectedDepartment}
+            onChange={(e) => setSelectedDepartment(e.target.value)}
+            inputProps={{ maxLength: 30 }}
+            sx={{
+              color: "black",
+              marginRight: '0.2rem',
+              height: '40px', // explicitly set height
+              '.MuiInputBase-root': {
+                height: '20px', // explicitly set input field height
+                fontSize: '10px' // explicitly set font size
+              },
+              '.MuiSelect-icon': { // Change color of icon to black
+                color: 'black',
+            }, 
+            }}
+          >
+            <MenuItem value="">Wählen Sie eine Abteilung</MenuItem>
+            {department_list.map((department) => (
+              <MenuItem key={department} value={department}>
+                {department}
+              </MenuItem>
+            ))}
+          </Select>
+      </FormControl>
+      </Box>
       <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: '1rem' }}>
         <IconButton 
           onClick={goToPreviousWeek} 
