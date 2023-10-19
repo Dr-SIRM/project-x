@@ -27,8 +27,7 @@ const Form = () => {
               }
           });
           setuserData(response.data);
-          console.log(response.data)
-          console.log(userData)
+          setDepartmentList(response.data.department_list);
           setIsLoading(false);
         } catch (error) {
           console.error('Error fetching user details:', error);
@@ -200,19 +199,6 @@ const Form = () => {
                   })}
                 </Select>
               </FormControl>
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Department"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.department}
-                name="department"
-                error={!!touched.department && !!errors.department}
-                helpertext={touched.department && errors.department}
-                sx={{ gridColumn: "span 4" }}
-              />
               <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 4" }}>
                 <InputLabel id="department-label">Abteilung</InputLabel>
                 <Select
@@ -224,6 +210,66 @@ const Form = () => {
                   onBlur={handleBlur}
                   error={!!touched.department && !!errors.department}
                   helpertext={touched.department && errors.department}
+                  sx={{
+                    gridColumn: "span 2",
+                    '& .MuiFilledInput-input': {
+                      paddingTop: '10px',
+                      paddingBottom: '10px',
+                    },
+                    '& .MuiSelect-icon': { 
+                      color: 'black', 
+                    },
+                  }}
+                >
+                  <MenuItem value="">Wählen Sie eine Abteilung</MenuItem>
+                  {department_list.map((department) => (
+                    <MenuItem key={department} value={department}>
+                      {department}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 4" }}>
+                <InputLabel id="department2-label">Abteilung 2</InputLabel>
+                <Select
+                  labelId="department2-label"
+                  id="department2"
+                  name="department2"
+                  value={values.department2}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.department2 && !!errors.department2}
+                  helpertext={touched.department2 && errors.department2}
+                  sx={{
+                    gridColumn: "span 2",
+                    '& .MuiFilledInput-input': {
+                      paddingTop: '10px',
+                      paddingBottom: '10px',
+                    },
+                    '& .MuiSelect-icon': { 
+                      color: 'black', 
+                    },
+                  }}
+                >
+                  <MenuItem value="">Wählen Sie eine Abteilung</MenuItem>
+                  {department_list.map((department) => (
+                    <MenuItem key={department} value={department}>
+                      {department}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 4" }}>
+                <InputLabel id="department3-label">Abteilung 3</InputLabel>
+                <Select
+                  labelId="department3-label"
+                  id="department3"
+                  name="department3"
+                  value={values.department3}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.department3 && !!errors.department3}
+                  helpertext={touched.department3 && errors.department3}
                   sx={{
                     gridColumn: "span 2",
                     '& .MuiFilledInput-input': {
