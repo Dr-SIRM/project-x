@@ -234,6 +234,9 @@ class DataProcessing:
         self.laden_schliesst = self.laden_schliesst * self.week_timeframe
         self.opening_hours = self.opening_hours * self.week_timeframe
 
+
+        # HIER LADEN ÖFFNET UND LADEN SCHLIESST PRINTEN UND ÜBERPRÜFEN
+
         
 
     def get_time_req(self):
@@ -249,6 +252,7 @@ class DataProcessing:
             TimeReq.date.between(self.start_date, self.end_date)
         ).all()
 
+        print("time_reqs: ", time_reqs)
         # Bestimme den Divisor basierend auf self.hour_devider
         divisor = 3600 / self.hour_devider
         
