@@ -1521,6 +1521,7 @@ def get_shift():
                 "end": record.end_time.strftime("%H:%M")
             }
     logging.debug(f"Opening hours data: {opening_hours_data}")
+    print("Opening:", opening_hours_data)
 
     if start_date and end_date:
         shift_records = Timetable.query.filter(
@@ -1559,6 +1560,7 @@ def get_shift():
                 }
             ]
         })
+        print("Shift:", shift_data)
 
     response = {
         'users': user_list,

@@ -105,8 +105,9 @@ const GanttChart = () => {
   //DAY VIEW
   const getWorkingHoursDuration = () => {
     const today = new Date();
-    const weekday = today.toLocaleDateString('en-US', { weekday: 'long' });
+    const weekday = today.toLocaleDateString('de-DE', { weekday: 'long' });
     const hours = openingHours[weekday.toLowerCase()];
+    console.log("Stunden:", hours)
     
     if (!hours) return 24; // Default to 24 hours if no hours are specified
   
@@ -118,7 +119,7 @@ const GanttChart = () => {
 
   const getShiftPosition = (shift) => {
     const today = currentDay;
-    const weekday = today.toLocaleDateString('en-US', { weekday: 'long' });
+    const weekday = today.toLocaleDateString('de-DE', { weekday: 'long' });
     const hours = openingHours[weekday.toLowerCase()];
 
     if (!hours) {
@@ -151,7 +152,7 @@ const GanttChart = () => {
 
 const getCurrentTimePercentage = () => {
   const today = new Date(currentDay);
-  const weekday = today.toLocaleDateString('en-US', { weekday: 'long' });
+  const weekday = today.toLocaleDateString('de-DE', { weekday: 'long' });
   const hours = openingHours[weekday.toLowerCase()];
   
   if (!hours) {
@@ -185,9 +186,6 @@ const renderShifts = (worker) => {
   worker.shifts.forEach(shiftData => {
       const { shifts } = shiftData;
       shifts.forEach(shift => {
-          console.log(`Start time for shift: ${shift.start_time}`);
-          console.log(`End time for shift: ${shift.end_time}`);
-
           if (shift.start_time && shift.end_time) {
               validShifts.push({
                   ...shiftData,
@@ -197,6 +195,7 @@ const renderShifts = (worker) => {
           }
       });
   });
+  console.log(validShifts)
 
   const currentTimePercentage = getCurrentTimePercentage();
   const currentTimeLineStyle = {
@@ -224,7 +223,7 @@ const renderShifts = (worker) => {
 
   const getTimelineLabels = () => {
     const today = new Date(currentDay);
-    const weekday = today.toLocaleDateString('en-US', { weekday: 'long' });
+    const weekday = today.toLocaleDateString('de-DE', { weekday: 'long' });
     const hours = openingHours[weekday.toLowerCase()];
 
 
@@ -257,7 +256,7 @@ const renderShifts = (worker) => {
   };
   console.log(currentDay)
   const formatDateDisplay = (date) => {
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    return date.toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' });
   };
   
 
@@ -505,8 +504,8 @@ const handleExportToExcel = async () => {
             {daysOfWeek(getStartOfWeek(currentDay), getEndOfWeek(currentDay)).map((day, index) => {    
               return (
                 <div className="weekday-box" key={index}>
-                  <div className="weekday-title">{day.toLocaleDateString('en-US', { weekday: 'long' })}</div>
-                  <div className="weekday-date">{day.toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}</div>
+                  <div className="weekday-title">{day.toLocaleDateString('de-DE', { weekday: 'long' })}</div>
+                  <div className="weekday-date">{day.toLocaleDateString('de-DE', { day: 'numeric', month: 'short' })}</div>
                   <div className="weekday-separator"></div>
                   {/* Displaying the shifts for the day here */}
                   {renderWeekShifts(day)}
