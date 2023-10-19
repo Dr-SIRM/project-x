@@ -10,7 +10,7 @@ from app import app, mail
 from openpyxl import Workbook
 import io
 from excel_output import create_excel_output
-from sqlalchemy import func, extract, and_
+from sqlalchemy import func, extract, and_, or_
 
 
 
@@ -1628,56 +1628,32 @@ def get_dashboard_data():
 
     # Format the data for JSON serialization
     hours_worked_data = [{"date": item.date.strftime('%A'), "hours_worked": item.hours_worked} for item in hours_worked_query]
+
+    # Fetching currently working shifts
+    now = datetime.datetime.now()
+    current_shifts_query = Timetable.query.filter(
+        (Timetable.company_name == current_user.company_name) &
+        (Timetable.date == now.date()) &
+        (Timetable.start_time <= now.time()) &
+        (Timetable.end_time >= now.time())
+    ).all()
+
+    # Formatting the currently working shifts data for JSON serialization
+    current_shifts = [{
+        'name': f'{shift.first_name} {shift.last_name}',
+        'start': shift.start_time.strftime('%H:%M'),
+        'end': shift.end_time.strftime('%H:%M')
+    } for shift in current_shifts_query]
  
-    print(hours_worked_data)
+    print(current_shifts)
     return jsonify({
         'worker_count': worker_count,
         'start_time_count': start_time_count,
         'upcoming_shifts': upcoming_shifts,
         'hours_worked_over_time': hours_worked_data,
+        'current_shifts': current_shifts
+        
     })
-
-
-
-
-""" @app.route('/api/dashboard', methods=['GET'])
-@jwt_required()
-def get_worker_count():
-    current_user_id = get_jwt_identity()
-    
-    current_user = User.query.filter_by(email=current_user_id).first()
-    if not current_user:
-        return jsonify({'error': 'User not found'}), 404
-
-    worker_count = User.query.filter_by(company_name=current_user.company_name).count()
-    start_date = datetime.datetime.now() - datetime.timedelta(days=14)
-
-    work_hours_by_day = (
-        db.session.query(
-            func.sum(
-                (func.hour(Timetable.end_time) * 3600 + func.minute(Timetable.end_time) * 60) -
-                (func.hour(Timetable.start_time) * 3600 + func.minute(Timetable.start_time) * 60)
-            ) / 3600,
-            Timetable.date
-        )
-        .filter(
-            (Timetable.company_name == current_user.company_name) & 
-            (Timetable.date >= start_date.date())
-        )
-        .group_by(Timetable.date)
-        .all()
-    )
-
-    work_hours_data = [
-        {"date": day.strftime("%Y-%m-%d"), "work_hours": hours}
-        for hours, day in work_hours_by_day
-    ]
-    
-    return jsonify({
-        'worker_count': worker_count, 
-        'work_hours_data': work_hours_data
-    })
- """
 
 
 @app.route('/api/calendar', methods=['GET'])
