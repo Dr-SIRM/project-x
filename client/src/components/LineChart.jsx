@@ -1,15 +1,26 @@
 import { ResponsiveLine } from "@nivo/line";
 import { useTheme } from "@mui/material";
 import { tokens } from "../theme";
-import { mockLineData as data } from "../data/mockData";
 
-const LineChart = ({ isCustomLineColors = false, isDashboard = false }) => {
+const LineChart = ({ isCustomLineColors = false, isDashboard = false, hoursWorkedData }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  
 
+  const formattedData = [
+    {
+      id: "Stunden",
+      data: hoursWorkedData.map(item => ({
+        x: item.date,
+        y: parseFloat(item.hours_worked),
+      })),
+    },
+  ];
+
+  console.log(formattedData)
   return (
     <ResponsiveLine
-      data={data}
+      data={formattedData}
       theme={{
         axis: {
           domain: {
@@ -43,13 +54,14 @@ const LineChart = ({ isCustomLineColors = false, isDashboard = false }) => {
           },
         },
       }}
-      colors={isDashboard ? { datum: "color" } : { scheme: "nivo" }} // added
+      colors={{ scheme: "set3" }}
+
       margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
       xScale={{ type: "point" }}
       yScale={{
         type: "linear",
-        min: "50",
-        max: "auto",
+        min: "0",
+        max: "50",
         stacked: true,
         reverse: false,
       }}

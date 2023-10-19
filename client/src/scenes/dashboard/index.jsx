@@ -19,12 +19,12 @@ import axios from 'axios';
 
 /* Mögliche Ideen fürs Dashboard
 - Anz gearbeitete Stunden diese Woche 
-- Anz MA
-- Eingeplante Schichten
+- Anz MA - done
+- Eingeplante Schichten - done
 - Wer arbeitet gerade 
 - Schichtplan gesolved ja nein für 1 Woche 2 Wochen 3 Wochen 4 Wochen (Recent Transaction)
 - Digramm Tage/Stunden/ MA Stunden
-- Download button ausblenden
+- Download button ausblenden - done
 */
 
 
@@ -33,6 +33,9 @@ const Dashboard = () => {
   const colors = tokens(theme.palette.mode);
   const [mitarbeiterCount, setMitarbeiterCount] = useState();
   const [StartTimeCount, setStartTimeCount] = useState();
+  const [upcomingShifts, setUpcomingShifts] = useState([]);
+  const [hoursWorkedData, setHoursWorkedData] = useState([]); 
+  const totalHoursWorked = hoursWorkedData.reduce((sum, item) => sum + parseFloat(item.hours_worked), 0);
   const token = localStorage.getItem('session_token'); 
   
   useEffect(() => {
@@ -46,7 +49,10 @@ const Dashboard = () => {
             });
             
             setMitarbeiterCount(response.data.worker_count);
-            setStartTimeCount(response.data.start_time_count);  
+            setStartTimeCount(response.data.start_time_count);
+            setUpcomingShifts(response.data.upcoming_shifts);  // Store the upcoming shifts data
+            setHoursWorkedData(response.data.hours_worked_over_time);
+            console.log(response.data.upcoming_shifts);
         } catch (error) {
             console.error("Error fetching data:", error);
         }
@@ -62,7 +68,7 @@ const Dashboard = () => {
         <Header title="DASHBOARD" subtitle="Willkomen auf dem Dashboard " />
 
         <Box>
-          <Button
+{/*           <Button
             sx={{
               backgroundColor: colors.blueAccent[700],
               color: colors.grey[100],
@@ -73,7 +79,7 @@ const Dashboard = () => {
           >
             <DownloadOutlinedIcon sx={{ mr: "10px" }} />
             Download Reports
-          </Button>
+          </Button> */}
         </Box>
       </Box>
 
@@ -193,12 +199,105 @@ const Dashboard = () => {
                 fontWeight="bold"
                 color={colors.greenAccent[500]}
               >
-                1540 Stunden
+                {totalHoursWorked} Stunden
               </Typography>
             </Box>
           </Box>
           <Box height="250px" m="-20px 0 0 0">
-            <LineChart isDashboard={true} />
+            <LineChart isDashboard={true} hoursWorkedData={hoursWorkedData} />
+
+          </Box>
+        </Box>
+        <Box
+          gridColumn="span 4"
+          gridRow="span 2"
+          backgroundColor={colors.primary[800]}
+          borderRadius="15px"
+          overflow="auto"
+        >
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            borderBottom={`4px solid ${colors.primary[500]}`}
+            colors={colors.grey[100]}
+            p="15px"
+          >
+            <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
+              Nächste Schichten 
+            </Typography>
+          </Box>
+          {upcomingShifts.map((shiftInfo, i) => (
+            <Box
+                key={`${shiftInfo.name}-${i}`}  // Use a unique key for each item
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                borderBottom={`4px solid ${colors.primary[500]}`}
+                p="15px"
+            >
+                <Box>
+                    <Typography
+                        color={colors.greenAccent[500]}
+                        variant="h5"
+                        fontWeight="600"
+                    >
+                        {shiftInfo.name}  {/* Display the name */}
+                    </Typography>
+                    {shiftInfo.shifts.map((shift, shiftIndex) => (  // Map over the shifts array
+                        <Typography color={colors.grey[100]} key={shiftIndex}>
+                            {shiftInfo.day} - {shift.start} bis {shift.end}  {/* Display the day and shift times */}
+                        </Typography>
+                    ))}
+                </Box>
+            </Box>
+        ))}
+
+        </Box>
+
+        {/* ROW 3 */}
+        <Box
+          gridColumn="span 4"
+          gridRow="span 2"
+          backgroundColor={colors.primary[800]}
+          borderRadius="15px"
+          p="30px"
+        >
+          <Typography variant="h5" fontWeight="600">
+            Campaign
+          </Typography>
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            mt="25px"
+          >
+            <ProgressCircle size="125" />
+            <Typography
+              variant="h5"
+              color={colors.greenAccent[500]}
+              sx={{ mt: "15px" }}
+            >
+              $48,352 revenue generated
+            </Typography>
+            <Typography>Includes extra misc expenditures and costs</Typography>
+          </Box>
+        </Box>
+        <Box
+          gridColumn="span 4"
+          gridRow="span 2"
+          backgroundColor={colors.primary[800]}
+          borderRadius="15px"
+        >
+          <Typography
+            variant="h5"
+            fontWeight="600"
+            sx={{ padding: "30px 30px 0 30px" }}
+          >
+            Sales Quantity
+          </Typography>
+          <Box height="250px" mt="-20px">
+            <BarChart isDashboard={true} />
           </Box>
         </Box>
         <Box
@@ -253,69 +352,6 @@ const Dashboard = () => {
           ))}
         </Box>
 
-        {/* ROW 3 */}
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[800]}
-          borderRadius="15px"
-          p="30px"
-        >
-          <Typography variant="h5" fontWeight="600">
-            Campaign
-          </Typography>
-          <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            mt="25px"
-          >
-            <ProgressCircle size="125" />
-            <Typography
-              variant="h5"
-              color={colors.greenAccent[500]}
-              sx={{ mt: "15px" }}
-            >
-              $48,352 revenue generated
-            </Typography>
-            <Typography>Includes extra misc expenditures and costs</Typography>
-          </Box>
-        </Box>
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[800]}
-          borderRadius="15px"
-        >
-          <Typography
-            variant="h5"
-            fontWeight="600"
-            sx={{ padding: "30px 30px 0 30px" }}
-          >
-            Sales Quantity
-          </Typography>
-          <Box height="250px" mt="-20px">
-            <BarChart isDashboard={true} />
-          </Box>
-        </Box>
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[800]}
-          borderRadius="15px"
-          padding="30px"
-        >
-          <Typography
-            variant="h5"
-            fontWeight="600"
-            sx={{ marginBottom: "15px" }}
-          >
-            Geography Based Traffic
-          </Typography>
-          <Box height="200px">
-            <GeographyChart isDashboard={true} />
-          </Box>
-        </Box>
       </Box>
     </Box>
   );
