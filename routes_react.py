@@ -1156,10 +1156,11 @@ def get_temp_timereq_dict(template_name, day_num, daily_slots, hour_divider, min
     return temp_timereq_dict
 
 def is_within_opening_hours(time, opening, closing):
+    if opening is None or closing is None:
+        return False
     if closing >= opening:
         return opening <= time < closing
     else:
-        # If closing time is before opening time, it means the closing is on the next day
         return opening <= time or time < closing
 
 
@@ -1307,6 +1308,7 @@ def get_required_workforce():
     if request.method == 'POST':
         button = request.json.get("button", None)
         if button == "Submit":
+            print(request.json)
             workforce_data = request.get_json()
             week_adjustment = int(request.args.get('week_adjustment', 0))
 
@@ -1327,9 +1329,9 @@ def get_required_workforce():
                     if opening_details == None:
                         pass
                     else:
-                        hours = opening_details.start_time.hour
-                        minutes = opening_details.start_time.minute
-                        total_hours = hours * hour_divider + minutes
+                        opening_hours = opening_details.start_time.hour
+                        opening_minutes = opening_details.start_time.minute
+                        total_hours = opening_hours * hour_divider + opening_minutes
                         if quarter < (total_hours):
                             pass
                         else:
@@ -1338,7 +1340,7 @@ def get_required_workforce():
 
                                 if i+1 < day_num:
                                     new_date = new_dates[i+1]
-                                    weekday = weekdays.get(i+1)
+                                    weekday = weekdays.get(i)
                                     opening_details = opening_hours_dict.get(weekday)
                                 else:
                                     new_date = new_dates[i] + datetime.timedelta(days=1)
@@ -1349,21 +1351,30 @@ def get_required_workforce():
                                 weekday = weekdays.get(i)
                                 opening_details = opening_hours_dict.get(weekday)
             
-                            quarter_hour = quarter / hour_divider
+                            quarter_hour = quarter // hour_divider
                             quarter_minute = (quarter % hour_divider) * minutes
                             formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+                    
                             capacity = workforce_data.get(f'worker_{i}_{formatted_time}', 0)
-
                             
                             time = f'{formatted_time}:00'
                             new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
 
                             if opening_details:
-                                if not (is_within_opening_hours(new_time, opening_details.start_time, opening_details.end_time) or
-                                        (opening_details.start_time2 and opening_details.end_time2 and 
-                                        is_within_opening_hours(new_time, opening_details.start_time2, opening_details.end_time2))):
-                                    capacity = 0
-
+                                if opening_details.end_time2 is not None:
+                                    # Both end_time and end_time2 are defined
+                                    if is_within_opening_hours(new_time, opening_details.start_time, opening_details.end_time) or \
+                                    is_within_opening_hours(new_time, opening_details.start_time, opening_details.end_time2):
+                                        pass
+                                    else:
+                                        capacity = 0
+                                else:
+                                    # Only end_time is defined
+                                    if is_within_opening_hours(new_time, opening_details.start_time, opening_details.end_time):
+                                        pass
+                                    else:
+                                        capacity = 0
+                                   
 
                             new_record = TimeReq(
                                 id=None,
