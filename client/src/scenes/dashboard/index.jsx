@@ -35,7 +35,8 @@ const Dashboard = () => {
   const [StartTimeCount, setStartTimeCount] = useState();
   const [upcomingShifts, setUpcomingShifts] = useState([]);
   const [hoursWorkedData, setHoursWorkedData] = useState([]); 
-  const totalHoursWorked = hoursWorkedData.reduce((sum, item) => sum + parseFloat(item.hours_worked), 0);
+  const [currentShifts, setCurrentShifts] = useState([]);
+  const totalHoursWorked = (hoursWorkedData && Array.isArray(hoursWorkedData)) ? hoursWorkedData.reduce((sum, item) => sum + parseFloat(item.hours_worked), 0) : 0;
   const token = localStorage.getItem('session_token'); 
   
   useEffect(() => {
@@ -52,6 +53,7 @@ const Dashboard = () => {
             setStartTimeCount(response.data.start_time_count);
             setUpcomingShifts(response.data.upcoming_shifts);  // Store the upcoming shifts data
             setHoursWorkedData(response.data.hours_worked_over_time);
+            setCurrentShifts(response.data.current_shifts);
             console.log(response.data.upcoming_shifts);
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -230,8 +232,8 @@ const Dashboard = () => {
           {upcomingShifts.map((shiftInfo, i) => (
             <Box
                 key={`${shiftInfo.name}-${i}`}  // Use a unique key for each item
-                display="flex"
-                justifyContent="space-between"
+                display="grid"
+                gridTemplateColumns="1fr 1fr 1fr"  // Two columns for name, one for day and one for time
                 alignItems="center"
                 borderBottom={`4px solid ${colors.primary[500]}`}
                 p="15px"
@@ -244,17 +246,22 @@ const Dashboard = () => {
                     >
                         {shiftInfo.name}  {/* Display the name */}
                     </Typography>
-                    {shiftInfo.shifts.map((shift, shiftIndex) => (  // Map over the shifts array
-                        <Typography color={colors.grey[100]} key={shiftIndex}>
-                            {shiftInfo.day} - {shift.start} bis {shift.end}  {/* Display the day and shift times */}
-                        </Typography>
-                    ))}
                 </Box>
+                <Box>
+                    <Typography color={colors.grey[100]}>
+                        {shiftInfo.day}  {/* Display the day */}
+                    </Typography>
+                </Box>
+                {shiftInfo.shifts.map((shift, shiftIndex) => (  // Map over the shifts array
+                    <Box key={shiftIndex}>
+                        <Typography color={colors.grey[100]}>
+                            {shift.start} bis {shift.end}  {/* Display the shift times */}
+                        </Typography>
+                    </Box>
+                ))}
             </Box>
-        ))}
-
+          ))}
         </Box>
-
         {/* ROW 3 */}
         <Box
           gridColumn="span 4"
@@ -316,41 +323,36 @@ const Dashboard = () => {
             p="15px"
           >
             <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-              Recent Transactions
+              Wer arbeitet gerade
             </Typography>
           </Box>
-          {mockTransactions.map((transaction, i) => (
+          {currentShifts.map((shift, i) => (
             <Box
-              key={`${transaction.txId}-${i}`}
+              key={`${shift.name}-${i}`}
               display="flex"
               justifyContent="space-between"
               alignItems="center"
               borderBottom={`4px solid ${colors.primary[500]}`}
               p="15px"
             >
-              <Box>
+              <Box flexGrow={1}>
                 <Typography
                   color={colors.greenAccent[500]}
                   variant="h5"
                   fontWeight="600"
                 >
-                  {transaction.txId}
-                </Typography>
-                <Typography color={colors.grey[100]}>
-                  
+                  {shift.name}
                 </Typography>
               </Box>
-              <Box color={colors.grey[100]}>{transaction.date}</Box>
-              <Box
-                backgroundColor={colors.greenAccent[500]}
-                p="5px 10px"
-                borderRadius="4px"
-              >
-                ${transaction.cost}
+              <Box>
+                <Typography color={colors.grey[100]}>
+                  {shift.start} bis {shift.end}
+                </Typography>
               </Box>
             </Box>
           ))}
         </Box>
+
 
       </Box>
     </Box>
@@ -358,3 +360,52 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+
+//Nächste Schichten old version in case of need
+// <Box
+//           gridColumn="span 4"
+//           gridRow="span 2"
+//           backgroundColor={colors.primary[800]}
+//           borderRadius="15px"
+//           overflow="auto"
+//         >
+//           <Box
+//             display="flex"
+//             justifyContent="space-between"
+//             alignItems="center"
+//             borderBottom={`4px solid ${colors.primary[500]}`}
+//             colors={colors.grey[100]}
+//             p="15px"
+//           >
+//             <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
+//               Nächste Schichten 
+//             </Typography>
+//           </Box>
+//           {upcomingShifts.map((shiftInfo, i) => (
+//             <Box
+//                 key={`${shiftInfo.name}-${i}`}  // Use a unique key for each item
+//                 display="flex"
+//                 justifyContent="space-between"
+//                 alignItems="center"
+//                 borderBottom={`4px solid ${colors.primary[500]}`}
+//                 p="15px"
+//             >
+//                 <Box>
+//                     <Typography
+//                         color={colors.greenAccent[500]}
+//                         variant="h5"
+//                         fontWeight="600"
+//                     >
+//                         {shiftInfo.name}  {/* Display the name */}
+//                     </Typography>
+//                     {shiftInfo.shifts.map((shift, shiftIndex) => (  // Map over the shifts array
+//                         <Typography color={colors.grey[100]} key={shiftIndex}>
+//                             {shiftInfo.day} - {shift.start} bis {shift.end}  {/* Display the day and shift times */}
+//                         </Typography>
+//                     ))}
+//                 </Box>
+//             </Box>
+//         ))}
+
+//         </Box>
