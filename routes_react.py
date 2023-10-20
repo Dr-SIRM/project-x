@@ -1337,6 +1337,7 @@ def get_required_workforce():
             new_dates = [monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment) for i in range(day_num)]
             TimeReq.query.filter(
                 TimeReq.company_name == user.company_name,
+                TimeReq.department == workforce_data["department"],
                 TimeReq.date.in_(new_dates)
             ).delete(synchronize_session='fetch')
             db.session.commit()
