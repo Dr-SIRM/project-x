@@ -21,6 +21,7 @@ class DataProcessing:
         self.laden_oeffnet = None
         self.laden_schliesst = None
         self.user_availability = None
+        self.skills = []
         self.time_req = None
         self.company_shifts = None
         self.employment_lvl = None
@@ -36,6 +37,7 @@ class DataProcessing:
         self.solving_period()
         self.get_availability()
         self.get_opening_hours()
+        self.get_skills()
         self.get_time_req()
         self.get_shift_weeklyhours_emp_lvl()
         self.binaere_liste()
@@ -234,14 +236,113 @@ class DataProcessing:
         self.laden_schliesst = self.laden_schliesst * self.week_timeframe
         self.opening_hours = self.opening_hours * self.week_timeframe
 
+        for i in range(7):
+            print(f"{i}-ter Tag Laden Öffnet: {self.laden_oeffnet[i]}")
+            print(f"{i}-ter Tag Laden Schliesst: {self.laden_schliesst[i]}")
+        
+        print("Opening_hour: ", self.opening_hours)
 
-        # HIER LADEN ÖFFNET UND LADEN SCHLIESST PRINTEN UND ÜBERPRÜFEN
 
+    def get_skills(self):
+        """ In dieser Methode werden sämtliche Skills einer Company in einer Liste gespeichert """
+
+        # company_name filtern aus der Datenkbank
+        user = User.query.filter_by(id=self.current_user_id).first()
+        company_name = user.company_name
+
+        # Die entsprechende Company-Instanz abfragen
+        company = Company.query.filter_by(company_name=company_name).first()
+
+        # Zugriff auf das erste Department, da deparment nicht mit 1 beginnt
+        first_department = getattr(company, 'department')
+        if first_department:
+            self.skills.append(first_department)
+        
+        # Die restlichen deparments durchiterieren 
+        for i in range(2, 11): 
+            department_value = getattr(company, f'department{i}')
+            if department_value:  # Wenn department_value nicht leer/null ist
+                self.skills.append(department_value)
+
+        print("Skills: ", self.skills)
         
 
-    def get_time_req(self):
-        """ In dieser Funktion werden die benötigten Mitarbeiter für jede Stunde jedes Tages abgerufen """
 
+    def get_time_req(self):
+        """ In dieser Funktion werden die benötigten Mitarbeiter für jede Stunde jedes Tages jedes Skills abgerufen """
+
+        # Holt den company_name aus der Datenbank.
+        user = User.query.filter_by(id=self.current_user_id).first()
+        company_name = user.company_name
+
+        # Abrufen aller TimeReq-Datensätze für das Unternehmen im relevanten Datumsbereich.
+        time_reqs = TimeReq.query.filter(
+            TimeReq.company_name == company_name,
+            TimeReq.date.between(self.start_date, self.end_date)
+        ).all()
+
+        # Bestimmt den Divisor basierend auf self.hour_devider (wahrscheinlich für die Umrechnung von Sekunden in Stunden).
+        divisor = 3600 / self.hour_devider
+
+        # Verschachteltes Wörterbuch, wobei das äussere Wörterbuch die Daten und das innere die Stunden und Anforderungen pro Skill enthält.
+        time_req_dict = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
+
+        for record in time_reqs:
+            date = record.date
+            department = record.department  # Dies ist der neue Teil, der den Department/Skill aus dem Datensatz holt.
+            start_time = self.time_to_timedelta(record.start_time)
+            worker = record.worker
+
+            weekday_index = date.weekday()
+
+            # Korrektur der Schließzeit, falls sie in den nächsten Tag übergeht.
+            if self.laden_schliesst[weekday_index] < self.laden_oeffnet[weekday_index]:
+                corrected_close_time = self.laden_schliesst[weekday_index] + timedelta(seconds=86400)
+            else:
+                corrected_close_time = self.laden_schliesst[weekday_index]
+
+            # Berücksichtigung nur der Schichten, die während der Öffnungszeiten stattfinden.
+            if (self.laden_oeffnet[weekday_index] <= start_time < corrected_close_time):
+                start_hour = int(start_time.total_seconds() // divisor) - int(self.laden_oeffnet[weekday_index].total_seconds() // divisor)
+                if start_hour < 0:
+                    start_hour = 0
+
+                # Speichert die Anforderungen im Wörterbuch, strukturiert nach Datum, Stunde und Abteilung/Skill.
+                time_req_dict[date][department][start_hour] = worker
+
+        # Konvertieren der Start- und Enddatenstrings in datetime.date-Objekte.
+        current_date = datetime.strptime(self.start_date, '%Y-%m-%d').date()
+        end_date = datetime.strptime(self.end_date, '%Y-%m-%d').date()
+
+        # Stellt sicher, dass für jeden Tag im Bereich ein Eintrag vorhanden ist, auch wenn keine Daten vorhanden sind.
+        while current_date <= end_date:
+            if current_date not in time_req_dict:
+                for skill in self.skills:  # Geht durch alle Skills in der Liste.
+                    time_req_dict[current_date][skill] = {}  # Erstellt ein leeres Wörterbuch für diesen Tag und Skill.
+            current_date += timedelta(days=1)
+
+        # Sortiert das Wörterbuch nach Datum und konvertiert es in ein geordnetes Wörterbuch, um die Reihenfolge beizubehalten.
+        self.time_req = OrderedDict(sorted(time_req_dict.items()))
+
+        print("TIME REQ:", self.time_req)
+
+        # Variable, um die insgesamt verteilbaren Stunden zu halten
+        verteilbare_stunden = 0
+
+        # Durchlaufen Sie das OrderedDict
+        for date, roles in self.time_req.items():
+            if isinstance(roles, defaultdict):
+                # Durchlaufen Sie jede Rolle und deren Stundenanforderungen
+                for role, hours in roles.items():
+                    if isinstance(hours, defaultdict):
+                        # Addieren Sie die Anforderungen für jede Stunde
+                        for hour, count in hours.items():
+                            verteilbare_stunden += count
+
+        print(f"Verteilbare Stunden: {verteilbare_stunden}")
+
+
+        """
         # company_name filtern aus der Datenkbank
         user = User.query.filter_by(id=self.current_user_id).first()
         company_name = user.company_name
@@ -252,7 +353,7 @@ class DataProcessing:
             TimeReq.date.between(self.start_date, self.end_date)
         ).all()
 
-        print("time_reqs: ", time_reqs)
+    
         # Bestimme den Divisor basierend auf self.hour_devider
         divisor = 3600 / self.hour_devider
         
@@ -290,7 +391,7 @@ class DataProcessing:
         # Sortiere das Wörterbuch nach Datum
         self.time_req = OrderedDict(sorted(time_req_dict_2.items()))
         print("TIME REQ:", self.time_req)
-
+        """
 
 
     def get_shift_weeklyhours_emp_lvl(self):

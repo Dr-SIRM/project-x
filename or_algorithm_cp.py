@@ -208,7 +208,7 @@ class ORAlgorithm_cp:
 
     def run(self):
         self.create_variables()
-        self.show_variables()
+        # self.show_variables()
         self.pre_check_programmer()
 
     # Diese Methode kann später gelöscht werden, da auf die einzelnen pre_checks zugegriffen wird.
