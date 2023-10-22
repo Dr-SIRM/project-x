@@ -295,25 +295,41 @@ class DataProcessing:
 
             weekday_index = date.weekday()
 
-            # Berechnung der korrigierten Schließzeit wie zuvor
+            # Hier prüfen wir, ob die Arbeitszeit nach Mitternacht beginnt.
+            if start_time < self.laden_oeffnet[weekday_index]:
+                # Wenn ja, dann beziehen wir uns auf den vorherigen Tag. 
+                weekday_index = (weekday_index - 1) % 7  # Wir verwenden Modulo 7, um sicherzustellen, dass der Wert innerhalb [0,6] bleibt.
+                start_time = start_time + timedelta(seconds=86400)
+                date = date - timedelta(days=1)
+
+
+
+
+            # Berechnung der korrigierten Schliesszeit
             if self.laden_schliesst[weekday_index] < self.laden_oeffnet[weekday_index]:
                 corrected_close_time = self.laden_schliesst[weekday_index] + timedelta(seconds=86400)
             else:
                 corrected_close_time = self.laden_schliesst[weekday_index]
 
-            # Anstatt nur die Zeiten innerhalb der regulären Öffnungszeiten zu berücksichtigen,
-            # fügen wir auch die "überlaufenden" Stunden hinzu.
+            # Anzahl der Slots berechnen
             hours_open = corrected_close_time - self.laden_oeffnet[weekday_index]
-            total_slots = self.time_to_int(hours_open)  # Berechnung der Gesamtanzahl von Zeitfenstern/Slots basierend auf den Öffnungszeiten
-            print(total_slots)
+            total_slots = self.time_to_int(hours_open)
 
+            print("weekday_index", weekday_index)
+            print("laden_oeffnet", self.laden_oeffnet[weekday_index])
+            print("start_time", start_time)
+            print("corrected_close_time", corrected_close_time)
+            print("date", date)
             if self.laden_oeffnet[weekday_index] <= start_time < corrected_close_time:
+                print("-------erfüllt-------")
                 start_hour = self.time_to_int(start_time - self.laden_oeffnet[weekday_index])
+                print(start_hour)
                 
-                # An dieser Stelle speichern wir die Anforderungen, aber wir müssen das über das normale Tagesende hinaus tun.
                 for hour_slot in range(start_hour, total_slots):
-                    # Alle slots 
+                    # Alle slots durchiterieren
                     time_req_dict[date][department][hour_slot] = worker 
+                    print(f"Datum {date}, Deparment {department}, Stundenslot {hour_slot}, Worker {worker}")
+
 
         # Konvertieren der Start- und Enddatenstrings in datetime.date-Objekte.
         current_date = datetime.strptime(self.start_date, '%Y-%m-%d').date()
