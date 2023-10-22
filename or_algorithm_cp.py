@@ -100,6 +100,7 @@ class ORAlgorithm_cp:
         self.hour_devider = dp.hour_devider                 # 113
         self.user_names = dp.user_names                     # 114
         self.user_skills = dp.user_skills                   # 115
+        self.skills = dp.skills                             # 116
 
         # Attribute der Methode "create_variables"
         self.mitarbeiter = None                             # 1
@@ -114,7 +115,7 @@ class ORAlgorithm_cp:
         self.employment = []                                # 10
         self.verteilbare_stunden = None                     # 11
         self.gesamtstunden_verfügbarkeit = []               # 12
-        self.min_anwesend = []                              # 13
+        self.min_anwesend = {}                              # 13
         self.gerechte_verteilung = []                       # 14
         self.fair_distribution = None                       # 15
         self.subsequent_workingdays = None                  # 16
@@ -211,7 +212,7 @@ class ORAlgorithm_cp:
     def run(self):
         self.create_variables()
         self.show_variables()
-        self.pre_check_programmer()
+        # self.pre_check_programmer()
 
     # Diese Methode kann später gelöscht werden, da auf die einzelnen pre_checks zugegriffen wird.
     def pre_check(self):
@@ -348,21 +349,17 @@ class ORAlgorithm_cp:
             self.gesamtstunden_verfügbarkeit.append(gesamt_stunden)
 
         # -- 13 ------------------------------------------------------------------------------------------------------------
-        # Eine Liste mit den min. anwesendheiten der MA wird erstellt
+        # Eine Dict mit den min. anwesendheiten der MA wird erstellt
 
         # Durch alle Elemente in self.time_req iterieren
         for _, day_skills in self.time_req.items():
-            daily_list = []
-
             for skill, hours in day_skills.items():
-                # Das Dictionary für den Skill erstellen, der die Stunden enthält
-                skill_dict = {skill: hours}
-
-                # Das Skill-Dictionary zur täglichen Liste hinzufügen
-                daily_list.append(skill_dict)
-
-            # Die tägliche Liste zur Gesamtliste hinzufügen
-            self.min_anwesend.append(daily_list)
+                # Überprüfen, ob der Skill bereits im Dictionary vorhanden ist
+                if skill not in self.min_anwesend:
+                    self.min_anwesend[skill] = []
+                
+                # Die Stunden für den aktuellen Tag zum Skill hinzufügen
+                self.min_anwesend[skill].append(hours)
 
         # -- 14 ------------------------------------------------------------------------------------------------------------
         # gerechte_verteilung -> eine Liste mit den Stunden wie sie gerecht verteilt werden
@@ -480,6 +477,7 @@ class ORAlgorithm_cp:
         print("113. self.hour_devider: ", self.hour_devider)
         print("114. self.user_names: ", self.user_names)
         print("115. self.user_skills: ", self.user_skills)
+        print("116. self.skills: ", self.skills)
         print()
         
         print("Attribute der Methode create_variables:")
@@ -1040,18 +1038,31 @@ class ORAlgorithm_cp:
         # HARTE NB
         # NB 2 - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend
         # -------------------------------------------------------------------------------------------------------
+        """
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
                 self.model.Add(sum(self.x[i, j, k] for i in self.mitarbeiter) >= self.min_anwesend[j][k])
+        """
+
+        # 22.10.2023
+        for s in self.skills:
+            for j in range(self.calc_time):
+                for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):
+                    # Überprüfen Sie, ob j und k innerhalb der Grenzen von self.min_anwesend[s] liegen
+                    if j < len(self.min_anwesend[s]) and k < len(self.min_anwesend[s][j]):
+                        self.model.Add(sum(self.x[i, j, k] for i in self.mitarbeiter) >= self.min_anwesend[s][j][k])
+
+
         # -------------------------------------------------------------------------------------------------------
         # WEICHE NB -- NEU 26.07.2023 --
         # NB 2 - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend 
         # ***** Weiche Nebenbedingung 1 *****
         # -------------------------------------------------------------------------------------------------------
+        """
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
                 self.model.Add(sum(self.x[i, j, k] for i in self.mitarbeiter) - self.min_anwesend[j][k] <= self.nb1_violation[j, k])
-
+        """
 
         # -------------------------------------------------------------------------------------------------------
         # WEICHE NB -- NEU 28.07.2023 -- --> Muss noch genauer überprüft werden ob es funktioniert!
