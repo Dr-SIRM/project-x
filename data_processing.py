@@ -287,6 +287,7 @@ class DataProcessing:
         # Verschachteltes Wörterbuch, wobei das äussere Wörterbuch die Daten und das innere die Stunden und Anforderungen pro Skill enthält.
         time_req_dict = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
 
+        # Hieritteriert man jeden Eintrag von time_reqs der Reihe nach durch
         for record in time_reqs:
             date = record.date
             department = record.department 
@@ -295,14 +296,12 @@ class DataProcessing:
 
             weekday_index = date.weekday()
 
-            # Hier prüfen wir, ob die Arbeitszeit nach Mitternacht beginnt.
+            # Hier prüfen wir, ob die Arbeitszeit nach Mitternacht beginnt. Wenn das zutrifft, gehen wir im index, in der start_time und im Datum einen Tag zurück
             if start_time < self.laden_oeffnet[weekday_index]:
                 # Wenn ja, dann beziehen wir uns auf den vorherigen Tag. 
-                weekday_index = (weekday_index - 1) % 7  # Wir verwenden Modulo 7, um sicherzustellen, dass der Wert innerhalb [0,6] bleibt.
+                weekday_index = (weekday_index - 1) % 7  # Modulo 7, um sicherzustellen, dass der Wert innerhalb [0,6] bleibt.
                 start_time = start_time + timedelta(seconds=86400)
                 date = date - timedelta(days=1)
-
-
 
 
             # Berechnung der korrigierten Schliesszeit
@@ -315,45 +314,49 @@ class DataProcessing:
             hours_open = corrected_close_time - self.laden_oeffnet[weekday_index]
             total_slots = self.time_to_int(hours_open)
 
-            print("weekday_index", weekday_index)
-            print("laden_oeffnet", self.laden_oeffnet[weekday_index])
-            print("start_time", start_time)
-            print("corrected_close_time", corrected_close_time)
-            print("date", date)
+            # Prints zu Debugging zwecken:
+            # print("weekday_index", weekday_index)
+            # print("laden_oeffnet", self.laden_oeffnet[weekday_index])
+            # print("start_time", start_time)
+            # print("corrected_close_time", corrected_close_time)
+            # print("date", date)
+
+            # Wenn die start_time innerhalb von Öffnung und Schliesszeit liegt, wird sie berücksichtigt
             if self.laden_oeffnet[weekday_index] <= start_time < corrected_close_time:
-                print("-------erfüllt-------")
                 start_hour = self.time_to_int(start_time - self.laden_oeffnet[weekday_index])
-                print(start_hour)
-                
+
+                # Durch alle slots durchitterieren, gebraucht wird nur immer der erste Wert, der Rest wird überschrieben
                 for hour_slot in range(start_hour, total_slots):
-                    # Alle slots durchiterieren
                     time_req_dict[date][department][hour_slot] = worker 
-                    print(f"Datum {date}, Deparment {department}, Stundenslot {hour_slot}, Worker {worker}")
+                    # print(f"Datum {date}, Deparment {department}, Stundenslot {hour_slot}, Worker {worker}")
 
 
-        # Konvertieren der Start- und Enddatenstrings in datetime.date-Objekte.
+        # Konvertieren der Start- und Enddatenstrings in datetime.date-Objekte
         current_date = datetime.strptime(self.start_date, '%Y-%m-%d').date()
         end_date = datetime.strptime(self.end_date, '%Y-%m-%d').date()
 
-        # Stellt sicher, dass für jeden Tag im Bereich ein Eintrag vorhanden ist, auch wenn keine Daten vorhanden sind.
+        # Überprüfen, ob für das aktuelle Datum ein Eintrag existiert und ob alle Skills vertreten sind
         while current_date <= end_date:
             if current_date not in time_req_dict:
-                for skill in self.skills:  # Geht durch alle Skills in der Liste.
-                    time_req_dict[current_date][skill] = {}  # Erstellt ein leeres Wörterbuch für diesen Tag und Skill.
+                for skill in self.skills:
+                    time_req_dict[current_date][skill] = {}  # Fügt leere dicts für alle Skills hinzu, wenn das Datum fehlt.
+            else:
+                # Wenn es bereits Einträge für das aktuelle Datum gibt, prüfen wir, ob alle Skills vorhanden sind.
+                for skill in self.skills:
+                    if skill not in time_req_dict[current_date]:
+                        time_req_dict[current_date][skill] = {}  # Fügt leere dicts für fehlende Skills hinzu.
             current_date += timedelta(days=1)
 
-        # Sortiert das Wörterbuch nach Datum und konvertiert es in ein geordnetes Wörterbuch, um die Reihenfolge beizubehalten.
+        # Sortiert das Wörterbuch nach Datum und konvertiert es in ein geordnetes Wörterbuch, um die Reihenfolge beizubehalten
         self.time_req = OrderedDict(sorted(time_req_dict.items()))
 
         print("TIME REQ:", self.time_req)
 
 
-
-    
         # Variable, um die insgesamt verteilbaren Stunden zu halten
         verteilbare_stunden = 0
 
-        # Durchlaufen Sie das OrderedDict
+        # OrderedDict durchlaufen
         for date, roles in self.time_req.items():
             if isinstance(roles, defaultdict):
                 # Durchlaufen Sie jede Rolle und deren Stundenanforderungen

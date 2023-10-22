@@ -335,6 +335,25 @@ class ORAlgorithm_cp:
                 self.verteilbare_stunden += self.time_req[date][hour]
                 self.verteilbare_stunden = self.verteilbare_stunden
 
+
+        #22.10.2023 --> Um später verteilbare Stunden korrekt zu berechnen:
+        """
+        # Variable, um die insgesamt verteilbaren Stunden zu halten
+        verteilbare_stunden = 0
+
+        # Durchlaufen Sie das OrderedDict
+        for date, roles in self.time_req.items():
+            if isinstance(roles, defaultdict):
+                # Durchlaufen Sie jede Rolle und deren Stundenanforderungen
+                for role, hours in roles.items():
+                    if isinstance(hours, defaultdict):
+                        # Addieren Sie die Anforderungen für jede Stunde
+                        for hour, count in hours.items():
+                            verteilbare_stunden += count
+
+        print(f"Verteilbare Stunden: {verteilbare_stunden}")
+        """
+
         # -- 12 ------------------------------------------------------------------------------------------------------------
         for key in self.binary_availability:
             gesamt_stunden = sum(sum(day_data[1]) for day_data in self.binary_availability[key])
