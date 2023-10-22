@@ -281,7 +281,7 @@ class DataProcessing:
             TimeReq.date.between(self.start_date, self.end_date)
         ).all()
 
-        # Bestimmt den Divisor basierend auf self.hour_devider (wahrscheinlich für die Umrechnung von Sekunden in Stunden).
+        # Bestimmt den Divisor basierend auf self.hour_devider
         divisor = 3600 / self.hour_devider
 
         # Verschachteltes Wörterbuch, wobei das äussere Wörterbuch die Daten und das innere die Stunden und Anforderungen pro Skill enthält.
@@ -289,26 +289,31 @@ class DataProcessing:
 
         for record in time_reqs:
             date = record.date
-            department = record.department  # Dies ist der neue Teil, der den Department/Skill aus dem Datensatz holt.
+            department = record.department 
             start_time = self.time_to_timedelta(record.start_time)
             worker = record.worker
 
             weekday_index = date.weekday()
 
-            # Korrektur der Schließzeit, falls sie in den nächsten Tag übergeht.
+            # Berechnung der korrigierten Schließzeit wie zuvor
             if self.laden_schliesst[weekday_index] < self.laden_oeffnet[weekday_index]:
                 corrected_close_time = self.laden_schliesst[weekday_index] + timedelta(seconds=86400)
             else:
                 corrected_close_time = self.laden_schliesst[weekday_index]
 
-            # Berücksichtigung nur der Schichten, die während der Öffnungszeiten stattfinden.
-            if (self.laden_oeffnet[weekday_index] <= start_time < corrected_close_time):
-                start_hour = int(start_time.total_seconds() // divisor) - int(self.laden_oeffnet[weekday_index].total_seconds() // divisor)
-                if start_hour < 0:
-                    start_hour = 0
+            # Anstatt nur die Zeiten innerhalb der regulären Öffnungszeiten zu berücksichtigen,
+            # fügen wir auch die "überlaufenden" Stunden hinzu.
+            hours_open = corrected_close_time - self.laden_oeffnet[weekday_index]
+            total_slots = self.time_to_int(hours_open)  # Berechnung der Gesamtanzahl von Zeitfenstern/Slots basierend auf den Öffnungszeiten
+            print(total_slots)
 
-                # Speichert die Anforderungen im Wörterbuch, strukturiert nach Datum, Stunde und Abteilung/Skill.
-                time_req_dict[date][department][start_hour] = worker
+            if self.laden_oeffnet[weekday_index] <= start_time < corrected_close_time:
+                start_hour = self.time_to_int(start_time - self.laden_oeffnet[weekday_index])
+                
+                # An dieser Stelle speichern wir die Anforderungen, aber wir müssen das über das normale Tagesende hinaus tun.
+                for hour_slot in range(start_hour, total_slots):
+                    # Alle slots 
+                    time_req_dict[date][department][hour_slot] = worker 
 
         # Konvertieren der Start- und Enddatenstrings in datetime.date-Objekte.
         current_date = datetime.strptime(self.start_date, '%Y-%m-%d').date()
@@ -326,6 +331,9 @@ class DataProcessing:
 
         print("TIME REQ:", self.time_req)
 
+
+
+    
         # Variable, um die insgesamt verteilbaren Stunden zu halten
         verteilbare_stunden = 0
 
