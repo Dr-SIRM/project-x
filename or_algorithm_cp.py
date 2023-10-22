@@ -16,6 +16,7 @@ from openpyxl.chart import LineChart, Reference
 from data_processing import DataProcessing
 from sqlalchemy import text
 from models import Timetable, User, SolverAnalysis
+from collections import defaultdict
 
 from ortools.sat.python import cp_model
 """
@@ -98,6 +99,7 @@ class ORAlgorithm_cp:
         self.week_timeframe = dp.week_timeframe             # 112
         self.hour_devider = dp.hour_devider                 # 113
         self.user_names = dp.user_names                     # 114
+        self.user_skills = dp.user_skills                   # 115
 
         # Attribute der Methode "create_variables"
         self.mitarbeiter = None                             # 1
@@ -208,7 +210,7 @@ class ORAlgorithm_cp:
 
     def run(self):
         self.create_variables()
-        # self.show_variables()
+        self.show_variables()
         self.pre_check_programmer()
 
     # Diese Methode kann später gelöscht werden, da auf die einzelnen pre_checks zugegriffen wird.
@@ -325,34 +327,20 @@ class ORAlgorithm_cp:
         for user_id in self.binary_availability.keys():
             if user_id in self.user_employment:
                 self.employment.append(self.user_employment[user_id])
-        # self.employment = ["Perm", "Temp", "Temp", "Temp", "Temp"] # selbst manipuliert
 
         # -- 11 ------------------------------------------------------------------------------------------------------------
         # verteilbare Stunden (Wieviele Mannstunden benötigt die Firma im definierten Zeitraum)
+
         self.verteilbare_stunden = 0
-        for date in self.time_req:
-            for hour in self.time_req[date]:
-                self.verteilbare_stunden += self.time_req[date][hour]
-                self.verteilbare_stunden = self.verteilbare_stunden
-
-
-        #22.10.2023 --> Um später verteilbare Stunden korrekt zu berechnen:
-        """
-        # Variable, um die insgesamt verteilbaren Stunden zu halten
-        verteilbare_stunden = 0
-
-        # Durchlaufen Sie das OrderedDict
+        # Durchlaufen OrderedDict
         for date, roles in self.time_req.items():
             if isinstance(roles, defaultdict):
-                # Durchlaufen Sie jede Rolle und deren Stundenanforderungen
+                # Durchlaufen jeder Rolle und deren Stundenanforderungen
                 for role, hours in roles.items():
                     if isinstance(hours, defaultdict):
-                        # Addieren Sie die Anforderungen für jede Stunde
+                        # Addieren der Anforderungen für jede Stunde
                         for hour, count in hours.items():
-                            verteilbare_stunden += count
-
-        print(f"Verteilbare Stunden: {verteilbare_stunden}")
-        """
+                            self.verteilbare_stunden += count
 
         # -- 12 ------------------------------------------------------------------------------------------------------------
         for key in self.binary_availability:
@@ -361,8 +349,20 @@ class ORAlgorithm_cp:
 
         # -- 13 ------------------------------------------------------------------------------------------------------------
         # Eine Liste mit den min. anwesendheiten der MA wird erstellt
-        for _, values in sorted(self.time_req.items()):
-            self.min_anwesend.append(list(values.values()))
+
+        # Durch alle Elemente in self.time_req iterieren
+        for _, day_skills in self.time_req.items():
+            daily_list = []
+
+            for skill, hours in day_skills.items():
+                # Das Dictionary für den Skill erstellen, der die Stunden enthält
+                skill_dict = {skill: hours}
+
+                # Das Skill-Dictionary zur täglichen Liste hinzufügen
+                daily_list.append(skill_dict)
+
+            # Die tägliche Liste zur Gesamtliste hinzufügen
+            self.min_anwesend.append(daily_list)
 
         # -- 14 ------------------------------------------------------------------------------------------------------------
         # gerechte_verteilung -> eine Liste mit den Stunden wie sie gerecht verteilt werden
@@ -479,6 +479,7 @@ class ORAlgorithm_cp:
         print("112. week_timeframe: ", self.week_timeframe)
         print("113. self.hour_devider: ", self.hour_devider)
         print("114. self.user_names: ", self.user_names)
+        print("115. self.user_skills: ", self.user_skills)
         print()
         
         print("Attribute der Methode create_variables:")

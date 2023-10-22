@@ -26,6 +26,7 @@ class DataProcessing:
         self.company_shifts = None
         self.employment_lvl = None
         self.user_employment = None
+        self.user_skills = None
         self.solver_requirements = None
         self.binary_availability = None
         self.user_names = None
@@ -41,7 +42,7 @@ class DataProcessing:
         self.get_time_req()
         self.get_shift_weeklyhours_emp_lvl()
         self.binaere_liste()
-        self.get_employment()
+        self.get_employment_skills()
         self.get_solver_requirement()
         self.user_name_list()
 
@@ -236,11 +237,13 @@ class DataProcessing:
         self.laden_schliesst = self.laden_schliesst * self.week_timeframe
         self.opening_hours = self.opening_hours * self.week_timeframe
 
+        """
         for i in range(7):
             print(f"{i}-ter Tag Laden Öffnet: {self.laden_oeffnet[i]}")
             print(f"{i}-ter Tag Laden Schliesst: {self.laden_schliesst[i]}")
         
         print("Opening_hour: ", self.opening_hours)
+        """
 
 
     def get_skills(self):
@@ -350,76 +353,7 @@ class DataProcessing:
         # Sortiert das Wörterbuch nach Datum und konvertiert es in ein geordnetes Wörterbuch, um die Reihenfolge beizubehalten
         self.time_req = OrderedDict(sorted(time_req_dict.items()))
 
-        print("TIME REQ:", self.time_req)
-
-
-        # Variable, um die insgesamt verteilbaren Stunden zu halten
-        verteilbare_stunden = 0
-
-        # OrderedDict durchlaufen
-        for date, roles in self.time_req.items():
-            if isinstance(roles, defaultdict):
-                # Durchlaufen Sie jede Rolle und deren Stundenanforderungen
-                for role, hours in roles.items():
-                    if isinstance(hours, defaultdict):
-                        # Addieren Sie die Anforderungen für jede Stunde
-                        for hour, count in hours.items():
-                            verteilbare_stunden += count
-
-        print(f"Verteilbare Stunden: {verteilbare_stunden}")
-
-
-        """
-        # company_name filtern aus der Datenkbank
-        user = User.query.filter_by(id=self.current_user_id).first()
-        company_name = user.company_name
-
-        # Anforderungen für das Unternehmen mit demselben company_name abrufen
-        time_reqs = TimeReq.query.filter(
-            TimeReq.company_name == company_name,
-            TimeReq.date.between(self.start_date, self.end_date)
-        ).all()
-
-    
-        # Bestimme den Divisor basierend auf self.hour_devider
-        divisor = 3600 / self.hour_devider
-        
-        # Erstellen eines Dictionaries mit Datum und Stunde als Schlüssel:
-        time_req_dict_2 = defaultdict(dict)
-        for record in time_reqs:
-            date = record.date
-            start_time = self.time_to_timedelta(record.start_time)
-            worker = record.worker
-            
-            weekday_index = date.weekday()
-            
-            # Prüfen, ob die Öffnungszeit am selben Tag bleibt oder in den nächsten Tag übergeht
-            if self.laden_schliesst[weekday_index] < self.laden_oeffnet[weekday_index]:
-                corrected_close_time = self.laden_schliesst[weekday_index] + timedelta(seconds=86400)
-            else:
-                corrected_close_time = self.laden_schliesst[weekday_index]
-
-            # Wenn die Schicht während der Öffnungszeiten stattfindet
-            if (self.laden_oeffnet[weekday_index] <= start_time < corrected_close_time):
-                start_hour = int(start_time.total_seconds() // divisor) - int(self.laden_oeffnet[weekday_index].total_seconds() // divisor)
-                if start_hour < 0:
-                    start_hour = 0
-                time_req_dict_2[date][start_hour] = worker
-                
-        # Umwandeln des Strings in ein datetime.date-Objekt
-        current_date = datetime.strptime(self.start_date, '%Y-%m-%d').date()
-        
-        # Füge fehlende Tage hinzu
-        while current_date <= datetime.strptime(self.end_date, '%Y-%m-%d').date():
-            if current_date not in time_req_dict_2:
-                time_req_dict_2[current_date] = {}
-            current_date += timedelta(days=1)
-        
-        # Sortiere das Wörterbuch nach Datum
-        self.time_req = OrderedDict(sorted(time_req_dict_2.items()))
-        print("TIME REQ:", self.time_req)
-        """
-
+ 
 
     def get_shift_weeklyhours_emp_lvl(self):
         """ In dieser Funktion wird als Key die user_id verwendet und die shift, employment_level und weekly_hours aus der Datenbank gezogen """
@@ -508,8 +442,8 @@ class DataProcessing:
 
 
 
-    def get_employment(self):
-        """ In der folgenden Methode holen wir die Beschäftigung jedes Benutzers und fügen sie in eine Liste ein """
+    def get_employment_skills(self):
+        """ In der folgenden Methode holen wir die Beschäftigung und die Skills jedes Benutzers und fügen sie jeweils in eine Liste ein """
 
         # company_name filtern aus der Datenkbank
         user = User.query.get(self.current_user_id)
@@ -518,9 +452,22 @@ class DataProcessing:
         # Hole das employment_level für jeden Benutzer, der in der gleichen Firma arbeitet wie der aktuelle Benutzer
         users = User.query.filter_by(company_name=company_name).all()
 
-        # Dictionarie erstellen mit user_id als Key:
+        # user_employment Dictionarie erstellen mit user_id als Key:
         self.user_employment = defaultdict(str, {user.id: user.employment for user in users})
 
+        # user_skills Dictionary erstellen mit user_id als Key:
+        self.user_skills = defaultdict(list) 
+        for user in users:
+            # Das erste Attribut heisst "department", nicht "department1", also müssen wir es separat behandeln
+            first_department = getattr(user, 'department')
+            if first_department:  # Füge hinzu, wenn es nicht None oder leer ist
+                self.user_skills[user.id].append(first_department)
+
+            # Iteration durch die restlichen "department"-Attribute (von "department2" bis "department10")
+            for i in range(2, 11):
+                skill = getattr(user, f'department{i}')
+                if skill:  # Füge hinzu, wenn es nicht None oder leer ist
+                    self.user_skills[user.id].append(skill)
 
 
 
