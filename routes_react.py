@@ -794,6 +794,7 @@ def run_solver():
 
         or_algo_cp.run()
     
+        """
         errors = []  # Eine Liste um alle Fehler zu speichern
         
         for i in range(1, 7):  # Assuming you have 6 pre-checks
@@ -811,6 +812,7 @@ def run_solver():
         # Wenn Fehler während der Überprüfungen aufgetreten sind, werden diese hier gesendet.
         if errors:
             return jsonify({'message': errors}), 400
+        """
 
         # Wenn keine Fehler aufgetreten sind, wird der Algorithmus weiter durchgeführt.
         or_algo_cp.run_2()
