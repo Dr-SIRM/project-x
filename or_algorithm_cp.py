@@ -258,6 +258,19 @@ class ORAlgorithm_cp:
         # user_ids Liste, wird als Key in der Ausgabe verwendet
         self.mitarbeiter = [user_id for user_id in self.binary_availability]
 
+
+        # 22.10.2023
+        self.mitarbeiter_2 = {}
+        # Erstellen Sie ein neues Wörterbuch basierend auf den user_ids in self.binary_availability
+        for user_id in self.binary_availability:
+            # Überprüfen Sie, ob die user_id in self.user_skills vorhanden ist
+            if user_id in self.user_skills:
+                # Füge die user_id und die zugehörigen Skills dem neuen Wörterbuch hinzu
+                self.mitarbeiter_2[user_id] = self.user_skills[user_id]
+        print("self.mitarbeiter_2: ", self.mitarbeiter_2)
+
+
+
         # -- 2 ------------------------------------------------------------------------------------------------------------
         # Aus dem binary_availability dict. die Verfügbarkeits-Informationen ziehen
         for i, (user_id, availabilities) in enumerate(self.binary_availability.items()):
@@ -812,12 +825,24 @@ class ORAlgorithm_cp:
         Entscheidungsvariabeln für den CP-Solver
         """
 
+        """
         # Arbeitsvariable
         self.x = {}
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
                     self.x[i, j, k] = self.model.NewIntVar(0, 1, f'x[{i}, {j}, {k}]')
+        """
+
+        # Arbeitsvariable
+        self.x = {}
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                for k in range(len(self.verfügbarkeit[i][j])):
+                    for s in self.skills:
+                        if s in self.mitarbeiter_2[i]:  # Dies stellt sicher, dass der Mitarbeiter den Skill tatsächlich hat
+                            self.x[i, j, k, s] = self.model.NewIntVar(0, 1, f'x[{i}, {j}, {k}, {s}]')
+
 
         # Arbeitsblockvariable
         self.y = {}
@@ -937,11 +962,13 @@ class ORAlgorithm_cp:
         Zielfunktion
         """
 
+        """
         # Kosten MA minimieren
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
                     self.cost_expressions.append(self.x[i, j, k] * int(self.kosten[i] / self.hour_devider))
+        """
 
         # Kosten Weiche NB1
         for j in range(self.calc_time):
@@ -1013,6 +1040,7 @@ class ORAlgorithm_cp:
         Beschränkungen / Nebenbedingungen
         """
 
+        """
         # -------------------------------------------------------------------------------------------------------
         # HARTE NB -- NEU 08.08.2023 --
         # NB 0 - Variable a ist 1, wenn der Mitarbeiter an einem Tag arbeitet, sonst 0
@@ -1024,15 +1052,18 @@ class ORAlgorithm_cp:
                 
                 self.model.Add(self.a[i, j] * (len(self.verfügbarkeit[i][j]) + 1) >= sum_x)
                 self.model.Add(self.a[i, j] <= sum_x)
+        """
         
         # -------------------------------------------------------------------------------------------------------
         # HARTE NB
         # NB 1 - MA nur einteilen, wenn er verfügbar ist. 
         # -------------------------------------------------------------------------------------------------------
+        """
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
                     self.model.Add(self.x[i, j, k] <= self.verfügbarkeit[i][j][k])
+        """
 
         # -------------------------------------------------------------------------------------------------------
         # HARTE NB
@@ -1045,12 +1076,23 @@ class ORAlgorithm_cp:
         """
 
         # 22.10.2023
-        for s in self.skills:
-            for j in range(self.calc_time):
-                for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):
-                    # Überprüfen Sie, ob j und k innerhalb der Grenzen von self.min_anwesend[s] liegen
-                    if j < len(self.min_anwesend[s]) and k < len(self.min_anwesend[s][j]):
-                        self.model.Add(sum(self.x[i, j, k] for i in self.mitarbeiter) >= self.min_anwesend[s][j][k])
+        for j in range(self.calc_time):
+            for k in range(len(self.verfügbarkeit[next(iter(self.mitarbeiter_2))][j])):  # 1. Mitarbeiter aus dem Wörterbuch, Arbeitszeit für alle gleich
+                for s in self.skills:
+                    # Überprüfen ob der Mitarbeiter über den Skill verfügt der min_anwesend sein muss
+                    self.model.Add(sum(self.x[i, j, k, s] for i in self.mitarbeiter_2 if s in self.mitarbeiter_2[i]) >= self.min_anwesend[s][j][k])
+
+        # 22.10.2023
+        for j in range(self.calc_time):
+            for k in range(len(self.verfügbarkeit[next(iter(self.mitarbeiter_2))][j])):  # 1. Mitarbeiter aus dem Wörterbuch, Arbeitszeit für alle gleich
+                for s in self.skills:
+                    # Überprüfen ob der Mitarbeiter über den Skill verfügt, der min_anwesend sein muss
+                    for i in self.mitarbeiter_2:
+                        if s in self.mitarbeiter_2[i]:
+                            print(f"self.x[{i}, {j}, {k}, {s}]")
+
+
+
 
 
         # -------------------------------------------------------------------------------------------------------
@@ -1063,6 +1105,10 @@ class ORAlgorithm_cp:
             for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
                 self.model.Add(sum(self.x[i, j, k] for i in self.mitarbeiter) - self.min_anwesend[j][k] <= self.nb1_violation[j, k])
         """
+
+
+
+
 
         # -------------------------------------------------------------------------------------------------------
         # WEICHE NB -- NEU 28.07.2023 -- --> Muss noch genauer überprüft werden ob es funktioniert!
