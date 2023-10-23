@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTheme, Box, Button, TextField, Snackbar, Typography, ButtonGroup, IconButton } from "@mui/material";
-import { Select, MenuItem } from "@mui/material";
+import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -14,6 +14,20 @@ import Tooltip from '@mui/material/Tooltip';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { API_BASE_URL } from "../../config";
 
+const BUTTON_STYLE = {
+  borderColor: "white",
+  "&.MuiButtonOutlined": {
+    borderColor: "white",
+  },
+  "&:hover": {
+    borderColor: "white",
+  },
+  "&.MuiButtonText": {
+    borderColor: "white",
+    color: "white",
+    backgroundColor: "#2e7c67",
+  },
+};
 
 const Availability = ({ availability }) => {
   const theme = useTheme();
@@ -28,6 +42,8 @@ const Availability = ({ availability }) => {
   const [additionalTimes, setAdditionalTimes] = useState(0);
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [activeTemplateData, setActiveTemplateData] = useState({});
+  const [selectedUser, setSelectedUser] = useState('');
+  const [user_list, setUserList] = useState([]);
 
   useEffect(() => {
     setActiveTemplateData(availabilityData.temp_dict);
@@ -43,6 +59,7 @@ const Availability = ({ availability }) => {
               }
           });
           setAvailabilityData(response.data);
+          setUserList(response.data.user_list);
           setIsLoading(false);
         } catch (error) {
           console.error('Error fetching availability details:', error);
@@ -92,7 +109,7 @@ useEffect(() => {
         values[key] = '00:00';
       }
     });
-    const payload = { ...values, button: buttonName, selectedTemplate };
+    const payload = { ...values, button: buttonName, selectedTemplate, selectedUser };
     console.log("Final payload before sending to server:", payload);
 
     try {
@@ -174,51 +191,59 @@ useEffect(() => {
         }) => (
           <form onSubmit={handleSubmit}>
             
-            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: '1rem' }}>
-              <IconButton onClick={goToPreviousWeek} 
-              sx={{
-                borderColor: 'black',
-                '&.MuiButtonOutlined': {
-                  borderColor: 'black',
-                },
-                '&:hover': {
-                  borderColor: 'black',
-                },
-                '&.MuiButtonText': {
-                  borderColor: 'white',
-                  color: 'black',
-                  backgroundColor: '#2e7c67',
-                }
-              }}>
-                <ChevronLeft style={{ color: 'black' }} />
-              </IconButton>
-              <Typography variant="h5" sx={{margin: '0 1rem' }}>
-                {
-                  new Intl.DateTimeFormat('de', { 
-                    weekday: 'short', 
-                    day: '2-digit', 
-                    month: 'long', 
-                    year: 'numeric'
-                  }).format(new Date(availabilityData.week_start))
-                }
-              </Typography>
-              <IconButton onClick={goToNextWeek} 
-              sx={{
-                borderColor: 'black',
-                '&.MuiButtonOutlined': {
-                  borderColor: 'black',
-                },
-                '&:hover': {
-                  borderColor: 'black',
-                },
-                '&.MuiButtonText': {
-                  borderColor: 'white',
-                  color: 'white',
-                  backgroundColor: '#2e7c67',
-                }
-              }}>
-                <ChevronRight style={{ color: 'black' }} />
-              </IconButton>
+            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', marginBottom: '1rem' }}>
+            <FormControl fullWidth variant="filled"sx={{ width: '250px' }}>
+              <InputLabel id="user-label">User</InputLabel>
+              <Select
+                labelId="user-label"
+                id="user"
+                name="user"
+                value={selectedUser}
+                onChange={(e) => setSelectedUser(e.target.value)}
+                inputProps={{ maxLength: 30 }}
+                sx={{
+                  color: "black",
+                  marginRight: '0.2rem',
+                  height: '40px', // explicitly set height
+                  '.MuiInputBase-root': {
+                    height: '20px', // explicitly set input field height
+                    fontSize: '10px' // explicitly set font size
+                  },
+                  '.MuiSelect-icon': { // Change color of icon to black
+                    color: 'black',
+                }, 
+                }}
+              >
+                <MenuItem value="">Wählen Sie einen Nutzer</MenuItem>
+                {user_list.map((user) => (
+                  <MenuItem key={user} value={user}>
+                    {user}
+                  </MenuItem>
+                ))}
+              </Select>
+          </FormControl>
+          </Box>
+          <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: '1rem' }}>
+            <IconButton 
+              onClick={goToPreviousWeek} 
+              style={BUTTON_STYLE}>
+              <ChevronLeft style={{ color: '#2E2E2E' }} />
+            </IconButton>
+            <Typography variant="h5" sx={{margin: '0 1rem'}}>
+              {
+                new Intl.DateTimeFormat('de', { 
+                  weekday: 'short', 
+                  day: '2-digit', 
+                  month: 'long', 
+                  year: 'numeric'
+                }).format(new Date(availabilityData.week_start))
+              }
+            </Typography>
+            <IconButton 
+              onClick={goToNextWeek} 
+              style={BUTTON_STYLE}>
+              <ChevronRight style={{ color: '#2E2E2E' }}/>
+            </IconButton>
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', marginBottom: '1rem' }}>
               <Button 

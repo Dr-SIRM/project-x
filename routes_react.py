@@ -10,7 +10,7 @@ from app import app, mail
 from openpyxl import Workbook
 import io
 from excel_output import create_excel_output
-from sqlalchemy import func, extract, and_, or_
+from sqlalchemy import func, extract, and_, or_, asc, desc
 
 
 
@@ -224,6 +224,15 @@ def new_user():
                         employment_level = admin_registration_data['employment_level'],
                         company_name = admin_registration_data['company_name'], 
                         department = admin_registration_data['department'],
+                        department2 = admin_registration_data['department2'] if 'department2' in admin_registration_data else None,
+                        department3 = admin_registration_data['department3'] if 'department3' in admin_registration_data else None,
+                        department4 = None,
+                        department5 = None,
+                        department6 = None,
+                        department7 = None,
+                        department8 = None,
+                        department9 = None,
+                        department10 = None,
                         access_level = admin_registration_data['access_level'], 
                         email = admin_registration_data['email'], 
                         password = hash,
@@ -519,6 +528,15 @@ def get_availability():
     query_weekdays = [weekdays[i] for i in range(day_num)]
     dates = [week_start + datetime.timedelta(days=i) for i in range(day_num)]
 
+    # Create Drop Down Based Access Level
+    if user.access_level == "User":
+        user_list = [f"{user.first_name}, {user.last_name}"]
+    else:
+        company_users = User.query.filter_by(company_name=user.company_name).order_by(asc(User.last_name)).all()
+        user_list = [f"{user.first_name}, {user.last_name}" for user in company_users]
+    
+
+
     # Fetch all relevant Availability records in a single query
     availabilities = Availability.query.filter(
         Availability.email == user.email,
@@ -545,12 +563,19 @@ def get_availability():
     if request.method == 'POST':
         button = request.json.get("button", None)
         if button == "Submit":
+            user_selection = request.json.get("selectedUser", None)
+            if user_selection == "":
+                new_user = user
+            else:
+                first_name, last_name = user_selection.split(', ')
+                new_user = User.query.filter_by(first_name=first_name, last_name=last_name).first()
+            
             new_entries = []
             
             # Delete all entries for the range in one operation
             for i in range(day_num):
                 new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
-                Availability.query.filter_by(user_id=user.id, date=new_date).delete()
+                Availability.query.filter_by(user_id=new_user.id, date=new_date).delete()
             db.session.commit()
 
             # Create all new entries
@@ -582,10 +607,10 @@ def get_availability():
                 # Create a new Availability instance and add to list
                 data = Availability(
                     id=None,
-                    user_id=user.id, 
+                    user_id=new_user.id, 
                     date=new_date, 
                     weekday=new_weekday, 
-                    email=user.email,
+                    email=new_user.email,
                     start_time=new_entry['entry1'], 
                     end_time=new_entry['entry2'], 
                     start_time2=new_entry['entry3'],
@@ -658,6 +683,7 @@ def get_availability():
         'temp_dict': temp_dict,
         'week_start': week_start,
         'hour_divider': solverreq.hour_devider,
+        'user_list': user_list,
         'template1_dict': get_temp_availability_dict("Template 1", user.email, day_num, weekdays),
         'template2_dict': get_temp_availability_dict("Template 2", user.email, day_num, weekdays),
         'template3_dict': get_temp_availability_dict("Template 3", user.email, day_num, weekdays),
@@ -768,7 +794,6 @@ def run_solver():
 
         or_algo_cp.run()
     
-        """
         errors = []  # Eine Liste um alle Fehler zu speichern
         
         for i in range(1, 7):  # Assuming you have 6 pre-checks
@@ -781,13 +806,11 @@ def run_solver():
 
             if not pre_check_result["success"]:
                 errors.append(f'Pre-check {i} failed: {pre_check_result["message"]}\n')
-        
+
         
         # Wenn Fehler während der Überprüfungen aufgetreten sind, werden diese hier gesendet.
         if errors:
             return jsonify({'message': errors}), 400
-
-        """
 
         # Wenn keine Fehler aufgetreten sind, wird der Algorithmus weiter durchgeführt.
         or_algo_cp.run_2()
@@ -1326,13 +1349,11 @@ def get_required_workforce():
     )
 
     department_list = [department for department in departments if department is not None]
-    print(department_list)
 
     #Submit the required FTE per hour
     if request.method == 'POST':
         button = request.json.get("button", None)
         if button == "Submit":
-            print(request.json)
             workforce_data = request.get_json()
             week_adjustment = int(request.args.get('week_adjustment', 0))
 
@@ -1340,7 +1361,7 @@ def get_required_workforce():
             new_dates = [monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment) for i in range(day_num)]
             TimeReq.query.filter(
                 TimeReq.company_name == user.company_name,
-                TimeReq.department == workforce_data["department"],
+                TimeReq.department == workforce_data['department'] if 'department' in workforce_data else None,
                 TimeReq.date.in_(new_dates)
             ).delete(synchronize_session='fetch')
             db.session.commit()
