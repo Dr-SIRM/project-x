@@ -151,6 +151,7 @@ def update_user(user_id):
     user.first_name = data.get('first_name', user.first_name)
     user.last_name = data.get('last_name', user.last_name)
     user.email = data.get('email', user.email)
+    user.employment = data.get('employment', user.employment)
     
     # Convert the employment_level to its original range [0, 1] before saving
     employment_level_percentage = data.get('employment_level')

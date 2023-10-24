@@ -119,6 +119,7 @@ const handleEmploymentLevelChange = async (event, id) => {
 
 const handleEmploymentChange = async (event, id) => {
   const newValue = event.target.value === "Vollzeit" ? "Perm" : "Temp";
+  console.log(event.target.value, newValue)
 
   try {
     // Send the modified data to the server
