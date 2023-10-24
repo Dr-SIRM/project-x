@@ -1287,40 +1287,45 @@ def get_required_workforce():
     
     # Pre-fetch all TimeReq for the given date range and company name
     end_date = week_start + datetime.timedelta(days=day_num)
-    all_time_reqs = TimeReq.query.filter(
-        TimeReq.company_name == user.company_name,
-        TimeReq.date.between(week_start, end_date)
-    ).all()
+    fetched_department = request.args.get('selectedDepartment', '')
+    if fetched_department:
+        all_time_reqs = TimeReq.query.filter(
+            TimeReq.company_name == user.company_name,
+            TimeReq.department == fetched_department,
+            TimeReq.date.between(week_start, end_date)
+        ).all()
 
-    # Convert all_time_reqs to a dictionary for quick lookup
-    time_req_lookup = {(rec.date, rec.start_time): rec.worker for rec in all_time_reqs}
+        # Convert all_time_reqs to a dictionary for quick lookup
+        time_req_lookup = {(rec.date, rec.start_time): rec.worker for rec in all_time_reqs}
 
-    timereq_dict = {}
-    for i in range(day_num):
-        for hour in range(daily_slots):
-            if hour >= full_day +1:
-                hour -= full_day + 1
-                new_date = monday + datetime.timedelta(days=i+1) + datetime.timedelta(days=week_adjustment)
-                quarter_hour = hour // hour_divider
-                quarter_minute = (hour % hour_divider) * minutes
-                formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
-                time = f'{formatted_time}:00'
-                new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
-                hour += full_day + 1
-            else:
-                new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
-                quarter_hour = hour // hour_divider
-                quarter_minute = (hour % hour_divider) * minutes
-                formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
-                time = f'{formatted_time}:00'
-                new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
-            
-            # Use dictionary for quick lookup
-            worker_count = time_req_lookup.get((new_date, new_time), 0)
-            
-            if worker_count != 0:
-                new_i = i + 1  # (Is this variable used?)
-                timereq_dict[f"{i}-{hour}"] = worker_count
+        timereq_dict = {}
+        for i in range(day_num):
+            for hour in range(daily_slots):
+                if hour >= full_day +1:
+                    hour -= full_day + 1
+                    new_date = monday + datetime.timedelta(days=i+1) + datetime.timedelta(days=week_adjustment)
+                    quarter_hour = hour // hour_divider
+                    quarter_minute = (hour % hour_divider) * minutes
+                    formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+                    time = f'{formatted_time}:00'
+                    new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+                    hour += full_day + 1
+                else:
+                    new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+                    quarter_hour = hour // hour_divider
+                    quarter_minute = (hour % hour_divider) * minutes
+                    formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+                    time = f'{formatted_time}:00'
+                    new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+                
+                # Use dictionary for quick lookup
+                worker_count = time_req_lookup.get((new_date, new_time), 0)
+                
+                if worker_count != 0:
+                    new_i = i + 1  # (Is this variable used?)
+                    timereq_dict[f"{i}-{hour}"] = worker_count
+    else:
+        timereq_dict = None
 
 
     # Opening Dictionary
