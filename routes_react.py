@@ -530,34 +530,41 @@ def get_availability():
 
     # Create Drop Down Based Access Level
     if user.access_level == "User":
-        user_list = [f"{user.first_name}, {user.last_name}"]
+        user_list = [f"{user.first_name}, {user.last_name}, {user.email}"]
     else:
         company_users = User.query.filter_by(company_name=user.company_name).order_by(asc(User.last_name)).all()
-        user_list = [f"{user.first_name}, {user.last_name}" for user in company_users]
+        user_list = [f"{user.first_name}, {user.last_name}, {user.email}" for user in company_users]
     
 
 
     # Fetch all relevant Availability records in a single query
-    availabilities = Availability.query.filter(
-        Availability.email == user.email,
-        Availability.date.in_(dates),
-        Availability.weekday.in_(query_weekdays)
-    ).all()
+    fetched_user = request.args.get('selectedUser', '')
+    if fetched_user:
+        first_name, last_name, email = fetched_user.split(', ')
 
-    temp_dict = {}
-    availability_dict = {(av.date, av.weekday): av for av in availabilities}
-    
-    for i, date in enumerate(dates):
-        temp = availability_dict.get((date, weekdays[i]))
+        availabilities = Availability.query.filter(
+            Availability.email == email,
+            Availability.date.in_(dates),
+            Availability.weekday.in_(query_weekdays)
+        ).all()
+
+        temp_dict = {}
+        availability_dict = {(av.date, av.weekday): av for av in availabilities}
         
-        if temp:
-            new_i = i + 1
-            temp_dict[f"{new_i}&0"] = temp.start_time.strftime("%H:%M") if temp.start_time else None
-            temp_dict[f"{new_i}&1"] = temp.end_time.strftime("%H:%M") if temp.end_time else None
-            temp_dict[f"{new_i}&2"] = temp.start_time2.strftime("%H:%M") if temp.start_time2 else None
-            temp_dict[f"{new_i}&3"] = temp.end_time2.strftime("%H:%M") if temp.end_time2 else None
-            temp_dict[f"{new_i}&4"] = temp.start_time3.strftime("%H:%M") if temp.start_time3 else None
-            temp_dict[f"{new_i}&5"] = temp.end_time3.strftime("%H:%M") if temp.end_time3 else None
+        for i, date in enumerate(dates):
+            temp = availability_dict.get((date, weekdays[i]))
+            
+            if temp:
+                new_i = i + 1
+                temp_dict[f"{new_i}&0"] = temp.start_time.strftime("%H:%M") if temp.start_time else None
+                temp_dict[f"{new_i}&1"] = temp.end_time.strftime("%H:%M") if temp.end_time else None
+                temp_dict[f"{new_i}&2"] = temp.start_time2.strftime("%H:%M") if temp.start_time2 else None
+                temp_dict[f"{new_i}&3"] = temp.end_time2.strftime("%H:%M") if temp.end_time2 else None
+                temp_dict[f"{new_i}&4"] = temp.start_time3.strftime("%H:%M") if temp.start_time3 else None
+                temp_dict[f"{new_i}&5"] = temp.end_time3.strftime("%H:%M") if temp.end_time3 else None
+    else:
+        temp_dict = None
+
     
     #Save Availability
     if request.method == 'POST':
