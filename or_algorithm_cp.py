@@ -122,6 +122,7 @@ class ORAlgorithm_cp:
         self.subsequent_workingdays = None                  # 16
         self.daily_deployment = None                        # 17
         self.time_per_deployment = None                     # 18
+        self.benoetigte_skills = []                         # 19
 
         self.desired_max_time_day = None
         self.max_time_day = None
@@ -467,6 +468,28 @@ class ORAlgorithm_cp:
         if key in self.solver_requirements:
             self.time_per_deployment = self.solver_requirements[key]
 
+        # -- 19 ------------------------------------------------------------------------------------------------------------
+        # Alle Skills pro Woche die im Zeitraum benötigt werden in einer Liste zusammenfassen. 
+
+        # Initialisieren von self.benoetigte_skills als Liste von leeren Listen für jede Woche
+        self.benoetigte_skills = [[] for _ in range(self.week_timeframe)]
+
+        # Durchlaufen aller Skills und deren Verfügbarkeiten
+        for skill, verfuegbarkeiten in self.min_anwesend.items():
+            # Für jede "Woche" im gegebenen Zeitrahmen
+            for i in range(self.week_timeframe):
+                # Start- und Endindex für den 7-Tage-Zeitraum festlegen
+                start_index = i * 7
+                end_index = start_index + 7
+
+                # Durchlaufen der Verfügbarkeiten innerhalb des aktuellen 7-Tage-Zeitraums
+                for verfuegbarkeit in verfuegbarkeiten[start_index:end_index]:
+                    # Wenn zu irgendeinem Zeitpunkt in dieser Woche eine Verfügbarkeit besteht, Skill hinzufügen
+                    if verfuegbarkeit and skill not in self.benoetigte_skills[i]:
+                        self.benoetigte_skills[i].append(skill)
+                        break  # Innere Schleife beenden und mit dem nächsten Intervall fortfahren, da der Skill bereits hinzugefügt wurde
+
+
 
 
     def show_variables(self):
@@ -517,6 +540,7 @@ class ORAlgorithm_cp:
         print("16. self.subsequent_workingdays: ", self.subsequent_workingdays)
         print("17. self.daily_deployment: ", self.daily_deployment)
         print("18. self.time_per_deployment: ", self.time_per_deployment)
+        print("19. self.benoetigte_skills: ", self.benoetigte_skills)
 
 
     def pre_check_programmer(self):
@@ -837,17 +861,20 @@ class ORAlgorithm_cp:
 
         # Arbeitsvariable - Neue Dimension s hinzugefügt - 23.10.2023
 
-        benoetigte_skills = ["Koch"]
 
-        
+
         self.x = {}
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
-                    for s in benoetigte_skills:
-                        if s in self.mitarbeiter_s[i]:  # Dies stellt sicher, dass der Mitarbeiter den Skill tatsächlich hat
-                            self.x[i, j, k, s] = self.model.NewIntVar(0, 1, f'x[{i}, {j}, {k}, {s}]')
-                            print(self.x[i, j, k, s])
+                    woche = j // 7
+                    if self.benoetigte_skills[woche]: # Überprüfen ob es in der Woche einen Skilleintrag gibt
+                        for s in self.benoetigte_skills[woche]: # Die Skills in der richtigen Woche berücksichtigen
+                            if s in self.mitarbeiter_s[i]:  # Dies stellt sicher, dass der Mitarbeiter den Skill tatsächlich hat
+                                self.x[i, j, k, s] = self.model.NewIntVar(0, 1, f'x[{i}, {j}, {k}, {s}]')
+                                print(self.x[i, j, k, s])
+
+
 
 
         # Arbeitsblockvariable
