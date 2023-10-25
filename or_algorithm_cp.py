@@ -836,13 +836,18 @@ class ORAlgorithm_cp:
         """
 
         # Arbeitsvariable - Neue Dimension s hinzugefügt - 23.10.2023
+
+        benoetigte_skills = ["Koch"]
+
+        
         self.x = {}
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
-                    for s in self.skills:
+                    for s in benoetigte_skills:
                         if s in self.mitarbeiter_s[i]:  # Dies stellt sicher, dass der Mitarbeiter den Skill tatsächlich hat
                             self.x[i, j, k, s] = self.model.NewIntVar(0, 1, f'x[{i}, {j}, {k}, {s}]')
+                            print(self.x[i, j, k, s])
 
 
         # Arbeitsblockvariable
@@ -979,8 +984,6 @@ class ORAlgorithm_cp:
                         if s in self.mitarbeiter_s[i]:  # Überprüfen, ob der Mitarbeiter den Skill hat
                             self.cost_expressions.append(self.x[i, j, k, s] * int(self.kosten[i] / self.hour_devider))
 
-
-
         # Kosten Weiche NB1
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):
@@ -1066,7 +1069,7 @@ class ORAlgorithm_cp:
                 self.model.Add(self.a[i, j] <= sum_x)
         """
 
-        # 23.10.2023 - unabhängig vom Skill!!!!!!!!!!
+        # 23.10.2023 - unabhängig vom Skill!
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 for s in self.skills:
@@ -1090,15 +1093,14 @@ class ORAlgorithm_cp:
                     self.model.Add(self.x[i, j, k] <= self.verfügbarkeit[i][j][k])
         """
 
-        # 23.10.2023
+        # 23.10.2023 - FUNKTIONIERT 100%
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
                     for s in self.skills:
                         if s in self.mitarbeiter_s[i]:  # Prüfen, ob der Mitarbeiter den Skill hat
                             self.model.Add(self.x[i, j, k, s] <= self.verfügbarkeit[i][j][k])
-
-
+                            print("x", self.x[i, j, k, s], "<=", self.verfügbarkeit[i][j][k])
 
 
         # -------------------------------------------------------------------------------------------------------
@@ -1111,13 +1113,19 @@ class ORAlgorithm_cp:
                 self.model.Add(sum(self.x[i, j, k] for i in self.mitarbeiter) >= self.min_anwesend[j][k])
         """
 
-        # 22.10.2023
+        # 22.10.2023 FUNKTIONIERT 90%
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[next(iter(self.mitarbeiter_s))][j])):  # 1. Mitarbeiter aus dem Wörterbuch, Arbeitszeit für alle gleich
                 for s in self.skills:
+                    print("j, k, s", j, k ,s)
                     if k in self.min_anwesend[s][j]:  # Überprüfen Sie zuerst, ob k in self.min_anwesend[s][j] existiert
+                        print("Kakascheisse")
                         # Überprüfen ob der Mitarbeiter über den Skill verfügt der min_anwesend sein muss
                         self.model.Add(sum(self.x[i, j, k, s] for i in self.mitarbeiter if s in self.mitarbeiter_s[i]) >= self.min_anwesend[s][j][k])
+
+                        for i in self.mitarbeiter: 
+                            if s in self.mitarbeiter_s[i]:
+                                print(self.x[i, j, k, s], ">=", self.min_anwesend[s][j][k])
 
 
 
@@ -1330,6 +1338,8 @@ class ORAlgorithm_cp:
 
 
         # DAS MUSS SPÄTER ALLES NOCH GEÄNDERT WERDEN!!! (23.10.2023)
+
+        
         elif self.company_shifts == 2:
             for i in self.mitarbeiter:
                 for j in range(7):
@@ -1792,7 +1802,7 @@ class ORAlgorithm_cp:
         """
         In dieser Methode werden die Kosten der einzelnen Nebenbedingungen berechnet und ausgegeben
         """
-        # self.model.ExportToFile('slow_model.pb.txt')
+        self.model.ExportToFile('slow_model.pb.txt')
 
         """
         # ----------------------------------------------------------------
@@ -1801,6 +1811,7 @@ class ORAlgorithm_cp:
             for j in range(self.calc_time):
                 # Drucken Sie den Wert von s3[i, j]
                 print(f"s2[{i}][{j}] =", self.solver.Value(self.s2[i, j]))
+        """
 
         # Die Werte von a printen
         for i in self.mitarbeiter:
@@ -1808,7 +1819,16 @@ class ORAlgorithm_cp:
                 # Drucken Sie den Wert von a[i, j]
                 print(f"a[{i}][{j}] =", self.solver.Value(self.a[i, j]))
         # ----------------------------------------------------------------
-        """
+
+        # Die Werte von x printen
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                for k in range(len(self.verfügbarkeit[i][j])):
+                    for s in self.skills:
+                        if s in self.mitarbeiter_s[i]:  # Dies stellt sicher, dass der Mitarbeiter den Skill tatsächlich hat
+                            print(f"x[{i}][{j}][{k}][{s}] =", self.solver.Value(self.x[i, j, k, s]))
+
+
 
         # Kosten für die Einstellung von Mitarbeitern
         # self.hiring_costs = sum((self.kosten[i] / self.hour_devider) * self.solver.Value(self.x[i, j, k]) for i in self.mitarbeiter for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[i][j])))
