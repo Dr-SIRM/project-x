@@ -1449,7 +1449,6 @@ def get_required_workforce():
                                 creation_timestamp=creation_date
                             )
                             new_records.append(new_record)
-
             db.session.bulk_save_objects(new_records)
             db.session.commit()
 
