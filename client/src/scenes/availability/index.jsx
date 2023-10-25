@@ -53,7 +53,7 @@ const Availability = ({ availability }) => {
     const fetchAvailabilityData = async () => {
       setIsLoading(true);
         try {
-          const response = await axios.get(`${API_BASE_URL}/api/availability?week_adjustment=` + weekAdjustment, {
+          const response = await axios.get(`${API_BASE_URL}/api/availability?week_adjustment=${weekAdjustment}&selectedUser=${encodeURIComponent(selectedUser)}`, {
               headers: {
                   'Authorization': `Bearer ${token}`
               }
@@ -68,7 +68,7 @@ const Availability = ({ availability }) => {
     };
 
     fetchAvailabilityData();
-}, [weekAdjustment, token]);
+}, [weekAdjustment, token, selectedUser]);
 
 useEffect(() => {
   if (availabilityData.temp_dict) {
@@ -114,7 +114,7 @@ useEffect(() => {
 
     try {
       // Send the updated form values to the server for database update
-      await axios.post(`${API_BASE_URL}/api/availability?week_adjustment=` + weekAdjustment, payload, {
+      await axios.post(`${API_BASE_URL}/api/availability?week_adjustment=${weekAdjustment}&selectedUser=${encodeURIComponent(selectedUser)}`, payload, {
     headers: {
         'Authorization': `Bearer ${token}`
         }
