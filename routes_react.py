@@ -1809,10 +1809,39 @@ def user_management():
             'id': user.id,
             'first_name': user.first_name,
             'last_name': user.last_name,
+            'email': user.email,
         }
         to_dict.append(user_dict)  # Append each user_dict to to_dict list
-    print(to_dict)
     return jsonify(users=to_dict)  # Return all user data as a JSON response
 
 
+@app.route('/api/user_availability/<string:email>', methods=['GET'])
+@jwt_required()
+def user_availability(email):
+    dates = request.args.getlist('dates')  # Assuming dates are passed as query params
+    query_weekdays = request.args.getlist('weekdays')  # Assuming weekdays are passed as query params
+    
+    availabilities = Availability.query.filter(
+        Availability.email == email
+    ).all()
 
+    
+    availability_data = []
+    for availability in availabilities:
+        availability_dict = {
+            'weekday': availability.weekday,
+            'start_time': availability.start_time.strftime('%H:%M:%S'),
+            'end_time': availability.end_time.strftime('%H:%M:%S'),
+            # Including the additional times as you've mentioned
+            'start_time2': availability.start_time2.strftime('%H:%M:%S') if availability.start_time2 else None,
+            'end_time2': availability.end_time2.strftime('%H:%M:%S') if availability.end_time2 else None,
+            'start_time3': availability.start_time3.strftime('%H:%M:%S') if availability.start_time3 else None,
+            'end_time3': availability.end_time3.strftime('%H:%M:%S') if availability.end_time3 else None
+        }
+        availability_data.append(availability_dict)
+    print(availability_data)
+    print(f'dates: {dates}')
+    print(f'query_weekdays: {query_weekdays}')
+    print(f'availabilities: {availabilities}')
+
+    return jsonify(availability=availability_data)

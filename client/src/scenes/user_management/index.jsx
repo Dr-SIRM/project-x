@@ -18,6 +18,7 @@ const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [availability, setAvailability] = useState([]);
   const token = localStorage.getItem('session_token'); 
 
   const theme = useTheme();
@@ -44,6 +45,25 @@ const UserManagement = () => {
     fetchUser();
   }, []);
 
+    const fetchAvailability = async (email) => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/api/user_availability/${email}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        setAvailability(response.data.availability);
+      } catch (error) {
+        console.error('Error fetching availability:', error);
+      }
+  };
+
+  const handleUserClick = (user) => {
+      setSelectedUser(user);
+      fetchAvailability(user.email);  // passing email instead of user.id
+  };
+
+
   return (
     <Box sx={{ p: 3 }}>
       <Header title="User Management " subtitle="Siehe die Mitarbeiter Details" />
@@ -61,16 +81,15 @@ const UserManagement = () => {
           >
             <List>
               {users.map((user) => (
-                <ListItem button key={user.id} onClick={() => setSelectedUser(user)}>
-                  <Chip
-                    avatar={<Avatar>{`${user.first_name.charAt(0)}${user.last_name.charAt(0)}`}</Avatar>}
-                    label={`${user.first_name} ${user.last_name}`}
-                    onClick={() => setSelectedUser(user)}
-                    sx={{ '&:hover': { backgroundColor: '#f0f0f0' }, color: 'black' }}
-                  />
-                </ListItem>
+                  <ListItem button key={user.id} onClick={() => handleUserClick(user)}>
+                      <Chip
+                          avatar={<Avatar>{`${user.first_name.charAt(0)}${user.last_name.charAt(0)}`}</Avatar>}
+                          label={`${user.first_name} ${user.last_name}`}
+                          sx={{ '&:hover': { backgroundColor: '#f0f0f0' }, color: 'black' }}
+                      />
+                  </ListItem>
               ))}
-            </List>
+          </List>
           </Box>
         </Grid>
         <Grid item xs={12} sm={5}>
@@ -83,7 +102,11 @@ const UserManagement = () => {
             p={2}  // Adjust padding as needed
             width="100%"  // Let the box take the full width of its grid item
           >
-            {/* Content for Verfügbarkeit */}
+            {availability.map((avail, index) => (
+              <Typography key={index} variant="body1">
+                {`${avail.weekday}: ${avail.start_time} - ${avail.end_time}`}
+              </Typography>
+            ))}
           </Box>
         </Grid>
         <Grid item xs={12} sm={5}>
