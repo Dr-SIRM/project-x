@@ -187,8 +187,8 @@ def update_user(user_id):
     user.email = data.get('email', user.email)
     user.department = data.get('department', user.department)
     user.department2 = data.get('department2', user.department2)
-    user.department3 = data.get('department2', user.department3)
-    
+    user.department3 = data.get('department3', user.department3)
+
     # Convert the employment_level to its original range [0, 1] before saving
     employment_level_percentage = data.get('employment_level')
     if employment_level_percentage is not None:
