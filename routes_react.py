@@ -119,6 +119,29 @@ def get_data():
     # Get the company name of the current logged-in user
     current_company_name = current_user.company_name
 
+    # Query the Company model to get the company data
+    company = Company.query.filter_by(company_name=current_company_name).first()
+
+    if company is None:
+        return jsonify({"message": "Company not found"}), 404
+
+    # Extract the department names from the company data
+    departments = [
+        company.department,
+        company.department2,
+        company.department3,
+        company.department4,
+        company.department5,
+        company.department6,
+        company.department7,
+        company.department8,
+        company.department9,
+        company.department10,
+    ]
+
+    # Filter out any None values from the departments list
+    departments = [dept for dept in departments if dept is not None]
+
     # Query users who are members of the same company
     users = User.query.filter_by(company_name=current_company_name).all()
 
@@ -137,13 +160,22 @@ def get_data():
         }
         user_list.append(user_dict)
 
-    return jsonify(user_list) 
+    # Create a response dictionary to hold both the user data and the department data
+    response_dict = {
+        'users': user_list,
+        'departments': departments
+    }
+
+    print(response_dict)
+    return jsonify(response_dict)
+
 
 @app.route('/api/users/update/<int:user_id>', methods=['PUT'])
 @jwt_required()
 def update_user(user_id):
     data = request.get_json()
     user = User.query.get(user_id)
+    
 
     if user is None:
         return jsonify({"message": "User not found"}), 404
@@ -151,7 +183,6 @@ def update_user(user_id):
     user.first_name = data.get('first_name', user.first_name)
     user.last_name = data.get('last_name', user.last_name)
     user.email = data.get('email', user.email)
-    user.employment = data.get('employment', user.employment)
     user.department = data.get('department', user.department)
     
     # Convert the employment_level to its original range [0, 1] before saving
@@ -159,8 +190,6 @@ def update_user(user_id):
     if employment_level_percentage is not None:
         user.employment_level = employment_level_percentage / 100.0
     
-    
-
     try:
         db.session.commit()
         return jsonify({"message": "User updated"}), 200
@@ -532,41 +561,34 @@ def get_availability():
 
     # Create Drop Down Based Access Level
     if user.access_level == "User":
-        user_list = [f"{user.first_name}, {user.last_name}, {user.email}"]
+        user_list = [f"{user.first_name}, {user.last_name}"]
     else:
         company_users = User.query.filter_by(company_name=user.company_name).order_by(asc(User.last_name)).all()
-        user_list = [f"{user.first_name}, {user.last_name}, {user.email}" for user in company_users]
+        user_list = [f"{user.first_name}, {user.last_name}" for user in company_users]
     
 
 
     # Fetch all relevant Availability records in a single query
-    fetched_user = request.args.get('selectedUser', '')
-    if fetched_user:
-        first_name, last_name, email = fetched_user.split(', ')
+    availabilities = Availability.query.filter(
+        Availability.email == user.email,
+        Availability.date.in_(dates),
+        Availability.weekday.in_(query_weekdays)
+    ).all()
 
-        availabilities = Availability.query.filter(
-            Availability.email == email,
-            Availability.date.in_(dates),
-            Availability.weekday.in_(query_weekdays)
-        ).all()
-
-        temp_dict = {}
-        availability_dict = {(av.date, av.weekday): av for av in availabilities}
+    temp_dict = {}
+    availability_dict = {(av.date, av.weekday): av for av in availabilities}
+    
+    for i, date in enumerate(dates):
+        temp = availability_dict.get((date, weekdays[i]))
         
-        for i, date in enumerate(dates):
-            temp = availability_dict.get((date, weekdays[i]))
-            
-            if temp:
-                new_i = i + 1
-                temp_dict[f"{new_i}&0"] = temp.start_time.strftime("%H:%M") if temp.start_time else None
-                temp_dict[f"{new_i}&1"] = temp.end_time.strftime("%H:%M") if temp.end_time else None
-                temp_dict[f"{new_i}&2"] = temp.start_time2.strftime("%H:%M") if temp.start_time2 else None
-                temp_dict[f"{new_i}&3"] = temp.end_time2.strftime("%H:%M") if temp.end_time2 else None
-                temp_dict[f"{new_i}&4"] = temp.start_time3.strftime("%H:%M") if temp.start_time3 else None
-                temp_dict[f"{new_i}&5"] = temp.end_time3.strftime("%H:%M") if temp.end_time3 else None
-    else:
-        temp_dict = None
-
+        if temp:
+            new_i = i + 1
+            temp_dict[f"{new_i}&0"] = temp.start_time.strftime("%H:%M") if temp.start_time else None
+            temp_dict[f"{new_i}&1"] = temp.end_time.strftime("%H:%M") if temp.end_time else None
+            temp_dict[f"{new_i}&2"] = temp.start_time2.strftime("%H:%M") if temp.start_time2 else None
+            temp_dict[f"{new_i}&3"] = temp.end_time2.strftime("%H:%M") if temp.end_time2 else None
+            temp_dict[f"{new_i}&4"] = temp.start_time3.strftime("%H:%M") if temp.start_time3 else None
+            temp_dict[f"{new_i}&5"] = temp.end_time3.strftime("%H:%M") if temp.end_time3 else None
     
     #Save Availability
     if request.method == 'POST':
@@ -576,8 +598,8 @@ def get_availability():
             if user_selection == "":
                 new_user = user
             else:
-                first_name, last_name, email = user_selection.split(', ')
-                new_user = User.query.filter_by(email=email).first()
+                first_name, last_name = user_selection.split(', ')
+                new_user = User.query.filter_by(first_name=first_name, last_name=last_name).first()
             
             new_entries = []
             
@@ -1288,45 +1310,40 @@ def get_required_workforce():
     
     # Pre-fetch all TimeReq for the given date range and company name
     end_date = week_start + datetime.timedelta(days=day_num)
-    fetched_department = request.args.get('selectedDepartment', '')
-    if fetched_department:
-        all_time_reqs = TimeReq.query.filter(
-            TimeReq.company_name == user.company_name,
-            TimeReq.department == fetched_department,
-            TimeReq.date.between(week_start, end_date)
-        ).all()
+    all_time_reqs = TimeReq.query.filter(
+        TimeReq.company_name == user.company_name,
+        TimeReq.date.between(week_start, end_date)
+    ).all()
 
-        # Convert all_time_reqs to a dictionary for quick lookup
-        time_req_lookup = {(rec.date, rec.start_time): rec.worker for rec in all_time_reqs}
+    # Convert all_time_reqs to a dictionary for quick lookup
+    time_req_lookup = {(rec.date, rec.start_time): rec.worker for rec in all_time_reqs}
 
-        timereq_dict = {}
-        for i in range(day_num):
-            for hour in range(daily_slots):
-                if hour >= full_day +1:
-                    hour -= full_day + 1
-                    new_date = monday + datetime.timedelta(days=i+1) + datetime.timedelta(days=week_adjustment)
-                    quarter_hour = hour // hour_divider
-                    quarter_minute = (hour % hour_divider) * minutes
-                    formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
-                    time = f'{formatted_time}:00'
-                    new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
-                    hour += full_day + 1
-                else:
-                    new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
-                    quarter_hour = hour // hour_divider
-                    quarter_minute = (hour % hour_divider) * minutes
-                    formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
-                    time = f'{formatted_time}:00'
-                    new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
-                
-                # Use dictionary for quick lookup
-                worker_count = time_req_lookup.get((new_date, new_time), 0)
-                
-                if worker_count != 0:
-                    new_i = i + 1  # (Is this variable used?)
-                    timereq_dict[f"{i}-{hour}"] = worker_count
-    else:
-        timereq_dict = None
+    timereq_dict = {}
+    for i in range(day_num):
+        for hour in range(daily_slots):
+            if hour >= full_day +1:
+                hour -= full_day + 1
+                new_date = monday + datetime.timedelta(days=i+1) + datetime.timedelta(days=week_adjustment)
+                quarter_hour = hour // hour_divider
+                quarter_minute = (hour % hour_divider) * minutes
+                formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+                time = f'{formatted_time}:00'
+                new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+                hour += full_day + 1
+            else:
+                new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
+                quarter_hour = hour // hour_divider
+                quarter_minute = (hour % hour_divider) * minutes
+                formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+                time = f'{formatted_time}:00'
+                new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+            
+            # Use dictionary for quick lookup
+            worker_count = time_req_lookup.get((new_date, new_time), 0)
+            
+            if worker_count != 0:
+                new_i = i + 1  # (Is this variable used?)
+                timereq_dict[f"{i}-{hour}"] = worker_count
 
 
     # Opening Dictionary
@@ -1450,6 +1467,7 @@ def get_required_workforce():
                                 creation_timestamp=creation_date
                             )
                             new_records.append(new_record)
+
             db.session.bulk_save_objects(new_records)
             db.session.commit()
 
