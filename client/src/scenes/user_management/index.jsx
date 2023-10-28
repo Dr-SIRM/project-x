@@ -13,7 +13,10 @@ import { DataGrid } from '@mui/x-data-grid';
 import Header from '../../components/Header';
 import { tokens } from '../../theme';
 import { API_BASE_URL } from '../../config';
-import axios from 'axios';  
+import axios from 'axios'; 
+import { useTranslation } from 'react-i18next';
+import '../../i18n';  // Import the i18n configuration
+ 
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -23,6 +26,7 @@ const UserManagement = () => {
   const token = localStorage.getItem('session_token');
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const { t, i18n } = useTranslation();
 
 
   useEffect(() => {
@@ -67,11 +71,11 @@ const UserManagement = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Header title="User Management " subtitle="Siehe die Mitarbeiter Details" />
+      <Header title={t('UserManagement')} subtitle={t('SeeEmployeeDetails')} />
       <Grid container spacing={4}>
         <Grid item xs={12} sm={2}>
           <Typography variant="h5" gutterBottom>
-            Mitarbeiter Liste
+           {t('EmployeeList')}
           </Typography>
           {/* Updated Box styling */}
           <Box
@@ -81,21 +85,25 @@ const UserManagement = () => {
             width="fit-content"  // Let the box fit its content
           >
             <List>
-              {users.map((user) => (
-                  <ListItem button key={user.id} onClick={() => handleUserClick(user)}>
-                      <Chip
-                          avatar={<Avatar>{`${user.first_name.charAt(0)}${user.last_name.charAt(0)}`}</Avatar>}
-                          label={`${user.first_name} ${user.last_name}`}
-                          sx={{ '&:hover': { backgroundColor: '#f0f0f0' }, color: 'black' }}
-                      />
-                  </ListItem>
-              ))}
+            {users.map((user) => (
+              <ListItem button key={user.id} onClick={() => handleUserClick(user)}>
+                <Chip
+                  avatar={<Avatar>{`${user.first_name.charAt(0)}${user.last_name.charAt(0)}`}</Avatar>}
+                  label={`${user.first_name} ${user.last_name}`}
+                  sx={{ 
+                    '&:hover': { backgroundColor: '#f0f0f0' }, 
+                    color: 'black',
+                    backgroundColor: selectedUser && selectedUser.id === user.id ? '#22E3B6' : 'transparent',  // Change 'blue' to any color you prefer
+                  }}
+                />
+              </ListItem>
+            ))}
           </List>
           </Box>
         </Grid>
         <Grid item xs={12} sm={5}>
           <Typography variant="h5" gutterBottom>
-            Verfügbarkeit
+            {t('Availability')}
           </Typography>
           <Box
             backgroundColor={colors.grey[900]}
@@ -111,10 +119,10 @@ const UserManagement = () => {
               getRowId={(row) => row.weekday}  // or use any other unique value
               hideFooterPagination
               hideFooter
-              columns={[
-                { field: 'weekday', headerName: 'Weekday', flex: 1 },
-                { field: 'start_time', headerName: 'Start Time', flex: 1 },
-                { field: 'end_time', headerName: 'End Time', flex: 1 }
+              columns = {[
+                { field: 'weekday', headerName: t('weekday'), flex: 1 },
+                { field: 'start_time', headerName: t('startTime'), flex: 1 },
+                { field: 'end_time', headerName: t('endTime'), flex: 1 }
               ]}
             />
 
@@ -123,7 +131,7 @@ const UserManagement = () => {
         </Grid>
         <Grid item xs={12} sm={5}>
           <Typography variant="h5" gutterBottom>
-            Geplante Schichten
+           {t('ScheduledShifts')}
           </Typography>
           <Box
             backgroundColor={colors.grey[900]}
@@ -131,6 +139,20 @@ const UserManagement = () => {
             p={2}  // Adjust padding as needed
             width="100%"  // Let the box take the full width of its grid item
           >
+            <DataGrid
+              style={{ color: "black" }}
+              rows={availability}
+              pageSize={5}
+              rowsPerPageOptions={[5]}
+              getRowId={(row) => row.weekday}  // or use any other unique value
+              hideFooterPagination
+              hideFooter
+              columns = {[
+                { field: 'weekday', headerName: t('weekday'), flex: 1 },
+                { field: 'start_time', headerName: t('startTime'), flex: 1 },
+                { field: 'end_time', headerName: t('endTime'), flex: 1 }
+              ]}
+            />
             {/* Content for Geplante Schichten */}
           </Box>
         </Grid>

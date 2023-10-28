@@ -1,18 +1,16 @@
-import { Box, IconButton, useTheme, Popover, Typography, Link } from "@mui/material";
+import { Box, IconButton, useTheme, Popover, Typography, Link, MenuItem, Menu } from "@mui/material";
 import { useContext, useState } from "react";
 import { ColorModeContext, tokens } from "../../theme";
 import InputBase from "@mui/material/InputBase";
-import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
-import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import LogoutIcon from "@mui/icons-material/Logout";
-import SettingsIcon from '@mui/icons-material/Settings';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import UpdateIcon from '@mui/icons-material/Update';
-import LockOpenIcon from '@mui/icons-material/LockOpen';
 import { AuthContext } from "../../AuthContext";
 import { API_BASE_URL } from "../../config";
+import { useTranslation } from 'react-i18next';
+import LanguageIcon from '@mui/icons-material/Language';
+
+
 
 const Topbar = () => {
   const theme = useTheme();
@@ -20,7 +18,7 @@ const Topbar = () => {
   const colorMode = useContext(ColorModeContext);
   const authContext = useContext(AuthContext);
   const { logout } = authContext;
-
+  const { t, i18n } = useTranslation();
   const [isLogoutHovered, setIsLogoutHovered] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [notificationsAnchor, setNotificationsAnchor] = useState(null);
@@ -45,6 +43,24 @@ const Topbar = () => {
     setIsNotificationsOpen(false);
   };
 
+  //Language change const
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLanguageChange = (lang) => {
+    i18n.changeLanguage(lang);
+    console.log('Language changed to:', lang);
+    handleClose();
+  };
+  
+
   return (
     <Box
       display="flex"
@@ -68,6 +84,21 @@ const Topbar = () => {
       {/* ICONS */}
       <Box justifyContent="flex-end" sx={{ width: "960px", display: "flex" }}>
         
+        <IconButton onClick={handleClick} color="inherit" style={{ color: 'black' }}>
+          <LanguageIcon />
+        </IconButton>
+
+
+        <Menu
+          anchorEl={anchorEl}
+          keepMounted
+          open={Boolean(anchorEl)}
+          onClose={handleClose}
+        >
+          <MenuItem onClick={() => handleLanguageChange('de')}>DE</MenuItem>
+          <MenuItem onClick={() => handleLanguageChange('en')}>EN</MenuItem>
+        </Menu>
+
         <IconButton onClick={handleNotificationsClick} sx={{ color: "black" }}>
           <NotificationsOutlinedIcon />
         </IconButton>
