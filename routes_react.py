@@ -1840,8 +1840,6 @@ def user_availability(email):
         }
         availability_data.append(availability_dict)
     print(availability_data)
-    print(f'dates: {dates}')
-    print(f'query_weekdays: {query_weekdays}')
-    print(f'availabilities: {availabilities}')
+
 
     return jsonify(availability=availability_data)

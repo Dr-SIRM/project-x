@@ -103,8 +103,9 @@ const UserManagement = () => {
             width="100%"  // Let the box take the full width of its grid item
           >
             {availability.map((avail, index) => (
-              <Typography key={index} variant="body1">
+              <Typography key={index} variant="body1" color={'black'}>
                 {`${avail.weekday}: ${avail.start_time} - ${avail.end_time}`}
+                
               </Typography>
             ))}
           </Box>
