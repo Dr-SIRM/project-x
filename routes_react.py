@@ -1818,8 +1818,8 @@ def user_management():
 @app.route('/api/user_availability/<string:email>', methods=['GET'])
 @jwt_required()
 def user_availability(email):
-    dates = request.args.getlist('dates')  # Assuming dates are passed as query params
-    query_weekdays = request.args.getlist('weekdays')  # Assuming weekdays are passed as query params
+    # dates = request.args.getlist('dates')  # Assuming dates are passed as query params
+    # query_weekdays = request.args.getlist('weekdays')  # Assuming weekdays are passed as query params
     
     availabilities = Availability.query.filter(
         Availability.email == email

@@ -9,6 +9,7 @@ import {
   Avatar,
   useTheme,
 } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
 import Header from '../../components/Header';
 import { tokens } from '../../theme';
 import { API_BASE_URL } from '../../config';
@@ -19,10 +20,10 @@ const UserManagement = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [availability, setAvailability] = useState([]);
-  const token = localStorage.getItem('session_token'); 
-
+  const token = localStorage.getItem('session_token');
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -102,13 +103,23 @@ const UserManagement = () => {
             p={2}  // Adjust padding as needed
             width="100%"  // Let the box take the full width of its grid item
           >
-            {availability.map((avail, index) => (
-              <Typography key={index} variant="body1" color={'black'}>
-                {`${avail.weekday}: ${avail.start_time} - ${avail.end_time}`}
-                
-              </Typography>
-            ))}
+            <DataGrid
+              style={{ color: "black" }}
+              rows={availability}
+              pageSize={5}
+              rowsPerPageOptions={[5]}
+              getRowId={(row) => row.weekday}  // or use any other unique value
+              hideFooterPagination
+              hideFooter
+              columns={[
+                { field: 'weekday', headerName: 'Weekday', flex: 1 },
+                { field: 'start_time', headerName: 'Start Time', flex: 1 },
+                { field: 'end_time', headerName: 'End Time', flex: 1 }
+              ]}
+            />
+
           </Box>
+
         </Grid>
         <Grid item xs={12} sm={5}>
           <Typography variant="h5" gutterBottom>
