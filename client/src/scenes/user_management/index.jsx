@@ -48,7 +48,7 @@ const UserManagement = () => {
     <Box sx={{ p: 3 }}>
       <Header title="User Management " subtitle="Siehe die Mitarbeiter Details" />
       <Grid container spacing={4}>
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={2}>
           <Typography variant="h5" gutterBottom>
             Mitarbeiter Liste
           </Typography>
@@ -73,23 +73,36 @@ const UserManagement = () => {
             </List>
           </Box>
         </Grid>
-        <Grid item xs={12} sm={8}>
+        <Grid item xs={12} sm={5}>
           <Typography variant="h5" gutterBottom>
-            Mitarbeiter Details
+            Verfügbarkeit
           </Typography>
-          {selectedUser ? (
-            <Typography sx={{ color: 'black' }} variant="body1">
-              {`${selectedUser.first_name} ${selectedUser.last_name}`}
-            </Typography>
-          ) : (
-            <Typography variant="body1">
-              Please select a user to view details.
-            </Typography>
-          )}
+          <Box
+            backgroundColor={colors.grey[900]}
+            borderRadius="15px"
+            p={2}  // Adjust padding as needed
+            width="100%"  // Let the box take the full width of its grid item
+          >
+            {/* Content for Verfügbarkeit */}
+          </Box>
+        </Grid>
+        <Grid item xs={12} sm={5}>
+          <Typography variant="h5" gutterBottom>
+            Geplante Schichten
+          </Typography>
+          <Box
+            backgroundColor={colors.grey[900]}
+            borderRadius="15px"
+            p={2}  // Adjust padding as needed
+            width="100%"  // Let the box take the full width of its grid item
+          >
+            {/* Content for Geplante Schichten */}
+          </Box>
         </Grid>
       </Grid>
     </Box>
   );
+
 };
 
 export default UserManagement;
