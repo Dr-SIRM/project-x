@@ -576,8 +576,8 @@ def get_availability():
             if user_selection == "":
                 new_user = user
             else:
-                first_name, last_name = user_selection.split(', ')
-                new_user = User.query.filter_by(first_name=first_name, last_name=last_name).first()
+                first_name, last_name, email = user_selection.split(', ')
+                new_user = User.query.filter_by(email=email).first()
             
             new_entries = []
             
@@ -1450,7 +1450,6 @@ def get_required_workforce():
                                 creation_timestamp=creation_date
                             )
                             new_records.append(new_record)
-
             db.session.bulk_save_objects(new_records)
             db.session.commit()
 

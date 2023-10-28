@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTheme, Box, Button, TextField, Snackbar, Typography, ButtonGroup, IconButton } from "@mui/material";
-import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
+import { Select, MenuItem, FormControl, InputLabel, Checkbox } from "@mui/material";
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -44,6 +44,7 @@ const Availability = ({ availability }) => {
   const [activeTemplateData, setActiveTemplateData] = useState({});
   const [selectedUser, setSelectedUser] = useState('');
   const [user_list, setUserList] = useState([]);
+  const [checkedBoxes, setCheckedBoxes] = useState([]);
 
   useEffect(() => {
     setActiveTemplateData(availabilityData.temp_dict);
@@ -88,7 +89,7 @@ useEffect(() => {
 
 
   const handleAddTime = () => {
-    if (additionalTimes < 2) {
+    if (additionalTimes < 1) {
       setAdditionalTimes(additionalTimes + 1);
     }
   };
@@ -100,6 +101,20 @@ useEffect(() => {
   const goToPreviousWeek = () => {
     setWeekAdjustment(weekAdjustment - 7);
   };
+
+  const handleCheckboxChange = (index, isChecked) => {
+    let updatedBoxes = [...checkedBoxes];
+
+    if (isChecked) {
+        updatedBoxes.push(index);
+        // Send data to server here
+        // For instance: sendDataToServer(index);
+    } else {
+        updatedBoxes = updatedBoxes.filter(item => item !== index);
+    }
+
+    setCheckedBoxes(updatedBoxes);
+  };
   
 
   const handleFormSubmit = async (values, buttonName) => {
@@ -109,7 +124,7 @@ useEffect(() => {
         values[key] = '00:00';
       }
     });
-    const payload = { ...values, button: buttonName, selectedTemplate, selectedUser };
+    const payload = { ...values, button: buttonName, selectedTemplate, selectedUser, checkedBoxes };
     console.log("Final payload before sending to server:", payload);
 
     try {
@@ -414,6 +429,18 @@ useEffect(() => {
           display: "flex",
           alignItems: "center",
           height: "100%",
+          justifyContent: "center",
+        }}
+      >
+        Ferien
+      </Typography>
+      <Typography
+        variant="h6"
+        sx={{
+          gridColumn: "span 1",
+          display: "flex",
+          alignItems: "center",
+          height: "100%",
         }}
       >
         Startzeit 1
@@ -455,32 +482,7 @@ useEffect(() => {
           </Typography>
         </>
       )}
-      {additionalTimes >= 2 && (
-        <>
-          <Typography
-            variant="h6"
-            sx={{
-              gridColumn: "span 1",
-              display: "flex",
-              alignItems: "center",
-              height: "100%",
-            }}
-          >
-            Start Time 3
-          </Typography>
-          <Typography
-            variant="h6"
-            sx={{
-              gridColumn: "span 1",
-              display: "flex",
-              alignItems: "center",
-              height: "100%",
-            }}
-          >
-            End Time 3
-          </Typography>
-        </>
-      )}
+      
       {Array.from({ length: availabilityData.day_num }).map((_, rowIndex) => (
         <Box
           display="grid"
@@ -506,6 +508,11 @@ useEffect(() => {
               ? availabilityData.weekdays[rowIndex]
               : ""}
           </Typography>
+          <Checkbox
+            checked={checkedBoxes.includes(rowIndex)}
+            onChange={(e) => handleCheckboxChange(rowIndex, e.target.checked)}
+            sx={{ gridColumn: "span 1" }}
+          />
           {Array.from({ length: 2 + additionalTimes * 2 }).map((_, columnIndex) => (
             <TextField
               key={`day_${rowIndex}_${columnIndex}`}

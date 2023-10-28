@@ -1,5 +1,5 @@
 from sqlalchemy import text, case
-from datetime import datetime, time
+from datetime import datetime, time, date
 from dateutil.relativedelta import relativedelta
 from collections import defaultdict
 from collections import OrderedDict
@@ -94,37 +94,59 @@ class DataProcessing:
 
 
     def get_availability(self):
-        """ In dieser Funktion wird user_id, date, start_time, end_time,
+        """ 
+        In dieser Funktion wird user_id, date, start_time, end_time,
         start_time2, end_time2, start_time3, und end_time3 aus der
         Availability Entität gezogen und in einer Liste gespeichert.
-        Key ist user_id """
+        Key ist user_id 
+        """
 
         print(f"Admin mit der User_id: {self.current_user_id} hat den Solve Button gedrückt.")
 
-        # company_name filtern aus der Datenkbank
+        # company_name filtern aus der Datenbank
         user = User.query.filter_by(id=self.current_user_id).first()
         company_name = user.company_name
 
-        users = User.query.filter_by(company_name=company_name).all()
-        user_ids = [user.id for user in users]
+        # Umwandlung der Datumsstrings in Datumsobjekte für die weitere Verarbeitung
+        start_date_obj = datetime.strptime(self.start_date, "%Y-%m-%d").date()
+        end_date_obj = datetime.strptime(self.end_date, "%Y-%m-%d").date()
 
-        availability = Availability.query.filter(
-            Availability.user_id.in_(user_ids),
+        # Erstellen einer Liste von Tagen im Bereich
+        date_range = [start_date_obj + timedelta(days=x) for x in range((end_date_obj - start_date_obj).days + 1)]
+
+        # Datenbankabfrage, um nur Benutzer mit Einträgen in der Verfügbarkeitstabelle abzurufen
+        user_ids_with_availability = db.session.query(Availability.user_id).filter(
             Availability.date.between(self.start_date, self.end_date)
-        ).all()
+        ).distinct().all()
 
-        times = [(record.user_id, record.date,
-              self.time_to_timedelta(record.start_time), self.time_to_timedelta(record.end_time),
-              self.time_to_timedelta(record.start_time2), self.time_to_timedelta(record.end_time2),
-              self.time_to_timedelta(record.start_time3), self.time_to_timedelta(record.end_time3))
-             for record in availability]
+        # Konvertieren von Ergebnissen in eine Liste von IDs
+        user_ids = [item[0] for item in user_ids_with_availability]
 
         user_availability = defaultdict(list)
-        for user_id, date, st1, et1, st2, et2, st3, et3 in times:
-            user_availability[user_id].append((date, st1, et1, st2, et2, st3, et3))
+        zero_time = timedelta(0)
 
-        for user_id, availabilities in user_availability.items():
-            user_availability[user_id] = sorted(availabilities, key=lambda x: x[0])
+        # Prüfen, ob jeder Benutzer und jeden Tag im Zeitraum die Verfügbarkeit hat
+        for user_id in user_ids:
+            for single_date in date_range:
+                # Versuchen Sie, für das aktuelle Datum einen Eintrag zu finden
+                availability_entry = Availability.query.filter_by(user_id=user_id, date=single_date).first()
+
+                if availability_entry:
+                    times = (self.time_to_timedelta(availability_entry.start_time),
+                            self.time_to_timedelta(availability_entry.end_time),
+                            self.time_to_timedelta(availability_entry.start_time2),
+                            self.time_to_timedelta(availability_entry.end_time2),
+                            self.time_to_timedelta(availability_entry.start_time3),
+                            self.time_to_timedelta(availability_entry.end_time3))
+                else:
+                    # Wenn kein Eintrag gefunden wird, verwenden Sie timedelta(0)
+                    times = (zero_time, zero_time, zero_time, zero_time, zero_time, zero_time)
+
+                # Fügen Sie die Zeiten für das aktuelle Datum dem user_availability-Dict hinzu
+                user_availability[user_id].append((single_date, *times))
+
+            # Sortieren Sie die Verfügbarkeiten für jeden Benutzer nach Datum
+            user_availability[user_id] = sorted(user_availability[user_id], key=lambda x: x[0])
 
         self.user_availability = user_availability
 

@@ -280,7 +280,7 @@ const TimeReq = ({ timereq }) => {
       payload["department"] = selectedDepartment;
       // Send the updated form values to the server for database update
       console.log("Final payload before sending to server:", payload);
-      await axios.post(`${API_BASE_URL}/api/requirement?week_adjustment=${weekAdjustment}&selectedDepartment=${encodeURIComponent(selectedDepartment)}`, payload, {
+      await axios.post(`${API_BASE_URL}/api/requirement/workforce?week_adjustment=${weekAdjustment}&selectedDepartment=${encodeURIComponent(selectedDepartment)}`, payload, {
     headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
