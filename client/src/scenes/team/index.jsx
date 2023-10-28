@@ -170,6 +170,52 @@ const handleDepartmentChange = async (event, id) => {
   }
 };
 
+const handleDepartment2Change = async (event, id) => {
+  const newValue = event.target.value;
+
+  try {
+    // Send the modified data to the server
+    await axios.put(`${API_BASE_URL}/api/users/update/${id}`, { department2: newValue }, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    // Re-fetch the data from the server
+    const response = await axios.get(`${API_BASE_URL}/api/users`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    setUsers(response.data.users);  // Update the users state with the fresh data from the server
+  } catch (error) {
+    console.error('Error updating user:', error);
+  }
+};
+const handleDepartment3Change = async (event, id) => {
+  const newValue = event.target.value;
+
+  try {
+    // Send the modified data to the server
+    await axios.put(`${API_BASE_URL}/api/users/update/${id}`, { department3: newValue }, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    // Re-fetch the data from the server
+    const response = await axios.get(`${API_BASE_URL}/api/users`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    setUsers(response.data.users);  // Update the users state with the fresh data from the server
+  } catch (error) {
+    console.error('Error updating user:', error);
+  }
+};
+
+
 
 
   if (isLoading) {
@@ -273,7 +319,7 @@ const handleDepartmentChange = async (event, id) => {
     {
       field: "department",
       headerName: "Abteilung",
-      flex: 1,
+      flex: 1.2,
       editable: false,
       renderCell: (params) => (
         <Select
@@ -302,6 +348,71 @@ const handleDepartmentChange = async (event, id) => {
         </Select>
       ),
     },
+    {
+      field: "department2",
+      headerName: "Abteilung 2",
+      flex: 1.2,
+      editable: false,
+      renderCell: (params) => (
+        <Select
+          value={params.value}  // this will be the current department2 for the user from the backend
+          onChange={(event) => handleDepartment2Change(event, params.id)}
+          sx={{
+            width: '100%',
+            backgroundColor: 'white !important',
+            '& .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+          }}
+        >
+          {/* Use the departments state to populate the dropdown */}
+          {departments.map((department) => (
+            <MenuItem key={department} value={department}>
+              {department}
+            </MenuItem>
+          ))}
+        </Select>
+      ),
+    },
+    {
+      field: "department3",
+      headerName: "Abteilung 3",
+      flex: 1.2,
+      editable: false,
+      renderCell: (params) => (
+        <Select
+          value={params.value}  // this will be the current department2 for the user from the backend
+          onChange={(event) => handleDepartment2Change(event, params.id)}
+          sx={{
+            width: '100%',
+            backgroundColor: 'white !important',
+            '& .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+          }}
+        >
+          {/* Use the departments state to populate the dropdown */}
+          {departments.map((department) => (
+            <MenuItem key={department} value={department}>
+              {department}
+            </MenuItem>
+          ))}
+        </Select>
+      ),
+    },
+    
     
     
     

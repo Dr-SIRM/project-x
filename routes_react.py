@@ -156,6 +156,8 @@ def get_data():
             'access_level': user.access_level,
             'employment': user.employment,
             'department': user.department,
+            'department2': user.department2,
+            'department3': user.department3,
             'employment_level': user.employment_level,
         }
         user_list.append(user_dict)
@@ -184,6 +186,8 @@ def update_user(user_id):
     user.last_name = data.get('last_name', user.last_name)
     user.email = data.get('email', user.email)
     user.department = data.get('department', user.department)
+    user.department2 = data.get('department2', user.department2)
+    user.department3 = data.get('department2', user.department3)
     
     # Convert the employment_level to its original range [0, 1] before saving
     employment_level_percentage = data.get('employment_level')
