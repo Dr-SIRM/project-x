@@ -8,6 +8,8 @@ import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import Header from "../../components/Header";
 import { ThreeDots } from "react-loader-spinner"; 
 import axios from "axios";
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+
 import { API_BASE_URL } from "../../config";
 
 
@@ -16,6 +18,8 @@ const Team = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [users, setUsers] = useState([]);
+  const [departments, setDepartments] = useState([]);
+
   const [isLoading, setIsLoading] = useState(true);
   const token = localStorage.getItem('session_token'); 
   //const [userData, setUserData] = useState({});
@@ -30,7 +34,8 @@ const Team = () => {
           }
         });
   
-        setUsers(response.data);
+        setUsers(response.data.users);
+        setDepartments(response.data.departments);
         setIsLoading(false);
       } catch (error) {
         console.error('Error fetching update details:', error);
@@ -83,7 +88,7 @@ const Team = () => {
                 }
             });
             console.log('Server Response:', response);
-            setUsers(response.data);  // Update the users state with the fresh data from the server
+            setUsers(response.data.users);  // Update the users state with the fresh data from the server
 
         } catch (error) {
             console.error('Error updating user:', error);
@@ -110,7 +115,7 @@ const handleEmploymentLevelChange = async (event, id) => {
               'Authorization': `Bearer ${token}`
           }
       });
-      setUsers(response.data);  // Update the users state with the fresh data from the server
+      setUsers(response.data.users);  // Update the users state with the fresh data from the server
 
   } catch (error) {
       console.error('Error updating user:', error);
@@ -135,11 +140,81 @@ const handleEmploymentChange = async (event, id) => {
         'Authorization': `Bearer ${token}`
       }
     });
-    setUsers(response.data);  // Update the users state with the fresh data from the server
+    setUsers(response.data.users);  // Update the users state with the fresh data from the server
   } catch (error) {
     console.error('Error updating user:', error);
   }
 };
+
+const handleDepartmentChange = async (event, id) => {
+  const newValue = event.target.value;
+
+  try {
+      // Send the modified data to the server
+      await axios.put(`${API_BASE_URL}/api/users/update/${id}`, { department: newValue }, {
+          headers: {
+              'Authorization': `Bearer ${token}`
+          }
+      });
+
+      // Re-fetch the data from the server
+      const response = await axios.get(`${API_BASE_URL}/api/users`, {
+          headers: {
+              'Authorization': `Bearer ${token}`
+          }
+      });
+      setUsers(response.data.users);  // Update the users state with the fresh data from the server
+
+  } catch (error) {
+      console.error('Error updating user:', error);
+  }
+};
+
+const handleDepartment2Change = async (event, id) => {
+  const newValue = event.target.value;
+
+  try {
+    // Send the modified data to the server
+    await axios.put(`${API_BASE_URL}/api/users/update/${id}`, { department2: newValue }, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    // Re-fetch the data from the server
+    const response = await axios.get(`${API_BASE_URL}/api/users`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    setUsers(response.data.users);  // Update the users state with the fresh data from the server
+  } catch (error) {
+    console.error('Error updating user:', error);
+  }
+};
+const handleDepartment3Change = async (event, id) => {
+  const newValue = event.target.value;
+
+  try {
+    // Send the modified data to the server
+    await axios.put(`${API_BASE_URL}/api/users/update/${id}`, { department3: newValue }, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    // Re-fetch the data from the server
+    const response = await axios.get(`${API_BASE_URL}/api/users`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    setUsers(response.data.users);  // Update the users state with the fresh data from the server
+  } catch (error) {
+    console.error('Error updating user:', error);
+  }
+};
+
 
 
 
@@ -182,6 +257,7 @@ const handleEmploymentChange = async (event, id) => {
         <Select
           value={params.value === "Perm" ? "Vollzeit" : "Teilzeit"}
           onChange={(event) => handleEmploymentChange(event, params.id)}
+          icon={<ArrowDropDownIcon sx={{ color: 'black' }} />}
           sx={{
             width: '100%',
             backgroundColor: 'white !important',
@@ -239,16 +315,108 @@ const handleEmploymentChange = async (event, id) => {
         return modifiedValue;
       },
     },
-    
-    
-  
-  
+
     {
       field: "department",
       headerName: "Abteilung",
-      flex: 1,
-      editable: true,
+      flex: 1.2,
+      editable: false,
+      renderCell: (params) => (
+        <Select
+          value={params.value}  // this will be the current department for the user from the backend
+          onChange={(event) => handleDepartmentChange(event, params.id)}
+          sx={{
+            width: '100%',
+            backgroundColor: 'white !important',
+            '& .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+          }}
+        >
+          {/* Use the departments state to populate the dropdown */}
+          {departments.map((department) => (
+            <MenuItem key={department} value={department}>
+              {department}
+            </MenuItem>
+          ))}
+        </Select>
+      ),
     },
+    {
+      field: "department2",
+      headerName: "Abteilung 2",
+      flex: 1.2,
+      editable: false,
+      renderCell: (params) => (
+        <Select
+          value={params.value}  // this will be the current department2 for the user from the backend
+          onChange={(event) => handleDepartment2Change(event, params.id)}
+          sx={{
+            width: '100%',
+            backgroundColor: 'white !important',
+            '& .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+          }}
+        >
+          {/* Use the departments state to populate the dropdown */}
+          {departments.map((department) => (
+            <MenuItem key={department} value={department}>
+              {department}
+            </MenuItem>
+          ))}
+        </Select>
+      ),
+    },
+    {
+      field: "department3",
+      headerName: "Abteilung 3",
+      flex: 1.2,
+      editable: false,
+      renderCell: (params) => (
+        <Select
+          value={params.value}  // this will be the current department2 for the user from the backend
+          onChange={(event) => handleDepartment3Change(event, params.id)}
+          sx={{
+            width: '100%',
+            backgroundColor: 'white !important',
+            '& .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+          }}
+        >
+          {/* Use the departments state to populate the dropdown */}
+          {departments.map((department) => (
+            <MenuItem key={department} value={department}>
+              {department}
+            </MenuItem>
+          ))}
+        </Select>
+      ),
+    },
+    
+    
+    
+    
+
     {
       field: "access_level",
       headerName: "Zugriffslevel",
