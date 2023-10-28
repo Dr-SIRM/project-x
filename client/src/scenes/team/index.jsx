@@ -388,7 +388,7 @@ const handleDepartment3Change = async (event, id) => {
       renderCell: (params) => (
         <Select
           value={params.value}  // this will be the current department2 for the user from the backend
-          onChange={(event) => handleDepartment2Change(event, params.id)}
+          onChange={(event) => handleDepartment3Change(event, params.id)}
           sx={{
             width: '100%',
             backgroundColor: 'white !important',
