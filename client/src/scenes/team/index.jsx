@@ -142,7 +142,6 @@ const handleEmploymentChange = async (event, id) => {
 };
 
 
-
   if (isLoading) {
     return (
       <Box m="20px" display="flex" justifyContent="center" alignItems="center" height="100vh">
@@ -239,16 +238,14 @@ const handleEmploymentChange = async (event, id) => {
         return modifiedValue;
       },
     },
-    
-    
-  
-  
+
     {
       field: "department",
       headerName: "Abteilung",
       flex: 1,
       editable: true,
     },
+
     {
       field: "access_level",
       headerName: "Zugriffslevel",

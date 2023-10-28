@@ -152,13 +152,14 @@ def update_user(user_id):
     user.last_name = data.get('last_name', user.last_name)
     user.email = data.get('email', user.email)
     user.employment = data.get('employment', user.employment)
+    user.department = data.get('department', user.department)
     
     # Convert the employment_level to its original range [0, 1] before saving
     employment_level_percentage = data.get('employment_level')
     if employment_level_percentage is not None:
         user.employment_level = employment_level_percentage / 100.0
     
-    user.department = data.get('department', user.department)
+    
 
     try:
         db.session.commit()
