@@ -1790,3 +1790,29 @@ def get_excel():
     
     return send_file(output, as_attachment=True, download_name="Schichtplan.xlsx", mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
+
+@app.route('/api/user_management', methods=['GET'])
+@jwt_required()
+def user_management():  
+    react_user_email = get_jwt_identity()
+    current_user = User.query.filter_by(email=react_user_email).first()
+    
+    if current_user is None:
+        return jsonify({"message": "User not found"}), 404
+    
+    current_company_name = current_user.company_name
+    users = User.query.filter_by(company_name=current_company_name).all()
+
+    to_dict = []  # This will hold all user data
+    for user in users:
+        user_dict = {  # Create a dictionary for each user
+            'id': user.id,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+        }
+        to_dict.append(user_dict)  # Append each user_dict to to_dict list
+    print(to_dict)
+    return jsonify(users=to_dict)  # Return all user data as a JSON response
+
+
+

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './plan.css';
-import { Box, IconButton, Button, Typography } from "@mui/material";
+import { Box, IconButton, Button, Typography, Chip, Avatar } from "@mui/material";
 import Header from "../../components/Header";
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { ThreeDots } from "react-loader-spinner"; 
@@ -482,7 +482,19 @@ const handleExportToExcel = async () => {
             </div>
             {shifts.map((workerShift, index) => (
               <div key={index} className="gantt-row">
-                <div className="gantt-worker">{`${workerShift.first_name} ${workerShift.last_name}`}</div>
+                <Chip
+                  avatar={<Avatar>{`${workerShift.first_name.charAt(0)}${workerShift.last_name.charAt(0)}`}</Avatar>}
+                  label={
+                    // Updated line
+                    <div>
+                      <Typography variant="body2" display="block">
+                        {workerShift.first_name}
+                      </Typography>
+                    </div>
+                  }
+                  variant="outlined"
+                  sx={{ marginRight: '16px', padding: '15px', color: 'black'}}  // Adjusting the right margin
+                />
                 {renderShifts(workerShift)}
               </div>
             ))}
