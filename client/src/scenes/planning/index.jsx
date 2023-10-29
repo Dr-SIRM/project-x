@@ -516,7 +516,7 @@ const TimeReq = ({ timereq }) => {
                     flexDirection: 'column',
                     alignItems: 'center',
                     }}>
-              <Typography variant="h4" gutterBottom component="div">
+              <Typography variant="h5" gutterBottom component="div">
                 {timereqData.weekdays[columnIndex]}
               </Typography>
               <TextField 
@@ -532,7 +532,7 @@ const TimeReq = ({ timereq }) => {
                 variant="contained"
                 color="primary"
                 onClick={() => EnteredSlots(columnIndex)}
-                sx={{ marginBottom: '10px' }} // Adjust as needed
+                sx={{ marginBottom: '10px', marginTop: '10px' }} 
               >
                 Enter
               </Button>
