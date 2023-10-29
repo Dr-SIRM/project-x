@@ -441,6 +441,7 @@ class ORAlgorithm_cp:
         print("6. self.gerechte_verteilung: ", self.gerechte_verteilung)  
         print("Final total_hours_assigned: ", total_hours_assigned)
 
+
         # -- 15 ------------------------------------------------------------------------------------------------------------
         # Toleranz der gerechten Verteilung
         key = "fair_distribution"
@@ -522,6 +523,7 @@ class ORAlgorithm_cp:
         for key, value in self.verfügbarkeit.items():
             print("MA_id: ", key)
             print("Wert: ", value)
+        print(self.verfügbarkeit)
         print("3. self.kosten: ", self.kosten)
         print("4. self.max_zeit: ", self.max_zeit)
         print("5. self.min_zeit: ", self.min_zeit)
@@ -1077,7 +1079,6 @@ class ORAlgorithm_cp:
         Beschränkungen / Nebenbedingungen
         """
 
-        
         # -------------------------------------------------------------------------------------------------------
         # HARTE NB -- NEU 08.08.2023 --
         # NB 0 - Variable a ist 1, wenn der Mitarbeiter an einem Tag arbeitet, sonst 0
@@ -1118,6 +1119,7 @@ class ORAlgorithm_cp:
                     self.model.Add(self.x[i, j, k] <= self.verfügbarkeit[i][j][k])
         """
 
+
         # 23.10.2023 - FUNKTIONIERT 100%
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
@@ -1130,6 +1132,7 @@ class ORAlgorithm_cp:
                                 print("NB1: ", self.x[i, j, k, s], "<=", self.verfügbarkeit[i][j][k])
 
 
+
         # -------------------------------------------------------------------------------------------------------
         # HARTE NB
         # NB 2 - Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend
@@ -1140,32 +1143,23 @@ class ORAlgorithm_cp:
                 self.model.Add(sum(self.x[i, j, k] for i in self.mitarbeiter) >= self.min_anwesend[j][k])
         """
 
-        """
-        # 22.10.2023 FUNKTIONIERT 90%
-        for j in range(self.calc_time):
-            for k in range(len(self.verfügbarkeit[next(iter(self.mitarbeiter_s))][j])):  # 1. Mitarbeiter aus dem Wörterbuch, Arbeitszeit für alle gleich
-                for s in self.skills:
-                    if k in self.min_anwesend[s][j]:  # Überprüfen Sie zuerst, ob k in self.min_anwesend[s][j] existiert
-                        # Überprüfen ob der Mitarbeiter über den Skill verfügt der min_anwesend sein muss
-                        self.model.Add(sum(self.x[i, j, k, s] for i in self.mitarbeiter if s in self.mitarbeiter_s[i]) >= self.min_anwesend[s][j][k])
-        """
-
+        # 27.10.2023 FUNKTIONIERT 95%
         # Stellen Sie sicher, dass zu jeder Stunde eine Mindestanzahl von Mitarbeitern mit dem benötigten Skill anwesend ist
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[next(iter(self.mitarbeiter_s))][j])):  # Verwendung des ersten Mitarbeiters als Referenz
                 for s in self.skills:
                     # Existiert ein Eintrag für die aktuelle Stunde und den aktuellen Skill?
                     if k < len(self.min_anwesend[s][j]):  # Überprüfen, ob für diese spezifische Stunde Informationen vorhanden sind
-                        # Erhalten der Mindestanzahl von erforderlichen Mitarbeitern für diesen Zeitpunkt
-                        min_mitarbeiter = self.min_anwesend[s][j][k]
-                        
+
                         # Sammeln der Mitarbeiter, die den erforderlichen Skill haben
                         mitarbeiter_mit_skill = [i for i in self.mitarbeiter if s in self.mitarbeiter_s[i]]
+                        print(mitarbeiter_mit_skill)
 
                         # Bedingung: Die Anzahl der anwesenden Mitarbeiter muss größer oder gleich der Mindestanzahl sein
-                        self.model.Add(sum(self.x[i, j, k, s] for i in mitarbeiter_mit_skill) >= min_mitarbeiter)
+                        self.model.Add(sum(self.x[i, j, k, s] for i in mitarbeiter_mit_skill) >= self.min_anwesend[s][j][k])
+                        print("------")
                         for i in mitarbeiter_mit_skill:
-                            print("NB2: ", self.x[i, j, k, s], ">=", min_mitarbeiter)
+                            print("NB2: (Summe der Folgenden x) ", self.x[i, j, k, s], ">=", self.min_anwesend[s][j][k])
 
 
 
@@ -1194,7 +1188,7 @@ class ORAlgorithm_cp:
                 self.model.Add(sum(self.x[i, j, k] for i in self.mitarbeiter) - self.min_anwesend[j][k] <= self.nb1_violation[j, k])
         """
         
-        # 23.10.2023
+        # 23.10.2023 FUNKTIONIERT 95%
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[next(iter(self.mitarbeiter_s))][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
                 for s in self.skills:
@@ -1217,7 +1211,9 @@ class ORAlgorithm_cp:
                 self.model.Add(total_hours[ma] - self.weekly_hours <= self.nb2_violation[ma][1])
         """
 
-        # 26.10.2023 - FUNKTIONIERT??
+
+        # 26.10.2023 - FUNKTIONIERT 90%
+        # Für die erste Woche
         if self.week_timeframe == 1:
             # Berechnung der Gesamtstunden pro Mitarbeiter unter Berücksichtigung der benötigten Skills
             total_hours = {}
@@ -1320,6 +1316,7 @@ class ORAlgorithm_cp:
                     self.model.Add(sum(self.y[i, j, k] for k in range(len(self.verfügbarkeit[i][j]))) <= self.daily_deployment)
         """
 
+
         # 26.10.2023
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
@@ -1334,6 +1331,7 @@ class ORAlgorithm_cp:
 
                         # Filtern der Skills, um nur diejenigen zu behalten, die der Mitarbeiter hat und die für diese Woche benötigt werden
                         valid_skills = [s for s in needed_skills_this_week if s in self.mitarbeiter_s[i]]
+                        print(i, "valid_skills: ", valid_skills)
 
                         # Für die erste Stunde des Tages berechnen wir die Summe unter Berücksichtigung der gültigen Skills
                         self.model.Add(self.y[i, j, 0] >= sum(self.x[i, j, 0, s] for s in valid_skills))
