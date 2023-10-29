@@ -161,13 +161,7 @@ export const themeSettings = (mode) => {
           }),
     },
     components: {
-      MuiSelect: {
-        styleOverrides: {
-          select: {
-            backgroundColor: 'white',  // Set the background color of the selected value field to white
-          },
-        },
-      },
+
       MuiInputLabel: {
         styleOverrides: {
           root: { // this applies to the label element within the TextField
