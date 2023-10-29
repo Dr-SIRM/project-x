@@ -1,12 +1,27 @@
 {
-    "UserManagement": "User Management",
-    "SeeEmployeeDetails": "See the Employee Details",
-    "EmployeeList": "Employee List",
-    "Availability": "Availability",
-    "ScheduledShifts": "Scheduled Shifts",
-    "weekday": "Weekday",
-    "startTime": "Start Time",
-    "endTime": "End Time"
-    
+  "UserManagement": "User Management",
+  "SeeEmployeeDetails": "See the Employee Details",
+  "EmployeeList": "Employee List",
+  "Availability": "Availability",
+  "ScheduledShifts": "Scheduled Shifts",
+  "weekday": "Weekday",
+  "startTime": "Start Time",
+  "endTime": "End Time",
+  "dashboard": {
+    "title": "DASHBOARD",
+    "subtitle": "Welcome to the Dashboard",
+    "emailsSent": "Emails Sent",
+    "salesObtained": "Sales Obtained",
+    "mitarbeiter": "Employees",
+    "eingeplanteSchichten": "Scheduled Shifts",
+    "hoursWorked": "Hours Worked",
+    "nextShifts": "Next Shifts",
+    "workingNow": "Working Now",
+    "campaign": "Campaign",
+    "salesQuantity": "Sales Quantity",
+    "revenueGenerated": "Revenue Generated",
+    "includesExpenditures": "Includes extra misc expenditures and costs",
+    "hours": "hours",
+    "whosworking": "Who's working"
   }
-  
+}

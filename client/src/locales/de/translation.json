@@ -6,6 +6,25 @@
     "ScheduledShifts": "Geplante Schichten",
     "weekday": "Wochentag",
     "startTime": "Startzeit",
-    "endTime": "Endzeit"
+    "endTime": "Endzeit",
+
+    "dashboard": {
+      "title": "DASHBOARD",
+      "subtitle": "Willkommen auf dem Dashboard",
+      "emailsSent": "Gesendete E-Mails",
+      "salesObtained": "Erhaltene Verkäufe",
+      "mitarbeiter": "Mitarbeiter",
+      "eingeplanteSchichten": "Eingeplante Schichten",
+      "hoursWorked": "Stunden gearbeitet",
+      "nextShifts": "Nächste Schichten",
+      "workingNow": "Wer arbeitet gerade",
+      "campaign": "Kampagne",
+      "salesQuantity": "Verkaufsmenge",
+      "revenueGenerated": "Erzielte Einnahmen",
+      "includesExpenditures": "Beinhaltet zusätzliche diverse Ausgaben und Kosten",
+      "hours": "Stunden",
+      "whosworking": "Wer arbeitet gerade"
+    }
+    
   }
   

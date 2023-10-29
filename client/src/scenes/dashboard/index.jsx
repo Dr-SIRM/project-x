@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
 import { mockTransactions } from "../../data/mockData";
-import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
+
 import EmailIcon from "@mui/icons-material/Email";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
@@ -16,6 +16,8 @@ import ProgressCircle from "../../components/ProgressCircle";
 import { AuthContext } from "../../AuthContext";
 import { API_BASE_URL } from "../../config";
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
+import '../../i18n';  // Import the i18n configuration
 
 /* Mögliche Ideen fürs Dashboard
 - Anz gearbeitete Stunden diese Woche 
@@ -38,6 +40,7 @@ const Dashboard = () => {
   const [currentShifts, setCurrentShifts] = useState([]);
   const totalHoursWorked = (hoursWorkedData && Array.isArray(hoursWorkedData)) ? hoursWorkedData.reduce((sum, item) => sum + parseFloat(item.hours_worked), 0) : 0;
   const token = localStorage.getItem('session_token'); 
+  const { t, i18n } = useTranslation();
   
   useEffect(() => {
     const fetchData = async () => {
@@ -67,7 +70,7 @@ const Dashboard = () => {
     <Box m="20px">
       {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="DASHBOARD" subtitle="Willkomen auf dem Dashboard " />
+      <Header title={t('dashboard.title')} subtitle={t('dashboard.subtitle')} />
 
         <Box>
 {/*           <Button
@@ -103,7 +106,7 @@ const Dashboard = () => {
         >
           <StatBox
             title="12,361"
-            subtitle="Emails Sent"
+            subtitle={t('dashboard.emailsSent')}
             progress="0.75"
             increase="+14%"
             icon={
@@ -123,7 +126,7 @@ const Dashboard = () => {
         >
           <StatBox
             title="431,225"
-            subtitle="Sales Obtained"
+            subtitle={t('dashboard.salesObtained')}
             progress="0.50"
             increase="+21%"
             icon={
@@ -143,7 +146,7 @@ const Dashboard = () => {
         >
           <StatBox
             title={mitarbeiterCount ? mitarbeiterCount.toString() : 'Loading...'}
-            subtitle="Mitarbeiter"
+            subtitle={t('dashboard.mitarbeiter')}
             progress="0.50"
             increase="+5%"
             icon={
@@ -163,7 +166,7 @@ const Dashboard = () => {
         >
           <StatBox
             title={StartTimeCount}
-            subtitle="Eingeplante Schichten"
+            subtitle={t('dashboard.eingeplanteSchichten')}
             progress="0.80"
             increase="+43%"
             icon={
@@ -194,14 +197,14 @@ const Dashboard = () => {
                 fontWeight="600"
                 color={colors.grey[100]}
               >
-                Stunden gearbeitet
+                {t('dashboard.hoursWorked')}
               </Typography>
               <Typography
                 variant="h3"
                 fontWeight="bold"
                 color={colors.greenAccent[500]}
               >
-                {totalHoursWorked} Stunden
+                {totalHoursWorked} {t('dashboard.hours')}
               </Typography>
             </Box>
           </Box>
@@ -226,7 +229,7 @@ const Dashboard = () => {
             p="15px"
           >
             <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-              Nächste Schichten 
+              {t('dashboard.nextShifts')} 
             </Typography>
           </Box>
           {upcomingShifts.map((shiftInfo, i) => (
@@ -244,12 +247,12 @@ const Dashboard = () => {
                         variant="h5"
                         fontWeight="600"
                     >
-                        {shiftInfo.name}  {/* Display the name */}
+                        {shiftInfo.name}  
                     </Typography>
                 </Box>
                 <Box>
                     <Typography color={colors.grey[100]}>
-                        {shiftInfo.day}  {/* Display the day */}
+                        {shiftInfo.day} 
                     </Typography>
                 </Box>
                 {shiftInfo.shifts.map((shift, shiftIndex) => (  // Map over the shifts array
@@ -271,7 +274,7 @@ const Dashboard = () => {
           p="30px"
         >
           <Typography variant="h5" fontWeight="600">
-            Campaign
+           {t('dashboard.campaign')} 
           </Typography>
           <Box
             display="flex"
@@ -301,7 +304,7 @@ const Dashboard = () => {
             fontWeight="600"
             sx={{ padding: "30px 30px 0 30px" }}
           >
-            Sales Quantity
+            {t('dashboard.salesQuantity')} 
           </Typography>
           <Box height="250px" mt="-20px">
             <BarChart isDashboard={true} />
@@ -323,7 +326,7 @@ const Dashboard = () => {
             p="15px"
           >
             <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-              Wer arbeitet gerade
+            {t('dashboard.whosworking')} 
             </Typography>
           </Box>
           {currentShifts.map((shift, i) => (
