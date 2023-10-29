@@ -1742,15 +1742,27 @@ def get_dashboard_data():
         'start': shift.start_time.strftime('%H:%M'),
         'end': shift.end_time.strftime('%H:%M')
     } for shift in current_shifts_query]
- 
-    print(current_shifts)
+
+    # Adjusting the queries to match the 'Perm' and 'Temp' values in the employment field
+    part_time_count = User.query.filter(
+        (User.company_name == current_user.company_name) &
+        (User.employment == 'Temp')
+    ).count()
+    
+    full_time_count = User.query.filter(
+        (User.company_name == current_user.company_name) &
+        (User.employment == 'Perm')
+    ).count()
+    print(part_time_count)
+    print(full_time_count)
     return jsonify({
         'worker_count': worker_count,
         'start_time_count': start_time_count,
         'upcoming_shifts': upcoming_shifts,
         'hours_worked_over_time': hours_worked_data,
-        'current_shifts': current_shifts
-        
+        'current_shifts': current_shifts,
+        'part_time_count': part_time_count,
+        'full_time_count': full_time_count
     })
 
 

@@ -12,7 +12,6 @@
       "title": "DASHBOARD",
       "subtitle": "Willkommen auf dem Dashboard",
       "emailsSent": "Gesendete E-Mails",
-      "salesObtained": "Erhaltene Verkäufe",
       "mitarbeiter": "Mitarbeiter",
       "eingeplanteSchichten": "Eingeplante Schichten",
       "hoursWorked": "Stunden gearbeitet",
@@ -23,7 +22,9 @@
       "revenueGenerated": "Erzielte Einnahmen",
       "includesExpenditures": "Beinhaltet zusätzliche diverse Ausgaben und Kosten",
       "hours": "Stunden",
-      "whosworking": "Wer arbeitet gerade"
+      "whosworking": "Wer arbeitet gerade",
+      "partimeworkers": "Teilzeit MA",
+      "fulltimeworkers": "Vollzeit MA"
     }
     
   }
