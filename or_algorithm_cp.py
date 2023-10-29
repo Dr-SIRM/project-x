@@ -1148,8 +1148,8 @@ class ORAlgorithm_cp:
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[next(iter(self.mitarbeiter_s))][j])):  # Verwendung des ersten Mitarbeiters als Referenz
                 for s in self.skills:
-                    # Existiert ein Eintrag für die aktuelle Stunde und den aktuellen Skill?
-                    if k < len(self.min_anwesend[s][j]):  # Überprüfen, ob für diese spezifische Stunde Informationen vorhanden sind
+                    # Existiert ein Eintrag für die aktuelle Stunde und den aktuellen Skill und sind die Stunden grösser 0?
+                    if k < len(self.min_anwesend[s][j]) and self.min_anwesend[s][j][k] > 0:
 
                         # Sammeln der Mitarbeiter, die den erforderlichen Skill haben
                         mitarbeiter_mit_skill = [i for i in self.mitarbeiter if s in self.mitarbeiter_s[i]]
@@ -1192,7 +1192,7 @@ class ORAlgorithm_cp:
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[next(iter(self.mitarbeiter_s))][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
                 for s in self.skills:
-                    if k in self.min_anwesend[s][j]:
+                    if k in self.min_anwesend[s][j] and self.min_anwesend[s][j][k] > 0:
                         self.model.Add(sum(self.x[i, j, k, s] for i in self.mitarbeiter if s in self.mitarbeiter_s[i]) - self.min_anwesend[s][j][k] <= self.nb1_violation[j, k])
                         for i in self.mitarbeiter: 
                             if s in self.mitarbeiter_s[i]:
