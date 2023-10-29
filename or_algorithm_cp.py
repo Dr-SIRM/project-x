@@ -882,7 +882,10 @@ class ORAlgorithm_cp:
         self.a = {}
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
-                self.a[i, j] = self.model.NewBoolVar(f'a[{i}, {j}]')
+                for s in self.skills:
+                    if s in self.mitarbeiter_s[i]:  # Der Mitarbeiter muss den Skill haben
+                        self.a[i, j, s] = self.model.NewBoolVar(f'a[{i}, {j}, {s}]')
+                        print("Variable a: ", self.a[i, j, s])
 
         # Schichtvariable Woche (2-Schicht)
         self.s2 = {}
@@ -1092,7 +1095,7 @@ class ORAlgorithm_cp:
                 self.model.Add(self.a[i, j] * (len(self.verfügbarkeit[i][j]) + 1) >= sum_x)
                 self.model.Add(self.a[i, j] <= sum_x)
         """
-
+    
         # 23.10.2023 - unabhängig vom Skill!
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
@@ -1103,8 +1106,8 @@ class ORAlgorithm_cp:
                             # sum_x ist die Summe, an der ein MA am Tag mit einem bestimmten Skill arbeiten kann
                             sum_x = sum(self.x[i, j, k, s] for k in range(len(self.verfügbarkeit[i][j])))
                             
-                            self.model.Add(self.a[i, j] * (len(self.verfügbarkeit[i][j]) + 1) >= sum_x)
-                            self.model.Add(self.a[i, j] <= sum_x)
+                            self.model.Add(self.a[i, j, s] * (len(self.verfügbarkeit[i][j]) + 1) >= sum_x)
+                            self.model.Add(self.a[i, j, s] <= sum_x)
 
         
     
@@ -1148,8 +1151,9 @@ class ORAlgorithm_cp:
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[next(iter(self.mitarbeiter_s))][j])):  # Verwendung des ersten Mitarbeiters als Referenz
                 for s in self.skills:
-                    # Existiert ein Eintrag für die aktuelle Stunde und den aktuellen Skill und sind die Stunden grösser 0?
-                    if k < len(self.min_anwesend[s][j]) and self.min_anwesend[s][j][k] > 0:
+                    # Existiert ein Eintrag für die aktuelle Stunde und den aktuellen Skill?
+                    if k in self.min_anwesend[s][j]:
+                    # if k < len(self.min_anwesend[s][j]) and self.min_anwesend[s][j][k] > 0: Getestet 29.10, bringt auch nichts
 
                         # Sammeln der Mitarbeiter, die den erforderlichen Skill haben
                         mitarbeiter_mit_skill = [i for i in self.mitarbeiter if s in self.mitarbeiter_s[i]]
@@ -1192,7 +1196,7 @@ class ORAlgorithm_cp:
         for j in range(self.calc_time):
             for k in range(len(self.verfügbarkeit[next(iter(self.mitarbeiter_s))][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
                 for s in self.skills:
-                    if k in self.min_anwesend[s][j] and self.min_anwesend[s][j][k] > 0:
+                    if k in self.min_anwesend[s][j]:
                         self.model.Add(sum(self.x[i, j, k, s] for i in self.mitarbeiter if s in self.mitarbeiter_s[i]) - self.min_anwesend[s][j][k] <= self.nb1_violation[j, k])
                         for i in self.mitarbeiter: 
                             if s in self.mitarbeiter_s[i]:
@@ -1279,22 +1283,25 @@ class ORAlgorithm_cp:
                 self.model.Add(self.nb4_max_violation[i, j] >= 0)
         """
 
-        # 26.10.2023
+        
+        # 29.10.2023 Skill bei a wird noch berücksichtigt, muss noch genau getestet werden
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
-                woche = j // 7  # Bestimmen Sie die entsprechende Woche für die Überprüfung der benötigten Skills
+                for s in self.skills:
+                    if s in self.mitarbeiter_s[i]: 
+                        woche = j // 7  # Bestimmen Sie die entsprechende Woche für die Überprüfung der benötigten Skills
 
-                # Summieren Sie die Stunden, wobei nur die Skills berücksichtigt werden, die in der aktuellen Woche benötigt werden und die der Mitarbeiter besitzt
-                sum_hour = sum(self.x[i, j, k, s] for k in range(len(self.verfügbarkeit[i][j])) for s in self.benoetigte_skills[woche] if s in self.mitarbeiter_s[i])
+                        # Summieren Sie die Stunden, wobei nur die Skills berücksichtigt werden, die in der aktuellen Woche benötigt werden und die der Mitarbeiter besitzt
+                        sum_hour = sum(self.x[i, j, k, s] for k in range(len(self.verfügbarkeit[i][j])) for s in self.benoetigte_skills[woche] if s in self.mitarbeiter_s[i])
 
-                # Prüfen, ob die Summe der Arbeitsstunden kleiner als die Mindestarbeitszeit ist
-                self.model.Add(sum_hour - self.min_zeit[i] * self.a[i, j] >= -self.nb3_min_violation[i, j])
-                self.model.Add(self.nb3_min_violation[i, j] >= 0)
+                        # Prüfen, ob die Summe der Arbeitsstunden kleiner als die Mindestarbeitszeit ist
+                        self.model.Add(sum_hour - self.min_zeit[i] * self.a[i, j, s] >= -self.nb3_min_violation[i, j])
+                        self.model.Add(self.nb3_min_violation[i, j] >= 0)
 
-                # Prüfen, ob die Summe der Arbeitsstunden größer als die maximale Arbeitszeit ist
-                self.model.Add(sum_hour - self.max_zeit[i] * self.a[i, j] <= self.nb4_max_violation[i, j])
-                self.model.Add(self.nb4_max_violation[i, j] >= 0)
-
+                        # Prüfen, ob die Summe der Arbeitsstunden größer als die maximale Arbeitszeit ist
+                        self.model.Add(sum_hour - self.max_zeit[i] * self.a[i, j, s] <= self.nb4_max_violation[i, j])
+                        self.model.Add(self.nb4_max_violation[i, j] >= 0)
+        
 
         # -------------------------------------------------------------------------------------------------------
         # HARTE NB
@@ -1316,7 +1323,7 @@ class ORAlgorithm_cp:
                     self.model.Add(sum(self.y[i, j, k] for k in range(len(self.verfügbarkeit[i][j]))) <= self.daily_deployment)
         """
 
-
+        
         # 26.10.2023
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
@@ -1709,7 +1716,7 @@ class ORAlgorithm_cp:
         # HARTE NB (08.10.2023)
         # NB 10 - Max. Anzahl an Arbeitstagen in Folge -> Obergrenze
         # -------------------------------------------------------------------------------------------------------
-
+        """
         # Diese Variable noch in der Datenbank implementieren
         self.subsequent_workingdays_max = 4
 
@@ -1742,7 +1749,7 @@ class ORAlgorithm_cp:
                 # nb10_violation wird nur erhöht, wenn die Anzahl der aufeinanderfolgenden Arbeitstage das Limit überschreitet
                 self.model.Add(self.nb10_violation[i, j] >= sum_consecutive_days - self.subsequent_workingdays)
                 self.model.Add(self.nb10_violation[i, j] >= 0)
-
+        """
 
         # -------------------------------------------------------------------------------------------------------
         # Weiche NB (08.10.2023)
@@ -1906,8 +1913,10 @@ class ORAlgorithm_cp:
         # Die Werte von a printen
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
-                # Drucken Sie den Wert von a[i, j]
-                print(f"a[{i}][{j}] =", self.solver.Value(self.a[i, j]))
+                for s in self.skills:
+                    if s in self.mitarbeiter_s[i]:
+                        # Drucken Sie den Wert von a[i, j]
+                        print(f"a[{i}][{j}][{s}] =", self.solver.Value(self.a[i, j, s]))
         # ----------------------------------------------------------------
 
         # Die Werte von x ausgeben, wenn sie existieren
