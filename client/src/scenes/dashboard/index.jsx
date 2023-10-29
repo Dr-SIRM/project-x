@@ -13,6 +13,8 @@ import GeographyChart from "../../components/GeographyChart";
 import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
 import ProgressCircle from "../../components/ProgressCircle";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import { AuthContext } from "../../AuthContext";
 import { API_BASE_URL } from "../../config";
 import axios from 'axios';
@@ -37,6 +39,8 @@ const Dashboard = () => {
   const [StartTimeCount, setStartTimeCount] = useState();
   const [upcomingShifts, setUpcomingShifts] = useState([]);
   const [hoursWorkedData, setHoursWorkedData] = useState([]); 
+  const [fullTimeWorkers, setFullTimeWorkers] = useState([]);
+  const [parttimeData, setPartTimeData] = useState([]); 
   const [currentShifts, setCurrentShifts] = useState([]);
   const totalHoursWorked = (hoursWorkedData && Array.isArray(hoursWorkedData)) ? hoursWorkedData.reduce((sum, item) => sum + parseFloat(item.hours_worked), 0) : 0;
   const token = localStorage.getItem('session_token'); 
@@ -51,9 +55,10 @@ const Dashboard = () => {
                 'Authorization': `Bearer ${token}`
               }
             });
-            
+            setPartTimeData(response.data.part_time_count)
             setMitarbeiterCount(response.data.worker_count);
             setStartTimeCount(response.data.start_time_count);
+            setFullTimeWorkers(response.data.full_time_count);
             setUpcomingShifts(response.data.upcoming_shifts);  // Store the upcoming shifts data
             setHoursWorkedData(response.data.hours_worked_over_time);
             setCurrentShifts(response.data.current_shifts);
@@ -105,12 +110,12 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title="12,361"
-            subtitle={t('dashboard.emailsSent')}
+            title={fullTimeWorkers}
+            subtitle={t('dashboard.fulltimeworkers')}
             progress="0.75"
             increase="+14%"
             icon={
-              <EmailIcon
+              <AccountCircleIcon
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
               />
             }
@@ -125,12 +130,12 @@ const Dashboard = () => {
           justifyContent="center"
         >
           <StatBox
-            title="431,225"
-            subtitle={t('dashboard.salesObtained')}
+            title={parttimeData}
+            subtitle={t('dashboard.partimeworkers')}
             progress="0.50"
             increase="+21%"
             icon={
-              <PointOfSaleIcon
+              <ChangeCircleIcon
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
               />
             }

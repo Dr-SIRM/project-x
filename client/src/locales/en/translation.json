@@ -11,7 +11,6 @@
     "title": "DASHBOARD",
     "subtitle": "Welcome to the Dashboard",
     "emailsSent": "Emails Sent",
-    "salesObtained": "Sales Obtained",
     "mitarbeiter": "Employees",
     "eingeplanteSchichten": "Scheduled Shifts",
     "hoursWorked": "Hours Worked",
@@ -22,6 +21,8 @@
     "revenueGenerated": "Revenue Generated",
     "includesExpenditures": "Includes extra misc expenditures and costs",
     "hours": "hours",
-    "whosworking": "Who's working"
+    "whosworking": "Who's working",
+    "partimeworkers": "Parttime Employees",
+    "fulltimeworkers": "Fulltime Employees"
   }
 }
