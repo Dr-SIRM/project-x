@@ -1287,21 +1287,21 @@ class ORAlgorithm_cp:
         # 29.10.2023 Skill bei a wird noch berücksichtigt, muss noch genau getestet werden
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
-                for s in self.skills:
-                    if s in self.mitarbeiter_s[i]: 
-                        woche = j // 7  # Bestimmen Sie die entsprechende Woche für die Überprüfung der benötigten Skills
+                woche = j // 7
+                if self.benoetigte_skills[woche]:
+                    for s in self.benoetigte_skills[woche]:
+                        if s in self.mitarbeiter_s[i]:
+                            # Summieren Sie die Stunden, wobei nur die Skills berücksichtigt werden, die in der aktuellen Woche benötigt werden und die der Mitarbeiter besitzt
+                            sum_hour = sum(self.x[i, j, k, s] for k in range(len(self.verfügbarkeit[i][j])))
 
-                        # Summieren Sie die Stunden, wobei nur die Skills berücksichtigt werden, die in der aktuellen Woche benötigt werden und die der Mitarbeiter besitzt
-                        sum_hour = sum(self.x[i, j, k, s] for k in range(len(self.verfügbarkeit[i][j])) for s in self.benoetigte_skills[woche] if s in self.mitarbeiter_s[i])
+                            # Prüfen, ob die Summe der Arbeitsstunden kleiner als die Mindestarbeitszeit ist
+                            self.model.Add(sum_hour - self.min_zeit[i] * self.a[i, j, s] >= -self.nb3_min_violation[i, j])
+                            self.model.Add(self.nb3_min_violation[i, j] >= 0)
 
-                        # Prüfen, ob die Summe der Arbeitsstunden kleiner als die Mindestarbeitszeit ist
-                        self.model.Add(sum_hour - self.min_zeit[i] * self.a[i, j, s] >= -self.nb3_min_violation[i, j])
-                        self.model.Add(self.nb3_min_violation[i, j] >= 0)
-
-                        # Prüfen, ob die Summe der Arbeitsstunden größer als die maximale Arbeitszeit ist
-                        self.model.Add(sum_hour - self.max_zeit[i] * self.a[i, j, s] <= self.nb4_max_violation[i, j])
-                        self.model.Add(self.nb4_max_violation[i, j] >= 0)
-        
+                            # Prüfen, ob die Summe der Arbeitsstunden größer als die maximale Arbeitszeit ist
+                            self.model.Add(sum_hour - self.max_zeit[i] * self.a[i, j, s] <= self.nb4_max_violation[i, j])
+                            self.model.Add(self.nb4_max_violation[i, j] >= 0)
+            
 
         # -------------------------------------------------------------------------------------------------------
         # HARTE NB
