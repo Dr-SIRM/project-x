@@ -77,7 +77,6 @@ const UserManagement = () => {
           <Typography variant="h5" gutterBottom>
            {t('EmployeeList')}
           </Typography>
-          {/* Updated Box styling */}
           <Box
             backgroundColor={colors.grey[900]}  // Change to your preferred color
             borderRadius="15px"
@@ -116,18 +115,17 @@ const UserManagement = () => {
               rows={availability}
               pageSize={5}
               rowsPerPageOptions={[5]}
-              getRowId={(row) => row.weekday}  // or use any other unique value
+              getRowId={(row) => row.weekday}
               hideFooterPagination
               hideFooter
               columns = {[
+                { field: 'date', headerName: t('date'), flex: 1 },
                 { field: 'weekday', headerName: t('weekday'), flex: 1 },
                 { field: 'start_time', headerName: t('startTime'), flex: 1 },
                 { field: 'end_time', headerName: t('endTime'), flex: 1 }
               ]}
             />
-
           </Box>
-
         </Grid>
         <Grid item xs={12} sm={5}>
           <Typography variant="h5" gutterBottom>
@@ -148,12 +146,12 @@ const UserManagement = () => {
               hideFooterPagination
               hideFooter
               columns = {[
+                { field: 'date', headerName: t('date'), flex: 1 },
                 { field: 'weekday', headerName: t('weekday'), flex: 1 },
                 { field: 'start_time', headerName: t('startTime'), flex: 1 },
                 { field: 'end_time', headerName: t('endTime'), flex: 1 }
               ]}
             />
-            {/* Content for Geplante Schichten */}
           </Box>
         </Grid>
       </Grid>

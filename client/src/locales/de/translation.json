@@ -7,6 +7,7 @@
     "weekday": "Wochentag",
     "startTime": "Startzeit",
     "endTime": "Endzeit",
+    "date": "Datum",
 
     "dashboard": {
       "title": "DASHBOARD",

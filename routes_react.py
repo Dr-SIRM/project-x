@@ -1841,6 +1841,7 @@ def user_availability(email):
     availability_data = []
     for availability in availabilities:
         availability_dict = {
+            'date': availability.date.strftime('%Y-%m-%d'),
             'weekday': availability.weekday,
             'start_time': availability.start_time.strftime('%H:%M:%S'),
             'end_time': availability.end_time.strftime('%H:%M:%S'),
