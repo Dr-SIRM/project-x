@@ -339,7 +339,7 @@ const handleDepartment3Change = async (event, id) => {
             },
           }}
         >
-          {/* Use the departments state to populate the dropdown */}
+          <MenuItem value="">---</MenuItem>
           {departments.map((department) => (
             <MenuItem key={department} value={department}>
               {department}
@@ -371,7 +371,7 @@ const handleDepartment3Change = async (event, id) => {
             },
           }}
         >
-          {/* Use the departments state to populate the dropdown */}
+          <MenuItem value="">---</MenuItem>
           {departments.map((department) => (
             <MenuItem key={department} value={department}>
               {department}
@@ -403,7 +403,7 @@ const handleDepartment3Change = async (event, id) => {
             },
           }}
         >
-          {/* Use the departments state to populate the dropdown */}
+          <MenuItem value="">---</MenuItem>
           {departments.map((department) => (
             <MenuItem key={department} value={department}>
               {department}
