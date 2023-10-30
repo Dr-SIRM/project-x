@@ -511,7 +511,7 @@ useEffect(() => {
           <Checkbox
             checked={checkedBoxes.includes(rowIndex)}
             onChange={(e) => handleCheckboxChange(rowIndex, e.target.checked)}
-            sx={{ gridColumn: "span 1" }}
+            sx={{ gridColumn: "span 1", color: "black" }}
           />
           {Array.from({ length: 2 + additionalTimes * 2 }).map((_, columnIndex) => (
             <TextField

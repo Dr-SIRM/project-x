@@ -77,9 +77,9 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
           </Box>
-          <Button type="submit" variant="contained" fullWidth disabled={loading}>
+          <Button type="submit" variant="contained" fullWidth disabled={loading} >
             {loading ? (
-              <CircularProgress size={24} color="inherit" /> 
+              <CircularProgress size={24} style={{ color: '#000' }} />  // Set color to black
             ) : (
               'Login'
             )}
