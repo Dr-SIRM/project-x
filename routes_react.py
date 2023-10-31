@@ -1316,8 +1316,11 @@ def get_required_workforce():
     end_date = week_start + datetime.timedelta(days=day_num)
     all_time_reqs = TimeReq.query.filter(
         TimeReq.company_name == user.company_name,
+        TimeReq.department == request.args.get('selectedDepartment'),
         TimeReq.date.between(week_start, end_date)
     ).all()
+
+    print(request.args.get('selectedDepartment'))
 
     # Convert all_time_reqs to a dictionary for quick lookup
     time_req_lookup = {(rec.date, rec.start_time): rec.worker for rec in all_time_reqs}
