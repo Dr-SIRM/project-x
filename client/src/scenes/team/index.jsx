@@ -9,9 +9,7 @@ import Header from "../../components/Header";
 import { ThreeDots } from "react-loader-spinner"; 
 import axios from "axios";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-
 import { API_BASE_URL } from "../../config";
-
 
 
 const Team = () => {
@@ -412,10 +410,6 @@ const handleDepartment3Change = async (event, id) => {
         </Select>
       ),
     },
-    
-    
-    
-    
 
     {
       field: "access_level",

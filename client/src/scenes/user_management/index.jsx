@@ -23,6 +23,7 @@ const UserManagement = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [availability, setAvailability] = useState([]);
+  const [scheduledShifts, setScheduledShifts] = useState([]);
   const token = localStorage.getItem('session_token');
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -50,23 +51,44 @@ const UserManagement = () => {
     fetchUser();
   }, []);
 
-    const fetchAvailability = async (email) => {
-      try {
-        const response = await axios.get(`${API_BASE_URL}/api/user_availability/${email}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+
+  //GET Availabilty DATA
+  const fetchAvailability = async (email) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/user_availability/${email}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      setAvailability(response.data.availability);
+    } catch (error) {
+      console.error('Error fetching availability:', error);
+    }
+};
+
+  //GET Shift DATA (backend not programmed yet)
+  const fetchScheduledShifts = async (email) => {
+    try {
+        const response = await axios.get(`${API_BASE_URL}/api/user_scheduled_shifts/${email}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
         });
-        setAvailability(response.data.availability);
-      } catch (error) {
-        console.error('Error fetching availability:', error);
-      }
-  };
+        setScheduledShifts(response.data.scheduledShifts);
+    } catch (error) {
+        console.error('Error fetching scheduled shifts:', error);
+    }
+};
 
   const handleUserClick = (user) => {
       setSelectedUser(user);
       fetchAvailability(user.email);  // passing email instead of user.id
+      fetchScheduledShifts(user.email);
   };
+
+  
+
+
 
 
   return (
@@ -101,32 +123,56 @@ const UserManagement = () => {
           </Box>
         </Grid>
         <Grid item xs={12} sm={5}>
-          <Typography variant="h5" gutterBottom>
-            {t('Availability')}
-          </Typography>
-          <Box
-            backgroundColor={colors.grey[900]}
-            borderRadius="15px"
-            p={2}  // Adjust padding as needed
-            width="100%"  // Let the box take the full width of its grid item
-          >
-            <DataGrid
-              style={{ color: "black" }}
-              rows={availability}
-              pageSize={5}
-              rowsPerPageOptions={[5]}
-              getRowId={(row) => row.weekday}
-              hideFooterPagination
-              hideFooter
-              columns = {[
-                { field: 'date', headerName: t('date'), flex: 1 },
-                { field: 'weekday', headerName: t('weekday'), flex: 1 },
-                { field: 'start_time', headerName: t('startTime'), flex: 1 },
-                { field: 'end_time', headerName: t('endTime'), flex: 1 }
-              ]}
-            />
-          </Box>
+            <Typography variant="h5" gutterBottom>
+                {t('Availability')}
+            </Typography>
+            <Box
+                m=""
+                borderRadius="15px"
+                height="75vh"
+                sx={{
+                    "& .MuiDataGrid-root": {
+                        borderColor: "black",
+                    },
+                    "& .MuiDataGrid-cell": {
+                        borderBottom: "1px solid black",
+                        color: colors.primary[100],
+                        backgroundColor: colors.grey[900],
+                        borderBottom: "none",    
+                    },
+                    "& .MuiDataGrid-columnHeaders": {
+                        backgroundColor: colors.grey[500],
+                        color: "white",
+                        borderColor: "black",
+                        
+                    },
+                    "& .MuiDataGrid-virtualScroller": {
+                        backgroundColor: colors.grey[900],
+                    },
+                    "& .MuiDataGrid-footerContainer": {
+                        borderTop: "none",
+                        backgroundColor: colors.grey[500],
+                    },
+                    "& .MuiCheckbox-root": {
+                        color: `${colors.greenAccent[200]} !important`,
+                    },
+                }}
+            >        
+                <DataGrid        
+                    rows={availability}
+                    pageSize={10}
+                    rowsPerPageOptions={[5]}
+                    getRowId={(row) => row.date}
+                    columns={[
+                        { field: 'date', headerName: t('date'), flex: 1 },
+                        { field: 'weekday', headerName: t('weekday'), flex: 1 },
+                        { field: 'start_time', headerName: t('startTime'), flex: 1 },
+                        { field: 'end_time', headerName: t('endTime'), flex: 1 },
+                    ]}
+                />
+            </Box>
         </Grid>
+
         <Grid item xs={12} sm={5}>
           <Typography variant="h5" gutterBottom>
            {t('ScheduledShifts')}
@@ -139,7 +185,7 @@ const UserManagement = () => {
           >
             <DataGrid
               style={{ color: "black" }}
-              rows={availability}
+              rows={scheduledShifts}
               pageSize={5}
               rowsPerPageOptions={[5]}
               getRowId={(row) => row.weekday}  // or use any other unique value
