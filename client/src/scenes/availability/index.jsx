@@ -62,6 +62,7 @@ const Availability = ({ availability }) => {
           setAvailabilityData(response.data);
           setUserList(response.data.user_list);
           setIsLoading(false);
+          console.log(response)
         } catch (error) {
           console.error('Error fetching availability details:', error);
           setIsLoading(false);
@@ -107,8 +108,6 @@ useEffect(() => {
 
     if (isChecked) {
         updatedBoxes.push(index);
-        // Send data to server here
-        // For instance: sendDataToServer(index);
     } else {
         updatedBoxes = updatedBoxes.filter(item => item !== index);
     }
@@ -174,6 +173,7 @@ useEffect(() => {
         enableReinitialize={true}
         initialValues={{
           ...Array.from({ length: availabilityData.day_num || 0 }).reduce((acc, _, rowIndex) => {
+            acc[`checkbox_${rowIndex}`] = activeTemplateData ? activeTemplateData[`checkBox${rowIndex + 1}`] === "X" : false;
             acc[`day_${rowIndex}_0`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&0`] ? activeTemplateData[`${rowIndex + 1}&0`] : '00:00';
             acc[`day_${rowIndex}_1`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&1`] ? activeTemplateData[`${rowIndex + 1}&1`] : '00:00';
             acc[`day_${rowIndex}_2`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&2`] ? activeTemplateData[`${rowIndex + 1}&2`] : '00:00';
@@ -203,6 +203,7 @@ useEffect(() => {
           handleBlur,
           handleChange,
           handleSubmit,
+          setFieldValue,
         }) => (
           <form onSubmit={handleSubmit}>
             
@@ -509,9 +510,17 @@ useEffect(() => {
               : ""}
           </Typography>
           <Checkbox
-            checked={checkedBoxes.includes(rowIndex)}
-            onChange={(e) => handleCheckboxChange(rowIndex, e.target.checked)}
-            sx={{ gridColumn: "span 1", color: "black" }}
+            name={`checkbox_${rowIndex}`}
+            checked={values[`checkbox_${rowIndex}`]}
+            onChange={(e) => {
+              setFieldValue(`checkbox_${rowIndex}`, e.target.checked); // Directly use setFieldValue
+              handleCheckboxChange(setFieldValue, `checkbox_${rowIndex}`, e.target.checked);
+          }}
+            disableRipple
+            sx={{ 
+              gridColumn: "span 1", 
+              color: "black"
+            }}
           />
           {Array.from({ length: 2 + additionalTimes * 2 }).map((_, columnIndex) => (
             <TextField
