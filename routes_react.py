@@ -565,12 +565,11 @@ def get_availability():
 
     # Create Drop Down Based Access Level
     if user.access_level == "User":
-        user_list = [f"{user.first_name}, {user.last_name}"]
+        user_list = [f"{user.first_name}, {user.last_name}, {user.email}"]
     else:
         company_users = User.query.filter_by(company_name=user.company_name).order_by(asc(User.last_name)).all()
-        user_list = [f"{user.first_name}, {user.last_name}" for user in company_users]
+        user_list = [f"{user.first_name}, {user.last_name}, {user.email}" for user in company_users]
     
-
 
     # Fetch all relevant Availability records in a single query
     availabilities = Availability.query.filter(
@@ -607,8 +606,9 @@ def get_availability():
             if user_selection == "":
                 new_user = user
             else:
-                first_name, last_name = user_selection.split(', ')
-                new_user = User.query.filter_by(first_name=first_name, last_name=last_name).first()
+                first_name, last_name, email = user_selection.split(', ')
+                new_user = User.query.filter_by(email=email).first()
+                print(email)
             
             new_entries = []
             
