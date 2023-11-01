@@ -127,9 +127,10 @@ const UserManagement = () => {
                 {t('Availability')}
             </Typography>
             <Box
-                m=""
+                m="20px"
                 borderRadius="15px"
                 height="75vh"
+                style={{ backgroundColor: "white" }}
                 sx={{
                     "& .MuiDataGrid-root": {
                         borderColor: "black",
