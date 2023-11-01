@@ -571,9 +571,22 @@ def get_availability():
         user_list = [f"{user.first_name}, {user.last_name}, {user.email}" for user in company_users]
     
 
-    # Fetch all relevant Availability records in a single query
+    if request.method == 'GET':
+        selected_user = request.args.get('selectedUser', None)
+    else: # request.method == 'POST'
+        selected_user = request.json.get('selectedUser', None)
+
+    if selected_user:
+        # Parse the 'selectedUser' string to extract the email
+        first_name, last_name, email = selected_user.split(', ')
+        selected_user_email = email.strip()
+    else:
+        # Fall back to the logged-in user's email if 'selectedUser' is not provided
+        selected_user_email = user.email
+    
+    # Use the extracted email in the availability query
     availabilities = Availability.query.filter(
-        Availability.email == user.email,
+        Availability.email == selected_user_email,
         Availability.date.in_(dates),
         Availability.weekday.in_(query_weekdays)
     ).all()
