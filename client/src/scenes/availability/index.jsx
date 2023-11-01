@@ -118,11 +118,6 @@ useEffect(() => {
 
   const handleFormSubmit = async (values, buttonName) => {
 
-    Object.keys(values).forEach((key) => {
-      if (values[key] === '' || values[key] === undefined) {
-        values[key] = '00:00';
-      }
-    });
     const payload = { ...values, button: buttonName, selectedTemplate, selectedUser, checkedBoxes };
     console.log("Final payload before sending to server:", payload);
 
