@@ -646,20 +646,23 @@ def get_availability():
                 new_entry = {}
                 for j in range(6):
                     entry = request.json.get(f'day_{i}_{j}')
-                    new_entry[f'entry{j + 1}'] = get_time_str(entry)
-                    if new_entry['entry1']:
-                        availability_hours = new_entry['entry1'].hour
-                        availability_minutes = new_entry['entry1'].minute
-                        total_availability_start = availability_hours * solverreq.hour_devider + availability_minutes
-                        opening_hours = opening.start_time.hour
-                        opening_minutes = opening.start_time.minute
-                        total_opening_start = opening_hours * solverreq.hour_devider + opening_minutes
-                        if total_availability_start == 0:
-                            new_entry[f'entry{j + 1}'] = get_time_str(entry)
-                        elif total_availability_start < total_opening_start:
-                            new_entry['entry1'] = opening.start_time
-                        else:
-                            new_entry[f'entry{j + 1}'] = get_time_str(entry)
+                    if entry is None:
+                        new_entry[f'entry{j + 1}'] = None
+                    else:
+                        new_entry[f'entry{j + 1}'] = get_time_str(entry)
+                        if new_entry['entry1']:
+                            availability_hours = new_entry['entry1'].hour
+                            availability_minutes = new_entry['entry1'].minute
+                            total_availability_start = availability_hours * solverreq.hour_devider + availability_minutes
+                            opening_hours = opening.start_time.hour
+                            opening_minutes = opening.start_time.minute
+                            total_opening_start = opening_hours * solverreq.hour_devider + opening_minutes
+                            if total_availability_start == 0:
+                                new_entry[f'entry{j + 1}'] = get_time_str(entry)
+                            elif total_availability_start < total_opening_start:
+                                new_entry['entry1'] = opening.start_time
+                            else:
+                                new_entry[f'entry{j + 1}'] = get_time_str(entry)
 
 
 

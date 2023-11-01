@@ -118,6 +118,14 @@ useEffect(() => {
 
   const handleFormSubmit = async (values, buttonName) => {
 
+    Object.keys(values).forEach(key => {
+      // Check if the key is a time field
+      if (key.startsWith('day_') && values[key] === '') {
+          // Set the value to None if the field is empty
+          values[key] = undefined;
+      }
+    });
+
     const payload = { ...values, button: buttonName, selectedTemplate, selectedUser, checkedBoxes };
     console.log("Final payload before sending to server:", payload);
 
@@ -169,12 +177,12 @@ useEffect(() => {
         initialValues={{
           ...Array.from({ length: availabilityData.day_num || 0 }).reduce((acc, _, rowIndex) => {
             acc[`checkbox_${rowIndex}`] = activeTemplateData ? activeTemplateData[`checkBox${rowIndex + 1}`] === "X" : false;
-            acc[`day_${rowIndex}_0`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&0`] ? activeTemplateData[`${rowIndex + 1}&0`] : '00:00';
-            acc[`day_${rowIndex}_1`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&1`] ? activeTemplateData[`${rowIndex + 1}&1`] : '00:00';
-            acc[`day_${rowIndex}_2`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&2`] ? activeTemplateData[`${rowIndex + 1}&2`] : '00:00';
-            acc[`day_${rowIndex}_3`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&3`] ? activeTemplateData[`${rowIndex + 1}&3`] : '00:00';
-            acc[`day_${rowIndex}_4`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&4`] ? activeTemplateData[`${rowIndex + 1}&4`] : '00:00';
-            acc[`day_${rowIndex}_5`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&5`] ? activeTemplateData[`${rowIndex + 1}&5`] : '00:00';
+            acc[`day_${rowIndex}_0`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&0`];
+            acc[`day_${rowIndex}_1`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&1`];
+            acc[`day_${rowIndex}_2`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&2`];
+            acc[`day_${rowIndex}_3`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&3`];
+            acc[`day_${rowIndex}_4`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&4`];
+            acc[`day_${rowIndex}_5`] = activeTemplateData && activeTemplateData[`${rowIndex + 1}&5`];
             return acc;
           }, {}),
         }}
@@ -526,7 +534,7 @@ useEffect(() => {
               inputProps={{ step }}
               onBlur={handleBlur}
               onChange={handleChange}
-              value={values[`day_${rowIndex}_${columnIndex}`] === '00:00' ? '' : values[`day_${rowIndex}_${columnIndex}`]}
+              value={values[`day_${rowIndex}_${columnIndex}`]}
               name={`day_${rowIndex}_${columnIndex}`}
               error={
                 !!touched[`day_${rowIndex}_${columnIndex}`] &&
