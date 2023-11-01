@@ -26,7 +26,22 @@
       "whosworking": "Wer arbeitet gerade",
       "partimeworkers": "Teilzeit MA",
       "fulltimeworkers": "Vollzeit MA"
-    }
+    },
     
+    "team": {
+      "title": "Team",
+      "subtitle": "Verwalten Sie Ihr Team",
+      "columns": {
+        "first_name": "Vorname",
+        "last_name": "Nachname",
+        "email": "E-mail",
+        "employment": "Anstellung",
+        "employment_level": "Anstellungsgrad",
+        "department": "Abteilung",
+        "department2": "Abteilung 2",
+        "department3": "Abteilung 3",
+        "access_level": "Zugriffslevel"
+      }
+    }
   }
   

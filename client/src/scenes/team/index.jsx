@@ -10,6 +10,8 @@ import { ThreeDots } from "react-loader-spinner";
 import axios from "axios";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { API_BASE_URL } from "../../config";
+import { useTranslation } from 'react-i18next';
+import '../../i18n';  
 
 
 const Team = () => {
@@ -17,7 +19,7 @@ const Team = () => {
   const colors = tokens(theme.palette.mode);
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
-
+  const { t, i18n } = useTranslation();
   const [isLoading, setIsLoading] = useState(true);
   const token = localStorage.getItem('session_token'); 
   //const [userData, setUserData] = useState({});
@@ -228,27 +230,27 @@ const handleDepartment3Change = async (event, id) => {
   const columns = [
     {
       field: "first_name",
-      headerName: "Vorname",
+      headerName: t('team.columns.first_name'),
       flex: 1,
       cellClassName: "name-column--cell",
       editable: true,
     },
     {
       field: "last_name",
-      headerName: "Nachname",
+      headerName: t('team.columns.last_name'),
       flex: 1,
       cellClassName: "name-column--cell",
       editable: true
     },
     {
       field: "email",
-      headerName: "E-mail",
+      headerName: t('team.columns.email'),
       flex: 1,
       editable: true,
     },
     {
       field: "employment",
-      headerName: "Anstellung",
+      headerName: t('team.columns.employment'),
       flex: 1,
       editable: false,
       renderCell: (params) => (
@@ -277,7 +279,7 @@ const handleDepartment3Change = async (event, id) => {
     },  
     {
       field: "employment_level",
-      headerName: "Anstellungsgrad",
+      headerName: t('team.columns.employment_level'),
       flex: 1,
       editable: false,
       renderCell: (params) => (
@@ -316,7 +318,7 @@ const handleDepartment3Change = async (event, id) => {
 
     {
       field: "department",
-      headerName: "Abteilung",
+      headerName: t('team.columns.department'),
       flex: 1.2,
       editable: false,
       renderCell: (params) => (
@@ -348,7 +350,7 @@ const handleDepartment3Change = async (event, id) => {
     },
     {
       field: "department2",
-      headerName: "Abteilung 2",
+      headerName: t('team.columns.department2'),
       flex: 1.2,
       editable: false,
       renderCell: (params) => (
@@ -380,7 +382,7 @@ const handleDepartment3Change = async (event, id) => {
     },
     {
       field: "department3",
-      headerName: "Abteilung 3",
+      headerName: t('team.columns.department3'),
       flex: 1.2,
       editable: false,
       renderCell: (params) => (
@@ -413,7 +415,7 @@ const handleDepartment3Change = async (event, id) => {
 
     {
       field: "access_level",
-      headerName: "Zugriffslevel",
+      headerName: t('team.columns.access_level'),
       flex: 1,
       renderCell: ({ row: { access_level } }) => {
         return (
@@ -446,7 +448,7 @@ const handleDepartment3Change = async (event, id) => {
 
   return (
     <Box m="20px">
-      <Header title="TEAM" subtitle="Übersicht von den Team Mitglieder" />
+      <Header title={t('team.title')} subtitle={t('team.subtitle')} />
       <Box
         m="40px 0 0 0"
         height="75vh"

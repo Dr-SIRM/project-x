@@ -26,5 +26,21 @@
     "whosworking": "Who's working",
     "partimeworkers": "Parttime Employees",
     "fulltimeworkers": "Fulltime Employees"
+  },
+
+  "team": {
+    "title": "Team",
+    "subtitle": "Manage your team",
+    "columns": {
+      "first_name": "First Name",
+      "last_name": "Last Name",
+      "email": "E-mail",
+      "employment": "Employment",
+      "employment_level": "Employment Level",
+      "department": "Department",
+      "department2": "Department 2",
+      "department3": "Department 3",
+      "access_level": "Access Level"
+    }
   }
 }

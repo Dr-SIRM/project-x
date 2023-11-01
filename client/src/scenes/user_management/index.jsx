@@ -15,7 +15,7 @@ import { tokens } from '../../theme';
 import { API_BASE_URL } from '../../config';
 import axios from 'axios'; 
 import { useTranslation } from 'react-i18next';
-import '../../i18n';  // Import the i18n configuration
+import '../../i18n';  
  
 
 const UserManagement = () => {
