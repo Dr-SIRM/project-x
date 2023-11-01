@@ -587,6 +587,7 @@ def get_availability():
         
         if temp:
             new_i = i + 1
+            temp_dict[f"checkBox{new_i}"] = temp.holiday if temp.holiday else None
             temp_dict[f"{new_i}&0"] = temp.start_time.strftime("%H:%M") if temp.start_time else None
             temp_dict[f"{new_i}&1"] = temp.end_time.strftime("%H:%M") if temp.end_time else None
             temp_dict[f"{new_i}&2"] = temp.start_time2.strftime("%H:%M") if temp.start_time2 else None
@@ -594,11 +595,15 @@ def get_availability():
             temp_dict[f"{new_i}&4"] = temp.start_time3.strftime("%H:%M") if temp.start_time3 else None
             temp_dict[f"{new_i}&5"] = temp.end_time3.strftime("%H:%M") if temp.end_time3 else None
     
+    print(temp_dict)
+
     #Save Availability
     if request.method == 'POST':
         button = request.json.get("button", None)
         if button == "Submit":
+            print(request.json)
             user_selection = request.json.get("selectedUser", None)
+            checkedBox_selection = request.json.get("checkedBoxes", None)
             if user_selection == "":
                 new_user = user
             else:
@@ -617,6 +622,12 @@ def get_availability():
             for i in range(day_num):
                 new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
                 new_weekday = weekdays[i]
+
+                if request.json.get(f'checkbox_{i}') is True:
+                    planned_holiday = "X"
+                    print(i)
+                else:
+                    planned_holiday = None
                 
                 # Loop through entries
                 new_entry = {}
@@ -645,6 +656,7 @@ def get_availability():
                     user_id=new_user.id, 
                     date=new_date, 
                     weekday=new_weekday, 
+                    holiday=planned_holiday,
                     email=new_user.email,
                     start_time=new_entry['entry1'], 
                     end_time=new_entry['entry2'], 
@@ -1316,8 +1328,11 @@ def get_required_workforce():
     end_date = week_start + datetime.timedelta(days=day_num)
     all_time_reqs = TimeReq.query.filter(
         TimeReq.company_name == user.company_name,
+        TimeReq.department == request.args.get('selectedDepartment'),
         TimeReq.date.between(week_start, end_date)
     ).all()
+
+    print(request.args.get('selectedDepartment'))
 
     # Convert all_time_reqs to a dictionary for quick lookup
     time_req_lookup = {(rec.date, rec.start_time): rec.worker for rec in all_time_reqs}
