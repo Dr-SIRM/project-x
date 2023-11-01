@@ -63,6 +63,7 @@ To-Do Liste:
 
  To-Do's 
  -------------------------------
+ - NB9 und NB14 um/bauen. Wenn das funktioniert, alle NB's mit Schichten umbauen.
  - (*)  Wenn man gar keine time_req eingegeben hat, hällt dann Vorüberprüfung 1 stand?
  - (*) MA mit verschiedenen Profilen - Department (Koch, Service, ..)
  - (*) self.subsequent_workingdays_max in die Datenbank einpflegen und ziehen
@@ -1236,10 +1237,7 @@ class ORAlgorithm_cp:
                     self.model.Add(sum(self.y[i, j, k] for k in range(len(self.verfügbarkeit[i][j]))) <= self.daily_deployment)
         """
 
-        # Wenn Arbeitsblöcke auf 2 gesetzt wird, dann ist es möglich, das ein Mitarbeiter mit 2 Skills nicht eingeteilt wird.
-
-        
-        # 26.10.2023
+        # 26.10.2023 (01.11.2023: NB sollte eig funktionieren)
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 # Überprüfen, ob der Betrieb an diesem Tag geöffnet ist
