@@ -42,5 +42,26 @@
       "department3": "Department 3",
       "access_level": "Access Level"
     }
+  },
+
+  "sidebar": {
+    "Dashboard": "Dashboard",
+    "Solver": "Solver",
+    "Solver Req": "Solver Req",
+    "Team": "Team",
+    "Manage Team": "Manage Team",
+    "User Management": "User Management",
+    "Einladen": "Invite",
+    "Seiten": "Pages",
+    "Verfügbarkeit": "Availability",
+    "Company": "Company",
+    "Kalender": "Calendar",
+    "Planung": "Planning",
+    "Schichtplan": "Shift Schedule",
+    "FAQ": "FAQ",
+    "Account": "Account",
+    "Einstellungen": "Settings",
+    "Sonstiges": "Miscellaneous",
+    "Neuer User": "New User"
   }
 }

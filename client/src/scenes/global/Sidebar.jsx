@@ -5,16 +5,10 @@ import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
-import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
-import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
-import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
-import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 import BusinessIcon from '@mui/icons-material/Business';
 import CalculateIcon from '@mui/icons-material/Calculate';
 import TuneIcon from '@mui/icons-material/Tune';
@@ -26,8 +20,8 @@ import EventNoteIcon from '@mui/icons-material/EventNote';
 import SettingsIcon from '@mui/icons-material/Settings';
 import axios from 'axios';
 import { API_BASE_URL } from "../../config";
-
-
+import { useTranslation } from 'react-i18next';
+import '../../i18n';  
 
 
 const Sidebar = () => {
@@ -36,6 +30,7 @@ const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
   const token = localStorage.getItem('session_token'); 
+  const { t, i18n } = useTranslation();
   const [user, setUser] = useState({
     firstName: '',
     lastName: '',
@@ -101,8 +96,6 @@ const Sidebar = () => {
     return <Typography {...props}>{children}</Typography>;
   };
   
-  
-
   
   return (
     <Box
@@ -179,14 +172,14 @@ const Sidebar = () => {
           {/* MENU ITEMS */}
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             <Item
-              title="Dashboard"
+              title={t('sidebar.Dashboard')}
               to="/dashboard"
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Solver"
+              title={t('sidebar.Solver')}
               to="/solver"
               icon={<CalculateIcon />}
               selected={selected}
@@ -195,7 +188,7 @@ const Sidebar = () => {
               accessLevel={user.accessLevel}
             />
             <Item
-              title="Solver Req"
+              title={t('sidebar.Solver Req')}
               to="/solver/requirement"
               icon={<TuneIcon />}
               selected={selected}
@@ -214,7 +207,7 @@ const Sidebar = () => {
               Team
             </ConditionalTypography>
             <Item
-              title="Manage Team"
+              title={t('sidebar.Manage Team')}
               to="/team"
               icon={<GroupsIcon />}
               selected={selected}
@@ -223,7 +216,7 @@ const Sidebar = () => {
               accessLevel={user.accessLevel}
             />
             <Item
-              title="User Management"
+              title={t('sidebar.User Management')}
               to="/user_management"
               icon={<GroupsIcon />}
               selected={selected}
@@ -233,7 +226,7 @@ const Sidebar = () => {
             />
             
             <Item
-              title="Einladen"
+              title={t('sidebar.Einladen')}
               to="/invite"
               icon={<GroupAddIcon />}
               selected={selected}
@@ -249,14 +242,14 @@ const Sidebar = () => {
               Seiten
             </Typography>
             <Item
-              title="Verfügbarkeit"
+              title={t('sidebar.Verfügbarkeit')}
               to="/availability"
               icon={<EventAvailableIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Company"
+              title={t('sidebar.Company')}
               to="/company"
               icon={<BusinessIcon />}
               selected={selected}
@@ -265,14 +258,14 @@ const Sidebar = () => {
               accessLevel={user.accessLevel}
             />
             <Item
-              title="Kalender"
+              title={t('sidebar.Kalender')}
               to="/calendar"
               icon={<CalendarTodayOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="Planung"
+              title={t('sidebar.Planung')}
               to="/planning"
               icon={<EventNoteIcon />}
               selected={selected}
@@ -281,14 +274,14 @@ const Sidebar = () => {
               accessLevel={user.accessLevel}
             />
             <Item
-              title="Schichtplan"
+              title={t('sidebar.Schichtplan')}
               to="/plan"
               icon={<CalendarViewMonthIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="FAQ"
+              title={t('sidebar.FAQ')}
               to="/faq"
               icon={<HelpOutlineOutlinedIcon />}
               selected={selected}
@@ -302,7 +295,7 @@ const Sidebar = () => {
               Account
             </Typography>
             <Item
-              title="Einstellungen"
+              title={t('sidebar.Einstellungen')}
               to="/update"
               icon={<SettingsIcon />}
               selected={selected}
@@ -318,7 +311,7 @@ const Sidebar = () => {
               Sonstiges
             </ConditionalTypography>
             <Item
-              title="Neuer User"
+              title={t('sidebar.Neuer User')}
               to="/form"
               icon={<PersonOutlinedIcon />}
               selected={selected}
@@ -328,19 +321,17 @@ const Sidebar = () => {
             />
           </Box>
           {!isCollapsed && (
-  <Box
-    style={{
-      paddingLeft: "50px", 
-      paddingTop: "20px",
-    }}
-  >
-    <Typography>
-      <h5>© 2023 TimeTab GmbH</h5>
-    </Typography>
-  </Box>
-)}
-
-
+            <Box
+              style={{
+                paddingLeft: "50px", 
+                paddingTop: "20px",
+              }}
+            >
+              <Typography>
+                <h5>© 2023 TimeTab GmbH</h5>
+              </Typography>
+            </Box>
+           )}
         </Menu>
       </ProSidebar>
     </Box>
