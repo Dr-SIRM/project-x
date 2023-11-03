@@ -63,6 +63,7 @@ To-Do Liste:
 
  To-Do's 
  -------------------------------
+ - NB9 und NB14 um/bauen. Wenn das funktioniert, alle NB's mit Schichten umbauen.
  - (*)  Wenn man gar keine time_req eingegeben hat, hällt dann Vorüberprüfung 1 stand?
  - (*) MA mit verschiedenen Profilen - Department (Koch, Service, ..)
  - (*) self.subsequent_workingdays_max in die Datenbank einpflegen und ziehen
@@ -263,16 +264,12 @@ class ORAlgorithm_cp:
         self.mitarbeiter = [user_id for user_id in self.binary_availability]
 
 
-        # 22.10.2023
         # Erstellen Sie ein neues Wörterbuch basierend auf den user_ids in self.binary_availability
         for user_id in self.binary_availability:
             # Überprüfen Sie, ob die user_id in self.user_skills vorhanden ist
             if user_id in self.user_skills:
                 # Füge die user_id und die zugehörigen Skills dem neuen Wörterbuch hinzu
                 self.mitarbeiter_s[user_id] = self.user_skills[user_id]
-        print("self.mitarbeiter_s: ", self.mitarbeiter_s)
-
-
 
         # -- 2 ------------------------------------------------------------------------------------------------------------
         # Aus dem binary_availability dict. die Verfügbarkeits-Informationen ziehen
@@ -1240,35 +1237,31 @@ class ORAlgorithm_cp:
                     self.model.Add(sum(self.y[i, j, k] for k in range(len(self.verfügbarkeit[i][j]))) <= self.daily_deployment)
         """
 
-        # Wenn Arbeitsblöcke auf 2 gesetzt wird, dann ist es möglich, das ein MA zur selben Zeit in verschiedenen Skills arbeitet
-        # Es muss eine NB für Anzahl Arbeitsblöcke und eine weitere NB gebaut werden, das ein MA zur selben Zeit nur in einem Skill arbeiten kann
-
-        
-        # 26.10.2023
+        # 26.10.2023 (01.11.2023: NB sollte eig funktionieren)
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 # Überprüfen, ob der Betrieb an diesem Tag geöffnet ist
                 if self.opening_hours[j] > 0:
                     current_week = j // 7
 
-                    # Überprüfen, ob current_week innerhalb des Zeitrahmens liegt, den self.week_timeframe festlegt
-                    if current_week < self.week_timeframe:
-                        # Zugriff auf die benötigten Skills für die aktuelle Woche
-                        needed_skills_this_week = self.benoetigte_skills[current_week]
+                    # Benötigten Skills für die aktuelle Woche
+                    needed_skills_this_week = self.benoetigte_skills[current_week]
 
-                        # Filtern der Skills, um nur diejenigen zu behalten, die der Mitarbeiter hat und die für diese Woche benötigt werden
-                        valid_skills = [s for s in needed_skills_this_week if s in self.mitarbeiter_s[i]]
-                        print(i, "valid_skills: ", valid_skills)
+                    # Filtern der Skills, um nur diejenigen zu behalten, die der Mitarbeiter für den j-ten Tag hat
+                    valid_skills = [s for s in needed_skills_this_week if s in self.mitarbeiter_s[i]]
+                    print(i, "valid_skills: ", valid_skills)
 
-                        # Für die erste Stunde des Tages berechnen wir die Summe unter Berücksichtigung der gültigen Skills
-                        self.model.Add(self.y[i, j, 0] >= sum(self.x[i, j, 0, s] for s in valid_skills))
-                        
-                        # Für die restlichen Stunden des Tages berechnen wir die Summe unter Berücksichtigung der gültigen Skills
-                        for k in range(1, len(self.verfügbarkeit[i][j])):
-                            self.model.Add(self.y[i, j, k] >= sum(self.x[i, j, k, s] for s in valid_skills) - sum(self.x[i, j, k-1, s] for s in valid_skills))
 
-                        # Die Summe der y[i, j, k] für einen bestimmten Tag j sollte nicht größer als daily_deployment sein
-                        self.model.Add(sum(self.y[i, j, k] for k in range(len(self.verfügbarkeit[i][j]))) <= self.daily_deployment)
+                    # Für die erste Stunde des Tages berechnen wir die Summe unter Berücksichtigung der gültigen Skills
+                    self.model.Add(self.y[i, j, 0] >= sum(self.x[i, j, 0, s] for s in valid_skills))
+                    
+                    # Für die restlichen Stunden des Tages berechnen wir die Summe unter Berücksichtigung der gültigen Skills
+                    for k in range(1, len(self.verfügbarkeit[i][j])):
+                        self.model.Add(self.y[i, j, k] >= sum(self.x[i, j, k, s] for s in valid_skills) - sum(self.x[i, j, k-1, s] for s in valid_skills))
+
+
+                    # Die Summe der y[i, j, k] für einen bestimmten Tag j sollte nicht größer als daily_deployment sein
+                    self.model.Add(sum(self.y[i, j, k] for k in range(len(self.verfügbarkeit[i][j]))) <= self.daily_deployment)
 
 
         
@@ -1599,11 +1592,15 @@ class ORAlgorithm_cp:
                             self.model.Add(ct)
         """
 
-        # 23.10.2023
+        # 01.11.2023
 
+        # Wenn diese NB aktiviert ist und Arbeitseinsätze pro Tag 2 ist, dann wird der MA mit 2 schichten nicht mehr eingeteilt
+
+        """
         # WEICHE NB
-        self.time_per_deployment = 2 * self.hour_devider
-
+        self.time_per_deployment = self.time_per_deployment * self.hour_devider
+        print("HAAAAAAAAALLLLLLLLLLOOOOOOOOOO:", self.time_per_deployment)
+        
         if self.daily_deployment == 2:
             for i in self.mitarbeiter:
                 for j in range(self.calc_time):
@@ -1616,8 +1613,7 @@ class ORAlgorithm_cp:
                                         if k + h < len(self.verfügbarkeit[i][j]):
                                             working_conditions.append(self.y[i, j, k] - self.x[i, j, k + h, s])
                                             
-                                    ct = sum(working_conditions) <= self.nb9_violation[i, j, k]
-                                    self.model.Add(ct)
+                                    self.model.Add(sum(working_conditions) <= self.nb9_violation[i, j, k])
 
                                 # Für die letzten Stunden des Tages
                                 else:
@@ -1627,10 +1623,9 @@ class ORAlgorithm_cp:
                                     missing_hours = self.time_per_deployment - remaining_hours
 
                                     # Anzahl der Verstöße ist gleich der Anzahl der fehlenden Stunden
-                                    ct = self.y[i, j, k] * missing_hours == self.nb9_violation[i, j, k]
-                                    self.model.Add(ct)
-
-
+                                    self.model.Add(self.y[i, j, k] * missing_hours == self.nb9_violation[i, j, k])
+        
+        """
         
         # -------------------------------------------------------------------------------------------------------
         # HARTE NB (08.10.2023)
@@ -1718,17 +1713,32 @@ class ORAlgorithm_cp:
             self.model.Add(self.nb12_max_violation[ma] >= 0)
        
 
-
         # -------------------------------------------------------------------------------------------------------
-        # HARTE NB (23.10.2023)
+        # HARTE NB (01.11.2023)
         # NB 13 - Ein Mitarbeiter darf nie mit verschiedenen Skills in der gleichen Stunde arbeiten
         # -------------------------------------------------------------------------------------------------------
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                for k in range(len(self.verfügbarkeit[i][j])):
+                    # Prüfen, ob Mitarbeiter in dieser Stunde für mehr als einen Skill verfügbar ist
+                    if len([s for s in self.mitarbeiter_s[i] if (i, j, k, s) in self.x]) > 1:
+                        # Die Summe der zugewiesenen Skills für diesen Mitarbeiter in dieser Stunde sollte <= 1 sein
+                        self.model.Add(sum(self.x[i, j, k, s] for s in self.mitarbeiter_s[i]) <= 1)
         
+
+        # -------------------------------------------------------------------------------------------------------
+        # HARTE NB (01.11.2023)
+        # NB 14 - Mehrere Skills an einem Tag ausführen J/N
+        # -------------------------------------------------------------------------------------------------------
         # Abfragen ob bei mehreren Skills die Mitarbeiter innerhalb von einem Tag die Skills wechseln dürfen.
         # Wenn nein, wird diese NB aktiviert
+        # Das muss noch in die Datenbank eingebaut werden
+        self.skills_per_day = 2
 
-
-
+        if self.skills_per_day == 1:
+            for i in self.mitarbeiter:
+                for j in range(self.calc_time):
+                    pass
 
 
 
