@@ -8,6 +8,8 @@ import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import axios from 'axios';
 import { API_BASE_URL } from "../../config";
+import { useTranslation } from 'react-i18next';
+import '../../i18n';  
 
 
 
@@ -19,7 +21,7 @@ const SolverReq = ({ solverreq }) => {
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [solverData, setsolverData] = useState({});
   const token = localStorage.getItem('session_token'); // Get the session token from local storage
-
+  const { t, i18n } = useTranslation();
   const [isChecked, setIsChecked] = useState(false);
   const [inputText, setInputText] = useState('');
 
@@ -61,8 +63,8 @@ const SolverReq = ({ solverreq }) => {
   return (
     <Box m="20px">
       <Header
-        title="Solver Anforderungen"
-        subtitle="Bestimme deinen Einsatzplan nach deinen Bedürfnissen!"
+        title={t('solverreq.title')}
+        subtitle={t('solverreq.subtitle')}
       />
 
       <Formik
@@ -116,7 +118,7 @@ const SolverReq = ({ solverreq }) => {
         }) => (
           <form onSubmit={handleSubmit}>   
           <br></br>
-          <Typography variant="h5">Mindestanforderungen</Typography>        
+          <Typography variant="h5">{t('solverreq.Mindestanforderungen')}</Typography>        
             <br></br>
             <Box
               display="grid"
@@ -138,7 +140,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
                 >
-                  Gewünschte Mindestanzahl Arbeitsstunden pro Tag
+                  {t('solverreq.wishedminworkinghoursperday')}
                 </Typography>
                 <TextField
                 fullWidth
@@ -185,7 +187,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
                 >
-                  Mindestanzahl Zeit pro Tag
+                  {t('solverreq.mintimeperday')}
                 </Typography>
                 <TextField
                 fullWidth
@@ -232,7 +234,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
                 >
-                  Gewünschte maximale Arbeitszeit pro Tag
+                 {t('solverreq.wishedmaxworkinghoutperday')}
                 </Typography>
                 <TextField
                 fullWidth
@@ -279,7 +281,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
                 >
-                  Maximale Arbeitszeit pro Tag
+                  {t('solverreq.maxworktimeperday')}
                 </Typography>
                 <TextField
                 fullWidth
@@ -327,7 +329,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
                 >
-                  Maximale Zeit pro Woche
+                  {t('solverreq.maxtimeperweek')}
                 </Typography>
                 <TextField
                 fullWidth
@@ -374,7 +376,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
                 >
-                 Abweichungsgrad zur gerechten Verteilung
+                 {t('solverreq.differencetodistribution')}
                 </Typography>
                 <TextField
                 fullWidth
@@ -421,7 +423,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
                 >
-                  Stundeneinheit
+                  {t('solverreq.hourunit')}
                 </Typography>
                 <TextField
                 fullWidth
@@ -468,7 +470,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
                 >
-                  Berechnungszeitraum
+                  {t('solverreq.calculationtimeframe')}
                 </Typography>
                 <TextField
                 fullWidth
@@ -515,7 +517,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
                 >
-                  Maximale Arbeitstage in Folge
+                  {t('solverreq.maxworkingdayinarow')}
                 </Typography>
                 <TextField
                 fullWidth
@@ -562,7 +564,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
                 >
-                  Anzahl Arbeitseinsätze pro Tag
+                  {t('solverreq.countofshiftsperday')}
                 </Typography>
                 <TextField
                 fullWidth
@@ -609,7 +611,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
                 >
-                  Mindestunden pro Arbeitsblock
+                  {t('solverreq.minhoursperworkingshift')}
                 </Typography>
                 <TextField
                 fullWidth
