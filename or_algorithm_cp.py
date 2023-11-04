@@ -59,15 +59,17 @@ To-Do Liste:
  - (erl) get_availability und binaere_liste anpassen 
  - (erl) start_time und end_time zwei und drei noch implementieren
  - (erl) TimeReq in data_processing anpassen, soabld Phu Planung fertiggestellt hat.
+ - (erl) MA mit verschiedenen Profilen - Department (Koch, Service, ..)
  
 
  To-Do's 
  -------------------------------
- - NB9 und NB14 um/bauen. Wenn das funktioniert, alle NB's mit Schichten umbauen.
+ - Alle NB's mit Schichten umbauen.
  - (*)  Wenn man gar keine time_req eingegeben hat, hällt dann Vorüberprüfung 1 stand?
- - (*) MA mit verschiedenen Profilen - Department (Koch, Service, ..)
- - (*) self.subsequent_workingdays_max in die Datenbank einpflegen und ziehen
- - (*) self.xxxx für Skills den ganzen Tag oder nicht
+ - (*) self.subsequent_workingdays_max, self.skills_per_day(1 oder 0) in die Datenbank einpflegen und ziehen
+
+ - self.max_time_week darf niemals grösser als self.weekly hours gewählt werden!
+ - self.daily_deployment soll nur 1 oder 2 werden können
 
 
  
@@ -439,6 +441,7 @@ class ORAlgorithm_cp:
         # Abschließende Überprüfung und Ausgabe
         print("6. self.gerechte_verteilung: ", self.gerechte_verteilung)  
         print("Final total_hours_assigned: ", total_hours_assigned)
+        # self.gerechte_verteilung = [40, 40]
 
 
         # -- 15 ------------------------------------------------------------------------------------------------------------
@@ -859,7 +862,6 @@ class ORAlgorithm_cp:
                         for s in self.benoetigte_skills[woche]: # Die Skills in der richtigen Woche berücksichtigen
                             if s in self.mitarbeiter_s[i]:  # Dies stellt sicher, dass der Mitarbeiter den Skill tatsächlich hat
                                 self.x[i, j, k, s] = self.model.NewIntVar(0, 1, f'x[{i}, {j}, {k}, {s}]')
-                                print("Entscheidungsvariable x: ", self.x[i, j, k, s])
 
         # Arbeitsblockvariable
         self.y = {}
@@ -875,14 +877,12 @@ class ORAlgorithm_cp:
                 for s in self.skills:
                     if s in self.mitarbeiter_s[i]:  # Der Mitarbeiter muss den Skill haben
                         self.a[i, j, s] = self.model.NewBoolVar(f'a[{i}, {j}, {s}]')
-                        print("Variable a: ", self.a[i, j, s])
 
         # Arbeitstagvariable Skillunabhängig
         self.a_sum = {}
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 self.a_sum[i, j] = self.model.NewBoolVar(f'a_sum[{i}, {j}]')
-                print("Variable a_sum: ", self.a_sum[i, j])
 
 
         # Schichtvariable Woche (2-Schicht)
@@ -999,7 +999,6 @@ class ORAlgorithm_cp:
                         for s in self.benoetigte_skills[woche]:
                             if s in self.mitarbeiter_s[i]:  # Überprüfen, ob der Mitarbeiter den Skill hat
                                 self.cost_expressions.append(self.x[i, j, k, s] * int(self.kosten[i] / self.hour_devider))
-                                print("Zielfunktion: ", self.x[i, j, k, s])
 
         # Kosten Weiche NB1
         for j in range(self.calc_time):
@@ -1063,7 +1062,6 @@ class ORAlgorithm_cp:
                 
         # Alle Kosten-Ausdrücke summieren und dem Model befehlen, die Kosten zu minimieren
         total_cost = sum(self.cost_expressions)
-        print("self.cost_expression: ", self.cost_expressions)
         self.model.Minimize(total_cost)
 
 
@@ -1151,7 +1149,6 @@ class ORAlgorithm_cp:
         # NB 3 - Max. Arbeitszeit pro Woche (Unabhängig vom Skill)
         # ***** Weiche Nebenbedingung 2 *****
         # -------------------------------------------------------------------------------------------------------
-        # Für die erste Woche
         if self.week_timeframe == 1:
             # Berechnung der Gesamtstunden pro Mitarbeiter unter Berücksichtigung der benötigten Skills
             total_hours = {}
@@ -1171,22 +1168,91 @@ class ORAlgorithm_cp:
                 self.model.Add(total_hours[ma] - self.weekly_hours <= self.nb2_violation[ma][1])
 
 
-
-        # MUSS SPÄTER NOCH GEÄNDERT WERDEN!!!! (30.10.2023)
-
         elif self.week_timeframe == 2:
-            total_hours_week1 = {ma: sum([self.x[ma, j, k] for j in range(self.calc_time // 2) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
-            total_hours_week2 = {ma: sum([self.x[ma, j, k] for j in range(self.calc_time // 2, self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
+            # Berechnung der Gesamtstunden pro Mitarbeiter unter Berücksichtigung der benötigten Skills
+            total_hours_week1 = {}
+            total_hours_week2 = {}
+
+            # 1. Woche
+            for ma in self.mitarbeiter:
+                ma_total_hours = 0  # Initialisieren der Gesamtstunden für den aktuellen Mitarbeiter
+                for j in range(7): # Für die erste Woche
+                    for k in range(len(self.verfügbarkeit[ma][j])):
+                        if self.benoetigte_skills[0]:  # Überprüfen, ob in der Woche Skills benötigt werden
+                            for s in self.benoetigte_skills[0]:
+                                if s in self.mitarbeiter_s[ma]:  # Sicherstellen, dass der Mitarbeiter den Skill hat
+                                    ma_total_hours += self.x[ma, j, k, s]
+                total_hours_week1[ma] = ma_total_hours  # Zuweisung der Gesamtstunden pro Mitarbeiter
+
+            # 2. Woche
+            for ma in self.mitarbeiter:
+                ma_total_hours = 0  # Initialisieren der Gesamtstunden für den aktuellen Mitarbeiter
+                for j in range(7, 14): # Für die zweite Woche
+                    for k in range(len(self.verfügbarkeit[ma][j])):
+                        if self.benoetigte_skills[0]:  # Überprüfen, ob in der Woche Skills benötigt werden
+                            for s in self.benoetigte_skills[0]:
+                                if s in self.mitarbeiter_s[ma]:  # Sicherstellen, dass der Mitarbeiter den Skill hat
+                                    ma_total_hours += self.x[ma, j, k, s]
+                total_hours_week2[ma] = ma_total_hours  # Zuweisung der Gesamtstunden pro Mitarbeiter
+
+            # Hinzufügen der Nebenbedingung für jeden Mitarbeiter
             for ma in self.mitarbeiter:
                 self.model.Add(total_hours_week1[ma] - self.weekly_hours <= self.nb2_violation[ma][1])
                 self.model.Add(total_hours_week2[ma] - self.weekly_hours <= self.nb2_violation[ma][2])
+
                         
         elif self.week_timeframe == 4:
-            total_hours_week1 = {ma: sum([self.x[ma, j, k] for j in range(self.calc_time // 4) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
-            total_hours_week2 = {ma: sum([self.x[ma, j, k] for j in range(self.calc_time // 4, self.calc_time // 2) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
-            total_hours_week3 = {ma: sum([self.x[ma, j, k] for j in range(self.calc_time // 2, 3 * self.calc_time // 4) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
-            total_hours_week4 = {ma: sum([self.x[ma, j, k] for j in range(3 * self.calc_time // 4, self.calc_time) for k in range(len(self.verfügbarkeit[ma][j]))]) for ma in self.mitarbeiter}
-            
+            # Berechnung der Gesamtstunden pro Mitarbeiter unter Berücksichtigung der benötigten Skills
+            total_hours_week1 = {}
+            total_hours_week2 = {}
+            total_hours_week3 = {}
+            total_hours_week4 = {}
+
+            # 1. Woche
+            for ma in self.mitarbeiter:
+                ma_total_hours = 0  # Initialisieren der Gesamtstunden für den aktuellen Mitarbeiter
+                for j in range(7): # Für die erste Woche
+                    for k in range(len(self.verfügbarkeit[ma][j])):
+                        if self.benoetigte_skills[0]:  # Überprüfen, ob in der Woche Skills benötigt werden
+                            for s in self.benoetigte_skills[0]:
+                                if s in self.mitarbeiter_s[ma]:  # Sicherstellen, dass der Mitarbeiter den Skill hat
+                                    ma_total_hours += self.x[ma, j, k, s]
+                total_hours_week1[ma] = ma_total_hours  # Zuweisung der Gesamtstunden pro Mitarbeiter
+
+            # 2. Woche
+            for ma in self.mitarbeiter:
+                ma_total_hours = 0  # Initialisieren der Gesamtstunden für den aktuellen Mitarbeiter
+                for j in range(7, 14): # Für die zweite Woche
+                    for k in range(len(self.verfügbarkeit[ma][j])):
+                        if self.benoetigte_skills[0]:  # Überprüfen, ob in der Woche Skills benötigt werden
+                            for s in self.benoetigte_skills[0]:
+                                if s in self.mitarbeiter_s[ma]:  # Sicherstellen, dass der Mitarbeiter den Skill hat
+                                    ma_total_hours += self.x[ma, j, k, s]
+                total_hours_week2[ma] = ma_total_hours  # Zuweisung der Gesamtstunden pro Mitarbeiter
+
+            # 3. Woche
+            for ma in self.mitarbeiter:
+                ma_total_hours = 0  # Initialisieren der Gesamtstunden für den aktuellen Mitarbeiter
+                for j in range(14, 21): # Für die dritte Woche
+                    for k in range(len(self.verfügbarkeit[ma][j])):
+                        if self.benoetigte_skills[0]:  # Überprüfen, ob in der Woche Skills benötigt werden
+                            for s in self.benoetigte_skills[0]:
+                                if s in self.mitarbeiter_s[ma]:  # Sicherstellen, dass der Mitarbeiter den Skill hat
+                                    ma_total_hours += self.x[ma, j, k, s]
+                total_hours_week3[ma] = ma_total_hours  # Zuweisung der Gesamtstunden pro Mitarbeiter
+
+            # 4. Woche
+            for ma in self.mitarbeiter:
+                ma_total_hours = 0  # Initialisieren der Gesamtstunden für den aktuellen Mitarbeiter
+                for j in range(21, 28): # Für die vierte Woche
+                    for k in range(len(self.verfügbarkeit[ma][j])):
+                        if self.benoetigte_skills[0]:  # Überprüfen, ob in der Woche Skills benötigt werden
+                            for s in self.benoetigte_skills[0]:
+                                if s in self.mitarbeiter_s[ma]:  # Sicherstellen, dass der Mitarbeiter den Skill hat
+                                    ma_total_hours += self.x[ma, j, k, s]
+                total_hours_week4[ma] = ma_total_hours  # Zuweisung der Gesamtstunden pro Mitarbeiter
+
+            # Hinzufügen der Nebenbedingung für jeden Mitarbeiter
             for ma in self.mitarbeiter:
                 self.model.Add(total_hours_week1[ma] - self.weekly_hours <= self.nb2_violation[ma][1])
                 self.model.Add(total_hours_week2[ma] - self.weekly_hours <= self.nb2_violation[ma][2])
@@ -1249,8 +1315,6 @@ class ORAlgorithm_cp:
 
                     # Filtern der Skills, um nur diejenigen zu behalten, die der Mitarbeiter für den j-ten Tag hat
                     valid_skills = [s for s in needed_skills_this_week if s in self.mitarbeiter_s[i]]
-                    print(i, "valid_skills: ", valid_skills)
-
 
                     # Für die erste Stunde des Tages berechnen wir die Summe unter Berücksichtigung der gültigen Skills
                     self.model.Add(self.y[i, j, 0] >= sum(self.x[i, j, 0, s] for s in valid_skills))
@@ -1313,12 +1377,12 @@ class ORAlgorithm_cp:
                         if s in self.mitarbeiter_s[ma] and j < len(self.verfügbarkeit[ma])  # Sicherstellen, dass der Index gültig ist
                     )
 
-                    # Minimalwert-Regelung
+                    # Unterschreitung
                     min_hours = round((self.weekly_hours * self.employment_lvl_exact[i]) + 0.5)
                     self.model.Add(total_hours_week - min_hours >= -self.nb5_min_violation[ma][week - 1])
                     self.model.Add(self.nb5_min_violation[ma][week - 1] >= 0)
 
-                    # Maximalwert-Regelung
+                    # Überschreitung
                     max_hours = round((self.weekly_hours * self.employment_lvl_exact[i]) + 0.5)
                     self.model.Add(max_hours - total_hours_week >= -self.nb6_max_violation[ma][week - 1])
                     self.model.Add(self.nb6_max_violation[ma][week - 1] >= 0)
@@ -1333,18 +1397,27 @@ class ORAlgorithm_cp:
         if self.company_shifts <= 1:
             pass
 
-
-        # DAS MUSS SPÄTER ALLES NOCH GEÄNDERT WERDEN!!! (30.10.2023)
-
-        
         elif self.company_shifts == 2:
             for i in self.mitarbeiter:
                 for j in range(7):
 
-                    # Hier noch einbauen, das wenn die Stundenanzahl ungerade ist!!
+                    # Bei z.B. 7 Stunden bekommt die erste Schicht 3 Stunden und die zweite Schicht 4 Stunden!
+                    first_shift_hours = 0
+                    second_shift_hours = 0
 
-                    first_shift_hours = sum(self.x[i, j, k] for k in range(0, int(len(self.verfügbarkeit[i][j]) / 2))) 
-                    second_shift_hours = sum(self.x[i, j, k] for k in range(int(len(self.verfügbarkeit[i][j]) / 2), len(self.verfügbarkeit[i][j]))) 
+                    # Über alle Stunden in der ersten Schichthälfte summieren
+                    for k in range(int(len(self.verfügbarkeit[i][j]) / 2)):
+                        if self.benoetigte_skills[0]:  # Überprüfen, ob in der Woche Skills benötigt werden
+                            for s in self.benoetigte_skills[0]:
+                                if s in self.mitarbeiter_s[i]:  # Sicherstellen, dass der Mitarbeiter den Skill hat
+                                    first_shift_hours += self.x[i, j, k, s]
+
+                    # Über alle Stunden in der zweiten Schichthälfte summieren
+                    for k in range(int(len(self.verfügbarkeit[i][j]) / 2), len(self.verfügbarkeit[i][j])):
+                        if self.benoetigte_skills[0]:  # Überprüfen, ob in der Woche Skills benötigt werden
+                            for s in self.benoetigte_skills[0]:
+                                if s in self.mitarbeiter_s[i]:  # Sicherstellen, dass der Mitarbeiter den Skill hat
+                                    second_shift_hours += self.x[i, j, k, s]
                     
                     delta = self.model.NewBoolVar("delta")
                     
@@ -1371,6 +1444,8 @@ class ORAlgorithm_cp:
                     self.model.Add(self.nb7_violation[i, j] >= diff)
                     self.model.Add(self.nb7_violation[i, j] >= -diff)
 
+
+
         elif self.company_shifts == 3:
             for i in self.mitarbeiter:
                 for j in range(7):
@@ -1379,9 +1454,30 @@ class ORAlgorithm_cp:
                     first_shift_len = third_shift_len + (total_len % 3) // 2
                     second_shift_len = third_shift_len + (total_len % 3) - (total_len % 3) // 2
 
-                    first_shift_hours = sum(self.x[i, j, k] for k in range(0, first_shift_len))
-                    second_shift_hours = sum(self.x[i, j, k] for k in range(first_shift_len, first_shift_len + second_shift_len))
-                    third_shift_hours = sum(self.x[i, j, k] for k in range(first_shift_len + second_shift_len, total_len))
+                    first_shift_hours = 0
+                    second_shift_hours = 0
+                    third_shift_hours = 0
+
+                    # Erst Schicht des Tages
+                    for k in range(0, first_shift_len):
+                        if self.benoetigte_skills[0]:  # Überprüfen, ob in der Woche Skills benötigt werden
+                            for s in self.benoetigte_skills[0]:
+                                if s in self.mitarbeiter_s[i]:  # Sicherstellen, dass der Mitarbeiter den Skill hat
+                                    first_shift_hours += self.x[i, j, k, s]
+
+                    # Zweite Schicht des Tages
+                    for k in range(first_shift_len, first_shift_len + second_shift_len):
+                        if self.benoetigte_skills[0]:  # Überprüfen, ob in der Woche Skills benötigt werden
+                            for s in self.benoetigte_skills[0]:
+                                if s in self.mitarbeiter_s[i]:  # Sicherstellen, dass der Mitarbeiter den Skill hat
+                                    second_shift_hours += self.x[i, j, k, s]
+                    
+                    # Dritte Schicht des Tages
+                    for k in range(first_shift_len + second_shift_len, total_len):
+                        if self.benoetigte_skills[0]:  # Überprüfen, ob in der Woche Skills benötigt werden
+                            for s in self.benoetigte_skills[0]:
+                                if s in self.mitarbeiter_s[i]:  # Sicherstellen, dass der Mitarbeiter den Skill hat
+                                    third_shift_hours += self.x[i, j, k, s]
 
                     delta1 = self.model.NewBoolVar(f"delta1_{i}_{j}")
                     delta2 = self.model.NewBoolVar(f"delta2_{i}_{j}")
@@ -1420,7 +1516,7 @@ class ORAlgorithm_cp:
                     self.model.Add(self.nb7_violation[i, j] <= 1) # Die Verletzung sollte maximal 1 betragen
 
         # -------------------------------------------------------------------------------------------------------
-        # WEICHE NB
+        # WEICHE NB (04.11.2023)
         # NB 8 - Wechselnde Schichten innerhalb von 2 und 4 Wochen
         # ***** Weiche Nebenbedingung 8 *****
         # -------------------------------------------------------------------------------------------------------
@@ -1446,8 +1542,23 @@ class ORAlgorithm_cp:
                     # In der zweiten Woche muss der Mitarbeiter in der entgegengesetzten Schicht arbeiten
                     for j in range(7, 14):
                         # Summe der Stunden in der ersten Schicht in der zweiten Woche
-                        first_shift_hours_second_week = sum(self.x[i, j, k] for k in range(0, int(len(self.verfügbarkeit[i][j]) / 2)))
-                        second_shift_hours_second_week = sum(self.x[i, j, k] for k in range(int(len(self.verfügbarkeit[i][j]) / 2), len(self.verfügbarkeit[i][j])))
+                        first_shift_hours_second_week = 0
+                        second_shift_hours_second_week = 0
+
+                        for k in range(0, int(len(self.verfügbarkeit[i][j]) / 2)):
+                            if self.benoetigte_skills[0]:  # Überprüfen, ob in der Woche Skills benötigt werden
+                                for s in self.benoetigte_skills[0]:
+                                    if s in self.mitarbeiter_s[i]:  # Sicherstellen, dass der Mitarbeiter den Skill hat
+                                        first_shift_hours_second_week += self.x[i, j, k, s]
+
+                        for k in range(int(len(self.verfügbarkeit[i][j]) / 2), len(self.verfügbarkeit[i][j])):
+                            if self.benoetigte_skills[0]:  # Überprüfen, ob in der Woche Skills benötigt werden
+                                for s in self.benoetigte_skills[0]:
+                                    if s in self.mitarbeiter_s[i]:  # Sicherstellen, dass der Mitarbeiter den Skill hat
+                                        second_shift_hours_second_week += self.x[i, j, k, s]
+
+                        # first_shift_hours_second_week = sum(self.x[i, j, k] for k in range(0, int(len(self.verfügbarkeit[i][j]) / 2)))
+                        # second_shift_hours_second_week = sum(self.x[i, j, k] for k in range(int(len(self.verfügbarkeit[i][j]) / 2), len(self.verfügbarkeit[i][j])))
 
                         # Kann 0 oder 1 annehmen
                         delta_2 = self.model.NewBoolVar("delta_2")
@@ -1502,8 +1613,24 @@ class ORAlgorithm_cp:
                     for week in range(2, 5): # Wochen 2 bis 4
                         for j in range((week-1)*7, week*7):
                             # Summe der Stunden in der ersten Schicht in der aktuellen Woche
-                            first_shift_hours_current_week = sum(self.x[i, j, k] for k in range(0, int(len(self.verfügbarkeit[i][j]) / 2)))
-                            second_shift_hours_current_week = sum(self.x[i, j, k] for k in range(int(len(self.verfügbarkeit[i][j]) / 2), len(self.verfügbarkeit[i][j])))
+                            first_shift_hours_current_week = 0
+                            second_shift_hours_current_week = 0
+
+                            for k in range(0, int(len(self.verfügbarkeit[i][j]) / 2)):
+                                if self.benoetigte_skills[0]:  # Überprüfen, ob in der Woche Skills benötigt werden
+                                    for s in self.benoetigte_skills[0]:
+                                        if s in self.mitarbeiter_s[i]:  # Sicherstellen, dass der Mitarbeiter den Skill hat
+                                            first_shift_hours_current_week += self.x[i, j, k, s]
+
+                            for k in range(int(len(self.verfügbarkeit[i][j]) / 2), len(self.verfügbarkeit[i][j])):
+                                if self.benoetigte_skills[0]:  # Überprüfen, ob in der Woche Skills benötigt werden
+                                    for s in self.benoetigte_skills[0]:
+                                        if s in self.mitarbeiter_s[i]:  # Sicherstellen, dass der Mitarbeiter den Skill hat
+                                            second_shift_hours_current_week += self.x[i, j, k, s]
+
+                                        
+                            # first_shift_hours_current_week = sum(self.x[i, j, k] for k in range(0, int(len(self.verfügbarkeit[i][j]) / 2)))
+                            # second_shift_hours_current_week = sum(self.x[i, j, k] for k in range(int(len(self.verfügbarkeit[i][j]) / 2), len(self.verfügbarkeit[i][j])))
 
                             # Kann 0 oder 1 annehmen
                             delta_2 = self.model.NewBoolVar("delta_2")
@@ -1534,51 +1661,30 @@ class ORAlgorithm_cp:
                     pass
 
 
-
-
         # -------------------------------------------------------------------------------------------------------
-        # WEICHE NB (28.08.2023)
+        # WEICHE NB (02.11.2023)
         # NB 9 - Minimale Arbeitsstunden pro Arbeitsblock
         # ***** Weiche Nebenbedingung 9 *****
         # -------------------------------------------------------------------------------------------------------
-
-        """
-        # HARTE NB
-        self.time_per_deployment = 4 * self.hour_devider
-
-        if self.self.daily_deployment == 2:
-            for i in self.mitarbeiter:
-                for j in range(self.calc_time):
-                    for k in range(len(self.verfügbarkeit[i][j]) - self.time_per_deployment + 1):
-                        # Wenn der MA in einem Block beginnt (y == 1), dann muss er für die nächsten self.time_per_deployment-1 Stunden arbeiten (x == 1)
-                        self.model.Add(self.y[i, j, k] <= self.x[i, j, k])
-                        for h in range(1, self.time_per_deployment):
-                            if k + h < len(self.verfügbarkeit[i][j]):  # Überprüfen, um IndexOutOfBounds zu vermeiden
-                                self.model.Add(self.y[i, j, k] <= self.x[i, j, k + h])
-
-                        # Verhindern, dass in den letzten self.time_per_deployment-1 Stunden des Tages ein neuer Block beginnt
-                        if len(self.verfügbarkeit[i][j]) >= self.time_per_deployment:
-                            for h in range(1, self.time_per_deployment):
-                                last_hour = len(self.verfügbarkeit[i][j]) - h
-                                self.model.Add(self.y[i, j, last_hour] == 0)
-        """
-
-        """
-        # WEICHE NB
-        self.time_per_deployment = 2 * self.hour_devider
+        self.time_per_deployment = self.time_per_deployment * self.hour_devider
 
         if self.daily_deployment == 2:
-            for i in self.mitarbeiter:
+            for i in self.mitarbeiter:  
                 for j in range(self.calc_time):
                     for k in range(len(self.verfügbarkeit[i][j])):
+                        # Bestimmen der gültigen Skills für den Mitarbeiter zu diesem Zeitpunkt
+                        current_week = j // 7
+                        valid_skills = [s for s in self.benoetigte_skills[current_week] if s in self.mitarbeiter_s[i]]
+                        print(valid_skills)
+                        
+                        # Für alle Stunden minus die mindestanzahl Stunden
                         if k < len(self.verfügbarkeit[i][j]) - self.time_per_deployment + 1:
-                            working_conditions = [self.y[i, j, k] - self.x[i, j, k]]
+                            working_conditions = [self.y[i, j, k] - sum(self.x[i, j, k, s] for s in valid_skills)]
                             for h in range(1, self.time_per_deployment):
                                 if k + h < len(self.verfügbarkeit[i][j]):
-                                    working_conditions.append(self.y[i, j, k] - self.x[i, j, k + h])
-                                    
-                            ct = sum(working_conditions) <= self.nb9_violation[i, j, k]
-                            self.model.Add(ct)
+                                    working_conditions.append(self.y[i, j, k] - sum(self.x[i, j, k + h, s] for s in valid_skills))
+
+                            self.model.Add(sum(working_conditions) <= self.nb9_violation[i, j, k])
 
                         # Für die letzten Stunden des Tages
                         else:
@@ -1588,44 +1694,8 @@ class ORAlgorithm_cp:
                             missing_hours = self.time_per_deployment - remaining_hours
 
                             # Anzahl der Verstöße ist gleich der Anzahl der fehlenden Stunden
-                            ct = self.y[i, j, k] * missing_hours == self.nb9_violation[i, j, k]
-                            self.model.Add(ct)
-        """
+                            self.model.Add(self.y[i, j, k] * missing_hours == self.nb9_violation[i, j, k])
 
-        # 01.11.2023
-
-        # Wenn diese NB aktiviert ist und Arbeitseinsätze pro Tag 2 ist, dann wird der MA mit 2 schichten nicht mehr eingeteilt
-
-        """
-        # WEICHE NB
-        self.time_per_deployment = self.time_per_deployment * self.hour_devider
-        print("HAAAAAAAAALLLLLLLLLLOOOOOOOOOO:", self.time_per_deployment)
-        
-        if self.daily_deployment == 2:
-            for i in self.mitarbeiter:
-                for j in range(self.calc_time):
-                    for k in range(len(self.verfügbarkeit[i][j])):
-                        for s in self.skills:
-                            if s in self.mitarbeiter_s[i]:  # Prüfen, ob der Mitarbeiter den Skill hat
-                                if k < len(self.verfügbarkeit[i][j]) - self.time_per_deployment + 1:
-                                    working_conditions = [self.y[i, j, k] - self.x[i, j, k, s]]
-                                    for h in range(1, self.time_per_deployment):
-                                        if k + h < len(self.verfügbarkeit[i][j]):
-                                            working_conditions.append(self.y[i, j, k] - self.x[i, j, k + h, s])
-                                            
-                                    self.model.Add(sum(working_conditions) <= self.nb9_violation[i, j, k])
-
-                                # Für die letzten Stunden des Tages
-                                else:
-                                    # Verbleibende Stunden des Tages ermitteln
-                                    remaining_hours = len(self.verfügbarkeit[i][j]) - k
-                                    # Anzahl der Stunden ermitteln, die fehlen, um self.time_per_deployment zu erreichen
-                                    missing_hours = self.time_per_deployment - remaining_hours
-
-                                    # Anzahl der Verstöße ist gleich der Anzahl der fehlenden Stunden
-                                    self.model.Add(self.y[i, j, k] * missing_hours == self.nb9_violation[i, j, k])
-        
-        """
         
         # -------------------------------------------------------------------------------------------------------
         # HARTE NB (08.10.2023)
@@ -1727,18 +1797,20 @@ class ORAlgorithm_cp:
         
 
         # -------------------------------------------------------------------------------------------------------
-        # HARTE NB (01.11.2023)
+        # HARTE NB (02.11.2023)
         # NB 14 - Mehrere Skills an einem Tag ausführen J/N
         # -------------------------------------------------------------------------------------------------------
         # Abfragen ob bei mehreren Skills die Mitarbeiter innerhalb von einem Tag die Skills wechseln dürfen.
         # Wenn nein, wird diese NB aktiviert
         # Das muss noch in die Datenbank eingebaut werden
-        self.skills_per_day = 2
+        self.skills_per_day = 1
 
         if self.skills_per_day == 1:
             for i in self.mitarbeiter:
                 for j in range(self.calc_time):
-                    pass
+                    # Sicherstellen, dass die Summe der a[i, j, s] über alle Skills s an einem Tag j für jeden Mitarbeiter i kleiner oder gleich 1 ist.
+                    self.model.Add(sum(self.a[i, j, s] for s in self.mitarbeiter_s[i] if j // 7 == woche and s in self.benoetigte_skills[woche]) <= 1)
+
 
 
 
@@ -1816,14 +1888,14 @@ class ORAlgorithm_cp:
         """
         self.model.ExportToFile('slow_model.pb.txt')
 
-        """
+        
         # ----------------------------------------------------------------
         # Die Werte von s2 printen
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
-                # Drucken Sie den Wert von s3[i, j]
+                # Drucken Sie den Wert von s2[i, j]
                 print(f"s2[{i}][{j}] =", self.solver.Value(self.s2[i, j]))
-        """
+        
 
         # Die Werte von a printen
         for i in self.mitarbeiter:
@@ -1840,6 +1912,7 @@ class ORAlgorithm_cp:
         
         # ----------------------------------------------------------------
 
+        """
         # Die Werte von x ausgeben, wenn sie existieren
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
@@ -1853,7 +1926,7 @@ class ORAlgorithm_cp:
                                 key = (i, j, k, s)
                                 if key in self.x:
                                     print(f"x[{i}][{j}][{k}][{s}] =", self.solver.Value(self.x[key]))
-
+        """
 
 
 
@@ -1914,7 +1987,7 @@ class ORAlgorithm_cp:
         # Kosten der einzelnen NBs ausgeben
         print('Kosten Einstellung von Mitarbeitern:', self.hiring_costs)
         print('Kosten Weiche NB1 (Mindestanzahl MA zu jeder Stunde an jedem Tag anwesend):', self.nb1_penalty_costs)
-        print('Kosten Weiche NB2 (Max. Arbeitszeit pro Woche "Temp" MA):', self.nb2_penalty_costs)
+        print('Kosten Weiche NB2 (Max. Arbeitszeit pro Woche MA):', self.nb2_penalty_costs)
         print('Kosten Weiche NB3 (Min. Arbeitszeit pro Tag):', self.nb3_min_penalty_costs)
         print('Kosten Weiche NB4 (Max. Arbeitszeit pro Tag):', self.nb4_max_penalty_costs)
         print('Kosten Weiche NB5 (Unterschreitung der festen Mitarbeiter zu employment_level):', self.nb5_min_penalty_costs)
