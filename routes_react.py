@@ -10,7 +10,7 @@ from app import app, mail
 from openpyxl import Workbook
 import io
 from excel_output import create_excel_output
-from sqlalchemy import func, extract, and_, or_, asc, desc
+from sqlalchemy import func, extract, and_, or_, asc, desc, text, create_engine
 
 
 
@@ -234,6 +234,29 @@ def new_user():
 
     if request.method =='POST':
         admin_registration_data = request.get_json()
+        schema_name = f"db_{admin_registration_data['company_name'].lower()}"
+        with db.engine.connect() as connection:
+            try:
+                connection.execute(text(f"CREATE SCHEMA `{schema_name}`;"))
+                connection.commit()  # Commit the changes
+            except Exception as e:
+                print(str(e))
+                return jsonify({'message': 'Failed to create schema'}), 500
+
+            # Clone entire schema
+            original_schema = 'projectx3'
+            query = text("SELECT table_name FROM information_schema.tables WHERE table_schema = :schema")
+            try:
+                tables = connection.execute(query, {'schema': original_schema}).fetchall()
+                for table in tables:
+                    table_name = table[0]
+                    connection.execute(text(f"CREATE TABLE `{schema_name}`.`{table_name}` LIKE `{original_schema}`.`{table_name}`;"))
+                connection.commit()  # Commit the changes after cloning the schema
+            except Exception as e:
+                print(str(e))
+                return jsonify({'message': 'Failed to clone schema'}), 500
+        
+        
         if admin_registration_data['password'] != admin_registration_data['password2']:
             return jsonify({'message': 'Password are not matching'}), 200
         else:
@@ -283,6 +306,8 @@ def new_user():
             except:
                 db.session.rollback()
                 return jsonify({'message': 'Registration went wrong!'}), 200
+    
+
     
     user_dict={
     'department_list': department_list,
@@ -571,9 +596,22 @@ def get_availability():
         user_list = [f"{user.first_name}, {user.last_name}, {user.email}" for user in company_users]
     
 
-    # Fetch all relevant Availability records in a single query
+    if request.method == 'GET':
+        selected_user = request.args.get('selectedUser', None)
+    else: # request.method == 'POST'
+        selected_user = request.json.get('selectedUser', None)
+
+    if selected_user:
+        # Parse the 'selectedUser' string to extract the email
+        first_name, last_name, email = selected_user.split(', ')
+        selected_user_email = email.strip()
+    else:
+        # Fall back to the logged-in user's email if 'selectedUser' is not provided
+        selected_user_email = user.email
+    
+    # Use the extracted email in the availability query
     availabilities = Availability.query.filter(
-        Availability.email == user.email,
+        Availability.email == selected_user_email,
         Availability.date.in_(dates),
         Availability.weekday.in_(query_weekdays)
     ).all()
@@ -633,20 +671,23 @@ def get_availability():
                 new_entry = {}
                 for j in range(6):
                     entry = request.json.get(f'day_{i}_{j}')
-                    new_entry[f'entry{j + 1}'] = get_time_str(entry)
-                    if new_entry['entry1']:
-                        availability_hours = new_entry['entry1'].hour
-                        availability_minutes = new_entry['entry1'].minute
-                        total_availability_start = availability_hours * solverreq.hour_devider + availability_minutes
-                        opening_hours = opening.start_time.hour
-                        opening_minutes = opening.start_time.minute
-                        total_opening_start = opening_hours * solverreq.hour_devider + opening_minutes
-                        if total_availability_start == 0:
-                            new_entry[f'entry{j + 1}'] = get_time_str(entry)
-                        elif total_availability_start < total_opening_start:
-                            new_entry['entry1'] = opening.start_time
-                        else:
-                            new_entry[f'entry{j + 1}'] = get_time_str(entry)
+                    if entry is None:
+                        new_entry[f'entry{j + 1}'] = None
+                    else:
+                        new_entry[f'entry{j + 1}'] = get_time_str(entry)
+                        if new_entry['entry1']:
+                            availability_hours = new_entry['entry1'].hour
+                            availability_minutes = new_entry['entry1'].minute
+                            total_availability_start = availability_hours * solverreq.hour_devider + availability_minutes
+                            opening_hours = opening.start_time.hour
+                            opening_minutes = opening.start_time.minute
+                            total_opening_start = opening_hours * solverreq.hour_devider + opening_minutes
+                            if total_availability_start == 0:
+                                new_entry[f'entry{j + 1}'] = get_time_str(entry)
+                            elif total_availability_start < total_opening_start:
+                                new_entry['entry1'] = opening.start_time
+                            else:
+                                new_entry[f'entry{j + 1}'] = get_time_str(entry)
 
 
 
@@ -1108,10 +1149,24 @@ def get_registration():
                 try:
                     db.session.add(data)
                     db.session.commit()
+                    schema_name = f"schema_{company_name.lower()}"
+    
+                    # Create new schema
+                    db.engine.execute(text(f"CREATE SCHEMA `{schema_name}`;"))
+                    
+                    # Clone entire schema
+                    original_schema = 'projectx3'
+                    query = text(f"SELECT table_name FROM information_schema.tables WHERE table_schema = :schema")
+                    tables = db.engine.execute(query, schema=original_schema)
+                    
+                    for table in tables:
+                        table_name = table[0]
+                        db.engine.execute(text(f"CREATE TABLE `{schema_name}`.`{table_name}` LIKE `{original_schema}`.`{table_name}`;"))
                     return jsonify({'message': 'Succesful Registration'}), 200
                 except:
                     db.session.rollback()
                     return jsonify({'message': 'Registration went wrong!'}), 200
+
 
     return jsonify({'message': 'Get Ready!'}), 200
 
@@ -1146,46 +1201,65 @@ def get_admin_registration():
 
     if request.method =='POST':
         admin_registration_data = request.get_json()
-        if admin_registration_data['password'] != admin_registration_data['password2']:
-            return jsonify({'message': 'Password are not matching'}), 200
-        else:
-            creation_date = datetime.datetime.now()
-            last = User.query.order_by(User.id.desc()).first()
-            hash = generate_password_hash(admin_registration_data['password'])
-            if last is None:
-                new_id = 1
+        companies_list = ["TimeTab AG", "TimeTab GmbH", "TimeTab CoKG", "LeckMichFett"]
+        for i in companies_list:
+            if i == admin_registration_data['company_name']:
+                if admin_registration_data['password'] != admin_registration_data['password2']:
+                    return jsonify({'message': 'Password are not matching'}), 200
+                else:
+                    creation_date = datetime.datetime.now()
+                    last = User.query.order_by(User.id.desc()).first()
+                    hash = generate_password_hash(admin_registration_data['password'])
+                    if last is None:
+                        new_id = 1
+                    else:
+                        new_id = last.id + 1
+
+                    last_company_id = User.query.filter_by(company_name=admin_registration_data['company_name']).order_by(User.company_id.desc()).first()
+                    if last_company_id is None:
+                        new_company_id = 10000
+                    else:
+                        new_company_id = last_company_id.company_id + 1
+
+                    data = User(id = new_id, 
+                                company_id = new_company_id, 
+                                first_name = admin_registration_data['first_name'],
+                                last_name = admin_registration_data['last_name'], 
+                                employment = admin_registration_data['employment'], 
+                                employment_level = admin_registration_data['employment_level'],
+                                company_name = admin_registration_data['company_name'], 
+                                department = admin_registration_data['department'],
+                                access_level = admin_registration_data['access_level'], 
+                                email = admin_registration_data['email'], 
+                                password = hash,
+                                created_by = new_company_id, 
+                                changed_by = new_company_id, 
+                                creation_timestamp = creation_date
+                                )
+
+                    try:
+                        db.session.add(data)
+                        db.session.commit()
+                        schema_name = f"schema_{admin_registration_data['company_name'].lower()}"
+            
+                        # Create new schema
+                        db.engine.execute(text(f"CREATE SCHEMA `{schema_name}`;"))
+                        
+                        # Clone entire schema
+                        original_schema = 'projectx3'
+                        query = text(f"SELECT table_name FROM information_schema.tables WHERE table_schema = :schema")
+                        tables = db.engine.execute(query, schema=original_schema)
+                        
+                        for table in tables:
+                            table_name = table[0]
+                            db.engine.execute(text(f"CREATE TABLE `{schema_name}`.`{table_name}` LIKE `{original_schema}`.`{table_name}`;"))
+                        return jsonify({'message': 'Successful Registration'}), 200
+                    except:
+                        db.session.rollback()
+                        return jsonify({'message': 'Registration went wrong!'}), 200
             else:
-                new_id = last.id + 1
-
-            last_company_id = User.query.filter_by(company_name=admin_registration_data['company_name']).order_by(User.company_id.desc()).first()
-            if last_company_id is None:
-                new_company_id = 10000
-            else:
-                new_company_id = last_company_id.company_id + 1
-
-            data = User(id = new_id, 
-                        company_id = new_company_id, 
-                        first_name = admin_registration_data['first_name'],
-                        last_name = admin_registration_data['last_name'], 
-                        employment = admin_registration_data['employment'], 
-                        employment_level = admin_registration_data['employment_level'],
-                        company_name = admin_registration_data['company_name'], 
-                        department = admin_registration_data['department'],
-                        access_level = admin_registration_data['access_level'], 
-                        email = admin_registration_data['email'], 
-                        password = hash,
-                        created_by = new_company_id, 
-                        changed_by = new_company_id, 
-                        creation_timestamp = creation_date
-                        )
-
-            try:
-                db.session.add(data)
-                db.session.commit()
-                return jsonify({'message': 'Successful Registration'}), 200
-            except:
-                db.session.rollback()
-                return jsonify({'message': 'Registration went wrong!'}), 200
+                return jsonify({'message': 'This company name already exists'}), 200
+                    
     
     user_dict={
     'department_list': department_list,

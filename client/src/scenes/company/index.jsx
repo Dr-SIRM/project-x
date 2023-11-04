@@ -48,11 +48,11 @@ const Company = ({ company }) => {
   
   const handleFormSubmit = async (values) => {
     
-    // Object.keys(values).forEach((key) => {
-    //   if (values[key] === '' || values[key] === undefined) {
-    //     values[key] = '00:00';
-    //   }
-    // });
+    Object.keys(values).forEach((key) => {
+      if (values[key] === '' || values[key] === undefined) {
+        values[key] = undefined;
+      }
+    });
 
     try {
       // Send the updated form values to the server for database update
@@ -486,7 +486,7 @@ const Company = ({ company }) => {
                     type="time"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values[`day_${rowIndex}_0`] === '00:00' ? '' : values[`day_${rowIndex}_0`]}
+                    value={values[`day_${rowIndex}_0`]}
                     name={`day_${rowIndex}_0`}
                     error={
                       !!touched[`day_${rowIndex}_0`] &&
@@ -511,7 +511,7 @@ const Company = ({ company }) => {
                     type="time"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values[`day_${rowIndex}_1`] === '00:00' ? '' : values[`day_${rowIndex}_1`]}
+                    value={values[`day_${rowIndex}_1`]}
                     name={`day_${rowIndex}_1`}
                     error={
                       !!touched[`day_${rowIndex}_1`] &&
@@ -536,7 +536,7 @@ const Company = ({ company }) => {
                     type="time"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values[`day_${rowIndex}_2`] === '00:00' ? '' : values[`day_${rowIndex}_2`]}
+                    value={values[`day_${rowIndex}_2`]}
                     name={`day_${rowIndex}_2`}
                     error={
                       !!touched[`day_${rowIndex}_2`] &&
@@ -561,7 +561,7 @@ const Company = ({ company }) => {
                     type="time"
                     onBlur={handleBlur}
                     onChange={handleChange}
-                    value={values[`day_${rowIndex}_3`] === '00:00' ? '' : values[`day_${rowIndex}_3`]}
+                    value={values[`day_${rowIndex}_3`]}
                     name={`day_${rowIndex}_3`}
                     error={
                       !!touched[`day_${rowIndex}_3`] &&
