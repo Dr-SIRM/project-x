@@ -66,8 +66,8 @@ To-Do Liste:
  -------------------------------
  - Alle NB's mit Schichten umbauen.
  - (*)  Wenn man gar keine time_req eingegeben hat, hällt dann Vorüberprüfung 1 stand?
+ 
  - (*) self.subsequent_workingdays_max, self.skills_per_day(1 oder 0) in die Datenbank einpflegen und ziehen
-
  - self.max_time_week darf niemals grösser als self.weekly hours gewählt werden!
  - self.daily_deployment soll nur 1 oder 2 werden können
 
@@ -105,6 +105,7 @@ class ORAlgorithm_cp:
         self.user_names = dp.user_names                     # 114
         self.user_skills = dp.user_skills                   # 115
         self.skills = dp.skills                             # 116
+        self.user_holidays = dp.user_holidays               # 117
 
         # Attribute der Methode "create_variables"
         self.mitarbeiter = None                             # 1
@@ -515,6 +516,7 @@ class ORAlgorithm_cp:
         print("114. self.user_names: ", self.user_names)
         print("115. self.user_skills: ", self.user_skills)
         print("116. self.skills: ", self.skills)
+        print("117. self.user_holidays: ", self.user_holidays)
         print()
         
         print("Attribute der Methode create_variables:")

@@ -1,16 +1,16 @@
-Starting CP-SAT solver v9.7.2996Parameters: max_time_in_seconds: 500 log_search_progress: true log_to_stdout: trueSetting number of workers to 8Initial optimization model '': (model_fingerprint: 0x8a3e1cfea796c091)
-#Variables: 323 (#bools: 218 #ints: 19 in objective)
-  - 297 Booleans in [0,1]
-  - 7 in [0,2]
-  - 7 in [0,3]
-  - 1 in [0,4]
-  - 2 in [0,36]
-  - 2 in [0,2688]
-  - 7 constants in {0} 
-#kLinear1: 240
-#kLinear2: 168
-#kLinear3: 17
-#kLinearN: 81 (#terms: 1'281)Starting presolve at 0.00sINFEASIBLE: ''Unsat after presolving constraint #88 (warning, dump might be inconsistent): linear { domain: 1 domain: 9223372036854775807 }Presolve summary:  - 0 affine relations were detected.  - rule 'linear: empty' was applied 62 times.  - rule 'linear: fixed or dup variables' was applied 63 times.  - rule 'linear: infeasible' was applied 1 time.  - rule 'linear: reduced variable domains' was applied 62 times.  - rule 'linear: simplified rhs' was applied 62 times.  - rule 'objective: variable not used elsewhere' was applied 75 times.  - rule 'presolve: iteration' was applied 1 time.Problem closed by presolve.CpSolverResponse summary:
+Starting CP-SAT solver v9.7.2996Parameters: max_time_in_seconds: 500 log_search_progress: true log_to_stdout: trueSetting number of workers to 8Initial optimization model '': (model_fingerprint: 0x46666038ca6ce157)
+#Variables: 537 (#bools: 283 #ints: 89 in objective)
+  - 434 Booleans in [0,1]
+  - 65 in [0,2]
+  - 14 in [0,3]
+  - 2 in [0,4]
+  - 4 in [0,36]
+  - 4 in [0,2688]
+  - 14 constants in {0} 
+#kLinear1: 275
+#kLinear2: 193
+#kLinear3: 116
+#kLinearN: 108 (#terms: 1'857)Starting presolve at 0.00sINFEASIBLE: ''Unsat after presolving constraint #172 (warning, dump might be inconsistent): linear { domain: 1 domain: 9223372036854775807 }Presolve summary:  - 0 affine relations were detected.  - rule 'linear: empty' was applied 125 times.  - rule 'linear: fixed or dup variables' was applied 126 times.  - rule 'linear: infeasible' was applied 1 time.  - rule 'linear: reduced variable domains' was applied 125 times.  - rule 'linear: simplified rhs' was applied 125 times.  - rule 'objective: variable not used elsewhere' was applied 135 times.  - rule 'presolve: iteration' was applied 1 time.Problem closed by presolve.CpSolverResponse summary:
 status: INFEASIBLE
 objective: NA
 best_bound: NA
@@ -22,7 +22,7 @@ propagations: 0
 integer_propagations: 0
 restarts: 0
 lp_iterations: 0
-walltime: 0.0073275
-usertime: 0.0073277
+walltime: 0.0077495
+usertime: 0.0077497
 deterministic_time: 0
 gap_integral: 0

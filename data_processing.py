@@ -21,6 +21,7 @@ class DataProcessing:
         self.laden_oeffnet = None
         self.laden_schliesst = None
         self.user_availability = None
+        self.user_holidays = None
         self.skills = []
         self.time_req = None
         self.company_shifts = None
@@ -95,10 +96,10 @@ class DataProcessing:
 
     def get_availability(self):
         """ 
-        In dieser Funktion wird user_id, date, start_time, end_time,
-        start_time2, end_time2, start_time3, und end_time3 aus der
-        Availability Entität gezogen und in einer Liste gespeichert.
-        Key ist user_id 
+        In dieser Funktion wird user_id, date, start_time, end_time, start_time2, end_time2, start_time3, und end_time3 
+        aus der Availability Entität gezogen und in einer Liste gespeichert. -> Ferien werden berücksichtigt!
+
+        Zusätzlich wird ein dict self.user_holidays erstellt, das angbit, welcher User an welchem Tag Ferien hat (Ferien = 1, keine Ferien = 0)
         """
 
         print(f"Admin mit der User_id: {self.current_user_id} hat den Solve Button gedrückt.")
@@ -114,7 +115,7 @@ class DataProcessing:
         # Erstellen einer Liste von Tagen im Bereich
         date_range = [start_date_obj + timedelta(days=x) for x in range((end_date_obj - start_date_obj).days + 1)]
 
-        # IDs der Nutzer der aktuellen Firma abrufen
+        # Sämtliche IDs der Nutzer der aktuellen Firma abrufen
         company_user_ids = db.session.query(User.id).filter_by(company_name=company_name).all()
         company_user_ids = [user_id for (user_id,) in company_user_ids]  # Umwandlung in eine Liste von IDs
 
@@ -128,6 +129,7 @@ class DataProcessing:
         user_ids = [item[0] for item in user_ids_with_availability]
 
         user_availability = defaultdict(list)
+        self.user_holidays = defaultdict(list)
 
         # Prüfen, ob jeder Benutzer und jeden Tag im Zeitraum die Verfügbarkeit hat
         for user_id in user_ids:
@@ -135,7 +137,12 @@ class DataProcessing:
                 # Versuchen, für das aktuelle Datum einen Eintrag zu finden
                 availability_entry = Availability.query.filter_by(user_id=user_id, date=single_date).first()
 
-                if availability_entry:
+                # Wenn der Mitarbeiter Ferien hat ("X" in der Spalte holiday), dann wird eine 1 für Ferien gesetzt
+                if availability_entry and availability_entry.holiday == "X":
+                    times = (None,) * 6  # Keine spezifischen Zeiten, weil Ferien
+                    self.user_holidays[user_id].append((single_date, 1))
+                # Wenn keine Ferien eingetragen sind
+                elif availability_entry:
                     times = (
                         self.time_to_timedelta(availability_entry.start_time) if availability_entry.start_time else None,
                         self.time_to_timedelta(availability_entry.end_time) if availability_entry.end_time else None,
@@ -144,18 +151,20 @@ class DataProcessing:
                         self.time_to_timedelta(availability_entry.start_time3) if availability_entry.start_time3 else None,
                         self.time_to_timedelta(availability_entry.end_time3) if availability_entry.end_time3 else None
                     )
+                    self.user_holidays[user_id].append((single_date, 0))
                 else:
-                    # Wenn kein Eintrag gefunden wird, wird None verwendet
-                    times = (None, None, None, None, None, None)
+                    # Wenn kein Eintrag, alles auf None setzen und als Arbeitstag betrachten
+                    times = (None,) * 6
+                    self.user_holidays[user_id].append((single_date, 0))
 
-                # Fügen Sie die Zeiten für das aktuelle Datum dem user_availability-Dict hinzu
+                # Zeiten für das aktuelle Datum dem user_availability-Dict hinzufügen
                 user_availability[user_id].append((single_date, *times))
 
-            # Sortieren Sie die Verfügbarkeiten für jeden Benutzer nach Datum
+            # Verfügbarkeiten und Ferien für jeden Benutzer nach Datum sortieren
             user_availability[user_id] = sorted(user_availability[user_id], key=lambda x: x[0])
+            self.user_holidays[user_id] = sorted(self.user_holidays[user_id], key=lambda x: x[0])
 
         self.user_availability = user_availability
-        print("user_availability: ", user_availability)
 
 
 
@@ -540,3 +549,4 @@ class DataProcessing:
                 self.user_names.append((user.first_name, user.last_name))
             else:
                 self.user_names.append((None, None))
+
