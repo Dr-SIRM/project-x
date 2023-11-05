@@ -165,6 +165,7 @@ class DataProcessing:
             self.user_holidays[user_id] = sorted(self.user_holidays[user_id], key=lambda x: x[0])
 
         self.user_availability = user_availability
+        print("user_availability: ", self.user_availability)
 
 
 
@@ -415,47 +416,51 @@ class DataProcessing:
     def binaere_liste(self):
         """ In dieser Funktion werden die zuvor erstellten user_availabilities in binäre Listen umgewandelt. """
 
-        binary_availability = defaultdict(list)
-
-        divisor = 3600 / self.hour_devider
+        self.binary_availability = defaultdict(list)
 
         for user_id, availabilities in self.user_availability.items():
-            for availability in availabilities:
-                date = availability[0]
-                time_blocks = availability[1:]  # Alle Zeitblöcke als Tuple extrahieren
+            for date, st1, et1, st2, et2, st3, et3 in availabilities:
                 weekday_index = date.weekday()
                 num_hours = self.opening_hours[weekday_index]
                 binary_list = [0] * num_hours
+                divisor = 3600 / self.hour_devider
 
-                for i in range(0, len(time_blocks), 2):  # Über Paare aus Start-/Endzeiten iterieren in 2er Schritten
-                    start_time = time_blocks[i]
-                    end_time = time_blocks[i + 1]
-
-                    # Überspringen, falls Startzeit oder Endzeit None sind
+                def update_binary_list(start_time, end_time):
                     if start_time is None or end_time is None:
-                        continue
+                        return  # Mitarbeiter arbeitet nicht in diesem Zeitfenster
 
-                    # Behandlung von Mitternacht als Endzeit
-                    if end_time == timedelta(0):
-                        end_time = timedelta(hours=24)
+                    # Wenn die Startzeit 0 ist, setzen wir sie auf Mitternacht
+                    if start_time.total_seconds() == 0:
+                        start_time = timedelta(seconds=0)  # Ab Mitternacht
 
-                    # Anpassung an die Öffnungszeit des Ladens
-                    start_hour = int((start_time.total_seconds() - self.laden_oeffnet[weekday_index].total_seconds()) / divisor)
-                    end_hour = int((end_time.total_seconds() - self.laden_oeffnet[weekday_index].total_seconds()) / divisor)
+                    # Wenn die Endzeit 0 ist, setzen wir sie auf Mitternacht
+                    if end_time.total_seconds() == 0:
+                        end_time = timedelta(seconds=86400)  # Bis Mitternacht
 
-                    # Sicherstellen, dass die Stunden innerhalb der Geschäftszeiten liegen
-                    start_hour = max(0, start_hour)
-                    end_hour = min(num_hours, end_hour)
+                    if end_time < start_time:
+                        end_time += timedelta(seconds=86400)
 
-                    # Die binäre Liste aktualisieren
-                    for hour in range(start_hour, end_hour):
-                        binary_list[hour] = 1
+                    if start_time < self.laden_oeffnet[weekday_index]:
+                        start_time += timedelta(seconds=86400)
+                        end_time += timedelta(seconds=86400)
 
-                binary_availability[user_id].append((date, binary_list))
+                    start_hour = int(start_time.total_seconds() / divisor) - int(self.laden_oeffnet[weekday_index].total_seconds() / divisor)
+                    end_hour = int(end_time.total_seconds() / divisor) - int(self.laden_oeffnet[weekday_index].total_seconds() / divisor)
 
-        self.binary_availability = binary_availability
+                    if start_hour < 0: start_hour = 0
+                    if end_hour > num_hours: end_hour = num_hours
 
+                    for i in range(start_hour, end_hour):
+                        if 0 <= i < len(binary_list):
+                            binary_list[i] = 1
 
+                update_binary_list(st1, et1)
+                update_binary_list(st2, et2)
+                update_binary_list(st3, et3)
+
+                self.binary_availability[user_id].append((date, binary_list))
+
+        print(self.binary_availability)
 
     def get_employment_skills(self):
         """ In der folgenden Methode holen wir die Beschäftigung und die Skills jedes Benutzers und fügen sie jeweils in eine Liste ein """
