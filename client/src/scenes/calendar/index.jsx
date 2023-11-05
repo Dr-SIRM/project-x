@@ -91,8 +91,7 @@ const Calendar = () => {
   return (
     <Box m="20px">
       <Header title="Calendar" subtitle="Full Calendar Interactive Page" />
-  
-      {/* Inline style to change the color of FullCalendar's header text */}
+
       <style>{`
         .fc-toolbar-title { 
           color: black !important;
@@ -101,8 +100,12 @@ const Calendar = () => {
           color: white !important; 
           background-color: black !important;
         }
+        .fc-timegrid-slot-label,
         .fc-col-header-cell { 
-          color: black !important; // Changing the column header (days) text color to black
+          color: black !important; 
+        }
+        .fc-timegrid-axis-cushion.fc-scrollgrid-shrink-cushion.fc-scrollgrid-sync-inner {
+          color: black !important;
         }
       `}</style>
   
