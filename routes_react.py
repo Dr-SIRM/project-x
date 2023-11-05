@@ -1,4 +1,4 @@
-from flask import request, url_for, session, jsonify, send_from_directory, make_response, send_file
+from flask import request, url_for, session, jsonify, send_from_directory, make_response, send_file, redirect
 from flask_mail import Message
 import datetime
 from datetime import date
@@ -11,7 +11,7 @@ from openpyxl import Workbook
 import io
 from excel_output import create_excel_output
 from sqlalchemy import func, extract, and_, or_, asc, desc, text, create_engine
-
+import stripe
 
 
 #Import of Database
@@ -1947,3 +1947,25 @@ def user_availability(email):
 
 
     return jsonify(availability=availability_data)
+
+
+stripe.api_key = 'sk_test_51O8inXLP2HwOJuOXYsZAeWHRxFedJ31u63UGY8RAZvEFyjwGdG6tUzUv3FSgmhqaYVNz907s7KIWi8SXzsGnxbJV0025IxrfKI'
+
+YOUR_DOMAIN = "http://localhost:3000"
+
+@app.route('/create-checkout-session', methods=['POST'])
+def create_checkout_session():
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            line_items=[{
+                'price': 'price_id',  # Replace with the price ID of your product
+                'quantity': 1,
+            }],
+            payment_method_types=['card'],
+            mode='subscription',
+            success_url=YOUR_DOMAIN + '/success',
+            cancel_url=YOUR_DOMAIN + '/cancel',
+        )
+        return jsonify(id=checkout_session.id)
+    except Exception as e:
+        return jsonify(error=str(e)), 403

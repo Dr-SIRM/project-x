@@ -86,10 +86,6 @@ const UserManagement = () => {
       fetchScheduledShifts(user.email);
   };
 
-  
-
-
-
 
   return (
     <Box sx={{ p: 3 }}>
@@ -127,7 +123,7 @@ const UserManagement = () => {
                 {t('Availability')}
             </Typography>
             <Box
-                m="20px"
+                mt="10px"
                 borderRadius="15px"
                 height="75vh"
                 style={{ backgroundColor: "white" }}

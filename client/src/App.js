@@ -25,6 +25,7 @@ import Geography from "./scenes/geography";
 import Calendar from "./scenes/calendar";
 import Planning from "./scenes/planning";
 import Plan from "./scenes/plan"
+import Payment from "./scenes/payment"
 import UserManagement from "./scenes/user_management";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { ColorModeContext, useMode } from "./theme";
@@ -62,6 +63,7 @@ function AppContent({ isSidebar, setIsSidebar }) {
           <Route path="/registration/admin" element={<Registration />} />
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/payment" element={<Payment />} />
           <Route path="/dashboard" element={<PrivateRoute component={Dashboard} accessLevels={["Super_Admin", "Admin", "User"]} />} />
           <Route path="/solver" element={<PrivateRoute component={Solver} accessLevels={["Super_Admin", "Admin"]} />} />
           <Route path="/solver/requirement" element={<PrivateRoute component={SolverRequirement} accessLevels={["Super_Admin", "Admin"]} />} />
