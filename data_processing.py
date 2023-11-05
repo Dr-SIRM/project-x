@@ -114,8 +114,13 @@ class DataProcessing:
         # Erstellen einer Liste von Tagen im Bereich
         date_range = [start_date_obj + timedelta(days=x) for x in range((end_date_obj - start_date_obj).days + 1)]
 
-        # Datenbankabfrage, um nur Benutzer mit Einträgen in der Verfügbarkeitstabelle abzurufen
+        # IDs der Nutzer der aktuellen Firma abrufen
+        company_user_ids = db.session.query(User.id).filter_by(company_name=company_name).all()
+        company_user_ids = [user_id for (user_id,) in company_user_ids]  # Umwandlung in eine Liste von IDs
+
+        # Datenbankabfrage, um nur Benutzer (aus der company) mit Einträgen in der Verfügbarkeitstabelle abzurufen
         user_ids_with_availability = db.session.query(Availability.user_id).filter(
+            Availability.user_id.in_(company_user_ids),
             Availability.date.between(self.start_date, self.end_date)
         ).distinct().all()
 
@@ -123,24 +128,25 @@ class DataProcessing:
         user_ids = [item[0] for item in user_ids_with_availability]
 
         user_availability = defaultdict(list)
-        zero_time = timedelta(0)
 
         # Prüfen, ob jeder Benutzer und jeden Tag im Zeitraum die Verfügbarkeit hat
         for user_id in user_ids:
             for single_date in date_range:
-                # Versuchen Sie, für das aktuelle Datum einen Eintrag zu finden
+                # Versuchen, für das aktuelle Datum einen Eintrag zu finden
                 availability_entry = Availability.query.filter_by(user_id=user_id, date=single_date).first()
 
                 if availability_entry:
-                    times = (self.time_to_timedelta(availability_entry.start_time),
-                            self.time_to_timedelta(availability_entry.end_time),
-                            self.time_to_timedelta(availability_entry.start_time2),
-                            self.time_to_timedelta(availability_entry.end_time2),
-                            self.time_to_timedelta(availability_entry.start_time3),
-                            self.time_to_timedelta(availability_entry.end_time3))
+                    times = (
+                        self.time_to_timedelta(availability_entry.start_time) if availability_entry.start_time else None,
+                        self.time_to_timedelta(availability_entry.end_time) if availability_entry.end_time else None,
+                        self.time_to_timedelta(availability_entry.start_time2) if availability_entry.start_time2 else None,
+                        self.time_to_timedelta(availability_entry.end_time2) if availability_entry.end_time2 else None,
+                        self.time_to_timedelta(availability_entry.start_time3) if availability_entry.start_time3 else None,
+                        self.time_to_timedelta(availability_entry.end_time3) if availability_entry.end_time3 else None
+                    )
                 else:
-                    # Wenn kein Eintrag gefunden wird, verwenden Sie timedelta(0)
-                    times = (zero_time, zero_time, zero_time, zero_time, zero_time, zero_time)
+                    # Wenn kein Eintrag gefunden wird, wird None verwendet
+                    times = (None, None, None, None, None, None)
 
                 # Fügen Sie die Zeiten für das aktuelle Datum dem user_availability-Dict hinzu
                 user_availability[user_id].append((single_date, *times))
@@ -149,6 +155,7 @@ class DataProcessing:
             user_availability[user_id] = sorted(user_availability[user_id], key=lambda x: x[0])
 
         self.user_availability = user_availability
+        print("user_availability: ", user_availability)
 
 
 
@@ -399,64 +406,37 @@ class DataProcessing:
     def binaere_liste(self):
         """ In dieser Funktion werden die zuvor erstellten user_availabilities in binäre Listen umgewandelt. """
 
-        # Generiert automatisch einen Standardwert für nicht vorhandene Schlüssel.
         binary_availability = defaultdict(list)
 
+        divisor = 3600 / self.hour_devider
+
         for user_id, availabilities in self.user_availability.items():
-            for date, st1, et1, st2, et2, st3, et3 in availabilities:
-                # Wochentag als Index (0 = Montag, 1 = Dienstag, usw.) erhalten
+            for availability in availabilities:
+                date = availability[0]
+                time_blocks = availability[1:]  # Alle Zeitblöcke als Tuple extrahieren
                 weekday_index = date.weekday()
-
-                # Anzahl der Stunden berechnen, in denen der Laden geöffnet ist
                 num_hours = self.opening_hours[weekday_index]
-
-                # Liste erstellen von Nullen mit der Länge der Anzahl der Stunden, in denen der Laden geöffnet ist
                 binary_list = [0] * num_hours
 
-                # Bestimme den Divisor basierend auf self.hour_devider
-                divisor = 3600 / self.hour_devider
+                for i in range(0, len(time_blocks), 2):  # Über Paare aus Start-/Endzeiten iterieren in 2er Schritten
+                    start_time = time_blocks[i]
+                    end_time = time_blocks[i + 1]
 
-                # Eine Hilfsfunktion, um die Binärliste für verschiedene Zeitspannen zu aktualisieren.
-                def update_binary_list(start_time, end_time):
-                    # Wenn die Endzeit vor der Startzeit liegt, füge 24 Stunden zur Endzeit hinzu.
-                    if end_time < start_time:
-                        end_time += timedelta(seconds=86400)
-                    
-                    # Behandlung der Zeiten, die über Mitternacht hinausgehen
-                    if start_time < self.laden_oeffnet[weekday_index]:
-                        start_time += timedelta(seconds=86400)
-                        end_time += timedelta(seconds=86400)
+                    # Überspringen, falls Startzeit oder Endzeit None sind
+                    if start_time is None or end_time is None:
+                        continue
 
-                    # Berechne die Stundenindizes für Start- und Endzeit.
-                    start_hour = int(start_time.total_seconds() / divisor) - int(self.laden_oeffnet[weekday_index].total_seconds() / divisor)
-                    end_hour = int(end_time.total_seconds() / divisor) - int(self.laden_oeffnet[weekday_index].total_seconds() / divisor)
+                    # Anpassung an die Öffnungszeit des Ladens
+                    start_hour = int((start_time.total_seconds() - self.laden_oeffnet[weekday_index].total_seconds()) / divisor)
+                    end_hour = int((end_time.total_seconds() - self.laden_oeffnet[weekday_index].total_seconds()) / divisor)
 
-                    """
-                    if user_id == 129:
-                        print(f"\nDebugging for user_id {user_id}, date {date}:")
-                        print(f"    time window: {start_time} to {end_time}")
-                        print(f"    start_time.total_seconds(): {start_time.total_seconds()}")
-                        print(f"    end_time.total_seconds(): {end_time.total_seconds()}")
-                        print(f"    divisor: {divisor}")
-                        print(f"    self.laden_oeffnet[{weekday_index}].total_seconds(): {self.laden_oeffnet[weekday_index].total_seconds()}")
-                        print(f"    Calculated start_hour: {start_hour}")
-                        print(f"    Calculated end_hour: {end_hour}")
-                    """
+                    # Sicherstellen, dass die Stunden innerhalb der Geschäftszeiten liegen
+                    start_hour = max(0, start_hour)
+                    end_hour = min(num_hours, end_hour)
 
-                    # Überprüfung und Korrektur von Zeiten, die außerhalb der Geschäftszeiten liegen.
-                    if start_hour < 0: start_hour = 0
-                    if end_hour > num_hours: end_hour = num_hours
-
-                    # Aktualisiere die Binärliste.
-                    for i in range(start_hour, end_hour):
-                        if 0 <= i < len(binary_list):
-                            binary_list[i] = 1
-
-
-                # Werte werden auf 1 gesetzt, wenn der Mitarbeiter während jedes Zeitfensters arbeiten kann.
-                update_binary_list(st1, et1)
-                update_binary_list(st2, et2)
-                update_binary_list(st3, et3)
+                    # Die binäre Liste aktualisieren
+                    for hour in range(start_hour, end_hour):
+                        binary_list[hour] = 1
 
                 binary_availability[user_id].append((date, binary_list))
 
