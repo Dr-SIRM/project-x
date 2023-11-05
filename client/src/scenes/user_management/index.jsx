@@ -128,32 +128,54 @@ const UserManagement = () => {
                 height="75vh"
                 style={{ backgroundColor: "white" }}
                 sx={{
-                    "& .MuiDataGrid-root": {
-                        borderColor: "black",
+                  "& .MuiDataGrid-root": {
+                    borderColor: "black",
+                  },
+                  "& .MuiDataGrid-cell": {
+                    borderBottom: "1px solid black",
+                    borderTop: "1px solid black",
+                    color: colors.primary[100],
+                    backgroundColor: colors.grey[900],
+                    '&:focus': {
+                      outline: 'none',
+                      borderWidth: '1px',
+                      borderColor: 'black',
                     },
-                    "& .MuiDataGrid-cell": {
-                        borderBottom: "1px solid black",
-                        color: colors.primary[100],
-                        backgroundColor: colors.grey[900],
-                        borderBottom: "none",    
+                    '&:focus-within': {
+                      outline: 'none',
+                      borderWidth: '1px',
+                      borderColor: 'black',
                     },
-                    "& .MuiDataGrid-columnHeaders": {
-                        backgroundColor: colors.grey[500],
-                        color: "white",
-                        borderColor: "black",
-                        
-                    },
-                    "& .MuiDataGrid-virtualScroller": {
-                        backgroundColor: colors.grey[900],
-                    },
-                    "& .MuiDataGrid-footerContainer": {
-                        borderTop: "none",
-                        backgroundColor: colors.grey[500],
-                    },
-                    "& .MuiCheckbox-root": {
-                        color: `${colors.greenAccent[200]} !important`,
-                    },
+                  },
+                  "& .MuiDataGrid-columnHeaders": {
+                    backgroundColor: colors.grey[500],
+                    color: "white",
+                    borderColor: "black",
+                  },
+                  "& .MuiDataGrid-virtualScroller": {
+                    backgroundColor: colors.grey[900],
+                  },
+                  "& .MuiDataGrid-footerContainer": {
+                    borderTop: "none",
+                    backgroundColor: colors.grey[500],
+                  },
+                  "& .MuiCheckbox-root": {
+                    color: `${colors.greenAccent[200]} !important`,
+                  },
+                  "& .MuiDataGrid-cell:focus, & .MuiDataGrid-cell:focus-within": {
+                    outline: 'none',
+                    borderLeft: 'none',
+                    borderRight: 'none',
+                  },
+                  "& .MuiDataGrid-row:focus-within, & .MuiDataGrid-row:focus": {
+                    outline: 'none',
+                  },
+                  "& .MuiDataGrid-columnHeader:focus, & .MuiDataGrid-columnHeader:focus-within": {
+                    outline: 'none',
+                  },
                 }}
+                
+                
             >        
                 <DataGrid        
                     rows={availability}
