@@ -435,6 +435,10 @@ class DataProcessing:
                     if start_time is None or end_time is None:
                         continue
 
+                    # Behandlung von Mitternacht als Endzeit
+                    if end_time == timedelta(0):
+                        end_time = timedelta(hours=24)
+
                     # Anpassung an die Öffnungszeit des Ladens
                     start_hour = int((start_time.total_seconds() - self.laden_oeffnet[weekday_index].total_seconds()) / divisor)
                     end_hour = int((end_time.total_seconds() - self.laden_oeffnet[weekday_index].total_seconds()) / divisor)
