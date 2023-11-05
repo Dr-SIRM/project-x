@@ -557,7 +557,6 @@ class ORAlgorithm_cp:
         for key, value in self.verfügbarkeit.items():
             print("MA_id: ", key)
             print("Wert: ", value)
-        print(self.verfügbarkeit)
         print("3. self.kosten: ", self.kosten)
         print("4. self.max_zeit: ", self.max_zeit)
         print("5. self.min_zeit: ", self.min_zeit)

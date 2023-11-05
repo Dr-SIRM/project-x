@@ -1,60 +1,27 @@
-Starting CP-SAT solver v9.7.2996Parameters: max_time_in_seconds: 500 log_search_progress: true log_to_stdout: trueSetting number of workers to 8Initial optimization model '': (model_fingerprint: 0xc15de41f1bb3ed6c)
-#Variables: 481 (#bools: 248 #ints: 82 in objective)
-  - 385 Booleans in [0,1]
-  - 58 in [0,2]
-  - 14 in [0,13]
-  - 4 in [0,24]
-  - 2 in [0,76]
-  - 4 in [0,2688]
-  - 14 constants in {0} 
-#kLinear1: 247
-#kLinear2: 172
-#kLinear3: 102
-#kLinearN: 101 (#terms: 1'619)Starting presolve at 0.00s[ExtractEncodingFromLinear] #potential_supersets=0 #potential_subsets=0 #at_most_one_encodings=0 #exactly_one_encodings=0 #unique_terms=0 #multiple_terms=0 #literals=0 time=2e-06s[Symmetry] Graph for symmetry has 481 nodes and 0 arcs.[Symmetry] Symmetry computation done. time: 2.93e-05 dtime: 2.886e-05[DetectDuplicateConstraints] #duplicates=0 #without_enforcements=0 time=1.23e-05s[DetectDominatedLinearConstraints] #relevant_constraints=0 #work_done=0 #num_inclusions=0 #num_redundant=0 time=3.1e-06s[ProcessSetPPC] #relevant_constraints=0 #num_inclusions=0 work=0 time=6.1e-06s[FindBigHorizontalLinearOverlap] #blocks=0 #saved_nz=0 #linears=0 #work_done=0/1e+09 time=1.15e-05s[FindBigVerticalLinearOverlap] #blocks=0 #nz_reduction=0 #work_done=2 time=1.76e-05s[MergeClauses] #num_collisions=0 #num_merges=0 #num_saved_literals=0 work=0/100000000 time=1.05e-05s[Symmetry] Graph for symmetry has 481 nodes and 0 arcs.[Symmetry] Symmetry computation done. time: 4.14e-05 dtime: 2.886e-05[DetectDuplicateConstraints] #duplicates=0 #without_enforcements=0 time=8.1e-06s[DetectDominatedLinearConstraints] #relevant_constraints=0 #work_done=0 #num_inclusions=0 #num_redundant=0 time=2.2e-06s[ProcessSetPPC] #relevant_constraints=0 #num_inclusions=0 work=0 time=3.1e-06s[FindBigHorizontalLinearOverlap] #blocks=0 #saved_nz=0 #linears=0 #work_done=0/1e+09 time=2.7e-06s[FindBigVerticalLinearOverlap] #blocks=0 #nz_reduction=0 #work_done=2 time=9.5e-06s[MergeClauses] #num_collisions=0 #num_merges=0 #num_saved_literals=0 work=0/100000000 time=3.3e-06s[ExpandObjective] #propagations=0 #entries=0 #tight_variables=0 #tight_constraints=0 #expands=0 #issues=0 time=3.37e-05sPresolve summary:  - 1 affine relations were detected.  - rule 'TODO linear2: contains a Boolean.' was applied 18 times.  - rule 'affine: new relation' was applied 1 time.  - rule 'bool_and: non-reified.' was applied 6 times.  - rule 'bool_or: always true' was applied 11 times.  - rule 'bool_or: implications' was applied 9 times.  - rule 'bool_or: only one literal' was applied 1 time.  - rule 'dual: fix variable' was applied 56 times.  - rule 'enforcement: false literal' was applied 47 times.  - rule 'enforcement: true literal' was applied 6 times.  - rule 'linear2: contains a Boolean.' was applied 44 times.  - rule 'linear: always true' was applied 183 times.  - rule 'linear: divide by GCD' was applied 23 times.  - rule 'linear: empty' was applied 179 times.  - rule 'linear: fixed or dup variables' was applied 472 times.  - rule 'linear: negative clause' was applied 6 times.  - rule 'linear: positive clause' was applied 6 times.  - rule 'linear: reduced variable domains' was applied 177 times.  - rule 'linear: simplified rhs' was applied 239 times.  - rule 'linear: singleton column' was applied 44 times.  - rule 'linear: small Boolean expression' was applied 3 times.  - rule 'linear: tightened into equality' was applied 6 times.  - rule 'objective: variable not used elsewhere' was applied 315 times.  - rule 'presolve: 437 unused variables removed.' was applied 1 time.  - rule 'presolve: iteration' was applied 2 times.Presolved optimization model '': (model_fingerprint: 0x4f2785c382a3fc4)
-#Variables: 0 ( in objective)
-Preloading model.#Bound   0.03s best:inf   next:[15100,15100] initial_domain[Symmetry] Graph for symmetry has 0 nodes and 0 arcs.#Model   0.03s var:0/0 constraints:0/0Starting search at 0.03s with 8 workers.6 full problem subsolvers: [default_lp, less_encoding, max_lp, no_lp, quick_restart, quick_restart_no_lp]1 first solution subsolver: [jump]2 incomplete subsolvers: [feasibility_pump, rins/rens]2 helper subsolvers: [neighborhood_helper, synchronization_agent]#1       0.03s best:15100 next:[]         default_lp fixed_bools:0/0#Done    0.03s default_lpTask timing                        n [     min,      max]      avg      dev     time         n [     min,      max]      avg      dev    dtime
-  'synchronization_agent':         0 [  0.00ns,   0.00ns]   0.00ns   0.00ns   0.00ns         0 [  0.00ns,   0.00ns]   0.00ns   0.00ns   0.00ns
-    'neighborhood_helper':         0 [  0.00ns,   0.00ns]   0.00ns   0.00ns   0.00ns         0 [  0.00ns,   0.00ns]   0.00ns   0.00ns   0.00ns
-             'default_lp':         1 [662.00us, 662.00us] 662.00us   0.00ns 662.00us         0 [  0.00ns,   0.00ns]   0.00ns   0.00ns   0.00ns
-          'less_encoding':         1 [588.60us, 588.60us] 588.60us   0.00ns 588.60us         0 [  0.00ns,   0.00ns]   0.00ns   0.00ns   0.00ns
-                  'no_lp':         1 [480.00us, 480.00us] 480.00us   0.00ns 480.00us         0 [  0.00ns,   0.00ns]   0.00ns   0.00ns   0.00ns
-                 'max_lp':         1 [433.40us, 433.40us] 433.40us   0.00ns 433.40us         0 [  0.00ns,   0.00ns]   0.00ns   0.00ns   0.00ns
-          'quick_restart':         1 [321.60us, 321.60us] 321.60us   0.00ns 321.60us         0 [  0.00ns,   0.00ns]   0.00ns   0.00ns   0.00ns
-    'quick_restart_no_lp':         1 [229.90us, 229.90us] 229.90us   0.00ns 229.90us         0 [  0.00ns,   0.00ns]   0.00ns   0.00ns   0.00ns
-       'feasibility_pump':         1 [ 19.00us,  19.00us]  19.00us   0.00ns  19.00us         0 [  0.00ns,   0.00ns]   0.00ns   0.00ns   0.00ns
-              'rins/rens':         0 [  0.00ns,   0.00ns]   0.00ns   0.00ns   0.00ns         0 [  0.00ns,   0.00ns]   0.00ns   0.00ns   0.00ns
-                   'jump':         1 [ 47.00us,  47.00us]  47.00us   0.00ns  47.00us         0 [  0.00ns,   0.00ns]   0.00ns   0.00ns   0.00ns
-Search stats              Bools  Conflicts  Branches  Restarts  BoolPropag  IntegerPropag
-           'default_lp':      0          0         0         0           0              1
-        'less_encoding':      0          0         0         0           0              0
-                'no_lp':      0          0         0         0           0              0
-               'max_lp':      0          0         0         0           0              0
-        'quick_restart':      0          0         0         0           0              0
-  'quick_restart_no_lp':      0          0         0         0           0              0
-LNS stats       Improv/Calls  Closed  Difficulty  TimeLimit
-  'rins/rens':           0/0      0%        0.50       0.10
-Solutions (1)    Num   Rank
-  'default_lp':    1  [1,1]
-Objective bounds     Num
-  'initial_domain':    1
-Solution repositories    Added  Queried  Ignored  Synchro
-  'feasible solutions':      0        0        0        0
-        'lp solutions':      0        0        0        0
-                'pump':      0        0
-CpSolverResponse summary:
-status: OPTIMAL
-objective: 15100
-best_bound: 15100
-integers: 1
+Starting CP-SAT solver v9.7.2996Parameters: max_time_in_seconds: 500 log_search_progress: true log_to_stdout: trueSetting number of workers to 8Initial optimization model '': (model_fingerprint: 0x47ba08575cabd814)
+#Variables: 3'678 (#bools: 2'152 #ints: 338 in objective)
+  - 3'312 Booleans in [0,1]
+  - 84 in [0,2]
+  - 262 in [0,4]
+  - 4 in [0,6]
+  - 8 in [0,84]
+  - 8 in [0,2688]
+#kLinear1: 1'152
+#kLinear2: 28
+#kLinear3: 1'076
+#kLinearN: 708 (#terms: 12'146)Starting presolve at 0.00sINFEASIBLE: ''Unsat after presolving constraint #1160 (warning, dump might be inconsistent): linear { domain: 1 domain: 9223372036854775807 }Presolve summary:  - 0 affine relations were detected.  - rule 'linear: always true' was applied 1048 times.  - rule 'linear: empty' was applied 1048 times.  - rule 'linear: fixed or dup variables' was applied 2097 times.  - rule 'linear: infeasible' was applied 1 time.  - rule 'linear: positive clause' was applied 28 times.  - rule 'linear: reduced variable domains' was applied 1048 times.  - rule 'linear: simplified rhs' was applied 1104 times.  - rule 'linear: small Boolean expression' was applied 28 times.  - rule 'objective: variable not used elsewhere' was applied 1104 times.  - rule 'presolve: iteration' was applied 1 time.Problem closed by presolve.CpSolverResponse summary:
+status: INFEASIBLE
+objective: NA
+best_bound: NA
+integers: 0
 booleans: 0
 conflicts: 0
 branches: 0
 propagations: 0
-integer_propagations: 1
+integer_propagations: 0
 restarts: 0
 lp_iterations: 0
-walltime: 0.0384774
-usertime: 0.0384777
-deterministic_time: 8.288e-05
+walltime: 0.018794
+usertime: 0.0187941
+deterministic_time: 0
 gap_integral: 0
-solution_fingerprint: 0xa2b7cbca7f15054b
