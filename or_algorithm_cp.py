@@ -66,7 +66,7 @@ To-Do Liste:
  -------------------------------
  - Alle NB's mit Schichten umbauen.
  - (*)  Wenn man gar keine time_req eingegeben hat, hällt dann Vorüberprüfung 1 stand?
- 
+
  - (*) self.subsequent_workingdays_max, self.skills_per_day(1 oder 0) in die Datenbank einpflegen und ziehen
  - self.max_time_week darf niemals grösser als self.weekly hours gewählt werden!
  - self.daily_deployment soll nur 1 oder 2 werden können
@@ -377,6 +377,30 @@ class ORAlgorithm_cp:
                 # Die Stunden für den aktuellen Tag zum Skill hinzufügen
                 self.min_anwesend[skill].append(hours)
 
+
+        # -- 13.5 ------------------------------------------------------------------------------------------------------------
+        # Ein dict erstellen mit den Anzahl Urlaubstagen pro User
+
+        # Maximale Anzahl der Ferientage basierend auf den Öffnungstagen berechnen
+        max_holidays = sum(1 for hours in self.opening_hours if hours > 0)
+
+        # Leeres Dictionary für die Gesamtanzahl der Urlaubstage pro Benutzer
+        self.total_holidays_per_user = {}
+        for user_id, dates in self.user_holidays.items():
+            # Summe der Urlaubstage für den aktuellen Benutzer initialisieren
+            total_holidays = 0
+            
+            # Alle Urlaubstage für den aktuellen Benutzer addieren
+            for _, holidays in dates:
+                total_holidays += holidays
+            
+            # Urlaubstage auf die maximale Anzahl der Öffnungstage limitieren
+            total_holidays = min(total_holidays, max_holidays)
+            
+            # Summe der Urlaubstage dem Benutzer im Dictionary zuweisen
+            self.total_holidays_per_user[user_id] = total_holidays
+
+
         # -- 14 ------------------------------------------------------------------------------------------------------------
         # gerechte_verteilung -> eine Liste mit den Stunden wie sie gerecht verteilt werden
 
@@ -384,17 +408,23 @@ class ORAlgorithm_cp:
         total_hours_assigned = 0
         temp_employees = []
         self.gerechte_verteilung = [0 for _ in range(len(self.mitarbeiter))]  # Initialisiere die Liste mit Platzhaltern
+        opening_days = sum(1 for item in self.opening_hours if item > 0) # Anzahl Tage an denen der Betrieb geöffnet ist im Solvingzeitraum
+        
         print("1. self.gerechte_verteilung: ", self.gerechte_verteilung)
 
-        for i in range(len(self.mitarbeiter)):
+        # Stunden den Vollzeit Mitarbeiter zuweisen (Wochenarbeitsstunde * Anstellungsgrad * week_timeframe * Ferienzeit Faktor (1 - (holidays_user / opening_days))
+        for i, employee in enumerate(self.mitarbeiter):
             if self.employment[i] == "Perm":
-                allocated_hours = self.employment_lvl_exact[i] * self.weekly_hours * self.week_timeframe
+                holidays_user = self.total_holidays_per_user[employee] # Anzahl Ferientage jedes "Perm" users
+                allocated_hours = (self.employment_lvl_exact[i] * self.weekly_hours * self.week_timeframe) * (1 - (holidays_user / opening_days))
+                print(f"Verhältniss von MA {employee} das * gerechnet wird: ", (1 - (holidays_user / opening_days)))
                 total_hours_assigned += allocated_hours
                 self.gerechte_verteilung[i] = round(allocated_hours + 0.5)
             else:
                 temp_employees.append(i)
         print("2. self.gerechte_verteilung: ", self.gerechte_verteilung)
 
+        # Die übrigen Stunden unter den den Teilzeit Mitarbeitern aufteilen
         remaining_hours = self.verteilbare_stunden - total_hours_assigned
         print("remaining_hours: ", remaining_hours)
         for i in temp_employees:
@@ -407,7 +437,7 @@ class ORAlgorithm_cp:
         if total_hours_assigned > self.verteilbare_stunden:
             # Sortieren der Temp-Mitarbeiter nach zugeteilten Stunden in absteigender Reihenfolge
             temp_employees.sort(key=lambda i: self.gerechte_verteilung[i], reverse=True)
-            print(temp_employees)
+            print("Temporäre Mitarbeiter: ", temp_employees)
             # Überschüssigen Stunden von den Temp-Mitarbeitern abziehen, beginnend mit demjenigen mit den meisten Stunden
             for i in temp_employees:
                 if total_hours_assigned == self.verteilbare_stunden:
@@ -539,6 +569,7 @@ class ORAlgorithm_cp:
         print("11. self.verteilbare_stunden: ", self.verteilbare_stunden)
         print("12. self.gesamtstunden_verfügbarkeit: ", self.gesamtstunden_verfügbarkeit)
         print("13. self.min_anwesend: ", self.min_anwesend)
+        print("13.5 self.total_holidays_per_user: ", self.total_holidays_per_user)
         print("14. self.gerechte_verteilung: ", self.gerechte_verteilung)
         print("15. self.fair_distribution: ", self.fair_distribution)
         print("16. self.subsequent_workingdays: ", self.subsequent_workingdays)
