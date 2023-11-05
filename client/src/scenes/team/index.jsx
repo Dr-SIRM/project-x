@@ -481,7 +481,7 @@ const handleConfirmDelete = async () => {
     },
     {
       field: 'delete',
-      headerName: 'Delete',
+      headerName: t('team.columns.delete'),
       sortable: false,
       renderCell: (params) => (
         <DeleteOutlineIcon
@@ -540,21 +540,23 @@ const handleConfirmDelete = async () => {
         <Dialog
           open={openDialog}
           onClose={handleDialogClose}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
+
+          PaperProps={{
+            style: { backgroundColor: 'black', color: "red" }, // your desired background color here
+          }}
         >
-          <DialogTitle id="alert-dialog-title">{"Confirm Delete"}</DialogTitle>
+          <DialogTitle id="alert-dialog-title" style={{ color: '#FFFFFF', fontSize: "16px"}}>{t('team.deletion.confirm_delete')}</DialogTitle>
           <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              Are you sure you want to delete this user?
+            <DialogContentText id="alert-dialog-description" style={{ color: '#FFFFFF'}}>
+              {t('team.deletion.question')}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleDialogClose} color="primary">
-              Cancel
+              {t('team.deletion.cancel')}
             </Button>
             <Button onClick={handleConfirmDelete} color="primary" autoFocus>
-              Confirm
+              {t('team.deletion.confirm')}
             </Button>
           </DialogActions>
         </Dialog>        
