@@ -2193,79 +2193,82 @@ class ORAlgorithm_cp:
         Diese Methode speichert die berechneten Arbeitszeiten in der Datenbank 
         """
         with app.app_context():
-            for user_id, days in self.mitarbeiter_arbeitszeiten.items(): # Durch mitarbeiter_arbeitszeiten durchitterieren
+            for user_id, departments in self.mitarbeiter_arbeitszeiten.items(): # Durch mitarbeiter_arbeitszeiten durchitterieren
                 print(f"Verarbeite Benutzer-ID: {user_id}")
 
                 # Benutzer aus der Datenbank abrufen
                 user = User.query.get(user_id)
-                print(user)
                 if not user:
                     print(f"Kein Benutzer gefunden mit ID: {user_id}")
                     continue
+                
+                for department, days in departments.items():
+                    print(f"Verarbeite Abteilung: {department}")
 
-                for day_index, day in enumerate(days):
-                    # Wir gehen davon aus, dass der erste Tag im 'self.user_availability' das Startdatum ist
-                    date = self.user_availability[user_id][0][0] + datetime.timedelta(days=day_index)
-                    print("DATE: ", date)
+                    for day_index, day in enumerate(days):
+                        # Wir gehen davon aus, dass der erste Tag im 'self.user_availability' das Startdatum ist
+                        date = self.user_availability[user_id][0][0] + datetime.timedelta(days=day_index)
+                        print("DATE: ", date)
 
-                    # Löschen der jeweiligen Tage
-                    Timetable.query.filter_by(email=user.email, date=date).delete()
-                    db.session.commit()
-                    
+                        # Löschen der jeweiligen Tage
+                        Timetable.query.filter_by(email=user.email, date=date).delete()
+                        db.session.commit()
+                        
+                        # Hier unterteilen wir den Tag in Schichten, basierend auf den Zeiten, zu denen der Mitarbeiter arbeitet
+                        shifts = []
+                        start_time_index = None
+                        for time_index in range(len(day)):
+                            if day[time_index] == 1 and start_time_index is None:
+                                start_time_index = time_index
+                            elif day[time_index] == 0 and start_time_index is not None:
+                                shifts.append((start_time_index, time_index))
+                                start_time_index = None
+                        
+                        if start_time_index is not None:
+                            shifts.append((start_time_index, len(day)))
 
-                    # Hier unterteilen wir den Tag in Schichten, basierend auf den Zeiten, zu denen der Mitarbeiter arbeitet
-                    shifts = []
-                    start_time_index = None
-                    for time_index in range(len(day)):
-                        if day[time_index] == 1 and start_time_index is None:
-                            start_time_index = time_index
-                        elif day[time_index] == 0 and start_time_index is not None:
-                            shifts.append((start_time_index, time_index))
-                            start_time_index = None
-                    
-                    if start_time_index is not None:
-                        shifts.append((start_time_index, len(day)))
+                        print(f"Berechnete Schichten für Benutzer-ID {user_id}, Tag-Index {day_index}: {shifts}")
 
-                    print(f"Berechnete Schichten für Benutzer-ID {user_id}, Tag-Index {day_index}: {shifts}")
+                        # Divisor bestimmen
+                        divisor = 3600 / self.hour_devider
 
-                    # Divisor bestimmen
-                    divisor = 3600 / self.hour_devider
+                        for shift_index, (start_time, end_time) in enumerate(shifts):
+                            opening_time_in_units = int(self.laden_oeffnet[day_index].total_seconds() * self.hour_devider / 3600)
+                            start_time += opening_time_in_units
+                            end_time += opening_time_in_units
 
-                    for shift_index, (start_time, end_time) in enumerate(shifts):
-                        opening_time_in_units = int(self.laden_oeffnet[day_index].total_seconds() * self.hour_devider / 3600)
-                        start_time += opening_time_in_units
-                        end_time += opening_time_in_units
+                            # Neues Timetable-Objekt
+                            if shift_index == 0:
+                                new_entry = Timetable(
+                                    id=None,
+                                    email=user.email,
+                                    first_name=user.first_name,
+                                    last_name=user.last_name,
+                                    company_name=user.company_name,
+                                    department=department,
+                                    date=date,
+                                    start_time=datetime.datetime.combine(date, datetime.time(hour=int(start_time // self.hour_devider), minute=int((start_time % self.hour_devider) * 60 / self.hour_devider))),
+                                    end_time=datetime.datetime.combine(date, datetime.time(hour=int(end_time // self.hour_devider), minute=int((end_time % self.hour_devider) * 60 / self.hour_devider))),
+                                    start_time2=None,
+                                    end_time2=None,
+                                    start_time3=None,
+                                    end_time3=None,
+                                    created_by=self.current_user_id,
+                                    changed_by=self.current_user_id,
+                                    creation_timestamp=datetime.datetime.now()
+                                )
+                                db.session.add(new_entry)
 
-                        # Neues Timetable-Objekt
-                        if shift_index == 0:
-                            new_entry = Timetable(
-                                id=None,
-                                email=user.email,
-                                first_name=user.first_name,
-                                last_name=user.last_name,
-                                company_name=user.company_name,
-                                date=date,
-                                start_time=datetime.datetime.combine(date, datetime.time(hour=int(start_time // self.hour_devider), minute=int((start_time % self.hour_devider) * 60 / self.hour_devider))),
-                                end_time=datetime.datetime.combine(date, datetime.time(hour=int(end_time // self.hour_devider), minute=int((end_time % self.hour_devider) * 60 / self.hour_devider))),
-                                start_time2=None,
-                                end_time2=None,
-                                start_time3=None,
-                                end_time3=None,
-                                created_by=self.current_user_id,
-                                changed_by=self.current_user_id,
-                                creation_timestamp=datetime.datetime.now()
-                            )
+                            elif shift_index == 1:
+                                new_entry.start_time2 = datetime.datetime.combine(date, datetime.time(hour=int(start_time // self.hour_devider), minute=int((start_time % self.hour_devider) * 60 / self.hour_devider)))
+                                new_entry.end_time2 = datetime.datetime.combine(date, datetime.time(hour=int(end_time // self.hour_devider), minute=int((end_time % self.hour_devider) * 60 / self.hour_devider)))
+
+                            # new_entry der Datenbank hinzufügen
                             db.session.add(new_entry)
 
-                        elif shift_index == 1:
-                            new_entry.start_time2 = datetime.datetime.combine(date, datetime.time(hour=int(start_time // self.hour_devider), minute=int((start_time % self.hour_devider) * 60 / self.hour_devider)))
-                            new_entry.end_time2 = datetime.datetime.combine(date, datetime.time(hour=int(end_time // self.hour_devider), minute=int((end_time % self.hour_devider) * 60 / self.hour_devider)))
+                # Änderungen in der Datenbank speichern
+                db.session.commit()
 
-                        # new_entry der Datenbank hinzufügen
-                        db.session.add(new_entry)
-
-            # Änderungen in der Datenbank speichern
-            db.session.commit()
 
 
     def save_data_in_database_testing(self):

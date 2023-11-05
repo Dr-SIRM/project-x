@@ -460,7 +460,7 @@ class DataProcessing:
 
                 self.binary_availability[user_id].append((date, binary_list))
 
-        print(self.binary_availability)
+
 
     def get_employment_skills(self):
         """ In der folgenden Methode holen wir die Beschäftigung und die Skills jedes Benutzers und fügen sie jeweils in eine Liste ein """
