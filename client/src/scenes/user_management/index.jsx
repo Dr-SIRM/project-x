@@ -174,8 +174,6 @@ const UserManagement = () => {
                     outline: 'none',
                   },
                 }}
-                
-                
             >        
                 <DataGrid        
                     rows={availability}
@@ -197,26 +195,72 @@ const UserManagement = () => {
            {t('ScheduledShifts')}
           </Typography>
           <Box
-            backgroundColor={colors.grey[900]}
-            borderRadius="15px"
-            p={2}  // Adjust padding as needed
-            width="100%"  // Let the box take the full width of its grid item
-          >
+                mt="10px"
+                borderRadius="15px"
+                height="75vh"
+                style={{ backgroundColor: "white" }}
+                sx={{
+                  "& .MuiDataGrid-root": {
+                    borderColor: "black",
+                  },
+                  "& .MuiDataGrid-cell": {
+                    borderBottom: "1px solid black",
+                    borderTop: "1px solid black",
+                    color: colors.primary[100],
+                    backgroundColor: colors.grey[900],
+                    '&:focus': {
+                      outline: 'none',
+                      borderWidth: '1px',
+                      borderColor: 'black',
+                    },
+                    '&:focus-within': {
+                      outline: 'none',
+                      borderWidth: '1px',
+                      borderColor: 'black',
+                    },
+                  },
+                  "& .MuiDataGrid-columnHeaders": {
+                    backgroundColor: colors.grey[500],
+                    color: "white",
+                    borderColor: "black",
+                  },
+                  "& .MuiDataGrid-virtualScroller": {
+                    backgroundColor: colors.grey[900],
+                  },
+                  "& .MuiDataGrid-footerContainer": {
+                    borderTop: "none",
+                    backgroundColor: colors.grey[500],
+                  },
+                  "& .MuiCheckbox-root": {
+                    color: `${colors.greenAccent[200]} !important`,
+                  },
+                  "& .MuiDataGrid-cell:focus, & .MuiDataGrid-cell:focus-within": {
+                    outline: 'none',
+                    borderLeft: 'none',
+                    borderRight: 'none',
+                  },
+                  "& .MuiDataGrid-row:focus-within, & .MuiDataGrid-row:focus": {
+                    outline: 'none',
+                  },
+                  "& .MuiDataGrid-columnHeader:focus, & .MuiDataGrid-columnHeader:focus-within": {
+                    outline: 'none',
+                  },
+                }}
+            >  
             <DataGrid
-              style={{ color: "black" }}
               rows={scheduledShifts}
               pageSize={5}
               rowsPerPageOptions={[5]}
-              getRowId={(row) => row.weekday}  // or use any other unique value
-              hideFooterPagination
-              hideFooter
-              columns = {[
+              getRowId={(row) => row.id} 
+              columns={[
                 { field: 'date', headerName: t('date'), flex: 1 },
                 { field: 'weekday', headerName: t('weekday'), flex: 1 },
                 { field: 'start_time', headerName: t('startTime'), flex: 1 },
                 { field: 'end_time', headerName: t('endTime'), flex: 1 }
+                
               ]}
             />
+
           </Box>
         </Grid>
       </Grid>

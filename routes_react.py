@@ -1966,6 +1966,32 @@ def user_availability(email):
 
     return jsonify(availability=availability_data)
 
+@app.route('/api/user_scheduled_shifts/<string:email>', methods=['GET'])
+@jwt_required()
+def user_scheduled_shifts(email):
+
+    today = datetime.datetime.today().date()
+    scheduled_shifts = Timetable.query.filter(
+        Timetable.email == email,
+        Timetable.date >= today  # This gets shifts from today onwards
+    ).order_by(Timetable.date).all()
+
+    shifts_data = []
+    for shift in scheduled_shifts:
+        shift_dict = {
+            'id': shift.id,
+            'date': shift.date.strftime('%Y-%m-%d'),
+            'start_time': shift.start_time.strftime('%H:%M:%S'),
+            'end_time': shift.end_time.strftime('%H:%M:%S'),
+            'start_time2': shift.start_time2.strftime('%H:%M:%S') if shift.start_time2 else None,
+            'end_time2': shift.end_time2.strftime('%H:%M:%S') if shift.end_time2 else None,
+            'start_time3': shift.start_time3.strftime('%H:%M:%S') if shift.start_time3 else None,
+            'end_time3': shift.end_time3.strftime('%H:%M:%S') if shift.end_time3 else None,
+            # Add additional fields as needed
+        }
+        shifts_data.append(shift_dict)
+    print(shifts_data)
+    return jsonify(scheduledShifts=shifts_data)
 
 stripe.api_key = 'sk_test_51O8inXLP2HwOJuOXYsZAeWHRxFedJ31u63UGY8RAZvEFyjwGdG6tUzUv3FSgmhqaYVNz907s7KIWi8SXzsGnxbJV0025IxrfKI'
 
