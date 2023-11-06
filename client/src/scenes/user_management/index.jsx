@@ -102,20 +102,24 @@ const UserManagement = () => {
             width="fit-content"  // Let the box fit its content
           >
             <List>
-            {users.map((user) => (
-              <ListItem button key={user.id} onClick={() => handleUserClick(user)}>
-                <Chip
-                  avatar={<Avatar>{`${user.first_name.charAt(0)}${user.last_name.charAt(0)}`}</Avatar>}
-                  label={`${user.first_name} ${user.last_name}`}
-                  sx={{ 
-                    '&:hover': { backgroundColor: '#f0f0f0' }, 
-                    color: 'black',
-                    backgroundColor: selectedUser && selectedUser.id === user.id ? '#22E3B6' : 'transparent',  // Change 'blue' to any color you prefer
-                  }}
-                />
-              </ListItem>
-            ))}
-          </List>
+              {users.map((user) => (
+                <ListItem button key={user.id} onClick={() => handleUserClick(user)}>
+                  <Chip
+                    avatar={<Avatar>{`${user.first_name.charAt(0)}${user.last_name.charAt(0)}`}</Avatar>}
+                    label={
+                      <Typography variant="body1" component="div" sx={{ fontSize: '1rem' }}>
+                        {`${user.first_name} ${user.last_name}`}
+                      </Typography>
+                    }
+                    sx={{ 
+                      '&:hover': { backgroundColor: '#f0f0f0' }, 
+                      color: 'black',
+                      backgroundColor: selectedUser && selectedUser.id === user.id ? '#22E3B6' : 'transparent',
+                    }}
+                  />
+                </ListItem>
+              ))}
+            </List>
           </Box>
         </Grid>
         <Grid item xs={12} sm={5}>
