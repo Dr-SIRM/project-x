@@ -60,11 +60,12 @@ To-Do Liste:
  - (erl) start_time und end_time zwei und drei noch implementieren
  - (erl) TimeReq in data_processing anpassen, soabld Phu Planung fertiggestellt hat.
  - (erl) MA mit verschiedenen Profilen - Department (Koch, Service, ..)
+ - (erl) Alle NB's mit Schichten umbauen.
  
 
  To-Do's 
  -------------------------------
- - Alle NB's mit Schichten umbauen.
+ - Solvingzeit mit der Zeit automaitsch abbrechen, Datenbank mit Variabeln befüllen und Daten ziehen
  - (*)  Wenn man gar keine time_req eingegeben hat, hällt dann Vorüberprüfung 1 stand?
 
  - (*) self.subsequent_workingdays_max, self.skills_per_day(1 oder 0) in die Datenbank einpflegen und ziehen
