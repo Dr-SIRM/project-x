@@ -2231,6 +2231,7 @@ class ORAlgorithm_cp:
                     for day_index, day in enumerate(days):
                         # Wir gehen davon aus, dass der erste Tag im 'self.user_availability' das Startdatum ist
                         date = self.user_availability[user_id][0][0] + datetime.timedelta(days=day_index)
+                        weekday = date.strftime('%A') # Den aktuellen Wochentag finden
 
                         # Hier unterteilen wir den Tag in Schichten, basierend auf den Zeiten, zu denen der Mitarbeiter arbeitet
                         shifts = []
@@ -2273,6 +2274,7 @@ class ORAlgorithm_cp:
                                     company_name=user.company_name,
                                     department=department,
                                     date=date,
+                                    weekday = weekday,
                                     start_time=start_datetime,
                                     end_time=end_datetime,
                                     start_time2=None,
