@@ -204,6 +204,7 @@ class Timetable(db.Model, UserMixin):
     company_name = db.Column(db.String(200), index=True, unique=False)
     department = db.Column(db.String(200), index=True, unique=False)
     date = db.Column(db.Date, index=True)
+    weekday = db.Column(db.String(200), index=True, unique=False)
     start_time = db.Column(db.Time)
     end_time = db.Column(db.Time)
     start_time2 = db.Column(db.Time)
@@ -218,7 +219,7 @@ class Timetable(db.Model, UserMixin):
 
 
     def __init__(self, id, email, first_name, last_name, date, start_time, end_time, start_time2, end_time2,
-                 start_time3, end_time3, created_by, changed_by, creation_timestamp, company_name, department):
+                 start_time3, end_time3, created_by, changed_by, creation_timestamp, company_name, department, weekday):
         self.id = id
         self.email = email
         self.first_name = first_name
@@ -226,6 +227,7 @@ class Timetable(db.Model, UserMixin):
         self.company_name = company_name
         self.department = department
         self.date = date
+        self.weekday = weekday
         self.start_time = start_time
         self.end_time = end_time
         self.start_time2 = start_time2
