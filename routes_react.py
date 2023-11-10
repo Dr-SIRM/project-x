@@ -117,7 +117,10 @@ def current_react_user():
 @jwt_required()
 def get_data():
     react_user_email = get_jwt_identity()
-    current_user = User.query.filter_by(email=react_user_email).first()
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    session = get_session(get_database_uri('', session_company))
+    current_user = session.query(User).filter_by(email=react_user_email).first()
     
     if current_user is None:
         return jsonify({"message": "User not found"}), 404
@@ -126,7 +129,7 @@ def get_data():
     current_company_name = current_user.company_name
 
     # Query the Company model to get the company data
-    company = Company.query.filter_by(company_name=current_company_name).first()
+    company = session.query(Company).filter_by(company_name=current_company_name).first()
 
     if company is None:
         return jsonify({"message": "Company not found"}), 404
@@ -149,7 +152,7 @@ def get_data():
     departments = [dept for dept in departments if dept is not None]
 
     # Query users who are members of the same company
-    users = User.query.filter_by(company_name=current_company_name).all()
+    users = session.query(User).filter_by(company_name=current_company_name).all()
 
     user_list = []
     for user in users:
@@ -173,6 +176,8 @@ def get_data():
         'users': user_list,
         'departments': departments
     }
+
+    session.close()
 
     print(response_dict)
     return jsonify(response_dict)
@@ -201,32 +206,36 @@ def get_data():
 #         user.employment_level = employment_level_percentage / 100.0
     
 #     try:
-#         db.session.commit()
+#         session.commit()
 #         return jsonify({"message": "User updated"}), 200
 #     except Exception as e:
-#         db.session.rollback()
+#         session.rollback()
 #         return jsonify({"message": "Failed to update user"}), 500
 #     finally:
-#         db.session.close()
+#         session.close()
 
 
 @app.route('/api/users/delete/<int:user_id>', methods=['DELETE'])
 @jwt_required()
 def delete_user(user_id):
 
-    user_to_delete = User.query.get(user_id)
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    session = get_session(get_database_uri('', session_company))
+
+    user_to_delete = session.query(User).get(user_id)
     if user_to_delete is None:
         return jsonify({"message": "User not found"}), 404
     
     try:
-        db.session.delete(user_to_delete)
-        db.session.commit()
+        session.delete(user_to_delete)
+        session.commit()
         return jsonify({"message": "User deleted"}), 200
     except Exception as e:
-        db.session.rollback()
+        session.rollback()
         return jsonify({"message": "Failed to delete user", "error": str(e)}), 500
     finally:
-        db.session.close()
+        session.close()
 
 
 @app.route('/api/new_user', methods=['GET', 'POST'])
@@ -455,7 +464,10 @@ def new_user():
 @jwt_required()
 def react_update():
     react_user = get_jwt_identity()
-    user = User.query.filter_by(email=react_user).first()
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    session = get_session(get_database_uri('', session_company))
+    user = session.query(User).filter_by(email=react_user).first()
 
     if user is None:
         return jsonify({"message": "User not found"}), 404
@@ -490,6 +502,8 @@ def react_update():
         'password': user.password,
     }
 
+    session.close()
+
     return jsonify(user_dict)
 
 
@@ -497,7 +511,10 @@ def react_update():
 @jwt_required()
 def get_change_password():
     react_user = get_jwt_identity()
-    user = User.query.filter_by(email=react_user).first()
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    session = get_session(get_database_uri('', session_company))
+    user = session.query(User).filter_by(email=react_user).first()
 
     if request.method == 'POST':
         password_data = request.get_json()
@@ -513,6 +530,8 @@ def get_change_password():
                 user.update_timestamp = datetime.datetime.now()
                 session.commit()
                 session.close()
+
+    session.close()
 
     return jsonify({'message': 'Password succesfull updated!'}), 200
 
@@ -667,7 +686,6 @@ def get_company():
                 # Append to list of new entries
                 new_opening_hours_entries.append(opening)
 
-        print(f"Current DB Session Bind: {db.session.bind}")
 
         # Bulk insert all new OpeningHours entries and commit
         session.bulk_save_objects(new_opening_hours_entries)
@@ -699,10 +717,15 @@ def get_company():
     return jsonify(company_list)
 
 def get_temp_availability_dict(template_name, email, day_num, weekdays):
+
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    session = get_session(get_database_uri('', session_company))
+
     temp_availability_dict = {}
 
     # Query once to get all relevant TemplateTimeRequirements
-    all_temps = TemplateAvailability.query.filter_by(
+    all_temps = session.query(TemplateAvailability).filter_by(
         email=email,
         template_name=template_name
     ).all()
@@ -721,7 +744,9 @@ def get_temp_availability_dict(template_name, email, day_num, weekdays):
             temp_availability_dict[f"{new_i}&3"] = temp.end_time2.strftime("%H:%M") if temp.end_time2 else None
             temp_availability_dict[f"{new_i}&4"] = temp.start_time3.strftime("%H:%M") if temp.start_time3 else None
             temp_availability_dict[f"{new_i}&5"] = temp.end_time3.strftime("%H:%M") if temp.end_time3 else None
-  
+    
+    session.close()
+
     return temp_availability_dict
 
 
@@ -730,15 +755,18 @@ def get_temp_availability_dict(template_name, email, day_num, weekdays):
 def get_availability():
     # today's date
     react_user = get_jwt_identity()
-    user = User.query.filter_by(email=react_user).first()
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    session = get_session(get_database_uri('', session_company))
+    user = session.query(User).filter_by(email=react_user).first()
     today = datetime.date.today()
     creation_date = datetime.datetime.now()
     monday = today - datetime.timedelta(days=today.weekday())
     weekdays = {0:'Montag', 1:'Dienstag', 2:'Mittwoch', 3:'Donnerstag', 4:'Freitag', 5:'Samstag', 6:'Sonntag'}
     day_num = 7
     company_id = user.company_id
-    solverreq = SolverRequirement.query.filter_by(company_name=user.company_name).first()
-    opening = OpeningHours.query.filter_by(company_name=user.company_name).first()
+    solverreq = session.query(SolverRequirement).filter_by(company_name=user.company_name).first()
+    opening = session.query(OpeningHours).filter_by(company_name=user.company_name).first()
 
     # Week with adjustments
     monday = today - datetime.timedelta(days=today.weekday())
@@ -752,7 +780,7 @@ def get_availability():
     if user.access_level == "User":
         user_list = [f"{user.first_name}, {user.last_name}, {user.email}"]
     else:
-        company_users = User.query.filter_by(company_name=user.company_name).order_by(asc(User.last_name)).all()
+        company_users = session.query(User).filter_by(company_name=user.company_name).order_by(asc(User.last_name)).all()
         user_list = [f"{user.first_name}, {user.last_name}, {user.email}" for user in company_users]
     
 
@@ -770,7 +798,7 @@ def get_availability():
         selected_user_email = user.email
     
     # Use the extracted email in the availability query
-    availabilities = Availability.query.filter(
+    availabilities = session.query(Availability).filter(
         Availability.email == selected_user_email,
         Availability.date.in_(dates),
         Availability.weekday.in_(query_weekdays)
@@ -941,6 +969,8 @@ def get_availability():
         'template3_dict': get_temp_availability_dict("Template 3", user.email, day_num, weekdays),
     }
 
+    session.close()
+
     return jsonify(availability_list)
 
 
@@ -948,6 +978,7 @@ def get_availability():
 def get_forget_password():
     if request.method == 'POST':
         forget_password_data = request.get_json()
+        session = get_session(get_database_uri('', "timetab"))
         
         existing_user = OverviewUser.query.filter_by(email=forget_password_data['email']).first()
         if existing_user is None:
@@ -963,8 +994,9 @@ def get_forget_password():
 
             data = PasswordReset(id=new_id, email=forget_password_data['email'], token=random_token)
 
-            db.session.add(data)
-            db.session.commit()
+            session.add(data)
+            session.commit()
+            session.close()
 
             msg = Message('Reset Password', recipients=['timetab@gmx.ch'])
             msg.body = f"Hey there,\n \n Below you will find your reset Link. \n \n {reset_url}"
@@ -979,7 +1011,10 @@ def get_forget_password():
 @jwt_required()
 def get_invite():
     react_user = get_jwt_identity()
-    user = User.query.filter_by(email=react_user).first()
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    session = get_session(get_database_uri('', session_company))
+    user = session.query(User).filter_by(email=react_user).first()
 
     if request.method == 'POST':
         invite_data = request.get_json()
@@ -1029,6 +1064,7 @@ def get_invite():
         'access_level': "",
     }
 
+    session.close()
     
     return jsonify(invite_dict)
 
@@ -1045,7 +1081,10 @@ def run_solver():
     print("Request received", request.method)  # Log the type of request received
 
     react_user = get_jwt_identity()
-    user = User.query.filter_by(email=react_user).first()
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    session = get_session(get_database_uri('', session_company))
+    user = session.query(User).filter_by(email=react_user).first()
 
     solver_data = request.get_json()
     print("JSON Payload:", solver_data)  # Log payload
@@ -1085,6 +1124,8 @@ def run_solver():
     else:
         print("Solver button was not clicked")  # Log if button wasn’t clicked
         return jsonify({'message': 'Solver button was not clicked'}), 200
+    
+    session.close()
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000)  # Adjust host and port as needed
@@ -1096,10 +1137,13 @@ if __name__ == '__main__':
 @jwt_required()
 def solver_req():
     react_user = get_jwt_identity()
-    user = User.query.filter_by(email=react_user).first()
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    session = get_session(get_database_uri('', session_company))
+    user = session.query(User).filter_by(email=react_user).first()
     session = get_session(get_database_uri('', user.company_name.lower().replace(' ', '_')))
-    company = Company.query.filter_by(company_name=user.company_name).first()
-    solver_requirement = SolverRequirement.query.filter_by(company_name=user.company_name).first()
+    company = session.query(Company).filter_by(company_name=user.company_name).first()
+    solver_requirement = session.query(SolverRequirement).filter_by(company_name=user.company_name).first()
 
     if solver_requirement is None:
         company_name = ""
@@ -1234,7 +1278,7 @@ def solver_req():
             session.close()
             return jsonify({'message': 'Succesful Registration'}), 200
         except:
-            db.session.rollback()
+            session.rollback()
             return jsonify({'message': 'Registration went wrong!'}), 200
 
 
@@ -1276,6 +1320,7 @@ def solver_req():
     "nb20": nb20
     }
 
+    session.close()
     
     return jsonify(solver_req_dict)
 
@@ -1348,95 +1393,106 @@ def get_registration():
     return jsonify({'message': 'Get Ready!'}), 200
 
 
-@app.route('/api/registration/admin', methods = ['GET', 'POST'])
-def get_admin_registration():
+# @app.route('/api/registration/admin', methods = ['GET', 'POST'])
+# def get_admin_registration():
 
-    react_user = get_jwt_identity()
-    user = User.query.filter_by(email=react_user).first()
+#     react_user = get_jwt_identity()
+#     jwt_data = get_jwt()
+#     session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+#     session = get_session(get_database_uri('', session_company))
+#     user = session.query(User).filter_by(email=react_user).first()
 
-    departments = (
-        Company.query
-        .filter_by(company_name=user.company)
-        .with_entities(
-            Company.department,
-            Company.department2,
-            Company.department3,
-            Company.department4,
-            Company.department5,
-            Company.department6,
-            Company.department7,
-            Company.department8,
-            Company.department9,
-            Company.department10
-        )
-        .all()
-    )
+#     departments = (
+#         session.query(Company)
+#         .filter_by(company_name=user.company)
+#         .with_entities(
+#             Company.department,
+#             Company.department2,
+#             Company.department3,
+#             Company.department4,
+#             Company.department5,
+#             Company.department6,
+#             Company.department7,
+#             Company.department8,
+#             Company.department9,
+#             Company.department10
+#         )
+#         .all()
+#     )
 
-    # Flatten the list of departments and filter out None values
-    department_list = [department for department in departments if department is not None]
-    print(department_list)
+#     # Flatten the list of departments and filter out None values
+#     department_list = [department for department in departments if department is not None]
+#     print(department_list)
 
-    if request.method =='POST':
-        admin_registration_data = request.get_json()
-        companies_list = ["TimeTab AG", "TimeTab GmbH", "TimeTab CoKG", "LeckMichFett"]
-        for i in companies_list:
-            if i == admin_registration_data['company_name']:
-                if admin_registration_data['password'] != admin_registration_data['password2']:
-                    return jsonify({'message': 'Password are not matching'}), 200
-                else:
-                    original_bind = app.config['SQLALCHEMY_BINDS']['dynamic']
-                    creation_date = datetime.datetime.now()
-                    last = User.query.order_by(User.id.desc()).first()
-                    hash = generate_password_hash(admin_registration_data['password'])
-                    if last is None:
-                        new_id = 1
-                    else:
-                        new_id = last.id + 1
+#     if request.method =='POST':
+#         admin_registration_data = request.get_json()
+#         session = get_session(get_database_uri('', company_name.lower().replace(' ', '_')))
+#         companies_list = ["TimeTab AG", "TimeTab GmbH", "TimeTab CoKG", "LeckMichFett"]
+#         for i in companies_list:
+#             if i == admin_registration_data['company_name']:
+#                 if admin_registration_data['password'] != admin_registration_data['password2']:
+#                     return jsonify({'message': 'Password are not matching'}), 200
+#                 else:
+#                     original_bind = app.config['SQLALCHEMY_BINDS']['dynamic']
+#                     creation_date = datetime.datetime.now()
+#                     last = User.query.order_by(User.id.desc()).first()
+#                     hash = generate_password_hash(admin_registration_data['password'])
+#                     if last is None:
+#                         new_id = 1
+#                     else:
+#                         new_id = last.id + 1
 
-                    last_company_id = User.query.filter_by(company_name=admin_registration_data['company_name']).order_by(User.company_id.desc()).first()
-                    if last_company_id is None:
-                        new_company_id = 10000
-                    else:
-                        new_company_id = last_company_id.company_id + 1
+#                     last_company_id = User.query.filter_by(company_name=admin_registration_data['company_name']).order_by(User.company_id.desc()).first()
+#                     if last_company_id is None:
+#                         new_company_id = 10000
+#                     else:
+#                         new_company_id = last_company_id.company_id + 1
 
-                    data = User(id = new_id, 
-                                company_id = new_company_id, 
-                                first_name = admin_registration_data['first_name'],
-                                last_name = admin_registration_data['last_name'], 
-                                employment = admin_registration_data['employment'], 
-                                employment_level = admin_registration_data['employment_level'],
-                                company_name = admin_registration_data['company_name'], 
-                                department = admin_registration_data['department'],
-                                access_level = admin_registration_data['access_level'], 
-                                email = admin_registration_data['email'], 
-                                password = hash,
-                                created_by = new_company_id, 
-                                changed_by = new_company_id, 
-                                creation_timestamp = creation_date
-                                )
+#                     data = User(id = new_id, 
+#                                 company_id = new_company_id, 
+#                                 first_name = admin_registration_data['first_name'],
+#                                 last_name = admin_registration_data['last_name'], 
+#                                 employment = admin_registration_data['employment'], 
+#                                 employment_level = admin_registration_data['employment_level'],
+#                                 company_name = admin_registration_data['company_name'], 
+#                                 department = admin_registration_data['department'],
+#                                 access_level = admin_registration_data['access_level'], 
+#                                 email = admin_registration_data['email'], 
+#                                 password = hash,
+#                                 created_by = new_company_id, 
+#                                 changed_by = new_company_id, 
+#                                 creation_timestamp = creation_date
+#                                 )
 
-                    try:
-                        app.config['SQLALCHEMY_BINDS']['dynamic'] = get_database_uri('', token.company_name)
-                        db.session.add(data)
-                        db.session.commit()
-                    except:
-                        db.session.rollback()
-                        return jsonify({'message': 'Registration went wrong!'}), 200
-            else:
-                return jsonify({'message': 'This company name already exists'}), 200
+#                     try:
+#                         session.add(data)
+#                         session.commit()
+#                     except:
+#                         session.rollback()
+#                         return jsonify({'message': 'Registration went wrong!'}), 200
+#             else:
+#                 return jsonify({'message': 'This company name already exists'}), 200
                     
     
-    user_dict={
-    'department_list': department_list,
-    }
-    return jsonify(user_dict)
+#     user_dict={
+#     'department_list': department_list,
+#     }
+
+#     session.close()
+
+#     return jsonify(user_dict)
                 
 
 def get_temp_timereq_dict(template_name, day_num, daily_slots, hour_divider, minutes, company_name, full_day):
+
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    session = get_session(get_database_uri('', session_company))
+
     temp_timereq_dict = {}
 
     # Query once to get all relevant TemplateTimeRequirements
-    all_temps = TemplateTimeRequirement.query.filter_by(
+    all_temps = session.query(TemplateTimeRequirement).filter_by(
         company_name=company_name,
         template_name=template_name
     ).all()
@@ -1467,6 +1523,8 @@ def get_temp_timereq_dict(template_name, day_num, daily_slots, hour_divider, min
             if worker_count is not None:
                 temp_timereq_dict[f"{i}-{hour}"] = worker_count
     
+    session.close()
+
     return temp_timereq_dict
 
 def is_within_opening_hours(time, opening, closing):
@@ -1483,11 +1541,14 @@ def is_within_opening_hours(time, opening, closing):
 @jwt_required()
 def get_required_workforce():
     react_user = get_jwt_identity()
-    user = User.query.filter_by(email=react_user).first()
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    session = get_session(get_database_uri('', session_company))
+    user = session.query(User).filter_by(email=react_user).first()
     creation_date = datetime.datetime.now()
     weekdays = {0: 'Montag', 1: 'Dienstag', 2: 'Mittwoch', 3: 'Donnerstag', 4: 'Freitag', 5: 'Samstag', 6: 'Sonntag'}
     today = datetime.date.today()
-    solverreq = SolverRequirement.query.filter_by(company_name=user.company_name).first()
+    solverreq = session.query(SolverRequirement).filter_by(company_name=user.company_name).first()
     hour_divider = solverreq.hour_devider
     full_day = (24 * hour_divider) -1
     minutes = 60 / hour_divider
@@ -1497,7 +1558,7 @@ def get_required_workforce():
    
 
     # Fetch Opening Data
-    all_opening_hours = OpeningHours.query.filter(
+    all_opening_hours = session.query(OpeningHours).filter(
         OpeningHours.company_name == user.company_name,
         OpeningHours.weekday.in_(list(weekdays.values()))
     ).all()
@@ -1565,7 +1626,7 @@ def get_required_workforce():
     
     # Pre-fetch all TimeReq for the given date range and company name
     end_date = week_start + datetime.timedelta(days=day_num)
-    all_time_reqs = TimeReq.query.filter(
+    all_time_reqs = session.query(TimeReq).filter(
         TimeReq.company_name == user.company_name,
         TimeReq.department == request.args.get('selectedDepartment'),
         TimeReq.date.between(week_start, end_date)
@@ -1622,7 +1683,7 @@ def get_required_workforce():
 
     #List of Departments
     departments = (
-        Company.query
+        session.query(Company)
         .filter_by(company_name=user.company_name)
         .with_entities(
             Company.department,
@@ -1789,6 +1850,8 @@ def get_required_workforce():
 
     }
 
+    session.close()
+
     return jsonify(calendar_dict)
 
 
@@ -1801,7 +1864,10 @@ import logging
 @jwt_required()
 def get_shift():
     react_user_email = get_jwt_identity()
-    current_user = User.query.filter_by(email=react_user_email).first()
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    session = get_session(get_database_uri('', session_company))
+    current_user = session.query(User).filter_by(email=react_user_email).first()
 
     if current_user is None:
         return jsonify({"message": "User not found"}), 404
@@ -1842,7 +1908,7 @@ def get_shift():
         start_date, end_date = None, None  # default to getting all shifts
 
     # Query users who are members of the same company
-    users = User.query.filter_by(company_name=current_company_name).all()
+    users = session.query(User).filter_by(company_name=current_company_name).all()
 
     user_list = []
     for user in users:
@@ -1853,7 +1919,7 @@ def get_shift():
         user_list.append(user_dict)
 
     # Query the opening hours for the current company
-    opening_hours_records = OpeningHours.query.filter_by(company_name=current_company_name).all()
+    opening_hours_records = session.query(OpeningHours).filter_by(company_name=current_company_name).all()
 
     opening_hours_data = {}
     for record in opening_hours_records:
@@ -1867,13 +1933,13 @@ def get_shift():
     print("Opening:", opening_hours_data)
 
     if start_date and end_date:
-        shift_records = Timetable.query.filter(
+        shift_records = session.query(Timetable).filter(
             Timetable.company_name == current_company_name, 
             Timetable.date >= start_date, 
             Timetable.date <= end_date
         ).all()
     else:
-        shift_records = Timetable.query.filter_by(company_name=current_company_name).all()
+        shift_records = session.query(Timetable).filter_by(company_name=current_company_name).all()
 
 
     shift_data = []
@@ -1910,6 +1976,8 @@ def get_shift():
         'opening_hours': opening_hours_data,
         'shifts': shift_data
     }
+
+    session.close()
 
     return jsonify(response)
 
@@ -2035,12 +2103,15 @@ def get_dashboard_data():
 @jwt_required()
 def get_calendar():
     current_user_id = get_jwt_identity()
-    current_user = User.query.filter_by(email=current_user_id).first()
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    session = get_session(get_database_uri('', session_company))
+    current_user = session.query(User).filter_by(email=current_user_id).first()
     if not current_user:
         return jsonify({'error': 'User not found'}), 404
     
     # Get the shifts for the current user
-    shifts = Timetable.query.filter_by(email=current_user_id).all()
+    shifts = session.query(Timetable).filter_by(email=current_user_id).all()
     
     # Convert the shifts to the format expected by FullCalendar
     events = [{
@@ -2051,6 +2122,9 @@ def get_calendar():
         'end': datetime.datetime.combine(shift.date, shift.end_time).strftime('%Y-%m-%dT%H:%M:%S'),
     } for shift in shifts]
     print(events)
+
+    session.close()
+
     return jsonify(events)
 
 
@@ -2061,9 +2135,14 @@ def get_calendar():
 @jwt_required()
 def get_excel():
     react_user = get_jwt_identity()
-    user = User.query.filter_by(email=react_user).first()
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    session = get_session(get_database_uri('', session_company))
+    user = session.query(User).filter_by(email=react_user).first()
 
     output = create_excel_output(user.id)
+
+    session.close()
     
     return send_file(output, as_attachment=True, download_name="Schichtplan.xlsx", mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
@@ -2072,13 +2151,16 @@ def get_excel():
 @jwt_required()
 def user_management():  
     react_user_email = get_jwt_identity()
-    current_user = User.query.filter_by(email=react_user_email).first()
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    session = get_session(get_database_uri('', session_company))
+    current_user = session.query(User).filter_by(email=react_user_email).first()
     
     if current_user is None:
         return jsonify({"message": "User not found"}), 404
     
     current_company_name = current_user.company_name
-    users = User.query.filter_by(company_name=current_company_name).all()
+    users = session.query(User).filter_by(company_name=current_company_name).all()
 
     to_dict = []  # This will hold all user data
     for user in users:
@@ -2095,10 +2177,13 @@ def user_management():
 @app.route('/api/user_availability/<string:email>', methods=['GET'])
 @jwt_required()
 def user_availability(email):
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    session = get_session(get_database_uri('', session_company))
     today = datetime.datetime.today().date()
     four_weeks_later = today + datetime.timedelta(weeks=4)
     
-    availabilities = Availability.query.filter(
+    availabilities = session.query(Availability).filter(
         Availability.email == email,
         Availability.date >= today,
         Availability.date <= four_weeks_later
@@ -2119,17 +2204,22 @@ def user_availability(email):
             'end_time3': availability.end_time3.strftime('%H:%M:%S') if availability.end_time3 else None
         }
         availability_data.append(availability_dict)
-    print(availability_data)
+    
+    session.close()
 
+    print(availability_data)
 
     return jsonify(availability=availability_data)
 
 @app.route('/api/user_scheduled_shifts/<string:email>', methods=['GET'])
 @jwt_required()
 def user_scheduled_shifts(email):
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    session = get_session(get_database_uri('', session_company))
 
     today = datetime.datetime.today().date()
-    scheduled_shifts = Timetable.query.filter(
+    scheduled_shifts = session.query(Timetable).filter(
         Timetable.email == email,
         Timetable.date >= today  # This gets shifts from today onwards
     ).order_by(Timetable.date).all()
