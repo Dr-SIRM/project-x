@@ -137,7 +137,7 @@ from routes_html import homepage, registration, admin_registration, login, logou
 #---------------------------------------------------------------------------------
 
 from routes_react import react_dashboard, login_react, current_react_user, get_data, \
-    get_admin_registration, get_availability, get_company, get_forget_password, get_invite, \
+    get_availability, get_company, get_forget_password, get_invite, \
     get_registration, get_required_workforce, new_user, run_solver, delete_user
 
 
