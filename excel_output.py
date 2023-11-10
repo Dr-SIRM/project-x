@@ -1,6 +1,6 @@
 import io
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from models import Timetable
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
@@ -21,10 +21,9 @@ def create_excel_output(user_id):
     In dieser Funktion werden relevante gesolvte Daten aus der Datenbank gezogen und eine Excelausgabe daraus generiert.
     """
 
-
     # Achtung, start_date muss immer ein Montag sein!
-    start_date = "2023-10-09"
-    end_date = "2023-10-15"
+    start_date = "2023-11-13"
+    end_date = "2023-11-19"
 
     """
     COMPANY INFOS ZIEHEN ---------------------------------------------------------------
@@ -32,6 +31,45 @@ def create_excel_output(user_id):
     # Hole den company_name des aktuellen Benutzers
     user = User.query.filter_by(id=user_id).first()
     company_name = user.company_name
+
+    # Liste von Farben für die Departments
+    available_colors = [
+        "B0C4DE",  # Sanftes Blau
+        "98FB98",  # Zartes Grün
+        "FFFF99",  # Helles Gelb
+        "FF9999",  # Sanftes Rot
+        "87CEEB",  # Himmelblau
+        "E6E6FA",  # Lavendel
+        "FFEFD5",  # Pfirsich
+        "98FF98",  # Mintgrün
+        "FFB6C1",  # Babyrosa
+        "FFFDD0",  # Creme
+    ]
+
+
+    # Die entsprechende Company-Instanz abfragen
+    company = Company.query.filter_by(company_name=company_name).first()
+
+    # Liste für die Abteilungen
+    departments = []
+
+    # Zugriff auf das erste Department
+    first_department = getattr(company, 'department')
+    if first_department:
+        departments.append(first_department)
+
+    # Die restlichen Departments durchiterieren 
+    for i in range(2, 11):
+        department_value = getattr(company, f'department{i}')
+        if department_value:
+            departments.append(department_value)
+
+    # Zuweisen von Farben zu Abteilungen
+    department_colors = {}
+    for i, department in enumerate(departments):
+        department_initials = department[:2].upper()  # Nehmen Sie die ersten zwei Buchstaben in Großbuchstaben
+        department_colors[department_initials] = available_colors[i % len(available_colors)]
+    print("department_colors: ", department_colors)
 
     # ----------------------------------------------------------------------------------
 
@@ -53,12 +91,13 @@ def create_excel_output(user_id):
     # Konvertieren Sie die Zeiten in time_delta und speichern Sie sie zusammen mit dem Wochentag in einer Liste
     times = [
         (record.weekday, 
-        time_to_timedelta(record.start_time), 
-        time_to_timedelta(record.end_time), 
-        time_to_timedelta(record.end_time2)) 
+         time_to_timedelta(record.start_time), 
+         time_to_timedelta(record.end_time), 
+         time_to_timedelta(record.end_time2) if record.end_time2 is not None else None) 
         for record in opening
     ]
-
+    
+    print("times: ", times)
     # ----------------------------------------------------------------------------------
 
     # Abfrage, um hour_devider abzurufen
@@ -84,6 +123,7 @@ def create_excel_output(user_id):
         .filter(Timetable.date.between(start_date, end_date))
         .with_entities(
             Timetable.email,
+            Timetable.department,
             Timetable.date,
             Timetable.start_time,
             Timetable.end_time,
@@ -96,16 +136,16 @@ def create_excel_output(user_id):
     # Konvertieren Sie die Zeiten in timedelta und speichern Sie sie in einer Liste
     data_timetable = [
         (
-            email, 
+            email,
+            department, 
             date, 
             time_to_timedelta(start_time), 
             time_to_timedelta(end_time), 
             time_to_timedelta(start_time2) if start_time2 is not None else None, 
             time_to_timedelta(end_time2) if end_time2 is not None else None
         ) 
-        for email, date, start_time, end_time, start_time2, end_time2 in data_timetable
+        for email, department, date, start_time, end_time, start_time2, end_time2 in data_timetable
     ]
-
 
 
     # Excel erstellen und befüllen ----------------------------------------------------------------------------------------------
@@ -193,8 +233,25 @@ def create_excel_output(user_id):
     for time_info in times:
         weekday, start_time_obj, end_time_obj, end_time2_obj = time_info
         start_time = (datetime.min + start_time_obj).time()
-        end_time = (datetime.min + (end_time2_obj if end_time2_obj != timedelta(0) else end_time_obj)).time()
-        hours = generate_hours(datetime.combine(datetime.today(), start_time), datetime.combine(datetime.today(), end_time), hour_devider)
+        print("start_time: ", start_time)
+        if end_time2_obj is None:
+            end_time = (datetime.min + end_time_obj).time()
+        else:
+            end_time = (datetime.min + end_time2_obj).time()
+        print("end_time: ", end_time)
+
+        # hours = generate_hours(datetime.combine(datetime.today(), start_time), datetime.combine(datetime.today(), end_time), hour_devider)
+        # Erstellen eines datetime-Objekts für start_time und end_time
+        start_datetime = datetime.combine(datetime.today(), start_time)
+        end_datetime = datetime.combine(datetime.today(), end_time)
+
+        # Wenn end_time kleiner als start_time ist, fügen Sie einen Tag zu end_datetime hinzu
+        if end_datetime < start_datetime:
+            end_datetime += timedelta(days=1)
+
+        hours = generate_hours(start_datetime, end_datetime, hour_devider)
+        print("hours: ", hours)
+
         row_index = 5
         
         if hours:
@@ -213,7 +270,7 @@ def create_excel_output(user_id):
                 ws.column_dimensions[get_column_letter(col_index)].width = 3.2
                 col_index += 1
             
-            for email, date, start_time, end_time, _, _ in data_timetable:
+            for email, department, date, start_time, end_time, _, _ in data_timetable:
                 if date.strftime("%Y-%m-%d") == start_date:
                     user_row = email_row_dict.get(email)
                     if user_row:
@@ -224,10 +281,17 @@ def create_excel_output(user_id):
                         end_col = start_col + (datetime.combine(datetime.today(), end_time) - datetime.combine(datetime.today(), start_time)).seconds // (60 * 60 // hour_devider) - 1
 
                         
-                        # Färben der Zellen
+                        # Färben der Zellen, Einfügen der Abteilungsinitialen und Formatierung
                         for col in range(start_col, end_col + 1):
                             cell = ws.cell(row=user_row, column=col)
-                            cell.fill = green_fill
+                            department_initials = department[:2].upper()  # Erste zwei Buchstaben der Abteilung
+                            cell.value = department_initials  # Setze die Abteilungsinitialen in die Zelle
+                            cell.alignment = Alignment(horizontal='center', vertical='center')  # Zentriere den Text
+                            cell.font = Font(size=8, bold=True)  # Setze die Schriftgröße und Schriftart
+
+                            cell_color = department_colors.get(department_initials, "00FF00")  # Standardfarbe ist Grün
+                            cell.fill = PatternFill(start_color=cell_color, end_color=cell_color, fill_type="solid")
+
         
         start_date = (datetime.strptime(start_date, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
 
@@ -236,6 +300,27 @@ def create_excel_output(user_id):
         for col in range(7, col_index):
             cell = ws.cell(row=row, column=col)
             cell.border = border_style  # Setzen Sie hier den vorher definierten border_style.
+
+
+
+    # Legende für die Abteilungen hinzufügen
+    legend_row = last_data_row + 2  # Beginne zwei Zeilen unter der letzten Datenzeile
+    ws.cell(row=legend_row, column=2, value="Legende Abteilungen:").font = Font(size=11, bold=True)
+
+    for i, department in enumerate(departments):
+        legend_row += 1  # Für jede Abteilung eine neue Zeile
+        department_initials = department[:2].upper()
+
+        # Füge die Abteilungsinitialen und die zugehörige Farbe in die Zelle ein
+        initial_cell = ws.cell(row=legend_row, column=2, value=department_initials)
+        initial_cell.font = Font(size=8, bold=True)
+        initial_cell.alignment = Alignment(horizontal='center')
+        cell_color = department_colors.get(department_initials, "00FF00")  # Standardfarbe ist Grün
+        initial_cell.fill = PatternFill(start_color=cell_color, end_color=cell_color, fill_type="solid")
+
+        # Füge den vollständigen Namen der Abteilung in die nächste Zelle rechts ein
+        ws.cell(row=legend_row, column=3, value=department).font = Font(size=10)
+
 
     # In-memory bytes stream
     output = io.BytesIO()

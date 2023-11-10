@@ -66,6 +66,7 @@ To-Do Liste:
  To-Do's 
  -------------------------------
  - Solvingzeit mit der Zeit automaitsch abbrechen, Datenbank mit Variabeln befüllen und Daten ziehen
+
  - (*)  Wenn man gar keine time_req eingegeben hat, hällt dann Vorüberprüfung 1 stand?
 
  - (*) self.subsequent_workingdays_max, self.skills_per_day(1 oder 0) in die Datenbank einpflegen und ziehen
@@ -957,6 +958,7 @@ class ORAlgorithm_cp:
         if diff_1 < 0:
             diff_1 = 0
         self.nb2_violation = {ma: {} for ma in self.mitarbeiter}
+        print("DIFFFFF 1: ", diff_1)
         for ma in self.mitarbeiter:
             for week in range(1, self.week_timeframe + 1):
                 self.nb2_violation[ma][week] = self.model.NewIntVar(0, diff_1, f'nb2_violation[{ma}][{week}]')
@@ -1736,7 +1738,7 @@ class ORAlgorithm_cp:
         # -------------------------------------------------------------------------------------------------------
     
         # Diese Variable noch in der Datenbank implementieren
-        self.subsequent_workingdays_max = 4
+        self.subsequent_workingdays_max = 5
 
         for i in self.mitarbeiter:
             for j in range(self.calc_time - self.subsequent_workingdays_max):
@@ -1836,7 +1838,7 @@ class ORAlgorithm_cp:
         # Abfragen ob bei mehreren Skills die Mitarbeiter innerhalb von einem Tag die Skills wechseln dürfen.
         # Wenn nein, wird diese NB aktiviert
         # Das muss noch in die Datenbank eingebaut werden
-        self.skills_per_day = 1
+        self.skills_per_day = 0
 
         if self.skills_per_day == 1:
             for i in self.mitarbeiter:
