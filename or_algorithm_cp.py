@@ -937,6 +937,13 @@ class ORAlgorithm_cp:
             for j in range(7, self.calc_time):
                 self.c[i, j] = self.model.NewIntVar(0, 1, f'c[{i}, {j}]')
 
+        # Skillwechsel pro Stunde
+        self.skill_change = {}
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                for k in range(1, len(self.verfügbarkeit[i][j])):  # Starten bei 1, da kein Wechsel vor Stunde 0 möglich ist
+                    self.skill_change[i, j, k] = self.model.NewIntVar(0, 1, f'skill_change[{i}, {j}, {k}]')
+
 
     def violation_variables(self):
         """ 
@@ -1840,6 +1847,7 @@ class ORAlgorithm_cp:
         # Das muss noch in die Datenbank eingebaut werden
         self.skills_per_day = 0
 
+        # Maximal einen Skill pro Tag
         if self.skills_per_day == 1:
             for i in self.mitarbeiter:
                 for j in range(self.calc_time):
@@ -1847,7 +1855,25 @@ class ORAlgorithm_cp:
                     self.model.Add(sum(self.a[i, j, s] for s in self.mitarbeiter_s[i] if j // 7 == woche and s in self.benoetigte_skills[woche]) <= 1)
 
 
+        # -------------------------------------------------------------------------------------------------------
+        # HARTE NB (10.11.2023)
+        # NB 15 - Max. 1 Wechsel von einem Deparment in ein anderes an einem Tag
+        # -------------------------------------------------------------------------------------------------------
+        """
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                for k in range(len(self.verfügbarkeit[i][j])):
+                    woche = j // 7
+                    if self.benoetigte_skills[woche]: # Überprüfen ob es in der Woche einen Skilleintrag gibt
+                        for s in self.benoetigte_skills[woche]: # Die Skills in der richtigen Woche berücksichtigen
+                            if s in self.mitarbeiter_s[i]:  # Dies stellt sicher, dass der Mitarbeiter den Skill tatsächlich hat
+                                pass
+        """
+       
 
+
+
+        
 
     def solve_problem(self):
         """
@@ -1925,13 +1951,13 @@ class ORAlgorithm_cp:
 
         
         # ----------------------------------------------------------------
+        """
         # Die Werte von s2 printen
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 # Drucken Sie den Wert von s2[i, j]
                 print(f"s2[{i}][{j}] =", self.solver.Value(self.s2[i, j]))
         
-
         # Die Werte von a printen
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
@@ -1944,7 +1970,11 @@ class ORAlgorithm_cp:
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 print(f"a_sum[{i}][{j}] =", self.solver.Value(self.a_sum[i, j]))
-        
+        """
+
+
+
+
         # ----------------------------------------------------------------
 
         """
@@ -2260,6 +2290,10 @@ class ORAlgorithm_cp:
                             start_time += opening_time_in_units
                             end_time += opening_time_in_units
 
+                            print("start_time: ", start_time)
+                            print("end_time: ", end_time)
+                            print("shift_index: ", shift_index)
+
                             start_datetime = datetime.datetime.combine(date, datetime.datetime.min.time()) + timedelta(hours=start_time // self.hour_devider, minutes=(start_time % self.hour_devider) * 60 / self.hour_devider)
                             end_datetime = datetime.datetime.combine(date, datetime.datetime.min.time()) + timedelta(hours=end_time // self.hour_devider, minutes=(end_time % self.hour_devider) * 60 / self.hour_devider)
 
@@ -2291,8 +2325,16 @@ class ORAlgorithm_cp:
                                 db.session.add(new_entry)
 
                             elif shift_index == 1:
-                                new_entry.start_time2 = datetime.datetime.combine(date, datetime.time(hour=int(start_time // self.hour_devider), minute=int((start_time % self.hour_devider) * 60 / self.hour_devider)))
-                                new_entry.end_time2 = datetime.datetime.combine(date, datetime.time(hour=int(end_time // self.hour_devider), minute=int((end_time % self.hour_devider) * 60 / self.hour_devider)))
+                                start_time2 = datetime.datetime.combine(date, datetime.datetime.min.time()) + timedelta(hours=start_time // self.hour_devider, minutes=(start_time % self.hour_devider) * 60 / self.hour_devider)
+                                end_time2 = datetime.datetime.combine(date, datetime.datetime.min.time()) + timedelta(hours=end_time // self.hour_devider, minutes=(end_time % self.hour_devider) * 60 / self.hour_devider)
+
+                                # Überprüfen, ob das Enddatum auf den nächsten Tag überläuft
+                                if end_time2.time() < start_time2.time():
+                                    end_time2 += timedelta(days=1)
+
+                                new_entry.start_time2 = start_time2
+                                new_entry.end_time2 = end_time2
+
 
                             # new_entry der Datenbank hinzufügen
                             db.session.add(new_entry)
