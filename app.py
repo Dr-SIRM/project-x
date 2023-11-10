@@ -9,8 +9,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 import random
 from models import db
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, get_jwt
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, get_jwt, verify_jwt_in_request
 from collections.abc import Mapping as ABCMapping
+from sqlalchemy import create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker
 
 #Config
 #----------------------------------------------------------------------------------
@@ -20,10 +22,19 @@ CORS(app)
 
 
 #SET SQLALCHEMY
+
+db_uri_prefix = 'mysql+pymysql://admin:ProjectX2023.@projectx3.cj6fxzhtmztu.eu-central-1.rds.amazonaws.com/'
+
 app.config["SECRET_KEY"] = "mysecret"
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:ProjectX2023.@projectx3.cj6fxzhtmztu.eu-central-1.rds.amazonaws.com/projectx3'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:ProjectX2023.@projectx3.cj6fxzhtmztu.eu-central-1.rds.amazonaws.com/projectx3'
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://PhuNguyen:ProjectX2023.@localhost/timetab'
-app.config['SQLALCHEMY_TRACK_MODIFICATION'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = f'{db_uri_prefix}schema_timetab'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_BINDS'] = {
+    'dynamic': f'{db_uri_prefix}schema_timetab'  # This will be set dynamically in before_request
+}
+
+# Database URI prefix
 db.init_app(app)
 migrate = Migrate(app, db)
 
@@ -59,14 +70,59 @@ app.secret_key = 'Only for Admins'
 password = 'Arsch_Und_Titten'
 
 
+def get_database_uri(company_name, schema_name=None):
+    if schema_name is None:
+        schema_name = f"schema_{company_name}"
+    else:
+        lower_name = schema_name.lower().replace(' ', "_")
+        schema_name = f"schema_{lower_name}"
 
+    print(f"Get URI: {db_uri_prefix}{schema_name}")
+    return f"{db_uri_prefix}{schema_name}"
 
+def jwt_required_optional(fn):
+    """
+    A decorator to optionally require JWT only if Authorization header is present.
+    """
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        if 'Authorization' in request.headers:
+            verify_jwt_in_request(optional=True)
+        return fn(*args, **kwargs)
+    return wrapper
 
+@app.before_request
+@jwt_required_optional
+def before_request():
+    print("Before request is being called")  # Debug print
+    react_user = get_jwt_identity() if 'Authorization' in request.headers else None
+    print(f"React User: {react_user}")  # Debug print
+    print(f"Request Method: {request.method}")
+
+    session_company = "timetab"  # Default schema name
+
+    if react_user:
+        user = User.query.filter_by(email=react_user).first()
+        if user:
+            session_company = user.company_name.lower().replace(' ', '_')
+            dynamic_bind_uri = get_database_uri(session_company, None)
+            app.config['SQLALCHEMY_DATABASE_URI'] = dynamic_bind_uri
+            app.config['SQLALCHEMY_BINDS']['dynamic'] = dynamic_bind_uri
+            print("Dynamic bind new:", dynamic_bind_uri)  # Debug print
+    else:
+        dynamic_bind_uri = get_database_uri(session_company, None)
+        app.config['SQLALCHEMY_DATABASE_URI'] = dynamic_bind_uri
+        app.config['SQLALCHEMY_BINDS']['dynamic'] = dynamic_bind_uri
+    print(f"Final Schema Used: {app.config['SQLALCHEMY_DATABASE_URI']}")
+
+    
+
+#app.before_request(before_request)
 #Import of Database
 #-------------------------------------------------------------------------
 
 from models import User, Availability, TimeReq, Company, OpeningHours, Timetable, \
-    TemplateAvailability, TemplateTimeRequirement, RegistrationToken, PasswordReset, SolverRequirement
+    TemplateAvailability, TemplateTimeRequirement, RegistrationToken, PasswordReset, SolverRequirement, OverviewUser
 
 
 #Import of routes_html
@@ -326,7 +382,6 @@ def set_db_test():
     db.session.commit()
     return "Company_name column updated successfully."
     """
-   
 
 
 if __name__ == "__main__":

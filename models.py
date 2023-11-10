@@ -6,8 +6,35 @@ db = SQLAlchemy()
 
 #Create of Database
 #-------------------------------------------------------------------------
+class OverviewUser(db.Model, UserMixin):
+    email = db.Column(db.String(200), primary_key=True)
+    company_name = db.Column(db.String(200))
+    password = db.Column(db.String(200))
+    access_level = db.Column(db.String(200), index=True, unique=False)
+    creation_timestamp = db.Column(db.DateTime)
+
+
+    def __init__(self, email, company_name, password, access_level, creation_timestamp):
+        self.email = email
+        self.company_name = company_name
+        self.password = password
+        self.access_level = access_level
+        self.creation_timestamp = creation_timestamp
+
+
+class OverviewCompany(db.Model, UserMixin):
+    company_name = db.Column(db.String(200), primary_key=True)
+    subscription = db.Column(db.String(200))
+    creation_timestamp = db.Column(db.DateTime)
+
+    def __init__(self, company_name, subscription, creation_timestamp):
+        self.company_name = company_name
+        self.weeklysubscription_hours = subscription
+        self.creation_timestamp = creation_timestamp
+
 
 class User(db.Model, UserMixin):
+    __bind_key__ = 'dynamic'
     id = db.Column(db.Integer, primary_key=True)
     company_id = db.Column(db.Integer, index=True, unique=False)
     first_name = db.Column(db.String(100), index=True, unique=False)
@@ -64,6 +91,7 @@ class User(db.Model, UserMixin):
 
 
 class Availability(db.Model, UserMixin):
+    __bind_key__ = 'dynamic'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
     email = db.Column(db.String(200), index=True, unique=False)
@@ -102,6 +130,7 @@ class Availability(db.Model, UserMixin):
 
 
 class TimeReq(db.Model, UserMixin):
+    __bind_key__ = 'dynamic'
     id = db.Column(db.Integer, primary_key=True)
     company_name = db.Column(db.String(200), index=True, unique=False)
     department = db.Column(db.String(200), index=True, unique=False)
@@ -127,6 +156,7 @@ class TimeReq(db.Model, UserMixin):
 
 
 class Company(db.Model, UserMixin):
+    __bind_key__ = 'dynamic'
     id = db.Column(db.Integer)
     company_name = db.Column(db.String(200), primary_key=True)
     weekly_hours = db.Column(db.Integer)
@@ -170,6 +200,7 @@ class Company(db.Model, UserMixin):
 
 
 class OpeningHours(db.Model, UserMixin):
+    __bind_key__ = 'dynamic'
     id = db.Column(db.Integer, primary_key=True)
     company_name = db.Column(db.String(200), index=True, unique=False)
     weekday = db.Column(db.String(200), index=True, unique=False)
@@ -197,11 +228,13 @@ class OpeningHours(db.Model, UserMixin):
 
 
 class Timetable(db.Model, UserMixin):
+    __bind_key__ = 'dynamic'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(200), index=True, unique=False)
     first_name = db.Column(db.String(100), index=True, unique=False)
     last_name = db.Column(db.String(100), index=True, unique=False)
     company_name = db.Column(db.String(200), index=True, unique=False)
+    department = db.Column(db.String(200), index=True, unique=False)
     date = db.Column(db.Date, index=True)
     start_time = db.Column(db.Time)
     end_time = db.Column(db.Time)
@@ -217,12 +250,13 @@ class Timetable(db.Model, UserMixin):
 
 
     def __init__(self, id, email, first_name, last_name, date, start_time, end_time, start_time2, end_time2,
-                 start_time3, end_time3, created_by, changed_by, creation_timestamp, company_name):
+                 start_time3, end_time3, created_by, changed_by, creation_timestamp, company_name, department):
         self.id = id
         self.email = email
         self.first_name = first_name
         self.last_name = last_name
         self.company_name = company_name
+        self.department = department
         self.date = date
         self.start_time = start_time
         self.end_time = end_time
@@ -238,6 +272,7 @@ class Timetable(db.Model, UserMixin):
 
 
 class TemplateTimeRequirement(db.Model, UserMixin):
+    __bind_key__ = 'dynamic'
     id = db.Column(db.Integer, primary_key=True)
     company_name = db.Column(db.String(200), index=True, unique=False)
     template_name = db.Column(db.String(200), index=True, unique=False)
@@ -263,6 +298,7 @@ class TemplateTimeRequirement(db.Model, UserMixin):
 
 
 class TemplateAvailability(db.Model, UserMixin):
+    __bind_key__ = 'dynamic'
     id = db.Column(db.Integer, primary_key=True)
     template_name = db.Column(db.String(200), index=True, unique=False)
     email = db.Column(db.String(200), index=True, unique=False)
@@ -306,11 +342,21 @@ class RegistrationToken(db.Model, UserMixin):
     employment = db.Column(db.String(200), index=True, unique=False)
     employment_level = db.Column(db.Float, index=True, unique=False)
     department = db.Column(db.String(200), index=True, unique=False)
+    department2 = db.Column(db.String(200), index=True, unique=False)
+    department3 = db.Column(db.String(200), index=True, unique=False)
+    department4 = db.Column(db.String(200), index=True, unique=False)
+    department5 = db.Column(db.String(200), index=True, unique=False)
+    department6 = db.Column(db.String(200), index=True, unique=False)
+    department7 = db.Column(db.String(200), index=True, unique=False)
+    department8 = db.Column(db.String(200), index=True, unique=False)
+    department9 = db.Column(db.String(200), index=True, unique=False)
+    department10 = db.Column(db.String(200), index=True, unique=False)
     access_level = db.Column(db.String(200), index=True, unique=False)
     created_by = db.Column(db.Integer, index=True, unique=False)
     creation_timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
 
-    def __init__(self, id, email, token, company_name, employment, employment_level, department, access_level, created_by):
+    def __init__(self, id, email, token, company_name, employment, employment_level, department, department2, department3, department4, 
+                 department5, department6, department7, department8, department9, department10, access_level, created_by):
         self.id = id
         self.email = email
         self.token = token
@@ -318,12 +364,22 @@ class RegistrationToken(db.Model, UserMixin):
         self.employment = employment
         self.employment_level = employment_level
         self.department = department
+        self.department2 = department2
+        self.department3 = department3
+        self.department4 = department4
+        self.department5 = department5
+        self.department6 = department6
+        self.department7 = department7
+        self.department8 = department8
+        self.department9 = department9
+        self.department10 = department10
         self.access_level = access_level
         self.created_by = created_by
 
 
 
 class PasswordReset(db.Model, UserMixin):
+    __bind_key__ = 'dynamic'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(200), index=True, unique=False)
     token = db.Column(db.String(6), index=True, unique=False)
@@ -338,6 +394,7 @@ class PasswordReset(db.Model, UserMixin):
 
 
 class SolverRequirement(db.Model, UserMixin):
+    __bind_key__ = 'dynamic'
     id = db.Column(db.Integer, primary_key=True)
     company_name = db.Column(db.String(200), index=True, unique=False)
     weekly_hours = db.Column(db.Integer)
@@ -431,6 +488,7 @@ class SolverRequirement(db.Model, UserMixin):
 
 
 class SolverAnalysis(db.Model, UserMixin):
+    __bind_key__ = 'dynamic'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     usecase = db.Column(db.String(30))
     self_current_user_id = db.Column(db.Text)
@@ -617,27 +675,3 @@ class SolverAnalysis(db.Model, UserMixin):
         self.gap_20 = gap_20
         self.gap_30 = gap_30
         self.memory = memory
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
