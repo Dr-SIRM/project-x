@@ -209,23 +209,6 @@ def get_data():
 #     finally:
 #         db.session.close()
 
-@app.route('/api/users/delete/<int:user_id>', methods=['DELETE'])
-@jwt_required()
-def delete_user(user_id):
-
-    user_to_delete = User.query.get(user_id)
-    if user_to_delete is None:
-        return jsonify({"message": "User not found"}), 404
-    
-    try:
-        db.session.delete(user_to_delete)
-        db.session.commit()
-        return jsonify({"message": "User deleted"}), 200
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"message": "Failed to delete user", "error": str(e)}), 500
-    finally:
-        db.session.close()
 
 @app.route('/api/users/delete/<int:user_id>', methods=['DELETE'])
 @jwt_required()
