@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useRef  } from 'react';
 import { Box, Typography, useTheme, Select, MenuItem } from "@mui/material";
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import Header from "../../components/Header";
 import { ThreeDots } from "react-loader-spinner"; 
 import axios from "axios";
@@ -216,6 +218,39 @@ const handleDepartment3Change = async (event, id) => {
 };
 
 
+const [openDialog, setOpenDialog] = useState(false);
+const [userIdToDelete, setUserIdToDelete] = useState(null);
+
+const handleDialogOpen = (id) => {
+  setUserIdToDelete(id);
+  setOpenDialog(true);
+};
+
+const handleDialogClose = () => {
+  setOpenDialog(false);
+};
+
+const handleConfirmDelete = async () => {
+  setOpenDialog(false);
+  if (userIdToDelete) {
+    await handleDeleteUser(userIdToDelete);
+    setUserIdToDelete(null);
+  }
+};
+
+  const handleDeleteUser = async (id) => {
+    try {
+      await axios.delete(`${API_BASE_URL}/api/users/delete/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      // Filter out the user from the current state
+      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
+  };
 
 
   if (isLoading) {
@@ -444,6 +479,26 @@ const handleDepartment3Change = async (event, id) => {
         );
       },
     },
+    {
+      field: 'delete',
+      headerName: t('team.columns.delete'),
+      sortable: false,
+      renderCell: (params) => (
+        <DeleteOutlineIcon
+          onClick={() => handleDialogOpen(params.id)}
+          sx={{
+            cursor: 'pointer',
+            color: 'error.main',
+            '&:hover': {
+              color: 'error.dark',
+            },
+          }}
+        />
+      ),
+      width: 100,
+      align: 'center',
+    },
+    
   ];
 
   return (
@@ -480,7 +535,31 @@ const handleDepartment3Change = async (event, id) => {
             color: `${colors.greenAccent[200]} !important`,
           },
         }}
-      >        
+        
+      >
+        <Dialog
+          open={openDialog}
+          onClose={handleDialogClose}
+
+          PaperProps={{
+            style: { backgroundColor: 'black', color: "red" }, // your desired background color here
+          }}
+        >
+          <DialogTitle id="alert-dialog-title" style={{ color: '#FFFFFF', fontSize: "16px"}}>{t('team.deletion.confirm_delete')}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description" style={{ color: '#FFFFFF'}}>
+              {t('team.deletion.question')}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDialogClose} color="primary">
+              {t('team.deletion.cancel')}
+            </Button>
+            <Button onClick={handleConfirmDelete} color="primary" autoFocus>
+              {t('team.deletion.confirm')}
+            </Button>
+          </DialogActions>
+        </Dialog>        
         <DataGrid        
         rows={users}
         columns={columns}

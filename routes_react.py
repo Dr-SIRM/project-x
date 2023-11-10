@@ -1,4 +1,4 @@
-from flask import request, url_for, session, jsonify, send_from_directory, make_response, send_file
+from flask import request, url_for, session, jsonify, send_from_directory, make_response, send_file, redirect
 from flask_mail import Message
 import datetime
 from datetime import date
@@ -12,7 +12,7 @@ import io
 from excel_output import create_excel_output
 from sqlalchemy import func, extract, and_, or_, asc, desc, text, create_engine, inspect
 from sqlalchemy.orm import scoped_session, sessionmaker
-
+import stripe
 
 
 #Import of Database
@@ -208,6 +208,42 @@ def get_data():
 #         return jsonify({"message": "Failed to update user"}), 500
 #     finally:
 #         db.session.close()
+
+@app.route('/api/users/delete/<int:user_id>', methods=['DELETE'])
+@jwt_required()
+def delete_user(user_id):
+
+    user_to_delete = User.query.get(user_id)
+    if user_to_delete is None:
+        return jsonify({"message": "User not found"}), 404
+    
+    try:
+        db.session.delete(user_to_delete)
+        db.session.commit()
+        return jsonify({"message": "User deleted"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": "Failed to delete user", "error": str(e)}), 500
+    finally:
+        db.session.close()
+
+@app.route('/api/users/delete/<int:user_id>', methods=['DELETE'])
+@jwt_required()
+def delete_user(user_id):
+
+    user_to_delete = User.query.get(user_id)
+    if user_to_delete is None:
+        return jsonify({"message": "User not found"}), 404
+    
+    try:
+        db.session.delete(user_to_delete)
+        db.session.commit()
+        return jsonify({"message": "User deleted"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": "Failed to delete user", "error": str(e)}), 500
+    finally:
+        db.session.close()
 
 
 @app.route('/api/new_user', methods=['GET', 'POST'])
@@ -2104,3 +2140,51 @@ def user_availability(email):
 
 
     return jsonify(availability=availability_data)
+
+@app.route('/api/user_scheduled_shifts/<string:email>', methods=['GET'])
+@jwt_required()
+def user_scheduled_shifts(email):
+
+    today = datetime.datetime.today().date()
+    scheduled_shifts = Timetable.query.filter(
+        Timetable.email == email,
+        Timetable.date >= today  # This gets shifts from today onwards
+    ).order_by(Timetable.date).all()
+
+    shifts_data = []
+    for shift in scheduled_shifts:
+        shift_dict = {
+            'id': shift.id,
+            'date': shift.date.strftime('%Y-%m-%d'),
+            'start_time': shift.start_time.strftime('%H:%M:%S'),
+            'end_time': shift.end_time.strftime('%H:%M:%S'),
+            'start_time2': shift.start_time2.strftime('%H:%M:%S') if shift.start_time2 else None,
+            'end_time2': shift.end_time2.strftime('%H:%M:%S') if shift.end_time2 else None,
+            'start_time3': shift.start_time3.strftime('%H:%M:%S') if shift.start_time3 else None,
+            'end_time3': shift.end_time3.strftime('%H:%M:%S') if shift.end_time3 else None,
+            # Add additional fields as needed
+        }
+        shifts_data.append(shift_dict)
+    print(shifts_data)
+    return jsonify(scheduledShifts=shifts_data)
+
+stripe.api_key = 'sk_test_51O8inXLP2HwOJuOXYsZAeWHRxFedJ31u63UGY8RAZvEFyjwGdG6tUzUv3FSgmhqaYVNz907s7KIWi8SXzsGnxbJV0025IxrfKI'
+
+YOUR_DOMAIN = "http://localhost:3000"
+
+@app.route('/create-checkout-session', methods=['POST'])
+def create_checkout_session():
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            line_items=[{
+                'price': 'price_id',  # Replace with the price ID of your product
+                'quantity': 1,
+            }],
+            payment_method_types=['card'],
+            mode='subscription',
+            success_url=YOUR_DOMAIN + '/success',
+            cancel_url=YOUR_DOMAIN + '/cancel',
+        )
+        return jsonify(id=checkout_session.id)
+    except Exception as e:
+        return jsonify(error=str(e)), 403

@@ -2,14 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
 import { mockTransactions } from "../../data/mockData";
-
-import EmailIcon from "@mui/icons-material/Email";
-import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import TrafficIcon from "@mui/icons-material/Traffic";
 import Header from "../../components/Header";
 import LineChart from "../../components/LineChart";
-import GeographyChart from "../../components/GeographyChart";
 import BarChart from "../../components/BarChart";
 import StatBox from "../../components/StatBox";
 import ProgressCircle from "../../components/ProgressCircle";
@@ -281,7 +277,7 @@ const Dashboard = () => {
           <Typography variant="h5" fontWeight="600">
            {t('dashboard.campaign')} 
           </Typography>
-          <Box
+          {/* <Box
             display="flex"
             flexDirection="column"
             alignItems="center"
@@ -296,7 +292,7 @@ const Dashboard = () => {
               $48,352 revenue generated
             </Typography>
             <Typography>Includes extra misc expenditures and costs</Typography>
-          </Box>
+          </Box> */}
         </Box>
         <Box
           gridColumn="span 4"
@@ -311,9 +307,9 @@ const Dashboard = () => {
           >
             {t('dashboard.salesQuantity')} 
           </Typography>
-          <Box height="250px" mt="-20px">
+          {/* <Box height="250px" mt="-20px">
             <BarChart isDashboard={true} />
-          </Box>
+          </Box> */}
         </Box>
         <Box
           gridColumn="span 4"
@@ -368,52 +364,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-
-//Nächste Schichten old version in case of need
-// <Box
-//           gridColumn="span 4"
-//           gridRow="span 2"
-//           backgroundColor={colors.primary[800]}
-//           borderRadius="15px"
-//           overflow="auto"
-//         >
-//           <Box
-//             display="flex"
-//             justifyContent="space-between"
-//             alignItems="center"
-//             borderBottom={`4px solid ${colors.primary[500]}`}
-//             colors={colors.grey[100]}
-//             p="15px"
-//           >
-//             <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-//               Nächste Schichten 
-//             </Typography>
-//           </Box>
-//           {upcomingShifts.map((shiftInfo, i) => (
-//             <Box
-//                 key={`${shiftInfo.name}-${i}`}  // Use a unique key for each item
-//                 display="flex"
-//                 justifyContent="space-between"
-//                 alignItems="center"
-//                 borderBottom={`4px solid ${colors.primary[500]}`}
-//                 p="15px"
-//             >
-//                 <Box>
-//                     <Typography
-//                         color={colors.greenAccent[500]}
-//                         variant="h5"
-//                         fontWeight="600"
-//                     >
-//                         {shiftInfo.name}  {/* Display the name */}
-//                     </Typography>
-//                     {shiftInfo.shifts.map((shift, shiftIndex) => (  // Map over the shifts array
-//                         <Typography color={colors.grey[100]} key={shiftIndex}>
-//                             {shiftInfo.day} - {shift.start} bis {shift.end}  {/* Display the day and shift times */}
-//                         </Typography>
-//                     ))}
-//                 </Box>
-//             </Box>
-//         ))}
-
-//         </Box>

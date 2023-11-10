@@ -239,7 +239,7 @@ const Sidebar = () => {
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              Seiten
+              Unternehmen
             </Typography>
             <Item
               title={t('sidebar.Verfügbarkeit')}
@@ -257,13 +257,7 @@ const Sidebar = () => {
               requiredAccessLevel={["Super_Admin", "Admin"]}
               accessLevel={user.accessLevel}
             />
-            <Item
-              title={t('sidebar.Kalender')}
-              to="/calendar"
-              icon={<CalendarTodayOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
+            
             <Item
               title={t('sidebar.Planung')}
               to="/planning"
@@ -273,6 +267,14 @@ const Sidebar = () => {
               requiredAccessLevel={["Super_Admin", "Admin"]}
               accessLevel={user.accessLevel}
             />
+            
+             <Typography
+              variant="h6"
+              color={colors.grey[300]}
+              sx={{ m: "15px 0 5px 20px" }}
+            >
+              Einteilungen
+            </Typography>
             <Item
               title={t('sidebar.Schichtplan')}
               to="/plan"
@@ -281,9 +283,9 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
             <Item
-              title={t('sidebar.FAQ')}
-              to="/faq"
-              icon={<HelpOutlineOutlinedIcon />}
+              title={t('sidebar.Kalender')}
+              to="/calendar"
+              icon={<CalendarTodayOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />
@@ -298,6 +300,13 @@ const Sidebar = () => {
               title={t('sidebar.Einstellungen')}
               to="/update"
               icon={<SettingsIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title={t('sidebar.FAQ')}
+              to="/faq"
+              icon={<HelpOutlineOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />

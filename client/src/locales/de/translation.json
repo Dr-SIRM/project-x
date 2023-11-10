@@ -40,7 +40,14 @@
         "department": "Abteilung",
         "department2": "Abteilung 2",
         "department3": "Abteilung 3",
-        "access_level": "Zugriffslevel"
+        "access_level": "Zugriffslevel",
+        "delete": "Löschen"
+      },
+      "deletion": {
+        "question": "Sind Sie sicher, dass Sie diesen Benutzer löschen möchten?",
+        "cancel": "Abbrechen",
+        "confirm": "Bestätigen",
+        "confirm_delete": "Bestätigen / Abbrechen"
       }
     },
 
@@ -63,6 +70,24 @@
       "Einstellungen": "Einstellungen",
       "Sonstiges": "Sonstiges",
       "Neuer User": "Neuer Benutzer"
+    },
+
+    "solverreq": {
+      "title": "Solver Anforderungen",
+      "subtitle": "Bestimme deinen Einsatzplan nach deinen Bedürfnissen!",
+      "Mindestanforderungen": "Mindestanforderungen",
+      "wishedminworkinghoursperday": "Gewünschte Mindestanzahl Arbeitsstunden pro Tag",
+      "mintimeperday": "Mindestanzahl Zeit pro Tag",
+      "wishedmaxworkinghoutperday": "Gewünschte maximale Arbeitszeit pro Tag",
+      "maxworktimeperday": "Maximale Arbeitszeit pro Tag",
+      "maxtimeperweek": "Maximale Zeit pro Woche",
+      "differencetodistribution": "Abweichungsgrad zur gerechten Verteilung",
+      "hourunit": "Stundeneinheit",
+      "calculationtimeframe": "Berechnungszeitraum",
+      "maxworkingdayinarow": "Maximale Arbeitstage in Folge",
+      "countofshiftsperday": "Anzahl Arbeitseinsätze pro Tag",
+      "minhoursperworkingshift": "Mindestunden pro Arbeitsblock"
     }
+
   }
   
