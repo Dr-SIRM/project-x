@@ -54,7 +54,6 @@ def login_react():
     # Generate the JWT token
     additional_claims = {"company_name": user.company_name}
     session_token = create_access_token(identity=email, additional_claims=additional_claims)
-    print("Token: ", session_token)
 
     # Return the session token
     response = make_response(jsonify({'session_token': session_token}))
@@ -78,10 +77,7 @@ def login_react():
 def current_react_user():
     react_user = get_jwt_identity()
     jwt_data = get_jwt()
-    print("JWT: ", jwt_data)
     session_company = jwt_data.get("company_name").lower().replace(' ', '_')
-    app.config['SQLALCHEMY_DATABASE_URI'] = get_database_uri("", session_company)
-    print(session_company)
     session = get_session(get_database_uri('', session_company))
     user = session.query(User).filter_by(email=react_user).first()
 
@@ -1063,12 +1059,12 @@ def get_invite():
             new_id = last.id + 1
 
         data = RegistrationToken(id=new_id, 
-                                 email=invite_data['email'], 
-                                 token=random_token, 
-                                 company_name=invite_data['company_name'], 
-                                 department=invite_data['department'], 
-                                 department2 =invite_data['department2'],
-                                 department3 =invite_data['department3'],
+                                email=invite_data['email'], 
+                                token=random_token, 
+                                company_name=invite_data['company_name'], 
+                                department=invite_data['department'] if invite_data.get('department') else None, 
+                                department2 =invite_data['department2'] if invite_data.get('department2') else None,
+                                department3 =invite_data['department3'] if invite_data.get('department3') else None,
                                 department4 = None,
                                 department5 = None,
                                 department6 = None,
@@ -1076,10 +1072,10 @@ def get_invite():
                                 department8 = None,
                                 department9 = None,
                                 department10 = None,
-                                 employment=invite_data['employment'], 
-                                 employment_level=invite_data['employment_level'], 
-                                 access_level=invite_data['access_level'], 
-                                 created_by=user.company_id)
+                                employment=invite_data['employment'], 
+                                employment_level=invite_data['employment_level'], 
+                                access_level=invite_data['access_level'], 
+                                created_by=user.company_id)
 
         session.add(data)
         session.commit()
@@ -1260,7 +1256,7 @@ def solver_req():
         solver_req_data = request.get_json()
         print(solver_req_data)
         session = get_session(get_database_uri('', user.company_name.lower().replace(' ', '_')))
-        data_deletion = SolverRequirement.query.filter_by(company_name=user.company_name)
+        data_deletion = session.query(SolverRequirement).filter_by(company_name=user.company_name)
         if solver_requirement:
             data_deletion.delete()
             session.commit()

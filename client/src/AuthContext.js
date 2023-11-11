@@ -56,9 +56,13 @@ const AuthProvider = ({ children }) => {
       }
       const data = await response.json();
       console.log('Server response:', data);
-      setUser(data.user);
-      localStorage.setItem('session_token', data.session_token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      if (data.session_token) {
+        localStorage.setItem('session_token', data.session_token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        setUser(data.user);  // Set user here only after token validation
+      } else {
+        throw new Error('Token not received');
+      }
     } catch (error) {
       setError('Invalid email or password');
     }
