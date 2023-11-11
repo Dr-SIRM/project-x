@@ -187,36 +187,40 @@ def get_data():
     return jsonify(response_dict)
 
 
-# @app.route('/api/users/update/<int:user_id>', methods=['PUT'])
-# @jwt_required()
-# def update_user(user_id):
-#     data = request.get_json()
-#     user = User.query.get(user_id)
+@app.route('/api/users/update/<int:user_id>', methods=['PUT'])
+@jwt_required()
+def update_user(user_id):
+    data = request.get_json()
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    session = get_session(get_database_uri('', session_company))
+    user = session.query(User).get(user_id)
     
 
-#     if user is None:
-#         return jsonify({"message": "User not found"}), 404
+    if user is None:
+        return jsonify({"message": "User not found"}), 404
 
-#     user.first_name = data.get('first_name', user.first_name)
-#     user.last_name = data.get('last_name', user.last_name)
-#     user.email = data.get('email', user.email)
-#     user.department = data.get('department', user.department)
-#     user.department2 = data.get('department2', user.department2)
-#     user.department3 = data.get('department3', user.department3)
+    user.first_name = data.get('first_name', user.first_name)
+    user.last_name = data.get('last_name', user.last_name)
+    user.email = data.get('email', user.email)
+    user.employment = data.get('employment', user.employment)
+    user.department = data.get('department', user.department)
+    user.department2 = data.get('department2', user.department2)
+    user.department3 = data.get('department3', user.department3)
 
-#     # Convert the employment_level to its original range [0, 1] before saving
-#     employment_level_percentage = data.get('employment_level')
-#     if employment_level_percentage is not None:
-#         user.employment_level = employment_level_percentage / 100.0
+    # Convert the employment_level to its original range [0, 1] before saving
+    employment_level_percentage = data.get('employment_level')
+    if employment_level_percentage is not None:
+        user.employment_level = employment_level_percentage / 100.0
     
-#     try:
-#         session.commit()
-#         return jsonify({"message": "User updated"}), 200
-#     except Exception as e:
-#         session.rollback()
-#         return jsonify({"message": "Failed to update user"}), 500
-#     finally:
-#         session.close()
+    try:
+        session.commit()
+        return jsonify({"message": "User updated"}), 200
+    except Exception as e:
+        session.rollback()
+        return jsonify({"message": "Failed to update user"}), 500
+    finally:
+        session.close()
 
 
 @app.route('/api/users/delete/<int:user_id>', methods=['DELETE'])
@@ -833,7 +837,7 @@ def get_availability():
                 new_user = user
             else:
                 first_name, last_name, email = user_selection.split(', ')
-                new_user = User.query.filter_by(email=email).first()
+                new_user = session.query(User).filter_by(email=email).first()
                 print(email)
             
             new_entries = []
@@ -841,8 +845,12 @@ def get_availability():
             # Delete all entries for the range in one operation
             for i in range(day_num):
                 new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
-                Availability.query.filter_by(user_id=new_user.id, date=new_date).delete()
-            session.commit()
+                try:
+                    session.query(Availability).filter_by(user_id=new_user.id, date=new_date).delete()
+                    session.commit()
+                except:
+                    pass
+            
 
             # Create all new entries
             for i in range(day_num):
@@ -1806,7 +1814,7 @@ def get_required_workforce():
                 data_deletion.delete()
                 session.commit()
             for i in range(day_num):
-                for quarter in range(daily_slots): # There are 96 quarters in a day
+                for quarter in range(int(daily_slots)): # There are 96 quarters in a day
                     if quarter >= full_day +1:
                         quarter -= full_day + 1
                         quarter_hour = quarter / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
@@ -2245,6 +2253,7 @@ def user_scheduled_shifts(email):
         }
         shifts_data.append(shift_dict)
     print(shifts_data)
+    session.close()
     return jsonify(scheduledShifts=shifts_data)
 
 stripe.api_key = 'sk_test_51O8inXLP2HwOJuOXYsZAeWHRxFedJ31u63UGY8RAZvEFyjwGdG6tUzUv3FSgmhqaYVNz907s7KIWi8SXzsGnxbJV0025IxrfKI'
