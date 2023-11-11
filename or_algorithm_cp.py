@@ -256,7 +256,7 @@ class ORAlgorithm_cp:
         self.solve_problem()
         self.calculate_costs()
         self.store_solved_data()
-        self.output_result_excel()
+        # self.output_result_excel() # Diese Methode wird in Zukunft nicht mehr benötigt
         self.plot_costs_excel()
         self.save_data_in_database()
         # self.save_data_in_database_testing()
