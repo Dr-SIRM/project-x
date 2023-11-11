@@ -2209,8 +2209,8 @@ def user_availability(email):
         availability_dict = {
             'date': availability.date.strftime('%Y-%m-%d'),
             'weekday': availability.weekday,
-            'start_time': availability.start_time.strftime('%H:%M:%S'),
-            'end_time': availability.end_time.strftime('%H:%M:%S'),
+            'start_time': availability.start_time.strftime('%H:%M:%S') if availability.start_time else None,
+            'end_time': availability.end_time.strftime('%H:%M:%S') if availability.end_time else None,
             # Including the additional times as you've mentioned
             'start_time2': availability.start_time2.strftime('%H:%M:%S') if availability.start_time2 else None,
             'end_time2': availability.end_time2.strftime('%H:%M:%S') if availability.end_time2 else None,
