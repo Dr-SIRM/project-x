@@ -34,6 +34,7 @@ const TimeReq = ({ timereq }) => {
   const theme = useTheme();
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
+  const [showMissingNotification, setShowMissingNotification] = useState(false);
   const [timereqData, setTimeReqData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [openingHours, setOpeningHours] = useState([]);
@@ -263,6 +264,11 @@ const TimeReq = ({ timereq }) => {
   };
 
   const handleFormSubmit = async (buttonName) => {
+    if (!selectedDepartment) {
+      // Display an error message or handle the missing selection appropriately
+      setShowMissingNotification(true);
+      return; // Prevent the form from submitting
+    }
     try {
       console.log(slotEmployeeCounts)
       const payload = {};
@@ -316,6 +322,7 @@ const TimeReq = ({ timereq }) => {
             value={selectedDepartment}
             onChange={(e) => setSelectedDepartment(e.target.value)}
             inputProps={{ maxLength: 30 }}
+            required
             sx={{
               color: "black",
               marginRight: '0.2rem',
@@ -664,6 +671,21 @@ const TimeReq = ({ timereq }) => {
         autoHideDuration={3000}
         sx={{
           backgroundColor: "green !important",
+          color: "white",
+          "& .MuiSnackbarContent-root": {
+            borderRadius: "4px",
+            padding: "15px",
+            fontSize: "16px",
+          },
+        }}
+      />
+      <Snackbar
+        open={showMissingNotification}
+        onClose={() => setShowMissingNotification(false)}
+        message="Please select a Department"
+        autoHideDuration={3000}
+        sx={{
+          backgroundColor: "red !important",
           color: "white",
           "& .MuiSnackbarContent-root": {
             borderRadius: "4px",

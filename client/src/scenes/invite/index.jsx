@@ -18,6 +18,7 @@ const Invite = ({ invite }) => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
+  const [department_list, setDepartmentList] = useState([]);
   const [inviteData, setinviteData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const token = localStorage.getItem('session_token'); // Get the session token from local storage
@@ -32,6 +33,7 @@ const Invite = ({ invite }) => {
               }
           });
           setinviteData(response.data);
+          setDepartmentList(response.data.department_list);
           setIsLoading(false);
         } catch (error) {
           console.error('Error fetching invite details:', error);
@@ -206,6 +208,47 @@ const Invite = ({ invite }) => {
                   },
                 }}
               />
+              <Typography
+                
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center", 
+                  height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
+                }}
+              >
+                Department 1
+              </Typography>
+              <Select
+                fullWidth
+                variant="filled"
+                type="text"
+                label= ""
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.department}
+                name="department"
+                error={!!touched.deoartment && !!errors.department}
+                helperText={touched.department && errors.department}
+                sx={{
+                  gridColumn: "span 2",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
+              >
+                <MenuItem value="">Wählen Sie eine Abteilung</MenuItem>
+                {department_list.map((department) => (
+                  <MenuItem key={department} value={department}>
+                    {department}
+                  </MenuItem>
+                ))}
+              </Select>
               <Typography
                 
                 variant="h6"

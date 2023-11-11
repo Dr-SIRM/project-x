@@ -629,7 +629,7 @@ def get_company():
         session = get_session(get_database_uri('', user.company_name.lower().replace(' ', '_')))
 
         # Delete existing company data
-        OpeningHours.query.filter_by(company_name=user.company_name).delete()
+        session.query(OpeningHours).filter_by(company_name=user.company_name).delete()
         session.commit()
 
         # Insert new company data
@@ -773,7 +773,7 @@ def get_availability():
 
     # Week with adjustments
     monday = today - datetime.timedelta(days=today.weekday())
-    week_adjustment = int(request.args.get('week_adjustment', 0))
+    week_adjustment = int(request.args.get('week_adjustment', 0)) +7
     week_start = monday + datetime.timedelta(days=week_adjustment)
 
     query_weekdays = [weekdays[i] for i in range(day_num)]
@@ -781,9 +781,15 @@ def get_availability():
 
     # Create Drop Down Based Access Level
     if user.access_level == "User":
-        user_list = [f"{user.first_name}, {user.last_name}, {user.email}"]
+        user_list = None
     else:
-        company_users = session.query(User).filter_by(company_name=user.company_name).order_by(asc(User.last_name)).all()
+        # Query all users from the same company, excluding the current user
+        company_users = session.query(User).filter(
+            User.company_name == user.company_name,
+            User.email != react_user
+        ).order_by(asc(User.last_name)).all()
+
+        # Create a list of user details
         user_list = [f"{user.first_name}, {user.last_name}, {user.email}" for user in company_users]
     
 
@@ -846,7 +852,7 @@ def get_availability():
             for i in range(day_num):
                 new_date = monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment)
                 try:
-                    session.query(Availability).filter_by(user_id=new_user.id, date=new_date).delete()
+                    session.query(Availability).filter_by(email=new_user.email, date=new_date).delete()
                     session.commit()
                 except:
                     pass
@@ -1024,6 +1030,27 @@ def get_invite():
     session = get_session(get_database_uri('', session_company))
     user = session.query(User).filter_by(email=react_user).first()
 
+    #List of Departments
+    departments = (
+        session.query(Company)
+        .filter_by(company_name=user.company_name)
+        .with_entities(
+            Company.department,
+            Company.department2,
+            Company.department3,
+            Company.department4,
+            Company.department5,
+            Company.department6,
+            Company.department7,
+            Company.department8,
+            Company.department9,
+            Company.department10
+        )
+        .first()
+    )
+
+    department_list = [department for department in departments if department is not None]
+
     if request.method == 'POST':
         invite_data = request.get_json()
         session = get_session(get_database_uri('', "timetab"))
@@ -1068,6 +1095,7 @@ def get_invite():
         'company_name': user.company_name,
         'department': "",
         'employment': "",
+        'department_list': department_list,
         'employment_level': "",
         'access_level': "",
     }
@@ -1624,7 +1652,7 @@ def get_required_workforce():
 
     # Week with adjustments
     monday = today - datetime.timedelta(days=today.weekday())
-    week_adjustment = int(request.args.get('week_adjustment', 0))
+    week_adjustment = int(request.args.get('week_adjustment', 0)) +7
     week_start = monday + datetime.timedelta(days=week_adjustment)
 
     slot_dict = {}
@@ -1719,7 +1747,7 @@ def get_required_workforce():
         button = request.json.get("button", None)
         if button == "Submit":
             workforce_data = request.get_json()
-            week_adjustment = int(request.args.get('week_adjustment', 0))
+            week_adjustment = int(request.args.get('week_adjustment', 0)) +7
             session = get_session(get_database_uri('', user.company_name.lower().replace(' ', '_')))
 
             # Delete existing TimeReq entries for the week
@@ -1734,7 +1762,7 @@ def get_required_workforce():
             # Create new TimeReq entries
             new_records = []
             for i in range(day_num):
-                for quarter in range(daily_slots):
+                for quarter in range(int(daily_slots)):
                     weekday = weekdays.get(i)
                     opening_details = opening_hours_dict.get(weekday)
                     if opening_details == None:
@@ -1810,7 +1838,7 @@ def get_required_workforce():
         if button == "Save Template":
             workforce_data = request.get_json()
             session = get_session(get_database_uri('', user.company_name.lower().replace(' ', '_')))
-            data_deletion = TemplateTimeRequirement.query.filter_by(company_name=user.company_name, template_name=workforce_data['template_name'])
+            data_deletion = session.query(TemplateTimeRequirement).filter_by(company_name=user.company_name, template_name=workforce_data['template_name'])
             if data_deletion:
                 data_deletion.delete()
                 session.commit()
