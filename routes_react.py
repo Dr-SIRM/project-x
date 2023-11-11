@@ -310,8 +310,8 @@ def new_user():
 
                 session = get_session(get_database_uri('', company_name.lower().replace(' ', '_')))
 
-                data2 = User(id = new_id, 
-                            company_id = new_company_id, 
+                data2 = User(id = None, 
+                            company_id = None, 
                             first_name = admin_registration_data['first_name'],
                             last_name = admin_registration_data['last_name'], 
                             employment = admin_registration_data['employment'], 
@@ -335,14 +335,10 @@ def new_user():
                             creation_timestamp = datetime.datetime.now()
                             )
 
-                try:
-                    session.add(data2)
-                    session.commit()
-                    session.close()
-                    return jsonify({'message': 'Successful Registration'}), 200
-                except:
-                    session.rollback()
-                    return jsonify({'message': 'Registration went wrong!'}), 200
+                session.add(data2)
+                session.commit()
+                session.close()
+                return jsonify({'message': 'Successful Registration'}), 200
             else:
                 schema_name = f"schema_{admin_registration_data['company_name'].lower().replace(' ', '_')}"
                 with db.engine.connect() as connection:
@@ -398,8 +394,8 @@ def new_user():
 
                         session = get_session(get_database_uri('', company_name.lower().replace(' ', '_')))
                         
-                        data3 = User(id = new_id, 
-                            company_id = new_company_id, 
+                        data3 = User(id = None, 
+                            company_id = None, 
                             first_name = "Time",
                             last_name = "Tab", 
                             employment = None, 
