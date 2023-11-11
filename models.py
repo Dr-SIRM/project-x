@@ -306,6 +306,7 @@ class TemplateAvailability(db.Model, UserMixin):
     email = db.Column(db.String(200), index=True, unique=False)
     date = db.Column(db.Date, index=True)
     weekday = db.Column(db.String(200), index=True, unique=False)
+    holiday = db.Column(db.String(200), index=True, unique=False)
     start_time = db.Column(db.Time)
     end_time = db.Column(db.Time)
     start_time2 = db.Column(db.Time)
@@ -317,13 +318,14 @@ class TemplateAvailability(db.Model, UserMixin):
     creation_timestamp = db.Column(db.DateTime)
     update_timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
 
-    def __init__(self, id, template_name, email, date, weekday, start_time, end_time, start_time2, end_time2,
+    def __init__(self, id, template_name, email, date, weekday, holiday, start_time, end_time, start_time2, end_time2,
                  start_time3, end_time3, created_by, changed_by, creation_timestamp):
         self.id = id
         self.template_name = template_name
         self.email = email
         self.date = date
         self.weekday = weekday
+        self.holiday = holiday
         self.start_time = start_time
         self.end_time = end_time
         self.start_time2 = start_time2

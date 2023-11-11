@@ -639,9 +639,9 @@ def get_company():
             company_name=company_data['company_name'],
             weekly_hours=company_data['weekly_hours'],
             shifts=company_data['shifts'],
-            department=company_data['department'],
-            department2=company_data['department2'],
-            department3=company_data['department3'],
+            department=company_data['department'] if company_data.get('department') else None,
+            department2=company_data['department2'] if company_data.get('department2') else None,
+            department3=company_data['department3'] if company_data.get('department3') else None,
             department4=None,
             department5=None,
             department6=None,
@@ -870,7 +870,7 @@ def get_availability():
                     if entry is None:
                         new_entry[f'entry{j + 1}'] = None
                     else:
-                        new_entry[f'entry{j + 1}'] = get_time_str(entry)
+                        new_entry[f'entry{j + 1}'] = get_time_str(entry) if entry else None
                         if new_entry['entry1']:
                             availability_hours = new_entry['entry1'].hour
                             availability_minutes = new_entry['entry1'].minute
@@ -879,11 +879,11 @@ def get_availability():
                             opening_minutes = opening.start_time.minute
                             total_opening_start = opening_hours * solverreq.hour_devider + opening_minutes
                             if total_availability_start == 0:
-                                new_entry[f'entry{j + 1}'] = get_time_str(entry)
+                                new_entry[f'entry{j + 1}'] = get_time_str(entry) if entry else None
                             elif total_availability_start < total_opening_start:
                                 new_entry['entry1'] = opening.start_time
                             else:
-                                new_entry[f'entry{j + 1}'] = get_time_str(entry)
+                                new_entry[f'entry{j + 1}'] = get_time_str(entry) if entry else None
 
 
 
@@ -937,7 +937,7 @@ def get_availability():
                 new_entry = {}
                 for j in range(6):
                     entry = request.json.get(f'day_{i}_{j}')
-                    new_entry[f'entry{j + 1}'] = get_time_str(entry)
+                    new_entry[f'entry{j + 1}'] = get_time_str(entry) if entry else None
 
                 # Create a new Availability instance and add to list
                 data = TemplateAvailability(
@@ -946,6 +946,7 @@ def get_availability():
                     date=new_date, 
                     weekday=new_weekday, 
                     email=user.email,
+                    holiday=None,
                     start_time=new_entry['entry1'], 
                     end_time=new_entry['entry2'], 
                     start_time2=new_entry['entry3'],
