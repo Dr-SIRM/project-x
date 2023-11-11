@@ -308,12 +308,7 @@ def new_user():
                             access_level = admin_registration_data['access_level'], 
                             creation_timestamp = datetime.datetime.now()
                             )
-                session.add(data1)
-                session.commit()
-                session.close()
-
-                session = get_session(get_database_uri('', company_name.lower().replace(' ', '_')))
-
+                
                 data2 = User(id = None, 
                             company_id = None, 
                             first_name = admin_registration_data['first_name'],
@@ -338,8 +333,40 @@ def new_user():
                             changed_by = new_company_id, 
                             creation_timestamp = datetime.datetime.now()
                             )
-
+                
+                session.add(data1)
                 session.add(data2)
+                session.commit()
+                session.close()
+
+                session = get_session(get_database_uri('', company_name.lower().replace(' ', '_')))
+
+                data3 = User(id = None, 
+                            company_id = None, 
+                            first_name = admin_registration_data['first_name'],
+                            last_name = admin_registration_data['last_name'], 
+                            employment = admin_registration_data['employment'], 
+                            employment_level = admin_registration_data['employment_level'],
+                            company_name = admin_registration_data['company_name'], 
+                            department = admin_registration_data['department'] if 'department' in admin_registration_data else None,
+                            department2 = admin_registration_data['department2'] if 'department2' in admin_registration_data else None,
+                            department3 = admin_registration_data['department3'] if 'department3' in admin_registration_data else None,
+                            department4 = None,
+                            department5 = None,
+                            department6 = None,
+                            department7 = None,
+                            department8 = None,
+                            department9 = None,
+                            department10 = None,
+                            access_level = admin_registration_data['access_level'], 
+                            email = admin_registration_data['email'], 
+                            password = generate_password_hash(admin_registration_data['password']),
+                            created_by = new_company_id, 
+                            changed_by = new_company_id, 
+                            creation_timestamp = datetime.datetime.now()
+                            )
+
+                session.add(data3)
                 session.commit()
                 session.close()
                 return jsonify({'message': 'Successful Registration'}), 200
@@ -387,17 +414,6 @@ def new_user():
                             creation_timestamp = datetime.datetime.now()
                             )
                         
-                        
-                        
-                        session.add(data1)
-                        session.add(data2)
-                        session.add(generic_admin)
-                        session.commit()
-                        session.close()
-                        
-
-                        session = get_session(get_database_uri('', company_name.lower().replace(' ', '_')))
-                        
                         data3 = User(id = None, 
                             company_id = None, 
                             first_name = "Time",
@@ -423,8 +439,45 @@ def new_user():
                             creation_timestamp = datetime.datetime.now()
                             )
                         
-                        data4 = User(id = new_id, 
-                            company_id = new_company_id, 
+                        
+                        
+                        session.add(data1)
+                        session.add(data2)
+                        session.add(data3)
+                        session.add(generic_admin)
+                        session.commit()
+                        session.close()
+                        
+
+                        session = get_session(get_database_uri('', company_name.lower().replace(' ', '_')))
+                        
+                        data4 = User(id = None, 
+                            company_id = None, 
+                            first_name = "Time",
+                            last_name = "Tab", 
+                            employment = None, 
+                            employment_level = None,
+                            company_name = admin_registration_data['company_name'], 
+                            department = None,
+                            department2 = None,
+                            department3 = None,
+                            department4 = None,
+                            department5 = None,
+                            department6 = None,
+                            department7 = None,
+                            department8 = None,
+                            department9 = None,
+                            department10 = None,
+                            access_level = "Super_Admin", 
+                            email = f"{admin_registration_data['company_name'].lower().replace(' ', '_')}@timetab.ch", 
+                            password = generate_password_hash('ProjectX2023.'),
+                            created_by = new_company_id, 
+                            changed_by = new_company_id, 
+                            creation_timestamp = datetime.datetime.now()
+                            )
+                        
+                        data5 = User(id = None, 
+                            company_id = None, 
                             first_name = admin_registration_data['first_name'],
                             last_name = admin_registration_data['last_name'], 
                             employment = admin_registration_data['employment'], 
@@ -448,8 +501,8 @@ def new_user():
                             creation_timestamp = datetime.datetime.now()
                             )
                         
-                        session.add(data3)
                         session.add(data4)
+                        session.add(data5)
                         session.commit()
                         session.close()
                         print("Schema and entry created")
