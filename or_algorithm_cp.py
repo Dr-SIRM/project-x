@@ -6,7 +6,7 @@ import re
 import threading
 import os
 
-from app import db, app, timedelta
+from app import db, app, timedelta, get_database_uri
 
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font
@@ -17,6 +17,8 @@ from data_processing import DataProcessing
 from sqlalchemy import text
 from models import Timetable, User, SolverAnalysis
 from collections import defaultdict
+from flask_jwt_extended import get_jwt
+from routes_react import get_session
 
 from ortools.sat.python import cp_model
 """
@@ -257,7 +259,7 @@ class ORAlgorithm_cp:
         self.output_result_excel()
         self.plot_costs_excel()
         self.save_data_in_database()
-        self.save_data_in_database_testing()
+        # self.save_data_in_database_testing()
 
 
     def create_variables(self):
@@ -2225,128 +2227,143 @@ class ORAlgorithm_cp:
         """ 
         Diese Methode speichert die berechneten Arbeitszeiten in der Datenbank 
         """
-        with app.app_context():
+        # with app.app_context():
             
-            # Bestimme den maximalen Datumsbereich aller Benutzer
-            all_start_dates = [self.user_availability[user_id][0][0] for user_id in self.mitarbeiter_arbeitszeiten]
-            all_end_dates = [start_date + datetime.timedelta(days=max(len(days) for days in departments.values()) - 1)
-                            for start_date, departments in zip(all_start_dates, self.mitarbeiter_arbeitszeiten.values())]
+        # Eine neue Session kreieren
+        jwt_data = get_jwt()
+        session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+        session = get_session(get_database_uri('', session_company))
+        
+        # Bestimme den maximalen Datumsbereich aller Benutzer
+        all_start_dates = [self.user_availability[user_id][0][0] for user_id in self.mitarbeiter_arbeitszeiten]
+        all_end_dates = [start_date + datetime.timedelta(days=max(len(days) for days in departments.values()) - 1)
+                        for start_date, departments in zip(all_start_dates, self.mitarbeiter_arbeitszeiten.values())]
 
-            # Wählen Sie das früheste Startdatum und das späteste Enddatum für den gesamten Löschvorgang
-            print(all_start_dates)
-            print(all_end_dates)
-            
-            global_start_date = min(all_start_dates)
-            global_end_date = max(all_end_dates)
-            print(global_start_date)
-            print(global_end_date)
+        # Wählen Sie das früheste Startdatum und das späteste Enddatum für den gesamten Löschvorgang
+        print(all_start_dates)
+        print(all_end_dates)
+        
+        global_start_date = min(all_start_dates)
+        global_end_date = max(all_end_dates)
+        print(global_start_date)
+        print(global_end_date)
 
-            # Lösche alle Einträge im globalen Datumsbereich
-            Timetable.query.filter(
-                Timetable.date >= global_start_date, 
-                Timetable.date <= global_end_date
-            ).delete()
-            db.session.commit()
+        # Lösche alle Einträge im globalen Datumsbereich
+        session.query(Timetable).filter(
+            Timetable.date >= global_start_date, 
+            Timetable.date <= global_end_date
+        ).delete()
+        session.commit()
 
-            for user_id, departments in self.mitarbeiter_arbeitszeiten.items(): # Durch mitarbeiter_arbeitszeiten durchitterieren
-                print(f"Verarbeite Benutzer-ID: {user_id}")
+        for email, departments in self.mitarbeiter_arbeitszeiten.items(): # Durch mitarbeiter_arbeitszeiten durchitterieren
+            print(f"Verarbeite Benutzer-Email: {email}")
 
-                # Benutzer aus der Datenbank abrufen
-                user = User.query.get(user_id)
-                print(user)
-                if not user:
-                    print(f"Kein Benutzer gefunden mit ID: {user_id}")
-                    continue
+            # Benutzer aus der Datenbank abrufen
+            user = session.query(User).filter_by(email=email).first()
+            print(user)
+            if not user:
+                print(f"Kein Benutzer gefunden mit Email: {email}")
+                continue
 
-                for department, days in departments.items():
-                    print(f"Verarbeite Abteilung: {department}")
+            for department, days in departments.items():
+                print(f"Verarbeite Abteilung: {department}")
 
-                    for day_index, day in enumerate(days):
-                        # Wir gehen davon aus, dass der erste Tag im 'self.user_availability' das Startdatum ist
-                        date = self.user_availability[user_id][0][0] + datetime.timedelta(days=day_index)
-                        weekday = date.strftime('%A') # Den aktuellen Wochentag finden
+                for day_index, day in enumerate(days):
+                    # Wir gehen davon aus, dass der erste Tag im 'self.user_availability' das Startdatum ist
+                    date = self.user_availability[email][0][0] + datetime.timedelta(days=day_index)
+                    weekday = date.strftime('%A') # Den aktuellen Wochentag finden
 
-                        # Hier unterteilen wir den Tag in Schichten, basierend auf den Zeiten, zu denen der Mitarbeiter arbeitet
-                        shifts = []
-                        start_time_index = None
+                    # Hier unterteilen wir den Tag in Schichten, basierend auf den Zeiten, zu denen der Mitarbeiter arbeitet
+                    shifts = []
+                    start_time_index = None
 
-                        for time_index in range(len(day)):
-                            if day[time_index] == 1 and start_time_index is None:
-                                start_time_index = time_index
-                            elif day[time_index] == 0 and start_time_index is not None:
-                                shifts.append((start_time_index, time_index))
-                                start_time_index = None
+                    for time_index in range(len(day)):
+                        if day[time_index] == 1 and start_time_index is None:
+                            start_time_index = time_index
+                        elif day[time_index] == 0 and start_time_index is not None:
+                            shifts.append((start_time_index, time_index))
+                            start_time_index = None
 
-                        if start_time_index is not None:
-                            shifts.append((start_time_index, len(day)))
+                    if start_time_index is not None:
+                        shifts.append((start_time_index, len(day)))
 
-                        print(f"Berechnete Schichten für Benutzer-ID {user_id}, Tag-Index {day_index}: {shifts}")
+                    print(f"Berechnete Schichten für Benutzer-Email {email}, Tag-Index {day_index}: {shifts}")
 
-                        # Divisor bestimmen
-                        divisor = 3600 / self.hour_devider
+                    # Divisor bestimmen
+                    divisor = 3600 / self.hour_devider
 
-                        for shift_index, (start_time, end_time) in enumerate(shifts):
-                            opening_time_in_units = int(self.laden_oeffnet[day_index].total_seconds() * self.hour_devider / 3600)
-                            start_time += opening_time_in_units
-                            end_time += opening_time_in_units
+                    for shift_index, (start_time, end_time) in enumerate(shifts):
+                        opening_time_in_units = int(self.laden_oeffnet[day_index].total_seconds() * self.hour_devider / 3600)
+                        start_time += opening_time_in_units
+                        end_time += opening_time_in_units
 
-                            print("start_time: ", start_time)
-                            print("end_time: ", end_time)
-                            print("shift_index: ", shift_index)
+                        print("start_time: ", start_time)
+                        print("end_time: ", end_time)
+                        print("shift_index: ", shift_index)
 
-                            start_datetime = datetime.datetime.combine(date, datetime.datetime.min.time()) + timedelta(hours=start_time // self.hour_devider, minutes=(start_time % self.hour_devider) * 60 / self.hour_devider)
-                            end_datetime = datetime.datetime.combine(date, datetime.datetime.min.time()) + timedelta(hours=end_time // self.hour_devider, minutes=(end_time % self.hour_devider) * 60 / self.hour_devider)
+                        start_datetime = datetime.datetime.combine(date, datetime.datetime.min.time()) + timedelta(hours=start_time // self.hour_devider, minutes=(start_time % self.hour_devider) * 60 / self.hour_devider)
+                        end_datetime = datetime.datetime.combine(date, datetime.datetime.min.time()) + timedelta(hours=end_time // self.hour_devider, minutes=(end_time % self.hour_devider) * 60 / self.hour_devider)
 
-                            # Überprüfen Sie, ob das Enddatum auf den nächsten Tag überläuft
-                            if end_datetime.time() < start_datetime.time():
-                                end_datetime += timedelta(days=1)
+                        # Überprüfen Sie, ob das Enddatum auf den nächsten Tag überläuft
+                        if end_datetime.time() < start_datetime.time():
+                            end_datetime += timedelta(days=1)
 
-                            # Neues Timetable-Objekt
-                            if shift_index == 0:
-                                new_entry = Timetable(
-                                    id=None,
-                                    email=user.email,
-                                    first_name=user.first_name,
-                                    last_name=user.last_name,
-                                    company_name=user.company_name,
-                                    department=department,
-                                    date=date,
-                                    weekday = weekday,
-                                    start_time=start_datetime,
-                                    end_time=end_datetime,
-                                    start_time2=None,
-                                    end_time2=None,
-                                    start_time3=None,
-                                    end_time3=None,
-                                    created_by=self.current_user_email,
-                                    changed_by=self.current_user_email,
-                                    creation_timestamp=datetime.datetime.now()
-                                )
-                                db.session.add(new_entry)
+                        # Neues Timetable-Objekt
+                        if shift_index == 0:
+                            new_entry = Timetable(
+                                id=None,
+                                email=user.email,
+                                first_name=user.first_name,
+                                last_name=user.last_name,
+                                company_name=user.company_name,
+                                department=department,
+                                date=date,
+                                weekday = weekday,
+                                start_time=start_datetime,
+                                end_time=end_datetime,
+                                start_time2=None,
+                                end_time2=None,
+                                start_time3=None,
+                                end_time3=None,
+                                created_by=self.current_user_email,
+                                changed_by=self.current_user_email,
+                                creation_timestamp=datetime.datetime.now()
+                            )
+                            session.add(new_entry)
 
-                            elif shift_index == 1:
-                                start_time2 = datetime.datetime.combine(date, datetime.datetime.min.time()) + timedelta(hours=start_time // self.hour_devider, minutes=(start_time % self.hour_devider) * 60 / self.hour_devider)
-                                end_time2 = datetime.datetime.combine(date, datetime.datetime.min.time()) + timedelta(hours=end_time // self.hour_devider, minutes=(end_time % self.hour_devider) * 60 / self.hour_devider)
+                        elif shift_index == 1:
+                            start_time2 = datetime.datetime.combine(date, datetime.datetime.min.time()) + timedelta(hours=start_time // self.hour_devider, minutes=(start_time % self.hour_devider) * 60 / self.hour_devider)
+                            end_time2 = datetime.datetime.combine(date, datetime.datetime.min.time()) + timedelta(hours=end_time // self.hour_devider, minutes=(end_time % self.hour_devider) * 60 / self.hour_devider)
 
-                                # Überprüfen, ob das Enddatum auf den nächsten Tag überläuft
-                                if end_time2.time() < start_time2.time():
-                                    end_time2 += timedelta(days=1)
+                            # Überprüfen, ob das Enddatum auf den nächsten Tag überläuft
+                            if end_time2.time() < start_time2.time():
+                                end_time2 += timedelta(days=1)
 
-                                new_entry.start_time2 = start_time2
-                                new_entry.end_time2 = end_time2
+                            new_entry.start_time2 = start_time2
+                            new_entry.end_time2 = end_time2
 
 
-                            # new_entry der Datenbank hinzufügen
-                            db.session.add(new_entry)
+                        # new_entry der Datenbank hinzufügen
+                        session.add(new_entry)
 
-                # Änderungen in der Datenbank speichern
-                db.session.commit()
+            # Änderungen in der Datenbank speichern
+            session.commit()
+
+        # Session wieder beenden
+        session.close()
 
 
     def save_data_in_database_testing(self):
         """ 
         Diese Methode speichert verwendete Daten in der Datenbank für das testing
         """
+
+        # Eine neue Session kreieren
+        jwt_data = get_jwt()
+        session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+        session = get_session(get_database_uri('', session_company))
+
+
         new_entry = SolverAnalysis(
             id = None,
             usecase = self.solver_requirements["company_name"],
@@ -2435,8 +2452,11 @@ class ORAlgorithm_cp:
         )
 
         # new_entry der Datenbank hinzufügen
-        db.session.add(new_entry)
+        session.add(new_entry)
 
         # Änderungen in der Datenbank speichern
-        db.session.commit()
+        session.commit()
         print("Daten erfolgreich in die Datenbank gespeichert.")
+
+        # Session wieder beenden
+        session.close()

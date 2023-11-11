@@ -5,18 +5,26 @@ from models import Timetable
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill, Border, Side
 from openpyxl.utils import get_column_letter
-from app import app, db, timedelta
+from app import app, db, timedelta, get_database_uri
 from sqlalchemy import text, case
 from models import User, Availability, TimeReq, Company, OpeningHours, Timetable, \
     TemplateAvailability, TemplateTimeRequirement, RegistrationToken, PasswordReset, \
     SolverRequirement, SolverAnalysis
+from flask_jwt_extended import get_jwt
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
 
+
+def get_session(uri):
+    engine = create_engine(uri)
+    Session = sessionmaker(bind=engine)
+    return Session()
 
 def time_to_timedelta(t):
     return timedelta(hours=t.hour, minutes=t.minute, seconds=t.second)
 
 
-def create_excel_output(user_id):
+def create_excel_output(current_user_email):
     """
     In dieser Funktion werden relevante gesolvte Daten aus der Datenbank gezogen und eine Excelausgabe daraus generiert.
     """
@@ -25,11 +33,18 @@ def create_excel_output(user_id):
     start_date = "2023-11-13"
     end_date = "2023-11-19"
 
+
+    # Neue Session starten
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    session = get_session(get_database_uri('', session_company))
+
+
     """
     COMPANY INFOS ZIEHEN ---------------------------------------------------------------
     """
     # Hole den company_name des aktuellen Benutzers
-    user = User.query.filter_by(id=user_id).first()
+    user = session.query(User).filter_by(email=current_user_email).first()
     company_name = user.company_name
 
     # Liste von Farben für die Departments
@@ -48,7 +63,7 @@ def create_excel_output(user_id):
 
 
     # Die entsprechende Company-Instanz abfragen
-    company = Company.query.filter_by(company_name=company_name).first()
+    company = session.query(Company).filter_by(company_name=company_name).first()
 
     # Liste für die Abteilungen
     departments = []
@@ -86,7 +101,7 @@ def create_excel_output(user_id):
     )
 
     # Öffnungszeiten basierend auf dem company_name abrufen und nach Wochentagen sortieren
-    opening = OpeningHours.query.filter_by(company_name=company_name).order_by(weekday_order).all()
+    opening = session.query(OpeningHours).filter_by(company_name=company_name).order_by(weekday_order).all()
 
     # Konvertieren Sie die Zeiten in time_delta und speichern Sie sie zusammen mit dem Wochentag in einer Liste
     times = [
@@ -101,7 +116,7 @@ def create_excel_output(user_id):
     # ----------------------------------------------------------------------------------
 
     # Abfrage, um hour_devider abzurufen
-    solver_requirement = SolverRequirement.query.filter_by(company_name=company_name).first()
+    solver_requirement = session.query(SolverRequirement).filter_by(company_name=company_name).first()
     hour_devider = solver_requirement.hour_devider if solver_requirement else None
 
 
@@ -110,7 +125,7 @@ def create_excel_output(user_id):
     """
 
     # Abfrage, um die User-Informationen abzurufen
-    company_users = User.query.filter_by(company_name=company_name).with_entities(
+    company_users = session.query(User).filter_by(company_name=company_name).with_entities(
         User.id, User.first_name, User.last_name, User.employment, 
         User.email, User.employment_level
     ).all()
@@ -119,7 +134,7 @@ def create_excel_output(user_id):
 
     # Abfrage, um die Timetable-Informationen abzurufen
     data_timetable = (
-        Timetable.query.filter_by(company_name=company_name)
+        session.query(Timetable).filter_by(company_name=company_name)
         .filter(Timetable.date.between(start_date, end_date))
         .with_entities(
             Timetable.email,
@@ -322,10 +337,16 @@ def create_excel_output(user_id):
         ws.cell(row=legend_row, column=3, value=department).font = Font(size=10)
 
 
+
+
+
     # In-memory bytes stream
     output = io.BytesIO()
     wb.save(output)
     output.seek(0)  # Gehe zum Start des Streams
+
+    # Session beenden
+    session.close()
 
     return output
 
