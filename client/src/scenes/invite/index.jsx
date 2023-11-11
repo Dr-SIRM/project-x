@@ -174,41 +174,7 @@ const Invite = ({ invite }) => {
                   },
                 }}
               />
-              <Typography
-                
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center", 
-                  height: "100%",
-                  padding: "0 8px", 
-                  backgroundColor: "#f0f0f0", 
-                }}
-              >
-                Department
-              </Typography>
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.department}
-                name="department"
-                error={!!touched.department && !!errors.department}
-                helperText={touched.department && errors.department}
-                sx={{
-                  gridColumn: "span 2",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
-                  },
-                }}
-              />
-              <Typography
+                            <Typography
                 
                 variant="h6"
                 sx={{
@@ -234,6 +200,88 @@ const Invite = ({ invite }) => {
                 name="department"
                 error={!!touched.deoartment && !!errors.department}
                 helperText={touched.department && errors.department}
+                sx={{
+                  gridColumn: "span 2",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
+              >
+                <MenuItem value="">Wählen Sie eine Abteilung</MenuItem>
+                {department_list.map((department) => (
+                  <MenuItem key={department} value={department}>
+                    {department}
+                  </MenuItem>
+                ))}
+              </Select>
+              <Typography
+                
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center", 
+                  height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
+                }}
+              >
+                Department 2
+              </Typography>
+              <Select
+                fullWidth
+                variant="filled"
+                type="text"
+                label= ""
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.department2}
+                name="department2"
+                error={!!touched.deoartment2 && !!errors.department2}
+                helperText={touched.department2 && errors.department2}
+                sx={{
+                  gridColumn: "span 2",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
+              >
+                <MenuItem value="">Wählen Sie eine Abteilung</MenuItem>
+                {department_list.map((department) => (
+                  <MenuItem key={department} value={department}>
+                    {department}
+                  </MenuItem>
+                ))}
+              </Select>
+              <Typography
+                
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center", 
+                  height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
+                }}
+              >
+                Department 3
+              </Typography>
+              <Select
+                fullWidth
+                variant="filled"
+                type="text"
+                label= ""
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.department3}
+                name="department3"
+                error={!!touched.deoartment3 && !!errors.department3}
+                helperText={touched.department3 && errors.department3}
                 sx={{
                   gridColumn: "span 2",
                   '& .MuiFilledInput-input': {

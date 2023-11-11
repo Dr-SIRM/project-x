@@ -1050,6 +1050,7 @@ def get_invite():
     )
 
     department_list = [department for department in departments if department is not None]
+    print(department_list)
 
     if request.method == 'POST':
         invite_data = request.get_json()
@@ -1066,8 +1067,8 @@ def get_invite():
                                  token=random_token, 
                                  company_name=invite_data['company_name'], 
                                  department=invite_data['department'], 
-                                 department2 = None,
-                                 department3 = None,
+                                 department2 =invite_data['department2'],
+                                 department3 =invite_data['department3'],
                                 department4 = None,
                                 department5 = None,
                                 department6 = None,
@@ -1126,7 +1127,7 @@ def run_solver():
     print("JSON Payload:", solver_data)  # Log payload
 
     if 'solverButtonClicked' in solver_data and solver_data['solverButtonClicked']:
-        dp = DataProcessing(user.id)
+        dp = DataProcessing(user.email)
         dp.run()
         or_algo_cp = ORAlgorithm_cp(dp)
 
