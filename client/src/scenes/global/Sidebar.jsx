@@ -49,8 +49,8 @@ const Sidebar = () => {
         if (response.data) {
           const currentUser = response.data;
           setUser({
-            firstName: currentUser.first_name,
-            lastName: currentUser.last_name,
+            // firstName: currentUser.first_name,
+            // lastName: currentUser.last_name,
             companyName: currentUser.company_name,
             email: currentUser.email,
             accessLevel: currentUser.access_level

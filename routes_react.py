@@ -69,6 +69,7 @@ def login_react():
             'access_level': user.access_level
         }
     }
+
     return jsonify(response)
 
 
@@ -77,7 +78,10 @@ def login_react():
 def current_react_user():
     react_user = get_jwt_identity()
     jwt_data = get_jwt()
+    print("JWT: ", jwt_data)
     session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    app.config['SQLALCHEMY_DATABASE_URI'] = get_database_uri("", session_company)
+    print(session_company)
     session = get_session(get_database_uri('', session_company))
     user = session.query(User).filter_by(email=react_user).first()
 
@@ -383,16 +387,27 @@ def new_user():
                             creation_timestamp = datetime.datetime.now()
                             )
                         
+                        
+                        
+                        session.add(data1)
+                        session.add(data2)
+                        session.add(generic_admin)
+                        session.commit()
+                        session.close()
+                        
+
+                        session = get_session(get_database_uri('', company_name.lower().replace(' ', '_')))
+                        
                         data3 = User(id = new_id, 
                             company_id = new_company_id, 
-                            first_name = admin_registration_data['first_name'],
-                            last_name = admin_registration_data['last_name'], 
-                            employment = admin_registration_data['employment'], 
-                            employment_level = admin_registration_data['employment_level'],
+                            first_name = "Time",
+                            last_name = "Tab", 
+                            employment = None, 
+                            employment_level = None,
                             company_name = admin_registration_data['company_name'], 
-                            department = admin_registration_data['department'] if 'department' in admin_registration_data else None,
-                            department2 = admin_registration_data['department2'] if 'department2' in admin_registration_data else None,
-                            department3 = admin_registration_data['department3'] if 'department3' in admin_registration_data else None,
+                            department = None,
+                            department2 = None,
+                            department3 = None,
                             department4 = None,
                             department5 = None,
                             department6 = None,
@@ -400,23 +415,13 @@ def new_user():
                             department8 = None,
                             department9 = None,
                             department10 = None,
-                            access_level = admin_registration_data['access_level'], 
-                            email = admin_registration_data['email'], 
-                            password = generate_password_hash(admin_registration_data['password']),
+                            access_level = "Super_Admin", 
+                            email = f"{admin_registration_data['company_name'].lower().replace(' ', '_')}@timetab.ch", 
+                            password = generate_password_hash('ProjectX2023.'),
                             created_by = new_company_id, 
                             changed_by = new_company_id, 
                             creation_timestamp = datetime.datetime.now()
                             )
-                        
-                        session.add(data1)
-                        session.add(data2)
-                        session.add(data3)
-                        session.add(generic_admin)
-                        session.commit()
-                        session.close()
-                        
-
-                        session = get_session(get_database_uri('', company_name.lower().replace(' ', '_')))
                         
                         data4 = User(id = new_id, 
                             company_id = new_company_id, 
@@ -443,7 +448,7 @@ def new_user():
                             creation_timestamp = datetime.datetime.now()
                             )
                         
-                    
+                        session.add(data3)
                         session.add(data4)
                         session.commit()
                         session.close()
@@ -566,8 +571,6 @@ def get_company():
     day_num = 7
     company_id = user.company_id
     creation_date = datetime.datetime.now()
-
-    print(company.company_name, company.weekly_hours, company.shifts)
 
     if company is None:
         company_name = user.company_name
@@ -1018,7 +1021,7 @@ def get_invite():
 
     if request.method == 'POST':
         invite_data = request.get_json()
-        session = get_session(get_database_uri('', user.company_name.lower().replace(' ', '_')))
+        session = get_session(get_database_uri('', "timetab"))
         random_token = random.randint(100000,999999)
         last = RegistrationToken.query.order_by(RegistrationToken.id.desc()).first()
         if last is None:
@@ -1501,7 +1504,7 @@ def get_temp_timereq_dict(template_name, day_num, daily_slots, hour_divider, min
     temp_lookup = {(temp.weekday, temp.start_time): temp.worker for temp in all_temps if temp.worker != 0}
     
     for i in range(day_num):
-        for hour in range(daily_slots):
+        for hour in range(int(daily_slots)):
             if hour > full_day:
                 hour -= full_day + 1
                 quarter_hour = hour // hour_divider
@@ -1590,6 +1593,8 @@ def get_required_workforce():
             closing_times.append(slot)
 
     daily_slots = max(closing_times) * hour_divider
+    print("Max: ", daily_slots)
+    print("Max: ", closing_times)
 
     # Calculation Min Working Day
     opening_times = []
@@ -1609,6 +1614,8 @@ def get_required_workforce():
             opening_times.append(slot)
     
     min_opening = min(opening_times)* hour_divider
+    print("Min: ", min_opening)
+    print("Min: ", opening_times)
 
     # Week with adjustments
     monday = today - datetime.timedelta(days=today.weekday())
@@ -1616,7 +1623,7 @@ def get_required_workforce():
     week_start = monday + datetime.timedelta(days=week_adjustment)
 
     slot_dict = {}
-    for i in range(min_opening, daily_slots):
+    for i in range(min_opening, int(daily_slots)):
         effective_hour = i % (full_day + 1) # This will wrap around the time after 24
         quarter_hour = effective_hour / hour_divider
         quarter_minute = (effective_hour % hour_divider) * minutes  # Remainder gives the quarter in the hour
@@ -1639,7 +1646,7 @@ def get_required_workforce():
 
     timereq_dict = {}
     for i in range(day_num):
-        for hour in range(daily_slots):
+        for hour in range(int(daily_slots)):
             if hour >= full_day +1:
                 hour -= full_day + 1
                 new_date = monday + datetime.timedelta(days=i+1) + datetime.timedelta(days=week_adjustment)
@@ -1988,12 +1995,15 @@ import locale
 def get_dashboard_data():
     current_user_id = get_jwt_identity()
     jwt_data = get_jwt()
+    print(jwt_data)
     session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    print(session_company)
     session = get_session(get_database_uri('', session_company))
 
 
     
     current_user = session.query(User).filter_by(email=current_user_id).first()
+
     if not current_user:
         return jsonify({'error': 'User not found'}), 404
 
