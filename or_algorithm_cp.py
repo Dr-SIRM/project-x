@@ -90,7 +90,7 @@ class ORAlgorithm_cp:
         self.start_date = dp.start_date
         self.end_date = dp.end_date
 
-        self.current_user_id = dp.current_user_id           # 100     
+        self.current_user_email = dp.current_user_email     # 100     
         self.user_availability = dp.user_availability       # 101
         self.opening_hours = dp.opening_hours               # 102
         self.laden_oeffnet = dp.laden_oeffnet               # 103
@@ -531,7 +531,7 @@ class ORAlgorithm_cp:
         Wenn die Methode aktiviert wird, werden alle Attribute geprintet
         """
         # Attribute aus DataProcessing
-        print("100. self.current_user_id: ", self.current_user_id) 
+        print("100. self.current_user_email: ", self.current_user_email) 
         print("101. self.user_availability: ", self.user_availability) 
         print("102. self.opening_hours: ", self.opening_hours) 
         print("103. self.laden_oeffnet: ", self.laden_oeffnet) 
@@ -1745,7 +1745,7 @@ class ORAlgorithm_cp:
         # -------------------------------------------------------------------------------------------------------
     
         # Diese Variable noch in der Datenbank implementieren
-        self.subsequent_workingdays_max = 5
+        self.subsequent_workingdays_max = 7
 
         for i in self.mitarbeiter:
             for j in range(self.calc_time - self.subsequent_workingdays_max):
@@ -2318,8 +2318,8 @@ class ORAlgorithm_cp:
                                     end_time2=None,
                                     start_time3=None,
                                     end_time3=None,
-                                    created_by=self.current_user_id,
-                                    changed_by=self.current_user_id,
+                                    created_by=self.current_user_email,
+                                    changed_by=self.current_user_email,
                                     creation_timestamp=datetime.datetime.now()
                                 )
                                 db.session.add(new_entry)
@@ -2350,7 +2350,7 @@ class ORAlgorithm_cp:
         new_entry = SolverAnalysis(
             id = None,
             usecase = self.solver_requirements["company_name"],
-            self_current_user_id = self.current_user_id,
+            self_current_user_email = self.current_user_email,
             self_user_availability = str(self.user_availability),
             self_opening_hours = str(self.opening_hours),
             self_laden_oeffnet = str(self.laden_oeffnet),

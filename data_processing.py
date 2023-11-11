@@ -3,16 +3,17 @@ from datetime import datetime, time, date
 from dateutil.relativedelta import relativedelta
 from collections import defaultdict
 from collections import OrderedDict
-from app import app, db, timedelta
+from app import app, db, timedelta, get_database_uri
 from models import User, Availability, TimeReq, Company, OpeningHours, Timetable, \
     TemplateAvailability, TemplateTimeRequirement, RegistrationToken, PasswordReset, \
     SolverRequirement, SolverAnalysis
-
+from routes_react import get_session
+from flask_jwt_extended import get_jwt
 
 class DataProcessing:
-    def __init__(self, current_user_id):
+    def __init__(self, current_user_email):
         # Attribute
-        self.current_user_id = current_user_id
+        self.current_user_email = current_user_email
         self.week_timeframe = None
         self.hour_devider = None
         self.start_date = None
@@ -31,11 +32,13 @@ class DataProcessing:
         self.solver_requirements = None
         self.binary_availability = None
         self.user_names = None
+        self.session = None
 
         
         
     def run(self):
         """ Die einzelnen Methoden werden in der Reihe nach ausgeführt """
+        self.load_session()
         self.solving_period()
         self.get_availability()
         self.get_opening_hours()
@@ -46,6 +49,16 @@ class DataProcessing:
         self.get_employment_skills()
         self.get_solver_requirement()
         self.user_name_list()
+        self.close_session()
+
+
+    def load_session(self):
+        """
+        In dieser Methode wird eine API SQL definiert
+        """
+        jwt_data = get_jwt()
+        session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+        self.session = get_session(get_database_uri('', session_company))
 
 
     def solving_period(self):
@@ -55,12 +68,13 @@ class DataProcessing:
         """
 
         # company_name filtern aus der Datenkbank
-        user = User.query.filter_by(id=self.current_user_id).first()
+        user = self.session.query(User).filter_by(email=self.current_user_email).first()
         company_name = user.company_name
 
         # week_timeframe und hour_devider filtern aus der Datenkbank
-        solver_req = SolverRequirement.query.filter_by(company_name=company_name).first()
+        solver_req = self.session.query(SolverRequirement).filter_by(company_name=company_name).first()
         self.week_timeframe = solver_req.week_timeframe
+        print("week timeframe: ", self.week_timeframe)
         self.hour_devider = solver_req.hour_devider
 
         # Holen Sie sich das heutige Datum
@@ -87,8 +101,8 @@ class DataProcessing:
         # self.start_date = "2023-08-07"
         # self.end_date = "2023-08-13"
 
-        print(self.start_date)
-        print(self.end_date)
+        print("start_date: ", self.start_date)
+        print("end_time: ", self.end_date)
 
         return self.start_date, self.end_date
 
@@ -102,10 +116,10 @@ class DataProcessing:
         Zusätzlich wird ein dict self.user_holidays erstellt, das angbit, welcher User an welchem Tag Ferien hat (Ferien = 1, keine Ferien = 0)
         """
 
-        print(f"Admin mit der User_id: {self.current_user_id} hat den Solve Button gedrückt.")
+        print(f"Admin mit der Email: {self.current_user_email} hat den Solve Button gedrückt.")
 
         # company_name filtern aus der Datenbank
-        user = User.query.filter_by(id=self.current_user_id).first()
+        user = self.session.query(User).filter_by(email=self.current_user_email).first()
         company_name = user.company_name
 
         # Umwandlung der Datumsstrings in Datumsobjekte für die weitere Verarbeitung
@@ -115,32 +129,33 @@ class DataProcessing:
         # Erstellen einer Liste von Tagen im Bereich
         date_range = [start_date_obj + timedelta(days=x) for x in range((end_date_obj - start_date_obj).days + 1)]
 
-        # Sämtliche IDs der Nutzer der aktuellen Firma abrufen
-        company_user_ids = db.session.query(User.id).filter_by(company_name=company_name).all()
-        company_user_ids = [user_id for (user_id,) in company_user_ids]  # Umwandlung in eine Liste von IDs
+        # Sämtliche Emails der Nutzer der aktuellen Firma abrufen
+        company_user_emails = self.session.query(User.email).filter_by(company_name=company_name).all()
+        company_user_emails = [user_email for (user_email,) in company_user_emails]  # Umwandlung in eine Liste von IDs
 
         # Datenbankabfrage, um nur Benutzer (aus der company) mit Einträgen in der Verfügbarkeitstabelle abzurufen
-        user_ids_with_availability = db.session.query(Availability.user_id).filter(
-            Availability.user_id.in_(company_user_ids),
+        user_emails_with_availability = self.session.query(Availability.email).filter(
+            Availability.email.in_(company_user_emails),
             Availability.date.between(self.start_date, self.end_date)
         ).distinct().all()
 
         # Konvertieren von Ergebnissen in eine Liste von IDs
-        user_ids = [item[0] for item in user_ids_with_availability]
+        user_emails = [item[0] for item in user_emails_with_availability]
 
         user_availability = defaultdict(list)
         self.user_holidays = defaultdict(list)
 
         # Prüfen, ob jeder Benutzer und jeden Tag im Zeitraum die Verfügbarkeit hat
-        for user_id in user_ids:
+        for email in user_emails:
             for single_date in date_range:
                 # Versuchen, für das aktuelle Datum einen Eintrag zu finden
-                availability_entry = Availability.query.filter_by(user_id=user_id, date=single_date).first()
+                availability_entry = self.session.query(Availability).filter_by(email=email, date=single_date).first()
 
                 # Wenn der Mitarbeiter Ferien hat ("X" in der Spalte holiday), dann wird eine 1 für Ferien gesetzt
                 if availability_entry and availability_entry.holiday == "X":
                     times = (None,) * 6  # Keine spezifischen Zeiten, weil Ferien
-                    self.user_holidays[user_id].append((single_date, 1))
+                    self.user_holidays[email].append((single_date, 1))
+
                 # Wenn keine Ferien eingetragen sind
                 elif availability_entry:
                     times = (
@@ -151,21 +166,20 @@ class DataProcessing:
                         self.time_to_timedelta(availability_entry.start_time3) if availability_entry.start_time3 else None,
                         self.time_to_timedelta(availability_entry.end_time3) if availability_entry.end_time3 else None
                     )
-                    self.user_holidays[user_id].append((single_date, 0))
+                    self.user_holidays[email].append((single_date, 0))
                 else:
                     # Wenn kein Eintrag, alles auf None setzen und als Arbeitstag betrachten
                     times = (None,) * 6
-                    self.user_holidays[user_id].append((single_date, 0))
+                    self.user_holidays[email].append((single_date, 0))
 
                 # Zeiten für das aktuelle Datum dem user_availability-Dict hinzufügen
-                user_availability[user_id].append((single_date, *times))
+                user_availability[email].append((single_date, *times))
 
             # Verfügbarkeiten und Ferien für jeden Benutzer nach Datum sortieren
-            user_availability[user_id] = sorted(user_availability[user_id], key=lambda x: x[0])
-            self.user_holidays[user_id] = sorted(self.user_holidays[user_id], key=lambda x: x[0])
+            user_availability[email] = sorted(user_availability[email], key=lambda x: x[0])
+            self.user_holidays[email] = sorted(self.user_holidays[email], key=lambda x: x[0])
 
         self.user_availability = user_availability
-        print("user_availability: ", self.user_availability)
 
 
 
@@ -198,7 +212,7 @@ class DataProcessing:
         """ In dieser Funktion werden die Öffnungszeiten (7 Tage) der jeweiligen Company aus der Datenbank gezogen. """
         
         # company_name filtern aus der Datenkbank
-        user = User.query.filter_by(id=self.current_user_id).first()
+        user = self.session.query(User).filter_by(email=self.current_user_email).first()
         company_name = user.company_name
 
         weekday_order = case(
@@ -211,7 +225,7 @@ class DataProcessing:
             (OpeningHours.weekday == "Sonntag", 7)]
         )
 
-        opening = OpeningHours.query.filter_by(company_name=company_name).order_by(weekday_order).all()
+        opening = self.session.query(OpeningHours).filter_by(company_name=company_name).order_by(weekday_order).all()
 
         # Dictionary mit den Öffnungszeiten für einfachere Abfragen
         opening_dict = {record.weekday: record for record in opening}
@@ -276,24 +290,22 @@ class DataProcessing:
         self.laden_schliesst = self.laden_schliesst * self.week_timeframe
         self.opening_hours = self.opening_hours * self.week_timeframe
 
-        """
+        
         for i in range(7):
             print(f"{i}-ter Tag Laden Öffnet: {self.laden_oeffnet[i]}")
             print(f"{i}-ter Tag Laden Schliesst: {self.laden_schliesst[i]}")
         
-        print("Opening_hour: ", self.opening_hours)
-        """
-
+        
 
     def get_skills(self):
         """ In dieser Methode werden sämtliche Skills einer Company in einer Liste gespeichert """
 
         # company_name filtern aus der Datenkbank
-        user = User.query.filter_by(id=self.current_user_id).first()
+        user = self.session.query(User).filter_by(email=self.current_user_email).first()
         company_name = user.company_name
 
         # Die entsprechende Company-Instanz abfragen
-        company = Company.query.filter_by(company_name=company_name).first()
+        company = self.session.query(Company).filter_by(company_name=company_name).first()
 
         # Zugriff auf das erste Department, da deparment nicht mit 1 beginnt
         first_department = getattr(company, 'department')
@@ -305,8 +317,6 @@ class DataProcessing:
             department_value = getattr(company, f'department{i}')
             if department_value:  # Wenn department_value nicht leer/null ist
                 self.skills.append(department_value)
-
-        print("Skills: ", self.skills)
         
 
 
@@ -314,11 +324,11 @@ class DataProcessing:
         """ In dieser Funktion werden die benötigten Mitarbeiter für jede Stunde jedes Tages jedes Skills abgerufen """
 
         # Holt den company_name aus der Datenbank.
-        user = User.query.filter_by(id=self.current_user_id).first()
+        user = self.session.query(User).filter_by(email=self.current_user_email).first()
         company_name = user.company_name
 
         # Abrufen aller TimeReq-Datensätze für das Unternehmen im relevanten Datumsbereich.
-        time_reqs = TimeReq.query.filter(
+        time_reqs = self.session.query(TimeReq).filter(
             TimeReq.company_name == company_name,
             TimeReq.date.between(self.start_date, self.end_date)
         ).all()
@@ -391,26 +401,24 @@ class DataProcessing:
 
         # Sortiert das Wörterbuch nach Datum und konvertiert es in ein geordnetes Wörterbuch, um die Reihenfolge beizubehalten
         self.time_req = OrderedDict(sorted(time_req_dict.items()))
-
  
 
     def get_shift_weeklyhours_emp_lvl(self):
         """ In dieser Funktion wird als Key die user_id verwendet und die shift, employment_level und weekly_hours aus der Datenbank gezogen """
 
         # company_name filtern aus der Datenkbank
-        user = User.query.get(self.current_user_id)
+        user = self.session.query(User).filter_by(email=self.current_user_email).first()
         company_name = user.company_name
 
         # Hole die Schichten und die weekly_hours für die Firma des aktuellen Benutzers in einer einzelnen Abfrage
-        company = Company.query.filter_by(company_name=company_name).first()
+        company = self.session.query(Company).filter_by(company_name=company_name).first()
         
         self.company_shifts = company.shifts
         self.weekly_hours = company.weekly_hours
 
         # Hole das employment_level für jeden Benutzer, der in der gleichen Firma arbeitet wie der aktuelle Benutzer
-        users = User.query.filter_by(company_name=company_name).all()
-        self.employment_lvl = {user.id: user.employment_level for user in users}
-
+        users = self.session.query(User).filter_by(company_name=company_name).all()
+        self.employment_lvl = {user.email: user.employment_level for user in users}
 
 
     def binaere_liste(self):
@@ -461,19 +469,18 @@ class DataProcessing:
                 self.binary_availability[user_id].append((date, binary_list))
 
 
-
     def get_employment_skills(self):
         """ In der folgenden Methode holen wir die Beschäftigung und die Skills jedes Benutzers und fügen sie jeweils in eine Liste ein """
 
         # company_name filtern aus der Datenkbank
-        user = User.query.get(self.current_user_id)
+        user = self.session.query(User).filter_by(email=self.current_user_email).first()
         company_name = user.company_name
 
         # Hole das employment_level für jeden Benutzer, der in der gleichen Firma arbeitet wie der aktuelle Benutzer
-        users = User.query.filter_by(company_name=company_name).all()
+        users = self.session.query(User).filter_by(company_name=company_name).all()
 
         # user_employment Dictionarie erstellen mit user_id als Key:
-        self.user_employment = defaultdict(str, {user.id: user.employment for user in users})
+        self.user_employment = defaultdict(str, {user.email: user.employment for user in users})
 
         # user_skills Dictionary erstellen mit user_id als Key:
         self.user_skills = defaultdict(list) 
@@ -481,24 +488,23 @@ class DataProcessing:
             # Das erste Attribut heisst "department", nicht "department1", also müssen wir es separat behandeln
             first_department = getattr(user, 'department')
             if first_department:  # Füge hinzu, wenn es nicht None oder leer ist
-                self.user_skills[user.id].append(first_department)
+                self.user_skills[user.email].append(first_department)
 
             # Iteration durch die restlichen "department"-Attribute (von "department2" bis "department10")
             for i in range(2, 11):
                 skill = getattr(user, f'department{i}')
                 if skill:  # Füge hinzu, wenn es nicht None oder leer ist
-                    self.user_skills[user.id].append(skill)
-
+                    self.user_skills[user.email].append(skill)
 
 
     def get_solver_requirement(self):
         """ In dieser Methode werden die Anforderungen des Solvers für das Unternehmen gezogen """
 
         # company_name filtern aus der Datenkbank
-        user = User.query.get(self.current_user_id)
+        user = self.session.query(User).filter_by(email=self.current_user_email).first()
         company_name = user.company_name
 
-        solver_requirement = SolverRequirement.query.filter_by(company_name=company_name).first()
+        solver_requirement = self.session.query(SolverRequirement).filter_by(company_name=company_name).first()
         
         self.solver_requirements = {
             'id': solver_requirement.id,
@@ -544,14 +550,14 @@ class DataProcessing:
         """ In dieser Funktion werden alle user Vor- und Nachnamen der company geozgen und in einer Liste gespeichert """
 
         # Eine Liste mit allen ids der user erstellen (Reihenfolge gleich wie später)
-        user_ids = [user_id for user_id in self.binary_availability]
+        user_emails = [user_email for user_email in self.binary_availability]
 
         # Liste für alle Vor- und Nachnamen der User
         self.user_names = []
 
-        for user_id in user_ids:
+        for email in user_emails:
             # user mit bestimmter ID aus der Datenbank abrufen
-            user = User.query.filter_by(id=user_id).first()
+            user = self.session.query(User).filter_by(email=email).first()
             
             # Überprüfen, ob ein Benutzer gefunden wurde
             if user is not None:
@@ -559,3 +565,7 @@ class DataProcessing:
             else:
                 self.user_names.append((None, None))
 
+
+    def close_session(self):
+        """ Session wieder closen """
+        self.session.close()
