@@ -74,7 +74,6 @@ class DataProcessing:
         # week_timeframe und hour_devider filtern aus der Datenkbank
         solver_req = self.session.query(SolverRequirement).filter_by(company_name=company_name).first()
         self.week_timeframe = solver_req.week_timeframe
-        print("week timeframe: ", self.week_timeframe)
         self.hour_devider = solver_req.hour_devider
 
         # Holen Sie sich das heutige Datum
@@ -290,11 +289,11 @@ class DataProcessing:
         self.laden_schliesst = self.laden_schliesst * self.week_timeframe
         self.opening_hours = self.opening_hours * self.week_timeframe
 
-        
+        """
         for i in range(7):
             print(f"{i}-ter Tag Laden Öffnet: {self.laden_oeffnet[i]}")
             print(f"{i}-ter Tag Laden Schliesst: {self.laden_schliesst[i]}")
-        
+        """
         
 
     def get_skills(self):

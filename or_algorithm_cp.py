@@ -967,7 +967,7 @@ class ORAlgorithm_cp:
         if diff_1 < 0:
             diff_1 = 0
         self.nb2_violation = {ma: {} for ma in self.mitarbeiter}
-        print("DIFFFFF 1: ", diff_1)
+
         for ma in self.mitarbeiter:
             for week in range(1, self.week_timeframe + 1):
                 self.nb2_violation[ma][week] = self.model.NewIntVar(0, diff_1, f'nb2_violation[{ma}][{week}]')
@@ -1719,7 +1719,6 @@ class ORAlgorithm_cp:
                         # Bestimmen der gültigen Skills für den Mitarbeiter zu diesem Zeitpunkt
                         current_week = j // 7
                         valid_skills = [s for s in self.benoetigte_skills[current_week] if s in self.mitarbeiter_s[i]]
-                        print(valid_skills)
                         
                         # Für alle Stunden minus die mindestanzahl Stunden
                         if k < len(self.verfügbarkeit[i][j]) - self.time_per_deployment + 1:
@@ -1973,9 +1972,6 @@ class ORAlgorithm_cp:
             for j in range(self.calc_time):
                 print(f"a_sum[{i}][{j}] =", self.solver.Value(self.a_sum[i, j]))
         """
-
-
-
 
         # ----------------------------------------------------------------
 
@@ -2239,10 +2235,7 @@ class ORAlgorithm_cp:
         all_end_dates = [start_date + datetime.timedelta(days=max(len(days) for days in departments.values()) - 1)
                         for start_date, departments in zip(all_start_dates, self.mitarbeiter_arbeitszeiten.values())]
 
-        # Wählen Sie das früheste Startdatum und das späteste Enddatum für den gesamten Löschvorgang
-        print(all_start_dates)
-        print(all_end_dates)
-        
+        # Früheste Startdatum und das späteste Enddatum für den gesamten Löschvorgang wählen
         global_start_date = min(all_start_dates)
         global_end_date = max(all_end_dates)
         print(global_start_date)
@@ -2297,9 +2290,11 @@ class ORAlgorithm_cp:
                         start_time += opening_time_in_units
                         end_time += opening_time_in_units
 
+                        """
                         print("start_time: ", start_time)
                         print("end_time: ", end_time)
                         print("shift_index: ", shift_index)
+                        """
 
                         start_datetime = datetime.datetime.combine(date, datetime.datetime.min.time()) + timedelta(hours=start_time // self.hour_devider, minutes=(start_time % self.hour_devider) * 60 / self.hour_devider)
                         end_datetime = datetime.datetime.combine(date, datetime.datetime.min.time()) + timedelta(hours=end_time // self.hour_devider, minutes=(end_time % self.hour_devider) * 60 / self.hour_devider)
