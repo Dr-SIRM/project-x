@@ -2051,6 +2051,7 @@ def get_shift():
             'email': record.email,
             'first_name': record.first_name,
             'last_name': record.last_name,
+            'department': record.department,
             'date': date_str,
             'shifts': [
                 {

@@ -220,7 +220,8 @@ const renderShifts = (worker) => {
                   style={getShiftPosition(shift)}
               >
                   <div className="tooltip">
-                      Start: {shift.start_time} - Ende: {shift.end_time}
+                      <div>Start: {shift.start_time} - Ende: {shift.end_time}</div>
+                      <div>{shift.department}</div>
                   </div>
               </div>
           ))}
@@ -374,7 +375,7 @@ const renderShifts = (worker) => {
 const renderWeekShifts = (day) => {
   const formattedDate = day.toISOString().split('T')[0];
   const shiftsForDay = getShiftsForDay(day);
-  
+
   return (
     <div key={day.toISOString()}>
       {shiftsForDay.map(worker => (
@@ -386,8 +387,6 @@ const renderWeekShifts = (day) => {
             }
 
             return shiftDetail.shifts.map((shift, index) => {
-
-              // Directly assigning the start and end times
               const startTime = shift.start_time && typeof shift.start_time === 'string' 
                 ? shift.start_time 
                 : 'N/A';
@@ -395,14 +394,14 @@ const renderWeekShifts = (day) => {
                 ? shift.end_time 
                 : 'N/A';
 
-              // If both times are 'N/A', don't render this shift
               if (startTime === 'N/A' && endTime === 'N/A') {
                 return null;
               }
 
               return (
-                <div key={index}>
-                  Start: {startTime} - Ende: {endTime}
+                <div key={index} className="shift-details">
+                  <div>Start: {startTime} - Ende: {endTime}</div>
+                  <div>{shiftDetail.department}</div> 
                 </div>
               );
             });
@@ -412,6 +411,8 @@ const renderWeekShifts = (day) => {
     </div>
   );
 };
+
+
 
 //export excel
 const handleExportToExcel = async () => {
