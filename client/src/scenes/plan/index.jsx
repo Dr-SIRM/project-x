@@ -113,42 +113,48 @@ const GanttChart = () => {
   
     const startHour = parseInt(hours.start.split(":")[0], 10);
     const endHour = parseInt(hours.end.split(":")[0], 10);
-    
-    return endHour - startHour; // Return difference in hours
-  };
 
-  const getShiftPosition = (shift) => {
-    const today = currentDay;
-    const weekday = today.toLocaleDateString('de-DE', { weekday: 'long' });
-    const hours = openingHours[weekday.toLowerCase()];
-
-    if (!hours) {
-        return { left: 0, width: 0 }; // Default values if no hours are specified
+    let duration = endHour - startHour;
+    if (endHour < startHour) { // End time is past midnight
+        duration += 24; // Add 24 hours to account for next day
     }
-
-    const startHourMinutes = hours.start.split(":").map(Number);
-    const endHourMinutes = hours.end.split(":").map(Number);
-    const shiftStartHourMinutes = shift.start_time.split(":").map(Number);
-    const shiftEndHourMinutes = shift.end_time.split(":").map(Number);
-
-    const startMinutes = startHourMinutes[0] * 60 + startHourMinutes[1];
-    const endMinutes = endHourMinutes[0] * 60 + endHourMinutes[1];
-    const shiftStartMinutes = shiftStartHourMinutes[0] * 60 + shiftStartHourMinutes[1];
-    const shiftEndMinutes = shiftEndHourMinutes[0] * 60 + shiftEndHourMinutes[1];
-
-    let maxDuration, left, width;
-    switch (view) {
-        case 'day':
-            maxDuration = endMinutes - startMinutes;
-            left = (shiftStartMinutes - startMinutes) / maxDuration * 100;
-            width = (shiftEndMinutes - shiftStartMinutes) / maxDuration * 100;
-            break;
-        default:
-            return { left: 0, width: 0 }; 
-    }
-
-    return { left: `${left}%`, width: `${width}%` };
+    return duration; // Return difference in hours
 };
+
+
+const getShiftPosition = (shift) => {
+  const today = currentDay;
+  const weekday = today.toLocaleDateString('de-DE', { weekday: 'long' });
+  const hours = openingHours[weekday.toLowerCase()];
+
+  if (!hours) {
+      return { left: 0, width: 0 }; // Default values if no hours are specified
+  }
+
+  const startHourMinutes = hours.start.split(":").map(Number);
+  const endHourMinutes = hours.end.split(":").map(Number);
+  const shiftStartHourMinutes = shift.start_time.split(":").map(Number);
+  const shiftEndHourMinutes = shift.end_time.split(":").map(Number);
+
+  const startMinutes = startHourMinutes[0] * 60 + startHourMinutes[1];
+  const endMinutes = endHourMinutes[0] * 60 + endHourMinutes[1];
+  const shiftStartMinutes = shiftStartHourMinutes[0] * 60 + shiftStartHourMinutes[1];
+  const shiftEndMinutes = shiftEndHourMinutes[0] * 60 + shiftEndHourMinutes[1];
+
+  let maxDuration, left, width;
+  switch (view) {
+      case 'day':
+          maxDuration = (endMinutes < startMinutes) ? (1440 - startMinutes) + endMinutes : endMinutes - startMinutes; // 1440 minutes in a day
+          left = ((shiftStartMinutes - startMinutes + 1440) % 1440) / maxDuration * 100;
+          width = ((shiftEndMinutes - shiftStartMinutes + 1440) % 1440) / maxDuration * 100;
+          break;
+      default:
+          return { left: 0, width: 0 }; 
+  }
+
+  return { left: `${left}%`, width: `${width}%` };
+};
+
 
 const getCurrentTimePercentage = () => {
   const today = new Date(currentDay);
@@ -163,10 +169,12 @@ const getCurrentTimePercentage = () => {
   const currentMinute = today.getMinutes();
   const startHour = parseInt(hours.start.split(":")[0], 10);
   const endHour = parseInt(hours.end.split(":")[0], 10);
-  const totalDuration = endHour - startHour;
-  const pastDuration = currentHour - startHour + currentMinute / 60;
+  const totalDuration = (endHour < startHour) ? (24 - startHour) + endHour : endHour - startHour;
+  const pastDuration = (currentHour < startHour) ? (24 - startHour) + currentHour : currentHour - startHour + currentMinute / 60;
+
   return (pastDuration / totalDuration) * 100;
 };
+
 
 
 
@@ -226,18 +234,22 @@ const renderShifts = (worker) => {
     const weekday = today.toLocaleDateString('de-DE', { weekday: 'long' });
     const hours = openingHours[weekday.toLowerCase()];
 
-
     if (!hours || view !== 'day') {
           return [];     
     }
 
     const startHour = parseInt(hours.start.split(":")[0], 10);
     const endHour = parseInt(hours.end.split(":")[0], 10);
-    const hoursArray = Array.from({ length: endHour - startHour + 1 }).map((_, index) => startHour + index);
+    const totalDuration = (endHour < startHour) ? (24 - startHour) + endHour : endHour - startHour;
 
-    const timelineLabels = hoursArray.map(hour => formatTime(hour));
+    const timelineLabels = [];
+    for (let hour = startHour; hour < startHour + totalDuration; hour++) {
+        let adjustedHour = hour % 24;
+        timelineLabels.push(formatTime(adjustedHour));
+    }
     return timelineLabels;
   };
+
 
   const goToNextDay = () => {
     setCurrentDay(prevDay => {

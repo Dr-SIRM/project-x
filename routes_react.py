@@ -2017,12 +2017,16 @@ def get_shift():
 
     opening_hours_data = {}
     for record in opening_hours_records:
-        if record.start_time is not None and record.end_time is not None:
-            german_day = DAY_MAP.get(record.weekday.lower(), record.weekday.lower())
+        german_day = DAY_MAP.get(record.weekday.lower(), record.weekday.lower())
+        
+        # Determine which end time to use
+        end_time = record.end_time2 if record.end_time2 is not None else record.end_time
+        
+        if record.start_time is not None and end_time is not None:
             opening_hours_data[german_day] = {
                 "start": record.start_time.strftime("%H:%M"),
-                "end": record.end_time.strftime("%H:%M")
-            }
+                "end": end_time.strftime("%H:%M")
+        }
     logging.debug(f"Opening hours data: {opening_hours_data}")
     print("Opening:", opening_hours_data)
 
@@ -2063,7 +2067,7 @@ def get_shift():
                 }
             ]
         })
-        print("Shift:", shift_data)
+        #print("Shift:", shift_data)
 
     response = {
         'users': user_list,
