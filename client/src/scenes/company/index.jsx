@@ -11,6 +11,8 @@ import axios from 'axios';
 import Alert from '@mui/material/Alert';
 import { Padding } from "@mui/icons-material";
 import { API_BASE_URL } from "../../config";
+import { useTranslation } from 'react-i18next';
+import '../../i18n'; 
 
 
 
@@ -24,6 +26,7 @@ const Company = ({ company }) => {
   const [isLoading, setIsLoading] = useState(true); 
   const token = localStorage.getItem('session_token');
   const [additionalTimes, setAdditionalTimes] = useState(0);
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const fetchCompany = async () => {
@@ -84,10 +87,10 @@ const Company = ({ company }) => {
   return (
     <Box m="20px">
       <Header
-        title="COMPANY"
-        subtitle="Please update your company data whenever necessary. These are the basics for your optimized Scheduler."
+        title={t('company.title')}
+        subtitle={t('company.subtitle')}
       />
-      <Typography variant="h4" paddingBottom={"10px"}>Firmen Information</Typography>
+      <Typography variant="h4" paddingBottom={"10px"}>{t('company.companyinfo')}</Typography>
       
 
       <Formik
@@ -157,7 +160,7 @@ const Company = ({ company }) => {
                   backgroundColor: "#f0f0f0", // You can set a light background color to distinguish it from other elements
                 }}
               >
-                Firmennamen
+                {t('company.companyname')}
               </Typography>
               <TextField
                 fullWidth
@@ -190,7 +193,7 @@ const Company = ({ company }) => {
                   backgroundColor: "#f0f0f0", // You can set a light background color to distinguish it from other elements
                 }}
               >
-                Abteilung 1
+                {t('company.departement1')}
               </Typography>
               <TextField
                 fullWidth
@@ -232,7 +235,7 @@ const Company = ({ company }) => {
                   backgroundColor: "#f0f0f0", // You can set a light background color to distinguish it from other elements
                 }}
               >
-                Wochenstunden
+                {t('company.weekhours')}
               </Typography>
               <TextField
                 fullWidth
@@ -266,7 +269,7 @@ const Company = ({ company }) => {
                   backgroundColor: "#f0f0f0", // You can set a light background color to distinguish it from other elements
                 }}
               >
-                Abteilung 2
+                {t('company.departement2')}
               </Typography>
               <TextField
                 fullWidth
@@ -308,7 +311,7 @@ const Company = ({ company }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Schichten
+                {t('company.shifts')}
               </Typography>
               <Select
                 fullWidth
@@ -348,7 +351,7 @@ const Company = ({ company }) => {
                   backgroundColor: "#f0f0f0", // You can set a light background color to distinguish it from other elements
                 }}
               >
-                Abteilung 3
+                {t('company.departement3')}
               </Typography>
               <TextField
                 fullWidth
@@ -381,7 +384,7 @@ const Company = ({ company }) => {
             </Box>
             <></>
             <></>
-            <Typography variant="h4" paddingBottom={"20px"} paddingTop={"30px"}>Öffnungszeiten</Typography>
+            <Typography variant="h4" paddingBottom={"20px"} paddingTop={"30px"}>{t('company.openinghours')}</Typography>
             
             <></>
             <></>
@@ -403,7 +406,7 @@ const Company = ({ company }) => {
                   justifyContent: "center",
                 }}
               >
-                Wochentag
+                {t('company.weekday')}
               </Typography>
               <Typography
                 variant="h6"
@@ -414,7 +417,7 @@ const Company = ({ company }) => {
                   height: "100%",
                 }}
               >
-                Startzeit 1
+                {t('company.startime1')}
               </Typography>
               <Typography
                 variant="h6"
@@ -425,7 +428,7 @@ const Company = ({ company }) => {
                   height: "100%",
                 }}
               >
-                Endezeit 1
+                {t('company.endtime1')}
               </Typography>
               <Typography
                 variant="h6"
@@ -436,7 +439,7 @@ const Company = ({ company }) => {
                   height: "100%",
                 }}
               >
-                Startzeit 2
+                {t('company.startime2')}
               </Typography>
               <Typography
                 variant="h6"
@@ -447,7 +450,7 @@ const Company = ({ company }) => {
                   height: "100%",
                 }}
               >
-                Endezeit 2
+                {t('company.endtime2')}
               </Typography>
 
               <Typography
@@ -614,7 +617,7 @@ const Company = ({ company }) => {
           }}
       >
           <Alert onClose={() => setShowSuccessNotification(false)} severity="success" sx={{ width: '100%' }}>
-              Verfügbarkeit erfolgreich erfasst
+            {t('company.success')}
           </Alert>
       </Snackbar>
       <Snackbar
@@ -629,7 +632,7 @@ const Company = ({ company }) => {
         }}
     >
         <Alert onClose={() => setShowErrorNotification(false)} severity="error" sx={{ width: '100%' }}>
-            Update nicht erfolgreich
+          {t('company.nosuccess')}
         </Alert>
     </Snackbar>
     </Box>

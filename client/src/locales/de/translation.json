@@ -108,6 +108,26 @@
       "addtime": "Zeit hinzufügen",
       "success": "Verfügbarkeit erfolgreich erfasst",
       "nosuccess": "Update nicht erfolgreich"
+    },
+
+    "company" : {
+      "title": "Unternehmen",
+      "subtitle": "Bitte aktualisieren Sie Ihre Firmendaten wann immer nötig. Dies sind die Grundlagen für Ihren optimierten Scheduler.",
+      "companyinfo": "Firmen Information",
+      "openinghours": "Öffnungszeiten",
+      "companyname": "Firmennamen",
+      "departement1": "Abteilung 1",
+      "weekhours": "Wochenstunden",
+      "departement2": "Abteilung 2",
+      "shifts": "Schichten",
+      "departement3": "Abteilung 3",
+      "weekday": "Wochentag",
+      "startime1": "Startzeit 1",
+      "endtime1": "Endzeit 1",
+      "startime2": "Startzeit 2",
+      "endtime2": "Endzeit 2",
+      "success": "Verfügbarkeit erfolgreich erfasst",
+      "nosuccess": "Update nicht erfolgreich"
     }
 
   }

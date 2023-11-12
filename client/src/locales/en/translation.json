@@ -108,6 +108,26 @@
     "addtime": "Add time",
     "success": "Availability successfully recorded",
     "nosuccess": "Update not  successful"
+  },
+
+  "company" : {
+    "title": "Unternehmen",
+    "subtitle": "Bitte aktualisieren Sie Ihre Firmendaten wann immer nötig. Dies sind die Grundlagen für Ihren optimierten Scheduler.",
+    "companyinfo": "Company information",
+    "companyname": "Companyname",
+    "openinghours": "Openinghours",
+    "departement1": "Departement 1",
+    "weekhours": "Weekhours",
+    "departement2": "Departement 2",
+    "shifts": "Shifts",
+    "departement3": "Departement 3",
+    "weekday": "Weekday",
+    "startime1": "Start-time 1",
+    "endtime1": "End-time 1",
+    "startime2": "Start-time 2",
+    "endtime2": "End-time 2",
+    "success": "Verfügbarkeit erfolgreich erfasst",
+    "nosuccess": "Update nicht erfolgreich"
   }
 
 }
