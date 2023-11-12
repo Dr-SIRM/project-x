@@ -482,23 +482,33 @@ const handleConfirmDelete = async () => {
     {
       field: 'delete',
       headerName: t('team.columns.delete'),
+      headerAlign: 'center', 
+      align: 'center', 
       sortable: false,
       renderCell: (params) => (
-        <DeleteOutlineIcon
-          onClick={() => handleDialogOpen(params.id)}
+        <Box
           sx={{
-            cursor: 'pointer',
-            color: 'error.main',
-            '&:hover': {
-              color: 'error.dark',
-            },
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%', // Ensures the Box takes the full width of the cell
           }}
-        />
+        >
+          <DeleteOutlineIcon
+            onClick={() => handleDialogOpen(params.id)}
+            sx={{
+              cursor: 'pointer',
+              color: 'error.main',
+              '&:hover': {
+                color: 'error.dark',
+              },
+            }}
+          />
+        </Box>
       ),
       width: 100,
-      align: 'center',
-    },
-    
+      align: 'center', // Centers the cell content
+    }    
   ];
 
   return (
