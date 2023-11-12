@@ -87,6 +87,27 @@
       "maxworkingdayinarow": "Maximale Arbeitstage in Folge",
       "countofshiftsperday": "Anzahl Arbeitseinsätze pro Tag",
       "minhoursperworkingshift": "Mindestunden pro Arbeitsblock"
+    },
+
+    "availabilty" : {
+      "title": "Verfügbarkeit",
+      "subtitle": "Bitte aktualisieren Sie Ihre Verfügbarkeitsdaten wann immer nötig. Dies sind die Grundlagen für Ihren optimierten Planer.",
+      "user": "Mitarbeiter",
+      "userselect": "Wählen Sie einen Nutzer",
+      "template1": "Vorlage 1",
+      "template2": "Vorlage 2",
+      "template3": "Vorlage 3",
+      "savetemplate": "Vorlage speichern",
+      "weekday": "Wochentag",
+      "holiday": "Ferien",
+      "startime1": "Startzeit 1",
+      "endtime1": "Endzeit 1",
+      "startime2": "Startzeit 2",
+      "endtime2": "Endzeit 2",
+      "submit": "Einreichen",
+      "addtime": "Zeit hinzufügen",
+      "success": "Verfügbarkeit erfolgreich erfasst",
+      "nosuccess": "Update nicht erfolgreich"
     }
 
   }

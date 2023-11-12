@@ -15,7 +15,7 @@ import { AuthContext } from "../../AuthContext";
 import { API_BASE_URL } from "../../config";
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
-import '../../i18n';  // Import the i18n configuration
+import '../../i18n';  
 
 /* Mögliche Ideen fürs Dashboard
 - Anz gearbeitete Stunden diese Woche 
@@ -69,7 +69,6 @@ const Dashboard = () => {
 
   return (
     <Box m="20px">
-      {/* HEADER */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
       <Header title={t('dashboard.title')} subtitle={t('dashboard.subtitle')} />
 

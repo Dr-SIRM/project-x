@@ -87,6 +87,27 @@
     "maxworkingdayinarow": "Maximum working days in a row",
     "countofshiftsperday": "Number of work shifts per day",
     "minhoursperworkingshift": "Minimum hours per work shift"
+  },
+
+  "availabilty" : {
+    "title": "Availabilty",
+    "subtitle": "Please update your availability data whenever necessary. These are the foundations for your optimized planner.",
+    "user": "User",
+    "userselect": "Wählen Sie einen Nutzer",
+    "template1": "Template 1",
+    "template2": "Template 2",
+    "template3": "Template 3",
+    "savetemplate": "Save template",
+    "weekday": "Weekday",
+    "holiday": "Holiday",
+    "startime1": "Start-time 1",
+    "endtime1": "End-time 1",
+    "startime2": "Start-time 2",
+    "endtime2": "End-time 2",
+    "submit": "Submit",
+    "addtime": "Add time",
+    "success": "Availability successfully recorded",
+    "nosuccess": "Update not  successful"
   }
 
 }

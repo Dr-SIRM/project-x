@@ -13,6 +13,8 @@ import Alert from '@mui/material/Alert';
 import Tooltip from '@mui/material/Tooltip';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { API_BASE_URL } from "../../config";
+import { useTranslation } from 'react-i18next';
+import '../../i18n';  
 
 const BUTTON_STYLE = {
   borderColor: "white",
@@ -45,6 +47,7 @@ const Availability = ({ availability }) => {
   const [selectedUser, setSelectedUser] = useState('');
   const [user_list, setUserList] = useState([]);
   const [checkedBoxes, setCheckedBoxes] = useState([]);
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     setActiveTemplateData(availabilityData.temp_dict);
@@ -167,8 +170,8 @@ useEffect(() => {
   return (
     <Box m="20px">
       <Header
-        title="Verfügbarkeit"
-        subtitle="Bitte aktualisieren Sie Ihre Verfügbarkeitsdaten wann immer nötig. Dies sind die Grundlagen für Ihren optimierten Planer."
+        title={t('availabilty.title')}
+        subtitle={t('availabilty.subtitle')}
       />
 
       <Formik
@@ -212,7 +215,7 @@ useEffect(() => {
             
             <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', marginBottom: '1rem' }}>
             <FormControl fullWidth variant="filled"sx={{ width: '250px' }}>
-              <InputLabel id="user-label">User</InputLabel>
+              <InputLabel id="user-label">{t('availabilty.user')}</InputLabel>
               <Select
                 labelId="user-label"
                 id="user"
@@ -233,7 +236,7 @@ useEffect(() => {
                 }, 
                 }}
               >
-                <MenuItem value="">Wählen Sie einen Nutzer</MenuItem>
+                <MenuItem value="">{t('availabilty.userselect')}</MenuItem>
                 {user_list.map((user) => (
                   <MenuItem key={user} value={user}>
                     {user}
@@ -289,7 +292,7 @@ useEffect(() => {
                   }
                 }}
               >
-                Template 1
+                {t('availabilty.template1')}
               </Button>
               <Button 
                 variant="outlined"
@@ -315,7 +318,7 @@ useEffect(() => {
                   }
                 }}
               >
-                Template 2
+                {t('availabilty.template2')}
               </Button>
               <Button 
                 variant="outlined"
@@ -341,18 +344,26 @@ useEffect(() => {
                   }
                 }}
               >
-                Template 3
+                {t('availabilty.template3')}
               </Button>
-              <Tooltip 
+              <Tooltip
                 title={
-                <>
-                <span style={{ fontWeight: 'bold' }}>Speicher deine Vorlage</span><br />
-                <br />
-                1. Trage deine Verfügbarkeiten unten ein<br />
-                2. Wähle einen Vorlagenamen aus der Drop-Down Liste<br />
-                3.Speicher deine Vorlage über den Save Template Knopf</>}>
+                  <div style={{ fontSize: '15px' }}> 
+                    <span style={{ ontSize: '10px' }}>Speicher deine Vorlage</span><br /><br />
+                    1. Trage deine Verfügbarkeiten unten ein<br />
+                    2. Wähle einen Vorlagenamen aus der Drop-Down Liste<br />
+                    3. Speicher deine Vorlage über den Save Template Knopf
+                  </div>
+                }
+                sx={{
+                  '& .MuiTooltip-tooltip': {
+                    padding: '10px', 
+                  }
+                }}
+              >
                 <InfoOutlinedIcon style={{ color: 'black' }} />
               </Tooltip>
+
               </Box>
               <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', marginBottom: '1rem' }}>
         <Button 
@@ -379,7 +390,7 @@ useEffect(() => {
                 }
               }}
             >
-              Save Template
+              {t('availabilty.savetemplate')}
             </Button>
             <Select 
                 type="text"
@@ -401,9 +412,9 @@ useEffect(() => {
                   
                 }}
               >
-                <MenuItem value={ 'Template 1' }>Template 1</MenuItem>
-                <MenuItem value={ 'Template 2' }>Template 2</MenuItem>
-                <MenuItem value={ 'Template 3' }>Template 3</MenuItem>
+                <MenuItem value={ 'Template 1' }>{t('availabilty.template1')}</MenuItem>
+                <MenuItem value={ 'Template 2' }>{t('availabilty.template2')}</MenuItem>
+                <MenuItem value={ 'Template 3' }>{t('availabilty.template3')}</MenuItem>
                 </Select>
         </Box>
             <Box
@@ -424,7 +435,7 @@ useEffect(() => {
           justifyContent: "center",
         }}
       >
-        Wochentag
+        {t('availabilty.weekday')}
       </Typography>
       <Typography
         variant="h6"
@@ -436,7 +447,7 @@ useEffect(() => {
           justifyContent: "center",
         }}
       >
-        Ferien
+        {t('availabilty.holiday')}
       </Typography>
       <Typography
         variant="h6"
@@ -447,7 +458,7 @@ useEffect(() => {
           height: "100%",
         }}
       >
-        Startzeit 1
+        {t('availabilty.startime1')}
       </Typography>
       <Typography
         variant="h6"
@@ -458,7 +469,7 @@ useEffect(() => {
           height: "100%",
         }}
       >
-        Endzeit 1
+        {t('availabilty.endtime1')}
       </Typography>
       {additionalTimes >= 1 && (
         <>
@@ -471,7 +482,7 @@ useEffect(() => {
               height: "100%",
             }}
           >
-            Startzeit 2
+            {t('availabilty.startime2')}
           </Typography>
           <Typography
             variant="h6"
@@ -482,7 +493,7 @@ useEffect(() => {
               height: "100%",
             }}
           >
-            Endzeit 2
+            {t('availabilty.endtime2')}
           </Typography>
         </>
       )}
@@ -558,7 +569,7 @@ useEffect(() => {
     </Box>
             <Box display="flex" justifyContent="end" mt="20px">
             <Button onClick={handleAddTime} color="primary" variant="contained" sx={{ marginRight: '10px' }}>
-              Add Time
+            {t('availabilty.addtime')}
             </Button>
             <Button 
             variant="outlined"
@@ -579,10 +590,9 @@ useEffect(() => {
               }
             }}
           >
-            Submit
+            {t('availabilty.submit')}
           </Button>
             </Box>
-
           </form>
         )}
       </Formik>
@@ -598,7 +608,7 @@ useEffect(() => {
           }}
       >
           <Alert onClose={() => setShowSuccessNotification(false)} severity="success" sx={{ width: '100%' }}>
-              Verfügbarkeit erfolgreich erfasst
+            {t('availabilty.success')}
           </Alert>
       </Snackbar>
       <Snackbar
@@ -613,7 +623,7 @@ useEffect(() => {
         }}
     >
         <Alert onClose={() => setShowErrorNotification(false)} severity="error" sx={{ width: '100%' }}>
-            Update nicht erfolgreich
+          {t('availabilty.nosuccess')}
         </Alert>
     </Snackbar>
 
