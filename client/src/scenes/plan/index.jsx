@@ -421,8 +421,6 @@ const handleExportToExcel = async () => {
   }
 };
 
-
-
   return (
     <Box m="20px">
       <Header

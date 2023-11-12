@@ -2207,17 +2207,21 @@ def get_calendar():
     if not current_user:
         return jsonify({'error': 'User not found'}), 404
     
-    # Get the shifts for the current user
-    shifts = session.query(Timetable).filter_by(email=current_user_id).all()
+    # Get the shifts and Departements for the current user
+
+
+    shifts = session.query(Timetable, Company).join(Company).filter(Timetable.email == current_user_id).all()
+
     
     # Convert the shifts to the format expected by FullCalendar
     events = [{
-        'id': shift.id,
-        'title': f"{shift.first_name} {shift.last_name}",
-        'date': shift.date.strftime('%Y-%m-%d'),
-        'start': datetime.datetime.combine(shift.date, shift.start_time).strftime('%Y-%m-%dT%H:%M:%S'),
-        'end': datetime.datetime.combine(shift.date, shift.end_time).strftime('%Y-%m-%dT%H:%M:%S'),
+        'id': shift.Timetable.id,
+        'title': f"{shift.Timetable.first_name} {shift.Timetable.last_name} - {shift.Company.department}",
+        'date': shift.Timetable.date.strftime('%Y-%m-%d'),
+        'start': datetime.datetime.combine(shift.Timetable.date, shift.Timetable.start_time).strftime('%Y-%m-%dT%H:%M:%S'),
+        'end': datetime.datetime.combine(shift.Timetable.date, shift.Timetable.end_time).strftime('%Y-%m-%dT%H:%M:%S'),
     } for shift in shifts]
+
     print(events)
 
     session.close()
