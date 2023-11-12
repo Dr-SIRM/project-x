@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { useTheme, Box, Button, TextField, Snackbar, Typography, ToggleButtonGroup, ToggleButton } from "@mui/material";
+import { useTheme, Box, Button, TextField, Snackbar, Typography, ToggleButtonGroup, ToggleButton, FormControl, InputLabel } from "@mui/material";
 import { Select, MenuItem } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -118,7 +118,8 @@ const SolverReq = ({ solverreq }) => {
         }) => (
           <form onSubmit={handleSubmit}>   
           <br></br>
-          <Typography variant="h5">{t('solverreq.Mindestanforderungen')}</Typography>        
+          <Typography variant="h4">{t('solverreq.Mindestanforderungen')}</Typography>        
+            <br></br>
             <br></br>
             <Box
               display="grid"
@@ -155,7 +156,7 @@ const SolverReq = ({ solverreq }) => {
                 helperText={touched.desired_min_time_day && errors.desired_min_time_day}
                 sx={{
                   gridColumn: "span 1",
-                  maxWidth: '50px',
+                  maxWidth: '150px',
                   '& .MuiFilledInput-input': {
                     paddingTop: '0px',
                     paddingBottom: '2px',
@@ -202,7 +203,7 @@ const SolverReq = ({ solverreq }) => {
                 helperText={touched.min_time_day && errors.min_time_day}
                 sx={{
                   gridColumn: "span 1",
-                  maxWidth: '50px',
+                  maxWidth: '150px',
                   '& .MuiFilledInput-input': {
                     paddingTop: '0px',
                     paddingBottom: '2px',
@@ -249,7 +250,7 @@ const SolverReq = ({ solverreq }) => {
                 helperText={touched.desired_max_time_day && errors.desired_max_time_day}
                 sx={{
                   gridColumn: "span 1",
-                  maxWidth: '50px',
+                  maxWidth: '150px',
                   '& .MuiFilledInput-input': {
                     paddingTop: '0px',
                     paddingBottom: '2px',
@@ -297,7 +298,7 @@ const SolverReq = ({ solverreq }) => {
 
                 sx={{
                   gridColumn: "span 1",
-                  maxWidth: '50px',
+                  maxWidth: '150px',
                   '& .MuiFilledInput-input': {
                     paddingTop: '0px',
                     paddingBottom: '2px',
@@ -344,7 +345,7 @@ const SolverReq = ({ solverreq }) => {
                 helperText={touched.max_time_week && errors.max_time_week}
                 sx={{
                   gridColumn: "span 1",
-                  maxWidth: '50px',
+                  maxWidth: '150px',
                   '& .MuiFilledInput-input': {
                     paddingTop: '0px',
                     paddingBottom: '2px',
@@ -391,7 +392,7 @@ const SolverReq = ({ solverreq }) => {
                 helperText={touched.fair_distribution && errors.fair_distribution}
                 sx={{
                   gridColumn: "span 1",
-                  maxWidth: '50px',
+                  maxWidth: '150px',
                   '& .MuiFilledInput-input': {
                     paddingTop: '0px',
                     paddingBottom: '2px',
@@ -415,7 +416,7 @@ const SolverReq = ({ solverreq }) => {
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 5",
+                  gridColumn: "span 3",
                   display: "flex",
                   alignItems: "left",
                   justifyContent: "left",
@@ -425,34 +426,33 @@ const SolverReq = ({ solverreq }) => {
                 >
                   {t('solverreq.hourunit')}
                 </Typography>
-                <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label=''
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.hour_devider}
-                name="hour_devider"
-                error={!!touched.hour_devider && !!errors.hour_devider}
+                <Select
+                  labelId="hour_divider-label"
+                  id="hour_divider"
+                  name="hour_divider"
+                  value={values.hour_devider}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.hour_devider && !!errors.hour_devider}
                 helperText={touched.hour_devider && errors.hour_devider}
-                sx={{
-                  gridColumn: "span 1",
-                  maxWidth: '50px',
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '0px',
-                    paddingBottom: '2px',
-                    justifyContent: "center",
-                    alignItems: "center",
-                    textAlign: "center",
-                  },
-                }}
-                />
+                  sx={{
+                    gridColumn: "span 1",
+                    '& .MuiFilledInput-input': {
+                      paddingTop: '0px',
+                      paddingBottom: '0px',
+                    },
+                    
+                  }}
+                >
+                  <MenuItem value="1">1</MenuItem>
+                  <MenuItem value="2">2</MenuItem>
+                  <MenuItem value="4">4</MenuItem>
+                </Select>
                 <Typography
                   color={colors.primary[100]}
                   variant=""
                   sx={{
-                    gridColumn: "span 3",
+                    gridColumn: "span 1",
                     display: "grid",
                     alignItems: "center",
                     height: "100%",
@@ -462,7 +462,7 @@ const SolverReq = ({ solverreq }) => {
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 5",
+                  gridColumn: "span 3",
                   display: "flex",
                   alignItems: "left",
                   justifyContent: "left",
@@ -472,34 +472,35 @@ const SolverReq = ({ solverreq }) => {
                 >
                   {t('solverreq.calculationtimeframe')}
                 </Typography>
-                <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label=''
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.week_timeframe}
-                name="week_timeframe"
-                error={!!touched.week_timeframe && !!errors.week_timeframe}
-                helperText={touched.week_timeframe && errors.week_timeframe}
-                sx={{
-                  gridColumn: "span 1",
-                  maxWidth: '50px',
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '0px',
-                    paddingBottom: '2px',
-                    justifyContent: "center",
-                    alignItems: "center",
-                    textAlign: "center",
-                  },
-                }}
-                />
+                <Select
+                  labelId="week_timeframe-label"
+                  id="week_timeframe"
+                  value={values.week_timeframe}
+                  name="week_timeframe"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.week_timeframe && !!errors.week_timeframe}
+                  helperText={touched.week_timeframe && errors.week_timeframe}
+                  sx={{
+                    gridColumn: "span 1",
+                    '& .MuiFilledInput-input': {
+                      paddingTop: '10px',
+                      paddingBottom: '10px',
+                    },
+                    '& .MuiSelect-icon': { 
+                      color: 'black', 
+                    },
+                  }}
+                >
+                  <MenuItem value="1">1</MenuItem>
+                  <MenuItem value="2">2</MenuItem>
+                  <MenuItem value="4">4</MenuItem>
+                </Select>
                 <Typography
                   color={colors.primary[100]}
                   variant=""
                   sx={{
-                    gridColumn: "span 3",
+                    gridColumn: "span 0",
                     display: "grid",
                     alignItems: "center",
                     height: "100%",
@@ -532,7 +533,7 @@ const SolverReq = ({ solverreq }) => {
                 helperText={touched.subsequent_workingdays && errors.subsequent_workingdays}
                 sx={{
                   gridColumn: "span 1",
-                  maxWidth: '50px',
+                  maxWidth: '150px',
                   '& .MuiFilledInput-input': {
                     paddingTop: '0px',
                     paddingBottom: '2px',
@@ -546,7 +547,7 @@ const SolverReq = ({ solverreq }) => {
                   color={colors.primary[100]}
                   variant=""
                   sx={{
-                    gridColumn: "span 3",
+                    gridColumn: "span 2",
                     display: "grid",
                     alignItems: "center",
                     height: "100%",
@@ -579,7 +580,7 @@ const SolverReq = ({ solverreq }) => {
                 helperText={touched.daily_deployment && errors.daily_deployment}
                 sx={{
                   gridColumn: "span 1",
-                  maxWidth: '50px',
+                  maxWidth: '150px',
                   '& .MuiFilledInput-input': {
                     paddingTop: '0px',
                     paddingBottom: '2px',
@@ -626,7 +627,7 @@ const SolverReq = ({ solverreq }) => {
                 helperText={touched.time_per_deployment && errors.time_per_deployment}
                 sx={{
                   gridColumn: "span 1",
-                  maxWidth: '50px',
+                  maxWidth: '150px',
                   '& .MuiFilledInput-input': {
                     paddingTop: '0px',
                     paddingBottom: '2px',
@@ -650,8 +651,8 @@ const SolverReq = ({ solverreq }) => {
             </Box>
             <br></br>
             <br></br>
-            <Typography variant="h5">Zusatzanforderungen</Typography> 
-              <br></br>
+            <br></br>
+            <Typography variant="h4">Zusatzanforderungen</Typography> 
               <br></br>
               <Box
               display="grid"
@@ -1577,7 +1578,7 @@ const SolverReq = ({ solverreq }) => {
       <Snackbar
         open={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
-        message="Solver Successfully Started!"
+        message="Solver Requirements Successfully Saved!"
         autoHideDuration={3000}
         sx={{
           backgroundColor: "green !important",
@@ -1592,7 +1593,7 @@ const SolverReq = ({ solverreq }) => {
       <Snackbar
         open={showErrorNotification}
         onClose={() => setShowErrorNotification(false)}
-        message="Error occurred - Solver Stopped!"
+        message="Error occurred - Solver Requirements Not Saved Yet!"
         autoHideDuration={3000}
         sx={{
           backgroundColor: "red !important",

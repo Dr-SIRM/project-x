@@ -282,17 +282,6 @@ def new_user():
 
         # Check if company name already exists
         existing_company = OverviewCompany.query.filter_by(company_name=company_name).first()      
-        last = User.query.order_by(User.id.desc()).first()
-        if last is None:
-            new_id = 1
-        else:
-            new_id = last.id + 1
-
-        last_company_id = User.query.filter_by(company_name=admin_registration_data['company_name']).order_by(User.company_id.desc()).first()
-        if last_company_id is None:
-            new_company_id = 10000
-        else:
-            new_company_id = last_company_id.company_id + 1 
         
         if admin_registration_data['password'] != admin_registration_data['password2']:
             return jsonify({'message': 'Password are not matching'}), 200
@@ -309,7 +298,7 @@ def new_user():
                             creation_timestamp = datetime.datetime.now()
                             )
                 
-                data2 = User(id = None, 
+                data2 = User(
                             company_id = None, 
                             first_name = admin_registration_data['first_name'],
                             last_name = admin_registration_data['last_name'], 
@@ -329,8 +318,8 @@ def new_user():
                             access_level = admin_registration_data['access_level'], 
                             email = admin_registration_data['email'], 
                             password = generate_password_hash(admin_registration_data['password']),
-                            created_by = new_company_id, 
-                            changed_by = new_company_id, 
+                            created_by = user.id, 
+                            changed_by = user.id, 
                             creation_timestamp = datetime.datetime.now()
                             )
                 
@@ -341,7 +330,7 @@ def new_user():
 
                 session = get_session(get_database_uri('', company_name.lower().replace(' ', '_')))
 
-                data3 = User(id = None, 
+                data3 = User(
                             company_id = None, 
                             first_name = admin_registration_data['first_name'],
                             last_name = admin_registration_data['last_name'], 
@@ -361,8 +350,8 @@ def new_user():
                             access_level = admin_registration_data['access_level'], 
                             email = admin_registration_data['email'], 
                             password = generate_password_hash(admin_registration_data['password']),
-                            created_by = new_company_id, 
-                            changed_by = new_company_id, 
+                            created_by = user.id, 
+                            changed_by = user.id, 
                             creation_timestamp = datetime.datetime.now()
                             )
 
@@ -414,7 +403,7 @@ def new_user():
                             creation_timestamp = datetime.datetime.now()
                             )
                         
-                        data3 = User(id = None, 
+                        data3 = User( 
                             company_id = None, 
                             first_name = "Time",
                             last_name = "Tab", 
@@ -434,8 +423,8 @@ def new_user():
                             access_level = "Super_Admin", 
                             email = f"{admin_registration_data['company_name'].lower().replace(' ', '_')}@timetab.ch", 
                             password = generate_password_hash('ProjectX2023.'),
-                            created_by = new_company_id, 
-                            changed_by = new_company_id, 
+                            created_by = user.id, 
+                            changed_by = user.id, 
                             creation_timestamp = datetime.datetime.now()
                             )
                         
@@ -451,7 +440,7 @@ def new_user():
 
                         session = get_session(get_database_uri('', company_name.lower().replace(' ', '_')))
                         
-                        data4 = User(id = None, 
+                        data4 = User(
                             company_id = None, 
                             first_name = "Time",
                             last_name = "Tab", 
@@ -471,12 +460,12 @@ def new_user():
                             access_level = "Super_Admin", 
                             email = f"{admin_registration_data['company_name'].lower().replace(' ', '_')}@timetab.ch", 
                             password = generate_password_hash('ProjectX2023.'),
-                            created_by = new_company_id, 
-                            changed_by = new_company_id, 
+                            created_by = user.id, 
+                            changed_by = user.id, 
                             creation_timestamp = datetime.datetime.now()
                             )
                         
-                        data5 = User(id = None, 
+                        data5 = User(
                             company_id = None, 
                             first_name = admin_registration_data['first_name'],
                             last_name = admin_registration_data['last_name'], 
@@ -496,8 +485,8 @@ def new_user():
                             access_level = admin_registration_data['access_level'], 
                             email = admin_registration_data['email'], 
                             password = generate_password_hash(admin_registration_data['password']),
-                            created_by = new_company_id, 
-                            changed_by = new_company_id, 
+                            created_by = user.id, 
+                            changed_by = user.id, 
                             creation_timestamp = datetime.datetime.now()
                             )
                         
@@ -688,7 +677,6 @@ def get_company():
         # Insert new company data
         # Removed manual ID setting, assuming that the ID column in your database is set to auto-increment
         new_company_data = Company(
-            id=None,
             company_name=company_data['company_name'],
             weekly_hours=company_data['weekly_hours'],
             shifts=company_data['shifts'],
@@ -727,7 +715,6 @@ def get_company():
                 
                 # Create new OpeningHours entry
                 opening = OpeningHours(
-                    id=None,
                     company_name=user.company_name,
                     weekday=new_weekday,
                     start_time=new_entry1,
@@ -948,7 +935,6 @@ def get_availability():
 
                 # Create a new Availability instance and add to list
                 data = Availability(
-                    id=None,
                     user_id=new_user.id, 
                     date=new_date, 
                     weekday=new_weekday, 
@@ -1000,7 +986,6 @@ def get_availability():
 
                 # Create a new Availability instance and add to list
                 data = TemplateAvailability(
-                    id=None,
                     template_name=availability_data['selectedTemplate'],
                     date=new_date, 
                     weekday=new_weekday, 
@@ -1053,13 +1038,8 @@ def get_forget_password():
         else:
             random_token = random.randint(100000,999999)
             reset_url = url_for('reset_password', token=random_token, _external=True)
-            last = PasswordReset.query.order_by(PasswordReset.id.desc()).first()
-            if last is None:
-                new_id = 1
-            else:
-                new_id = last.id + 1
 
-            data = PasswordReset(id=new_id, email=forget_password_data['email'], token=random_token)
+            data = PasswordReset(email=forget_password_data['email'], token=random_token)
 
             session.add(data)
             session.commit()
@@ -1109,30 +1089,25 @@ def get_invite():
         invite_data = request.get_json()
         session = get_session(get_database_uri('', "timetab"))
         random_token = random.randint(100000,999999)
-        last = RegistrationToken.query.order_by(RegistrationToken.id.desc()).first()
-        if last is None:
-            new_id = 1
-        else:
-            new_id = last.id + 1
 
-        data = RegistrationToken(id=new_id, 
-                                 email=invite_data['email'], 
-                                 token=random_token, 
-                                 company_name=invite_data['company_name'], 
-                                 department=invite_data['department'], 
-                                 department2 =invite_data['department2'],
-                                 department3 =invite_data['department3'],
-                                department4 = None,
-                                department5 = None,
-                                department6 = None,
-                                department7 = None,
-                                department8 = None,
-                                department9 = None,
-                                department10 = None,
-                                 employment=invite_data['employment'], 
-                                 employment_level=invite_data['employment_level'], 
-                                 access_level=invite_data['access_level'], 
-                                 created_by=user.company_id)
+        data = RegistrationToken( 
+            email=invite_data['email'], 
+            token=random_token, 
+            company_name=invite_data['company_name'], 
+            department=invite_data['department'], 
+            department2 =invite_data['department2'],
+            department3 =invite_data['department3'],
+            department4 = None,
+            department5 = None,
+            department6 = None,
+            department7 = None,
+            department8 = None,
+            department9 = None,
+            department10 = None,
+            employment=invite_data['employment'], 
+            employment_level=invite_data['employment_level'], 
+            access_level=invite_data['access_level'], 
+            created_by=user.company_id)
 
         session.add(data)
         session.commit()
@@ -1321,7 +1296,6 @@ def solver_req():
             pass
 
         data = SolverRequirement(       
-                                id = None,
                                 company_name = user.company_name,
                                 weekly_hours = company.weekly_hours,
                                 shifts = company.shifts,
@@ -1431,43 +1405,32 @@ def get_registration():
                 return jsonify({'message': 'Token does not exist'}), 200
             else:
                 creation_date = datetime.datetime.now()
-                last = User.query.order_by(User.id.desc()).first()
                 hash = generate_password_hash(registration_data['password'])
-                if last is None:
-                    new_id = 1
-                else:
-                    new_id = last.id + 1
 
-                last_company_id = User.query.filter_by(company_name=token.company_name).order_by(User.company_id.desc()).first()
-                if last_company_id is None:
-                    new_company_id = 10000
-                else:
-                    new_company_id = last_company_id.company_id + 1
-
-                data = User(id = new_id, 
-                            company_id = new_company_id, 
-                            first_name = registration_data['first_name'],
-                            last_name = registration_data['last_name'],
-                            employment = token.employment,
-                            employment_level = token.employment_level,
-                            company_name = token.company_name, 
-                            access_level = token.access_level, 
-                            department = token.department,
-                            department2 = token.department2,
-                            department3 = token.department3,
-                            department4 = token.department4,
-                            department5 = token.department5,
-                            department6 = token.department6,
-                            department7 = token.department7,
-                            department8 = token.department8,
-                            department9 = token.department9,
-                            department10 = token.department10,
-                            email = token.email, 
-                            password = hash,
-                            created_by = new_company_id, 
-                            changed_by = new_company_id, 
-                            creation_timestamp = creation_date
-                            )
+                data = User( 
+                    company_id = None, 
+                    first_name = registration_data['first_name'],
+                    last_name = registration_data['last_name'],
+                    employment = token.employment,
+                    employment_level = token.employment_level,
+                    company_name = token.company_name, 
+                    access_level = token.access_level, 
+                    department = token.department,
+                    department2 = token.department2,
+                    department3 = token.department3,
+                    department4 = token.department4,
+                    department5 = token.department5,
+                    department6 = token.department6,
+                    department7 = token.department7,
+                    department8 = token.department8,
+                    department9 = token.department9,
+                    department10 = token.department10,
+                    email = token.email, 
+                    password = hash,
+                    created_by = user.id, 
+                    changed_by = user.id, 
+                    creation_timestamp = creation_date
+                    )
 
                 try:
                     session.add(data)
@@ -1525,12 +1488,7 @@ def get_registration():
 #                 else:
 #                     original_bind = app.config['SQLALCHEMY_BINDS']['dynamic']
 #                     creation_date = datetime.datetime.now()
-#                     last = User.query.order_by(User.id.desc()).first()
 #                     hash = generate_password_hash(admin_registration_data['password'])
-#                     if last is None:
-#                         new_id = 1
-#                     else:
-#                         new_id = last.id + 1
 
 #                     last_company_id = User.query.filter_by(company_name=admin_registration_data['company_name']).order_by(User.company_id.desc()).first()
 #                     if last_company_id is None:
@@ -1538,7 +1496,7 @@ def get_registration():
 #                     else:
 #                         new_company_id = last_company_id.company_id + 1
 
-#                     data = User(id = new_id, 
+#                     data = User( 
 #                                 company_id = new_company_id, 
 #                                 first_name = admin_registration_data['first_name'],
 #                                 last_name = admin_registration_data['last_name'], 
@@ -1870,7 +1828,6 @@ def get_required_workforce():
                                    
 
                             new_record = TimeReq(
-                                id=None,
                                 company_name=user.company_name,
                                 department=workforce_data['department'],
                                 date=new_date,
@@ -1913,7 +1870,6 @@ def get_required_workforce():
                         new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
 
                         temp_req = TemplateTimeRequirement(
-                            id=None, 
                             company_name = user.company_name,
                             template_name = workforce_data['template_name'],
                             weekday = {i},

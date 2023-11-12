@@ -106,6 +106,8 @@ useEffect(() => {
     setWeekAdjustment(weekAdjustment - 7);
   };
 
+  const isUserEmpty = selectedUser === null || selectedUser === undefined || selectedUser === '';
+
   const handleCheckboxChange = (index, isChecked) => {
     let updatedBoxes = [...checkedBoxes];
 
@@ -214,8 +216,8 @@ useEffect(() => {
           <form onSubmit={handleSubmit}>
             
             <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', marginBottom: '1rem' }}>
-            <FormControl fullWidth variant="filled"sx={{ width: '250px' }}>
-              <InputLabel id="user-label">{t('availabilty.user')}</InputLabel>
+            <FormControl fullWidth variant="filled" sx={{ width: '250px' }} disabled={isUserEmpty}>
+              <InputLabel id="user-label" disabled={isUserEmpty}>{t('availabilty.user')}</InputLabel>
               <Select
                 labelId="user-label"
                 id="user"
@@ -223,6 +225,7 @@ useEffect(() => {
                 value={selectedUser}
                 onChange={(e) => setSelectedUser(e.target.value)}
                 inputProps={{ maxLength: 30 }}
+                disabled={isUserEmpty}
                 sx={{
                   color: "black",
                   marginRight: '0.2rem',
@@ -233,17 +236,17 @@ useEffect(() => {
                   },
                   '.MuiSelect-icon': { // Change color of icon to black
                     color: 'black',
-                }, 
+                  }, 
                 }}
               >
                 <MenuItem value="">{t('availabilty.userselect')}</MenuItem>
-                {user_list.map((user) => (
-                  <MenuItem key={user} value={user}>
+                {Array.isArray(user_list) && user_list.map((user) => (
+                  <MenuItem key={user} value={user} disabled={isUserEmpty}>
                     {user}
                   </MenuItem>
                 ))}
               </Select>
-          </FormControl>
+            </FormControl>
           </Box>
           <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', marginBottom: '1rem' }}>
             <IconButton 

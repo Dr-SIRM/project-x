@@ -61,10 +61,9 @@ class User(db.Model, UserMixin):
     update_timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
 
 
-    def __init__(self, id, company_id, first_name, last_name, employment, email, password, employment_level, company_name, department,
+    def __init__(self, company_id, first_name, last_name, employment, email, password, employment_level, company_name, department,
                  department2, department3, department4, department5, department6, department7, department8, department9, department10,
                  access_level, created_by, changed_by, creation_timestamp):
-        self.id = id
         self.company_id = company_id
         self.first_name = first_name
         self.last_name = last_name
@@ -109,9 +108,8 @@ class Availability(db.Model, UserMixin):
     creation_timestamp = db.Column(db.DateTime)
     update_timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
 
-    def __init__(self, id, user_id, email, date, weekday, holiday, start_time, end_time, start_time2, end_time2, start_time3, end_time3,
+    def __init__(self, user_id, email, date, weekday, holiday, start_time, end_time, start_time2, end_time2, start_time3, end_time3,
                  created_by, changed_by, creation_timestamp):
-        self.id = id
         self.user_id = user_id
         self.email = email
         self.date = date
@@ -142,8 +140,7 @@ class TimeReq(db.Model, UserMixin):
     creation_timestamp = db.Column(db.DateTime)
     update_timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
 
-    def __init__(self, company_name, department, id, date, start_time, worker, created_by, changed_by, creation_timestamp):
-        self.id = id
+    def __init__(self, company_name, department, date, start_time, worker, created_by, changed_by, creation_timestamp):
         self.company_name = company_name
         self.department = department
         self.date = date
@@ -177,9 +174,8 @@ class Company(db.Model, UserMixin):
     creation_timestamp = db.Column(db.DateTime)
     update_timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
 
-    def __init__(self, id, company_name, weekly_hours, shifts, department, department2, department3, department4, 
+    def __init__(self, company_name, weekly_hours, shifts, department, department2, department3, department4, 
                  department5, department6, department7, department8, department9, department10, created_by, changed_by, creation_timestamp):
-        self.id = id
         self.company_name = company_name
         self.weekly_hours = weekly_hours
         self.shifts = shifts
@@ -213,8 +209,7 @@ class OpeningHours(db.Model, UserMixin):
     creation_timestamp = db.Column(db.DateTime)
     update_timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
 
-    def __init__(self, id, company_name, weekday, start_time, end_time, start_time2, end_time2,created_by, changed_by, creation_timestamp):
-        self.id = id
+    def __init__(self, company_name, weekday, start_time, end_time, start_time2, end_time2,created_by, changed_by, creation_timestamp):
         self.company_name = company_name
         self.weekday = weekday
         self.start_time = start_time
@@ -250,9 +245,8 @@ class Timetable(db.Model, UserMixin):
     
 
 
-    def __init__(self, id, email, first_name, last_name, date, start_time, end_time, start_time2, end_time2,
+    def __init__(self, email, first_name, last_name, date, start_time, end_time, start_time2, end_time2,
                  start_time3, end_time3, created_by, changed_by, creation_timestamp, company_name, department, weekday):
-        self.id = id
         self.email = email
         self.first_name = first_name
         self.last_name = last_name
@@ -286,8 +280,7 @@ class TemplateTimeRequirement(db.Model, UserMixin):
     creation_timestamp = db.Column(db.DateTime)
     update_timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
 
-    def __init__(self, id, company_name, template_name, weekday, start_time, worker, created_by, changed_by, creation_timestamp):
-        self.id = id
+    def __init__(self, company_name, template_name, weekday, start_time, worker, created_by, changed_by, creation_timestamp):
         self.company_name = company_name
         self.template_name = template_name
         self.weekday = weekday
@@ -318,9 +311,8 @@ class TemplateAvailability(db.Model, UserMixin):
     creation_timestamp = db.Column(db.DateTime)
     update_timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
 
-    def __init__(self, id, template_name, email, date, weekday, holiday, start_time, end_time, start_time2, end_time2,
+    def __init__(self, template_name, email, date, weekday, holiday, start_time, end_time, start_time2, end_time2,
                  start_time3, end_time3, created_by, changed_by, creation_timestamp):
-        self.id = id
         self.template_name = template_name
         self.email = email
         self.date = date
@@ -359,9 +351,8 @@ class RegistrationToken(db.Model, UserMixin):
     created_by = db.Column(db.Integer, index=True, unique=False)
     creation_timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
 
-    def __init__(self, id, email, token, company_name, employment, employment_level, department, department2, department3, department4, 
+    def __init__(self, email, token, company_name, employment, employment_level, department, department2, department3, department4, 
                  department5, department6, department7, department8, department9, department10, access_level, created_by):
-        self.id = id
         self.email = email
         self.token = token
         self.company_name = company_name
@@ -390,8 +381,7 @@ class PasswordReset(db.Model, UserMixin):
     expiration = db.Column(db.DateTime, default=datetime.datetime.now() + datetime.timedelta(hours=24))
     creation_timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
 
-    def __init__(self, id, email, token):
-        self.id = id
+    def __init__(self, email, token):
         self.email = email
         self.token = token
 
@@ -442,12 +432,11 @@ class SolverRequirement(db.Model, UserMixin):
     update_timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
 
 
-    def __init__(self, id, company_name, weekly_hours, shifts, desired_min_time_day, desired_max_time_day, 
+    def __init__(self, company_name, weekly_hours, shifts, desired_min_time_day, desired_max_time_day, 
                  min_time_day, max_time_day, desired_max_time_week, max_time_week, hour_devider, 
                  fair_distribution, week_timeframe, subsequent_workingdays, daily_deployment, time_per_deployment, nb1, nb2, nb3, nb4, nb5, nb6, nb7, nb8, nb9, nb10, 
                  nb11, nb12, nb13, nb14, nb15, nb16, nb17, nb18, nb19, nb20, created_by, changed_by, 
                  creation_timestamp, update_timestamp):
-        self.id = id
         self.company_name = company_name
         self.weekly_hours = weekly_hours
         self.shifts = shifts
@@ -580,7 +569,7 @@ class SolverAnalysis(db.Model, UserMixin):
     memory = db.Column(db.String(15))
 
 
-    def __init__(self, id, usecase, self_current_user_id, self_user_availability, self_opening_hours, 
+    def __init__(self, usecase, self_current_user_id, self_user_availability, self_opening_hours, 
                self_laden_oeffnet, self_laden_schliesst, self_binary_availability, self_company_shifts, 
                self_weekly_hours, self_employment_lvl, self_time_req, self_user_employment, 
                self_solver_requirements, self_week_timeframe, self_hour_devider, self_mitarbeiter, 
