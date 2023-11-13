@@ -16,7 +16,7 @@ const AuthProvider = ({ children }) => {
     const difference = now - lastActivity;
     const differenceInMinutes = Math.floor(difference / 1000 / 60);
 
-    if (differenceInMinutes >= 15) {
+    if (differenceInMinutes >= 60) {
       localStorage.removeItem('session_token');
       localStorage.removeItem('last_activity');
       localStorage.removeItem('user');
