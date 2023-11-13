@@ -38,6 +38,7 @@ const Dashboard = () => {
   const [fullTimeWorkers, setFullTimeWorkers] = useState([]);
   const [parttimeData, setPartTimeData] = useState([]); 
   const [currentShifts, setCurrentShifts] = useState([]);
+  const [missingUser, setMissingUser] = useState([])
   const totalHoursWorked = (hoursWorkedData && Array.isArray(hoursWorkedData)) ? hoursWorkedData.reduce((sum, item) => sum + parseFloat(item.hours_worked), 0) : 0;
   const token = localStorage.getItem('session_token'); 
   const { t, i18n } = useTranslation();
@@ -58,6 +59,7 @@ const Dashboard = () => {
             setUpcomingShifts(response.data.upcoming_shifts);  // Store the upcoming shifts data
             setHoursWorkedData(response.data.hours_worked_over_time);
             setCurrentShifts(response.data.current_shifts);
+            setMissingUser(response.data.missing_user_list);
             console.log(response.data.upcoming_shifts);
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -270,12 +272,47 @@ const Dashboard = () => {
           gridColumn="span 4"
           gridRow="span 2"
           backgroundColor={colors.primary[800]}
-          borderRadius="15px"
-          p="30px"
+          borderRadius="0px"
+          p="0px"
         >
-          <Typography variant="h5" fontWeight="600">
-           {t('dashboard.campaign')} 
-          </Typography>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            borderBottom={`4px solid ${colors.primary[500]}`}
+            colors={colors.grey[100]}
+            p="15px"
+          >
+            <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
+              {t('dashboard.nextShifts')} 
+            </Typography>
+          </Box>
+          {missingUser.map((user) => (
+            <Box
+                key={`${user.name}`}  // Use a unique key for each item
+                display="grid"
+                gridTemplateColumns="1fr 1fr"  // Two columns for name, one for day and one for time
+                alignItems="center"
+                borderBottom={`4px solid ${colors.primary[500]}`}
+                p="15px"
+            >
+                <Box>
+                    <Typography
+                        color={colors.greenAccent[500]}
+                        variant="h5"
+                        fontWeight="600"
+                    >
+                        {user.name}  
+                    </Typography>
+                </Box>
+                <Box>
+                    <Typography color={colors.grey[100]}>
+                        {user.email} 
+                    </Typography>
+                </Box>
+                
+              </Box>
+              ))}
           {/* <Box
             display="flex"
             flexDirection="column"

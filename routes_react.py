@@ -10,7 +10,7 @@ from app import app, mail, get_database_uri
 from openpyxl import Workbook
 import io
 from excel_output import create_excel_output
-from sqlalchemy import func, extract, and_, or_, asc, desc, text, create_engine, inspect
+from sqlalchemy import func, extract, not_, and_, or_, asc, desc, text, create_engine, inspect, case, exists
 from sqlalchemy.orm import scoped_session, sessionmaker
 import stripe
 
@@ -2095,9 +2095,16 @@ def get_dashboard_data():
     hours_worked_query = (
         session.query(
             Timetable.date,
-            func.sum(
-                (
-                    (func.hour(Timetable.end_time) - func.hour(Timetable.start_time)) * 60 +
+            func.sum(                
+                (                   
+                    (
+                        case(
+                            (func.hour(Timetable.end_time) < func.hour(Timetable.start_time),
+                            func.hour(Timetable.end_time) + 24),
+                            else_=func.hour(Timetable.end_time)
+                        ) -
+                        func.hour(Timetable.start_time)
+                    ) * 60 +
                     (func.minute(Timetable.end_time) - func.minute(Timetable.start_time))
                 ) / 60
             ).label('hours_worked')
@@ -2115,6 +2122,7 @@ def get_dashboard_data():
 
     # Format the data for JSON serialization
     hours_worked_data = [{"date": item.date.strftime('%A'), "hours_worked": item.hours_worked} for item in hours_worked_query]
+    print(hours_worked_data)
 
     # Fetching currently working shifts
     now = datetime.datetime.now()
@@ -2145,6 +2153,31 @@ def get_dashboard_data():
     print(part_time_count)
     print(full_time_count)
 
+
+
+    # Fetch user without availability
+    missing_fte_query = session.query(Availability.email).filter(
+        Availability.date >= start_of_week,
+        Availability.date <= end_of_week
+    ).subquery()
+
+    missing_users = session.query(User).filter(
+    not_(User.email.in_(missing_fte_query))
+    ).filter_by(company_name=current_user.company_name).all()
+
+    # Preparing the list of missing users
+    missing_user_list = []
+    for user in missing_users:
+        user_dict = {
+            'name': f'{user.first_name} {user.last_name}',
+            'email': user.email
+        }
+        missing_user_list.append(user_dict)
+
+    print("Missing User:", missing_user_list)
+
+
+
     session.close()
     return jsonify({
         'worker_count': worker_count,
@@ -2153,7 +2186,8 @@ def get_dashboard_data():
         'hours_worked_over_time': hours_worked_data,
         'current_shifts': current_shifts,
         'part_time_count': part_time_count,
-        'full_time_count': full_time_count
+        'full_time_count': full_time_count,
+        'missing_user_list': missing_user_list
     })
 
 
