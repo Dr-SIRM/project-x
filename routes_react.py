@@ -2041,76 +2041,77 @@ import locale
 @app.route('/api/dashboard', methods=['POST', 'GET'])
 @jwt_required()
 def get_dashboard_data():
-    current_user_id = get_jwt_identity()
-    jwt_data = get_jwt()
-    print(jwt_data)
-    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
-    print(session_company)
-    session = get_session(get_database_uri('', session_company))
-
-    current_user = session.query(User).filter_by(email=current_user_id).first()
-
+    session, current_user = get_current_user_session()
     if not current_user:
         return jsonify({'error': 'User not found'}), 404
 
-    # Existing data fetching
-    worker_count = session.query(User).filter_by(company_name=current_user.company_name).count()
-    start_time_count = session.query(Timetable).filter(
+    try:
+        return jsonify({
+            'worker_count': get_worker_count(session, current_user),
+            'start_time_count': get_start_time_count(session, current_user),
+            'upcoming_shifts': get_upcoming_shifts(session, current_user),
+            'hours_worked_over_time': get_hours_worked(session, current_user),
+            'current_shifts': get_current_shifts(session, current_user),
+            'part_time_count': get_part_time_count(session, current_user),
+            'full_time_count': get_full_time_count(session, current_user),
+            'missing_user_list': get_missing_user_list(session, current_user)
+        })
+    finally:
+        session.close()
+
+def get_current_user_session():
+    current_user_id = get_jwt_identity()
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    session = get_session(get_database_uri('', session_company))
+    current_user = session.query(User).filter_by(email=current_user_id).first()
+    return session, current_user
+
+def get_worker_count(session, current_user):
+    return session.query(User).filter_by(company_name=current_user.company_name).count()
+
+def get_start_time_count(session, current_user):
+    return session.query(Timetable).filter(
         (Timetable.company_name == current_user.company_name) & 
         (Timetable.start_time != None)
     ).count()
 
-    # Fetching upcoming shifts 
+def get_upcoming_shifts(session, current_user):
     now = datetime.datetime.now()
-
     upcoming_shifts_query = session.query(Timetable).filter(
         (Timetable.company_name == current_user.company_name) &
-        (
-            (Timetable.date > now.date()) | 
-            ((Timetable.date == now.date()) & (Timetable.start_time >= now.time()))
-        ) &
+        ((Timetable.date > now.date()) | ((Timetable.date == now.date()) & (Timetable.start_time >= now.time()))) &
         (Timetable.date < now.date() + datetime.timedelta(days=7))
     ).order_by(Timetable.date, Timetable.start_time).all()
+    return format_shifts(upcoming_shifts_query)
 
-
-    # Set the locale to German temporarily
+def format_shifts(shifts):
     locale.setlocale(locale.LC_TIME, "de_DE.UTF-8")
-    # Formatting the upcoming shifts data for JSON serialization
-    upcoming_shifts = [{
-        'name': f'{shift.first_name} {shift.last_name}',
-        'day': shift.date.strftime('%A'),  # Displaying day name
-        'shifts': [
-            {'start': shift.start_time.strftime('%H:%M'), 'end': shift.end_time.strftime('%H:%M')} if shift.start_time and shift.end_time else None,
-            {'start': shift.start_time2.strftime('%H:%M'), 'end': shift.end_time2.strftime('%H:%M')} if shift.start_time2 and shift.end_time2 else None,
-            {'start': shift.start_time3.strftime('%H:%M'), 'end': shift.end_time3.strftime('%H:%M')} if shift.start_time3 and shift.end_time3 else None
-        ]
-    } for shift in upcoming_shifts_query]
+    formatted_shifts = []
+    for shift in shifts:
+        shift_data = {
+            'name': f'{shift.first_name} {shift.last_name}',
+            'day': shift.date.strftime('%A'),
+            'shifts': [format_shift_time(shift, i) for i in range(1, 4)]
+        }
+        shift_data['shifts'] = [s for s in shift_data['shifts'] if s]
+        formatted_shifts.append(shift_data)
+    return formatted_shifts
 
-    # Remove any None values from the shifts lists
-    for shift in upcoming_shifts:
-        shift['shifts'] = [s for s in shift['shifts'] if s]
+def format_shift_time(shift, index):
+    start_time = getattr(shift, f'start_time{index}' if index > 1 else 'start_time')
+    end_time = getattr(shift, f'end_time{index}' if index > 1 else 'end_time')
+    if start_time and end_time:
+        return {'start': start_time.strftime('%H:%M'), 'end': end_time.strftime('%H:%M')}
+    return None
 
-    # Determine the start and end dates of the current week
-    today = datetime.datetime.now().date()
-    start_of_week = today - datetime.timedelta(days=today.weekday())
-    end_of_week = start_of_week + datetime.timedelta(days=6)
-
-    # Fetching hours worked data
+def get_hours_worked(session, current_user):
+    start_of_week, end_of_week = get_current_week_range()
     hours_worked_query = (
         session.query(
             Timetable.date,
-            func.sum(                
-                (                   
-                    (
-                        case(
-                            (func.hour(Timetable.end_time) < func.hour(Timetable.start_time),
-                            func.hour(Timetable.end_time) + 24),
-                            else_=func.hour(Timetable.end_time)
-                        ) -
-                        func.hour(Timetable.start_time)
-                    ) * 60 +
-                    (func.minute(Timetable.end_time) - func.minute(Timetable.start_time))
-                ) / 60
+            func.sum(
+                calculate_shift_hours(Timetable.start_time, Timetable.end_time)
             ).label('hours_worked')
         )
         .filter(
@@ -2123,12 +2124,27 @@ def get_dashboard_data():
         .group_by(Timetable.date)
         .all()
     )
+    return [{"date": item.date.strftime('%A'), "hours_worked": item.hours_worked} for item in hours_worked_query]
 
-    # Format the data for JSON serialization
-    hours_worked_data = [{"date": item.date.strftime('%A'), "hours_worked": item.hours_worked} for item in hours_worked_query]
-    print(hours_worked_data)
+def calculate_shift_hours(start_time, end_time):
+    return (
+        (
+            case(
+                (func.hour(end_time) < func.hour(start_time), func.hour(end_time) + 24),
+                else_=func.hour(end_time)
+            ) -
+            func.hour(start_time)
+        ) * 60 +
+        (func.minute(end_time) - func.minute(start_time))
+    ) / 60
 
-    # Fetching currently working shifts
+def get_current_week_range():
+    today = datetime.datetime.now().date()
+    start_of_week = today - datetime.timedelta(days=today.weekday())
+    end_of_week = start_of_week + datetime.timedelta(days=6)
+    return start_of_week, end_of_week
+
+def get_current_shifts(session, current_user):
     now = datetime.datetime.now()
     current_shifts_query = session.query(Timetable).filter(
         (Timetable.company_name == current_user.company_name) &
@@ -2136,63 +2152,35 @@ def get_dashboard_data():
         (Timetable.start_time <= now.time()) &
         (Timetable.end_time >= now.time())
     ).all()
-
-    # Formatting the currently working shifts data for JSON serialization
-    current_shifts = [{
+    return [{
         'name': f'{shift.first_name} {shift.last_name}',
         'start': shift.start_time.strftime('%H:%M'),
         'end': shift.end_time.strftime('%H:%M')
     } for shift in current_shifts_query]
 
-    # Adjusting the queries to match the 'Perm' and 'Temp' values in the employment field
-    part_time_count = session.query(User).filter(
+def get_part_time_count(session, current_user):
+    return session.query(User).filter(
         (User.company_name == current_user.company_name) &
         (User.employment == 'Temp')
     ).count()
-    
-    full_time_count = session.query(User).filter(
+
+def get_full_time_count(session, current_user):
+    return session.query(User).filter(
         (User.company_name == current_user.company_name) &
         (User.employment == 'Perm')
     ).count()
-    print(part_time_count)
-    print(full_time_count)
 
-
-
-    # Fetch user without availability
+def get_missing_user_list(session, current_user):
+    start_of_week, end_of_week = get_current_week_range()
     missing_fte_query = session.query(Availability.email).filter(
         Availability.date >= start_of_week,
         Availability.date <= end_of_week
     ).subquery()
-
     missing_users = session.query(User).filter(
-    not_(User.email.in_(missing_fte_query))
+        not_(User.email.in_(missing_fte_query))
     ).filter_by(company_name=current_user.company_name).all()
+    return [{'name': f'{user.first_name} {user.last_name}', 'email': user.email} for user in missing_users]
 
-    # Preparing the list of missing users
-    missing_user_list = []
-    for user in missing_users:
-        user_dict = {
-            'name': f'{user.first_name} {user.last_name}',
-            'email': user.email
-        }
-        missing_user_list.append(user_dict)
-
-    print("Missing User:", missing_user_list)
-
-
-
-    session.close()
-    return jsonify({
-        'worker_count': worker_count,
-        'start_time_count': start_time_count,
-        'upcoming_shifts': upcoming_shifts,
-        'hours_worked_over_time': hours_worked_data,
-        'current_shifts': current_shifts,
-        'part_time_count': part_time_count,
-        'full_time_count': full_time_count,
-        'missing_user_list': missing_user_list
-    })
 
 
 @app.route('/api/calendar', methods=['GET'])
