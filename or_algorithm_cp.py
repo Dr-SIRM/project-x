@@ -898,6 +898,7 @@ class ORAlgorithm_cp:
                         for s in self.benoetigte_skills[woche]: # Die Skills in der richtigen Woche berücksichtigen
                             if s in self.mitarbeiter_s[i]:  # Dies stellt sicher, dass der Mitarbeiter den Skill tatsächlich hat
                                 self.x[i, j, k, s] = self.model.NewIntVar(0, 1, f'x[{i}, {j}, {k}, {s}]')
+                                # print(f'x[{i}, {j}, {k}, {s}]')
 
         # Arbeitsblockvariable
         self.y = {}
@@ -943,8 +944,12 @@ class ORAlgorithm_cp:
         self.skill_change = {}
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
-                for k in range(1, len(self.verfügbarkeit[i][j])):  # Starten bei 1, da kein Wechsel vor Stunde 0 möglich ist
-                    self.skill_change[i, j, k] = self.model.NewIntVar(0, 1, f'skill_change[{i}, {j}, {k}]')
+                for s1 in self.skills:
+                    for s2 in self.skills:
+                        if s1 != s2 and s1 in self.mitarbeiter_s[i] and s2 in self.mitarbeiter_s[i]:
+                            self.skill_change[i, j, s1, s2] = self.model.NewIntVar(0, 1, f'skill_change[{i}, {j}, {s1}, {s2}]')
+                            print(f'skill_change[{i}, {j}, {s1}, {s2}]')
+
 
 
     def violation_variables(self):
@@ -1827,16 +1832,17 @@ class ORAlgorithm_cp:
        
 
         # -------------------------------------------------------------------------------------------------------
-        # HARTE NB (01.11.2023)
+        # HARTE NB (14.11.2023)
         # NB 13 - Ein Mitarbeiter darf nie mit verschiedenen Skills in der gleichen Stunde arbeiten
         # -------------------------------------------------------------------------------------------------------
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
+                    woche = j // 7
                     # Prüfen, ob Mitarbeiter in dieser Stunde für mehr als einen Skill verfügbar ist
                     if len([s for s in self.mitarbeiter_s[i] if (i, j, k, s) in self.x]) > 1:
                         # Die Summe der zugewiesenen Skills für diesen Mitarbeiter in dieser Stunde sollte <= 1 sein
-                        self.model.Add(sum(self.x[i, j, k, s] for s in self.mitarbeiter_s[i]) <= 1)
+                        self.model.Add(sum(self.x[i, j, k, s] for s in self.mitarbeiter_s[i] if s in self.benoetigte_skills[woche]) <= 1)
         
 
         # -------------------------------------------------------------------------------------------------------
@@ -1857,7 +1863,7 @@ class ORAlgorithm_cp:
 
 
         # -------------------------------------------------------------------------------------------------------
-        # HARTE NB (10.11.2023)
+        # HARTE NB (14.11.2023)
         # NB 15 - Max. 1 Wechsel von einem Deparment in ein anderes an einem Tag
         # -------------------------------------------------------------------------------------------------------
         """
@@ -1871,10 +1877,24 @@ class ORAlgorithm_cp:
                                 pass
         """
        
+        # 14.11.2023
+        for i in self.mitarbeiter:
+            for j in range(self.calc_time):
+                skill_wechsel_summe = 0
+                for k in range(1, len(self.verfügbarkeit[i][j])):
+                    woche = j // 7
+                    for s1 in self.skills:
+                        for s2 in self.skills:
+                            if s1 != s2 and s1 in self.mitarbeiter_s[i] and s2 in self.mitarbeiter_s[i] and s1 in self.benoetigte_skills[woche] and s2 in self.benoetigte_skills[woche]:
+                                # Aktualisierung der skill_change Variable, wenn ein Wechsel stattfindet
+                                self.model.Add(self.skill_change[i, j, s1, s2] >= self.x[i, j, k, s2] - self.x[i, j, k-1, s1])
+                                skill_wechsel_summe += self.skill_change[i, j, s1, s2]
+
+                # Stellen Sie sicher, dass die Gesamtzahl der Skillwechsel pro Tag 1 nicht überschreitet
+                self.model.Add(skill_wechsel_summe <= 1)
 
 
 
-        
 
     def solve_problem(self):
         """
