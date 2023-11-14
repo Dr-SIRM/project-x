@@ -2194,12 +2194,13 @@ def get_calendar():
     if not current_user:
         return jsonify({'error': 'User not found'}), 404
     
-    # Get the shifts and Departements for the current user
 
-
-    shifts = session.query(Timetable, Company).join(Company).filter(Timetable.email == current_user_id).all()
-
-    
+    shifts = session.query(Timetable, Company)\
+                .select_from(Timetable)\
+                .join(Company, Timetable.company_name == Company.company_name)\
+                .filter(Timetable.email == current_user_id)\
+                .all()
+   
     # Convert the shifts to the format expected by FullCalendar
     events = [{
         'id': shift.Timetable.id,
