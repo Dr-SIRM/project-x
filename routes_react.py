@@ -2048,8 +2048,6 @@ def get_dashboard_data():
     print(session_company)
     session = get_session(get_database_uri('', session_company))
 
-
-    
     current_user = session.query(User).filter_by(email=current_user_id).first()
 
     if not current_user:
@@ -2062,12 +2060,18 @@ def get_dashboard_data():
         (Timetable.start_time != None)
     ).count()
 
-    # Fetching upcoming shifts (assuming today's date is represented by datetime.now().date())
+    # Fetching upcoming shifts 
+    now = datetime.datetime.now()
+
     upcoming_shifts_query = session.query(Timetable).filter(
         (Timetable.company_name == current_user.company_name) &
-        (Timetable.date >= datetime.datetime.now().date()) &
-        (Timetable.date < datetime.datetime.now().date() + datetime.timedelta(days=7))  # Adjust this timeframe as needed
+        (
+            (Timetable.date > now.date()) | 
+            ((Timetable.date == now.date()) & (Timetable.start_time >= now.time()))
+        ) &
+        (Timetable.date < now.date() + datetime.timedelta(days=7))
     ).order_by(Timetable.date, Timetable.start_time).all()
+
 
     # Set the locale to German temporarily
     locale.setlocale(locale.LC_TIME, "de_DE.UTF-8")
