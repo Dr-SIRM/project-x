@@ -111,8 +111,8 @@
   },
 
   "company" : {
-    "title": "Unternehmen",
-    "subtitle": "Bitte aktualisieren Sie Ihre Firmendaten wann immer nötig. Dies sind die Grundlagen für Ihren optimierten Scheduler.",
+    "title": "Company",
+    "subtitle": "Please update your company data whenever necessary. This is the basis for your optimised scheduler.",
     "companyinfo": "Company information",
     "companyname": "Companyname",
     "openinghours": "Openinghours",
@@ -128,6 +128,22 @@
     "endtime2": "End-time 2",
     "success": "Verfügbarkeit erfolgreich erfasst",
     "nosuccess": "Update nicht erfolgreich"
+  },
+
+  "planning" : {
+    "title": "Planning",
+    "subtitle": "Plan your workforce on weekly base and ensure minimal costs!",
+    "departement": "Departement",
+    "choosedepartement": "Select a department",
+    "template1": "Template 1",
+    "template2": "Template 2",
+    "template3": "Template 3",
+    "enteremployeecount": "Enter employee count",
+    "submit": "Submit"
+  },
+
+  "shiftplan": {
+
   }
 
 }

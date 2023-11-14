@@ -128,7 +128,23 @@
       "endtime2": "Endzeit 2",
       "success": "Verfügbarkeit erfolgreich erfasst",
       "nosuccess": "Update nicht erfolgreich"
-    }
+    },
 
+    "planning" : {
+      "title": "Planung",
+      "subtitle": "Planen Sie Ihren Personalbestand auf Wochenbasis und sorgen Sie für minimale Kosten!",
+      "departement": "Abteilung",
+      "choosedepartement": "Wählen Sie eine Abteilung",
+      "template1": "Vorlage 1",
+      "template2": "Vorlage 2",
+      "template3": "Vorlage 3",
+      "savetemplate": "Vorlage speichern",
+      "enteremployeecount": "Mitarbeiterzahl eingeben",
+      "submit": "Einreichen"
+    },
+
+    "shiftplan": {
+    
+    }
   }
   
