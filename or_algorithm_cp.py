@@ -1880,7 +1880,7 @@ class ORAlgorithm_cp:
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 woche = j // 7
-                self.model.Add(sum(self.skill_change[i, j, s1, s2] for s1 in self.skills for s2 in self.skills if s1 != s2 and s1 in self.mitarbeiter_s[i] and s2 in self.mitarbeiter_s[i] and s1 in self.benoetigte_skills[woche] and s2 in self.benoetigte_skills[woche]) <= 2)
+                self.model.Add(sum(self.skill_change[i, j, s1, s2] for s1 in self.skills for s2 in self.skills if s1 != s2 and s1 in self.mitarbeiter_s[i] and s2 in self.mitarbeiter_s[i] and s1 in self.benoetigte_skills[woche] and s2 in self.benoetigte_skills[woche]) <= 1)
         
                         
 
@@ -2003,6 +2003,7 @@ class ORAlgorithm_cp:
                                     print(f"x[{i}][{j}][{k}][{s}] =", self.solver.Value(self.x[key]))
         """
 
+        """
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 for s1 in self.skills:
@@ -2011,7 +2012,7 @@ class ORAlgorithm_cp:
                             key = (i, j, s1, s2)
                             skill_change_value = self.solver.Value(self.skill_change[key])
                             print(f"skill_change[{i}][{j}][{s1}][{s2}] =", skill_change_value)
-
+        """
 
 
 

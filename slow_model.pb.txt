@@ -26028,14 +26028,14 @@ constraints {
   linear {
     vars: [7]
     coeffs: [1]
-    domain: [1, 9223372036854775807]
+    domain: [0, 9223372036854775807]
   }
 }
 constraints {
   linear {
     vars: [8]
     coeffs: [1]
-    domain: [0, 9223372036854775807]
+    domain: [1, 9223372036854775807]
   }
 }
 constraints {
@@ -31803,14 +31803,14 @@ constraints {
   linear {
     vars: [4654, 7]
     coeffs: [-1, 1]
-    domain: [-9223372036854775808, 1]
+    domain: [-9223372036854775808, 0]
   }
 }
 constraints {
   linear {
     vars: [4654, 8]
     coeffs: [-1, 1]
-    domain: [-9223372036854775808, 0]
+    domain: [-9223372036854775808, 1]
   }
 }
 constraints {
@@ -66495,49 +66495,49 @@ constraints {
   linear {
     vars: [4615, 4614, 4613, 4612, 4611, 4610]
     coeffs: [1, 1, 1, 1, 1, 1]
-    domain: [-9223372036854775808, 2]
+    domain: [-9223372036854775808, 1]
   }
 }
 constraints {
   linear {
     vars: [4621, 4620, 4619, 4618, 4617, 4616]
     coeffs: [1, 1, 1, 1, 1, 1]
-    domain: [-9223372036854775808, 2]
+    domain: [-9223372036854775808, 1]
   }
 }
 constraints {
   linear {
     vars: [4627, 4626, 4625, 4624, 4623, 4622]
     coeffs: [1, 1, 1, 1, 1, 1]
-    domain: [-9223372036854775808, 2]
+    domain: [-9223372036854775808, 1]
   }
 }
 constraints {
   linear {
     vars: [4633, 4632, 4631, 4630, 4629, 4628]
     coeffs: [1, 1, 1, 1, 1, 1]
-    domain: [-9223372036854775808, 2]
+    domain: [-9223372036854775808, 1]
   }
 }
 constraints {
   linear {
     vars: [4639, 4638, 4637, 4636, 4635, 4634]
     coeffs: [1, 1, 1, 1, 1, 1]
-    domain: [-9223372036854775808, 2]
+    domain: [-9223372036854775808, 1]
   }
 }
 constraints {
   linear {
     vars: [4645, 4644, 4643, 4642, 4641, 4640]
     coeffs: [1, 1, 1, 1, 1, 1]
-    domain: [-9223372036854775808, 2]
+    domain: [-9223372036854775808, 1]
   }
 }
 constraints {
   linear {
     vars: [4651, 4650, 4649, 4648, 4647, 4646]
     coeffs: [1, 1, 1, 1, 1, 1]
-    domain: [-9223372036854775808, 2]
+    domain: [-9223372036854775808, 1]
   }
 }
 constraints {
