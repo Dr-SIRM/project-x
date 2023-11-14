@@ -13,6 +13,9 @@ import axios from 'axios';
 import Tooltip from '@mui/material/Tooltip';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { API_BASE_URL } from "../../config";
+import { useTranslation } from 'react-i18next';
+import '../../i18n'; 
+
 
 const BUTTON_STYLE = {
   borderColor: "white",
@@ -51,6 +54,7 @@ const TimeReq = ({ timereq }) => {
   const [selectedDepartment, setSelectedDepartment] = useState('');
   const navigate = useNavigate();
   const [department_list, setDepartmentList] = useState([]);
+  const { t, i18n } = useTranslation();
 
   const convertTimeToMinutes = (timeStr) => {
     if (!timeStr) return undefined;
@@ -309,12 +313,12 @@ const TimeReq = ({ timereq }) => {
   return (
     <Box m="20px">
       <Header
-        title="Time Requirement"
-        subtitle="Plan your workforce on weekly base and ensure minimal costs!"
+        title={t('planning.title')}
+        subtitle={t('planning.subtitle')}
       />
       <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', marginBottom: '1rem' }}>
         <FormControl fullWidth variant="filled"sx={{ width: '250px' }}>
-          <InputLabel id="department-label">Abteilung</InputLabel>
+          <InputLabel id="department-label">{t('planning.departement')}</InputLabel>
           <Select
             labelId="department-label"
             id="department"
@@ -336,7 +340,7 @@ const TimeReq = ({ timereq }) => {
             }, 
             }}
           >
-            <MenuItem value="">Wählen Sie eine Abteilung</MenuItem>
+            <MenuItem value="">{t('planning.choosedepartement')}</MenuItem>
             {department_list.map((department) => (
               <MenuItem key={department} value={department}>
                 {department}
@@ -392,7 +396,7 @@ const TimeReq = ({ timereq }) => {
             }
           }}
         >
-          Template 1
+          {t('planning.template1')}
         </Button>
         <Button 
           variant="outlined"
@@ -418,7 +422,7 @@ const TimeReq = ({ timereq }) => {
             }
           }}
         >
-          Template 2
+          {t('planning.template2')}
         </Button>
         <Button 
           variant="outlined"
@@ -444,7 +448,7 @@ const TimeReq = ({ timereq }) => {
             }
           }}
         >
-          Template 3
+          {t('planning.template1')}
         </Button>
         <Tooltip 
           title={
@@ -482,7 +486,7 @@ const TimeReq = ({ timereq }) => {
                 }
               }}
             >
-              Save Template
+              {t('planning.savetemplate')}
             </Button>
             <Select 
                 type="text"
@@ -504,9 +508,9 @@ const TimeReq = ({ timereq }) => {
                 }, 
                 }}
               >
-                <MenuItem value={ 'Template 1' }>Template 1</MenuItem>
-                <MenuItem value={ 'Template 2' }>Template 2</MenuItem>
-                <MenuItem value={ 'Template 3' }>Template 3</MenuItem>
+                <MenuItem value={ 'Template 1' }>{t('planning.template1')}</MenuItem>
+                <MenuItem value={ 'Template 2' }>{t('planning.template2')}</MenuItem>
+                <MenuItem value={ 'Template 3' }>{t('planning.template3')}</MenuItem>
                 </Select>
         </Box>
         <span></span>
@@ -530,7 +534,7 @@ const TimeReq = ({ timereq }) => {
                 type="number" 
                 value={employeeCount[columnIndex] || ''} 
                 onChange={(e) => setEmployees(e, columnIndex)} 
-                label="Enter employee count" 
+                label={t('planning.enteremployeecount')}
                 variant="outlined"
                 fullWidth
                 inputProps={{ min: 0 }}
@@ -660,7 +664,7 @@ const TimeReq = ({ timereq }) => {
               }
             }}
           >
-            Submit
+            {t('planning.submit')}
           </Button>
         </Box>
 

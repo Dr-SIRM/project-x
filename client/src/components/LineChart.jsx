@@ -61,7 +61,7 @@ const LineChart = ({ isCustomLineColors = false, isDashboard = false, hoursWorke
       yScale={{
         type: "linear",
         min: "0",
-        max: "50",
+        max: "auto",
         stacked: true,
         reverse: false,
       }}

@@ -107,19 +107,19 @@ const GanttChart = () => {
     const today = new Date();
     const weekday = today.toLocaleDateString('de-DE', { weekday: 'long' });
     const hours = openingHours[weekday.toLowerCase()];
-    console.log("Stunden:", hours)
     
     if (!hours) return 24; // Default to 24 hours if no hours are specified
   
     const startHour = parseInt(hours.start.split(":")[0], 10);
     const endHour = parseInt(hours.end.split(":")[0], 10);
-
-    let duration = endHour - startHour;
-    if (endHour < startHour) { // End time is past midnight
-        duration += 24; // Add 24 hours to account for next day
-    }
+  
+    // Handle end time past midnight
+    let duration = endHour >= startHour 
+                   ? endHour - startHour 
+                   : (24 - startHour) + endHour;
     return duration; // Return difference in hours
-};
+  };
+  
 
 
 const getShiftPosition = (shift) => {
@@ -144,7 +144,7 @@ const getShiftPosition = (shift) => {
   let maxDuration, left, width;
   switch (view) {
       case 'day':
-          maxDuration = (endMinutes < startMinutes) ? (1440 - startMinutes) + endMinutes : endMinutes - startMinutes; // 1440 minutes in a day
+          maxDuration = (endMinutes < startMinutes) ? (1440 - startMinutes) + endMinutes : endMinutes - startMinutes;
           left = ((shiftStartMinutes - startMinutes + 1440) % 1440) / maxDuration * 100;
           width = ((shiftEndMinutes - shiftStartMinutes + 1440) % 1440) / maxDuration * 100;
           break;
@@ -174,9 +174,6 @@ const getCurrentTimePercentage = () => {
 
   return (pastDuration / totalDuration) * 100;
 };
-
-
-
 
 
 const renderShifts = (worker) => {
@@ -236,20 +233,23 @@ const renderShifts = (worker) => {
     const hours = openingHours[weekday.toLowerCase()];
 
     if (!hours || view !== 'day') {
-          return [];     
+        return [];     
     }
 
     const startHour = parseInt(hours.start.split(":")[0], 10);
     const endHour = parseInt(hours.end.split(":")[0], 10);
-    const totalDuration = (endHour < startHour) ? (24 - startHour) + endHour : endHour - startHour;
+    let totalDuration = endHour >= startHour 
+                        ? endHour - startHour 
+                        : (24 - startHour) + endHour;
 
     const timelineLabels = [];
-    for (let hour = startHour; hour < startHour + totalDuration; hour++) {
-        let adjustedHour = hour % 24;
+    for (let i = 0; i <= totalDuration; i++) {
+        let adjustedHour = (startHour + i) % 24;
         timelineLabels.push(formatTime(adjustedHour));
     }
     return timelineLabels;
   };
+
 
 
   const goToNextDay = () => {
