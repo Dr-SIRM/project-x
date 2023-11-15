@@ -821,7 +821,7 @@ def get_availability():
 
     # Create Drop Down Based Access Level
     if user.access_level == "User":
-        user_list = None
+        user_list = f"{user.first_name}, {user.last_name}, {user.email}"
     else:
         # Query all users from the same company, excluding the current user
         company_users = session.query(User).filter(
@@ -2044,6 +2044,7 @@ def get_dashboard_data():
     session, current_user = get_current_user_session()
     if not current_user:
         return jsonify({'error': 'User not found'}), 404
+    
 
     try:
         return jsonify({
@@ -2106,7 +2107,7 @@ def format_shift_time(shift, index):
     return None
 
 def get_hours_worked(session, current_user):
-    start_of_week, end_of_week = get_current_week_range()
+    start_of_week, end_of_week, *_ = get_current_week_range()
     hours_worked_query = (
         session.query(
             Timetable.date,
@@ -2139,10 +2140,17 @@ def calculate_shift_hours(start_time, end_time):
     ) / 60
 
 def get_current_week_range():
+    if request.method == 'GET':
+        selectedMissingWeek = int(request.args.get('selectedMissingWeek', None))
+    else: # request.method == 'POST'
+        selectedMissingWeek = int(request.json.get('selectedMissingWeek', None))
+    print(selectedMissingWeek)
     today = datetime.datetime.now().date()
     start_of_week = today - datetime.timedelta(days=today.weekday())
     end_of_week = start_of_week + datetime.timedelta(days=6)
-    return start_of_week, end_of_week
+    start_of_week_missing_team = today - datetime.timedelta(days=today.weekday()) + datetime.timedelta(days=7)
+    end_of_week_missing_team = start_of_week + datetime.timedelta(days=6*selectedMissingWeek) 
+    return start_of_week, end_of_week, start_of_week_missing_team, end_of_week_missing_team
 
 def get_current_shifts(session, current_user):
     now = datetime.datetime.now()
@@ -2171,16 +2179,64 @@ def get_full_time_count(session, current_user):
     ).count()
 
 def get_missing_user_list(session, current_user):
-    start_of_week, end_of_week = get_current_week_range()
+    start_of_week_missing_team, end_of_week_missing_team, *_ = get_current_week_range()
     missing_fte_query = session.query(Availability.email).filter(
-        Availability.date >= start_of_week,
-        Availability.date <= end_of_week
+        Availability.date >= start_of_week_missing_team,
+        Availability.date <= end_of_week_missing_team
     ).subquery()
     missing_users = session.query(User).filter(
         not_(User.email.in_(missing_fte_query))
     ).filter_by(company_name=current_user.company_name).all()
     return [{'name': f'{user.first_name} {user.last_name}', 'email': user.email} for user in missing_users]
 
+
+def unavailable_times():
+    start_of_week_missing_team, end_of_week_missing_team, *_ = get_current_week_range()
+    
+    unavailable_times = {}
+    
+    # Fetch TimeReq and Availability data (example: for a specific date)
+    time_reqs = session.query(TimeReq).filter(
+        TimeReq.date >= start_of_week_missing_team,
+        TimeReq.date <= end_of_week_missing_team,
+        TimeReq.worker >= 0
+    ).subquery()
+    availabilities = session.query(Availability).filter(
+        Availability.date >= start_of_week_missing_team,
+        Availability.date <= end_of_week_missing_team
+    ).subquery()
+
+    for time_req in time_reqs:
+        is_available = False
+
+        for availability in availabilities:
+            # Check if time_req falls within availability time slots
+            if check_time_overlap(time_req.start_time, time_req.end_time, availability):
+                is_available = True
+                break
+
+        # if not is_available:
+        #     # Add to unavailable_times
+        #     if date_filter not in unavailable_times:
+        #         unavailable_times[date_filter] = []
+        #     unavailable_times[date_filter].append((time_req.start_time, time_req.end_time))
+
+    return unavailable_times
+
+def check_time_overlap(start_time, end_time, availability):
+    # Function to check if given time_req overlaps with availability
+    time_slots = [
+        (availability.start_time, availability.end_time),
+        (availability.start_time2, availability.end_time2),
+        (availability.start_time3, availability.end_time3)
+    ]
+
+    for start, end in time_slots:
+        if start is not None and end is not None:
+            if start <= end_time and end >= start_time:
+                return True
+
+    return False
 
 
 @app.route('/api/calendar', methods=['GET'])
@@ -2215,8 +2271,6 @@ def get_calendar():
     session.close()
 
     return jsonify(events)
-
-
 
 
 # Bearbeitet von Gery am 23.09.2023
