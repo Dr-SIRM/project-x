@@ -10,8 +10,8 @@ import axios from "axios";
 // Arrow Function in JawaScript
 const Solver = () => {
     const [loadingSteps, setLoadingSteps] = useState([
-        { label: "1. Vorüberprüfung: Haben Sie in jeder Stunde eingegeben, wieviele Mitarbeiter benötigt werden?", status: null },
-        { label: "2. Vorüberprüfung: Stehen die Vollzeit Mitarbeiter mindestens die Wochenarbeitsstunden zur Verfügung?", status: null },
+        { label: "1. Vorüberprüfung: Haben Sie für mindestens eine Fähigkeit/Abteilung im Berechnungszeitraum unter Planung eigetragen, wieviele Mitarbeiter benötigt werden?", status: null },
+        { label: "2. Vorüberprüfung: Stehen die Vollzeit Mitarbeiter mind. Wochenarbeitsstunden * Anzahl Berechungswochen zur Verfügung (bei Ferien werden die Stunden abgezogen)?", status: null },
         { label: "3. Vorüberprüfung: Haben die Mitarbeiter mindestens die anzahl Stunden welche sie eingeteilt werden eingegeben?", status: null },
         { label: "4. Vorüberprüfung: Haben alle Mitarbeiter zusammen genug Stunden eingeplant, um ihre Planung zu erfüllen?", status: null },
         { label: "5. Vorüberprüfung: Stehen zu jeder Zeit mindestens die Anzahl Mitarbeiter zur Verfügung, die Sie benötigten?", status: null },

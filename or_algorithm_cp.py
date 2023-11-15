@@ -636,8 +636,8 @@ class ORAlgorithm_cp:
     def pre_check_1(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        1. Vorüberprüfung: Haben Sie in jeder Stunde eingegeben, wieviele Mitarbeiter benötigt werden?
-        Überprüfen, ob der Admin zu jeder Öffnungszeitstunde time_req eingegeben hat
+        1. Vorüberprüfung: Haben Sie für mindestens eine Fähigkeit/Abteilung im Berechnungszeitraum unter Planung eigetragen, 
+                           wieviele Mitarbeiter benötigt werden?
         ---------------------------------------------------------------------------------------------------------------
         """
         # Funktion um Zeitwerte umzurechnen ---------------------------------------------------------------------------
@@ -666,7 +666,7 @@ class ORAlgorithm_cp:
             # Erzeugt alle möglichen Daten innerhalb des Bereichs
             start_date = datetime.datetime.strptime(self.start_date, "%Y-%m-%d").date()
             end_date = datetime.datetime.strptime(self.end_date, "%Y-%m-%d").date()
-            date_range = [start_date + timedelta(days=x) for x in range((end_date-start_date).days + 1)]
+            date_range = [start_date + timedelta(days=x) for x in range((end_date - start_date).days + 1)]
 
             for current_date in date_range:
                 # Wochentag als Index (0 = Montag, 1 = Dienstag, usw.) erhalten
@@ -675,14 +675,15 @@ class ORAlgorithm_cp:
                 # Prüft, ob der Tag ein Arbeitstag ist (Basierend auf den Öffnungszeiten)
                 if self.laden_oeffnet[weekday_index] is not None and self.laden_schliesst[weekday_index] is not None:
                     time_req_dict = self.time_req.get(current_date, {})
+                    
+                    # Prüft, ob für den Tag Stunden in mindestens einer Abteilung geplant sind
+                    if all(not dept_hours for dept_hours in time_req_dict.values()):
+                        fehlende_stunden.append(current_date)
 
-                    for hour in range(time_to_int(self.laden_schliesst[weekday_index]) - time_to_int(self.laden_oeffnet[weekday_index])):
-                        if hour not in time_req_dict:
-                            fehlende_stunden.append((current_date, hour))
             if fehlende_stunden:
-                error_message_lines = ["Für folgende Zeitfenster haben Sie noch keine Mitarbeiter eingeplant:"]
-                for date, hour in fehlende_stunden:
-                    error_message_lines.append(f"Datum: {date}, Stunde: {hour}")
+                error_message_lines = ["An folgenden Tagen wurden keine Stunden für irgendeine Abteilung geplant:"]
+                for date in fehlende_stunden:
+                    error_message_lines.append(f"Datum: {date}")
                 raise ValueError("\n".join(error_message_lines))
                         
             return {"success": True, "name": "Pre-check_1", "message": "All checks are successful!"}
@@ -690,26 +691,41 @@ class ORAlgorithm_cp:
             return {"success": False, "name": "Pre-check_1", "message": str(e)}
 
 
-
     def pre_check_2(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        2. Vorüberprüfung: Stehen die Vollzeit Mitarbeiter mindestens die Wochenarbeitsstunden zur Verfügung?
-        Überprüfen ob die "Perm" Mitarbeiter mind. self.weekly_hours Stunden einplant haben
-        ---------------------------------------------------------------------------------------------------------------
+        2. Vorüberprüfung: Stehen die Vollzeit Mitarbeiter mind. die Wochenarbeitsstunden zur Verfügung (bei Ferien werden die Stunden abgezogen)?
+        --------------------------------------------------------------------------------------------------------------
         """
         try:
-            for i in range(len(self.mitarbeiter)):
+            error_messages = []
+            opening_days = sum(1 for item in self.opening_hours if item > 0) # Anzahl Tage an denen der Betrieb geöffnet ist im Solvingzeitraum
+
+            for i, employee in enumerate(self.mitarbeiter):
                 if self.employment[i] == "Perm": 
+                    holidays_user = self.total_holidays_per_user[employee] # Anzahl Ferientage jedes "Perm" users
                     sum_availability_perm = 0
                     for j in range(self.calc_time):
                         for k in range(len(self.verfügbarkeit[self.mitarbeiter[i]][j])):
                             sum_availability_perm += self.verfügbarkeit[self.mitarbeiter[i]][j][k]
 
-                    if sum_availability_perm < self.weekly_hours * self.employment_lvl_exact[i]:
-                        raise ValueError(f"Fester Mitarbeiter mit ID {self.mitarbeiter[i]} hat nicht genügend Stunden geplant.")
+                    # Arbeitsstunden die benötigt werden für einen Vollzeit Mitarbeiter
+                    sum_needed_hours = self.weekly_hours * self.employment_lvl_exact[i] * self.week_timeframe * (1 - (holidays_user / opening_days))
+                    if sum_availability_perm < sum_needed_hours:
+
+                        # Die Zeiteinheiten in Ganze Stunden umrechnen
+                        full_hours_availability = sum_availability_perm / self.hour_devider
+                        full_hours_needed = sum_needed_hours / self.hour_devider
+
+                        error_messages.append(f"Vollzeit Mitarbeiter mit der Email {self.mitarbeiter[i]} hat im Berechnungszeitraum nur {full_hours_availability}h eingeplant. \
+                                      In diesem Zeitraum sollte er allerdings {full_hours_needed}h eintragen.")
                     
+            # Überprüfen, ob Fehlermeldungen vorhanden sind
+            if error_messages:
+                raise ValueError("\n".join(error_messages))
+
             return {"success": True, "name": "Pre-check_2", "message": "All checks are successful!"}
+
         except ValueError as e:
             return {"success": False, "name": "Pre-check_2", "message": str(e)}
 
