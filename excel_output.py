@@ -233,6 +233,9 @@ def create_excel_output(current_user_email):
 
     last_data_row = row - 1  # Da row nach dem letzten Eintrag erhöht wurde, reduzieren wir es um 1.
 
+
+
+
     # Funktion zur Generierung der Stunden
     def generate_hours(start_time, end_time, hour_devider):
         current_time = start_time
@@ -285,17 +288,17 @@ def create_excel_output(current_user_email):
                 ws.column_dimensions[get_column_letter(col_index)].width = 3.2
                 col_index += 1
             
-            for email, department, date, start_time, end_time, _, _ in data_timetable:
+            for email, department, date, start_time, end_time, start_time2, end_time2 in data_timetable:
                 if date.strftime("%Y-%m-%d") == start_date:
                     user_row = email_row_dict.get(email)
                     if user_row:
+                        # Verarbeitung der ersten Schicht
                         start_time = (datetime.min + start_time).time()
                         end_time = (datetime.min + end_time).time()
                         
                         start_col = col_index - len(hours) + (datetime.combine(datetime.today(), start_time) - datetime.combine(datetime.today(), (datetime.min + start_time_obj).time())).seconds // (60 * 60 // hour_devider)
                         end_col = start_col + (datetime.combine(datetime.today(), end_time) - datetime.combine(datetime.today(), start_time)).seconds // (60 * 60 // hour_devider) - 1
 
-                        
                         # Färben der Zellen, Einfügen der Abteilungsinitialen und Formatierung
                         for col in range(start_col, end_col + 1):
                             cell = ws.cell(row=user_row, column=col)
@@ -307,8 +310,28 @@ def create_excel_output(current_user_email):
                             cell_color = department_colors.get(department_initials, "00FF00")  # Standardfarbe ist Grün
                             cell.fill = PatternFill(start_color=cell_color, end_color=cell_color, fill_type="solid")
 
-        
+
+                        # Verarbeitung der zweiten Schicht
+                        if start_time2 and end_time2:
+                            start_time2 = (datetime.min + start_time2).time()
+                            end_time2 = (datetime.min + end_time2).time()
+
+                            start_col2 = col_index - len(hours) + (datetime.combine(datetime.today(), start_time2) - datetime.combine(datetime.today(), (datetime.min + start_time_obj).time())).seconds // (60 * 60 // hour_devider)
+                            end_col2 = start_col2 + (datetime.combine(datetime.today(), end_time2) - datetime.combine(datetime.today(), start_time2)).seconds // (60 * 60 // hour_devider) - 1
+
+                            # Färben der Zellen, Einfügen der Abteilungsinitialen und Formatierung für die zweite Schicht
+                            for col in range(start_col2, end_col2 + 1):
+                                cell = ws.cell(row=user_row, column=col)
+                                department_initials = department[:2].upper()  # Erste zwei Buchstaben der Abteilung
+                                cell.value = department_initials  # Setze die Abteilungsinitialen in die Zelle
+                                cell.alignment = Alignment(horizontal='center', vertical='center')  # Zentriere den Text
+                                cell.font = Font(size=8, bold=True)  # Setze die Schriftgröße und Schriftart
+
+                                cell_color = department_colors.get(department_initials, "00FF00")  # Standardfarbe ist Grün
+                                cell.fill = PatternFill(start_color=cell_color, end_color=cell_color, fill_type="solid")
+
         start_date = (datetime.strptime(start_date, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
+
 
     # Rahmen für alle Zellen
     for row in range(first_data_row, last_data_row + 1):

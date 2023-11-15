@@ -216,8 +216,8 @@ useEffect(() => {
           <form onSubmit={handleSubmit}>
             
             <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', marginBottom: '1rem' }}>
-            <FormControl fullWidth variant="filled" sx={{ width: '250px' }} disabled={isUserEmpty}>
-              <InputLabel id="user-label" disabled={isUserEmpty}>{t('availabilty.user')}</InputLabel>
+            <FormControl fullWidth variant="filled" sx={{ width: '250px' }}>
+              <InputLabel id="user-label">{t('availabilty.user')}</InputLabel>
               <Select
                 labelId="user-label"
                 id="user"
@@ -225,7 +225,6 @@ useEffect(() => {
                 value={selectedUser}
                 onChange={(e) => setSelectedUser(e.target.value)}
                 inputProps={{ maxLength: 30 }}
-                disabled={isUserEmpty}
                 sx={{
                   color: "black",
                   marginRight: '0.2rem',
@@ -240,8 +239,8 @@ useEffect(() => {
                 }}
               >
                 <MenuItem value="">{t('availabilty.userselect')}</MenuItem>
-                {Array.isArray(user_list) && user_list.map((user) => (
-                  <MenuItem key={user} value={user} disabled={isUserEmpty}>
+                {user_list.map((user) => (
+                  <MenuItem key={user} value={user}>
                     {user}
                   </MenuItem>
                 ))}

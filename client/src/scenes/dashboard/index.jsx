@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography, Select, MenuItem, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
 import { mockTransactions } from "../../data/mockData";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
@@ -42,11 +42,12 @@ const Dashboard = () => {
   const totalHoursWorked = (hoursWorkedData && Array.isArray(hoursWorkedData)) ? hoursWorkedData.reduce((sum, item) => sum + parseFloat(item.hours_worked), 0) : 0;
   const token = localStorage.getItem('session_token'); 
   const { t, i18n } = useTranslation();
+  const [selectedMissingWeek, setSelectedMissingWeek] = useState(1);
   
   useEffect(() => {
     const fetchData = async () => {
         try {
-            const response = await axios.get(`${API_BASE_URL}/api/dashboard`,
+            const response = await axios.get(`${API_BASE_URL}/api/dashboard?selectedMissingWeek=${encodeURIComponent(selectedMissingWeek)}`,
             {
               headers: {
                 'Authorization': `Bearer ${token}`
@@ -67,7 +68,7 @@ const Dashboard = () => {
     }
 
     fetchData();
-}, []);
+}, [selectedMissingWeek]);
 
   return (
     <Box m="20px">
@@ -286,6 +287,18 @@ const Dashboard = () => {
             <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
               {t('dashboard.nextShifts')} 
             </Typography>
+            <Select
+              labelId="simple-select-label"
+              id="simple-select"
+              value={selectedMissingWeek}
+              onChange={(e) => setSelectedMissingWeek(e.target.value)}
+              style={{ color: colors.grey[100], width: '120px' }}  // Assuming you want the dropdown text to be white
+              size="small"
+          >
+              <MenuItem value={1}>Next Week</MenuItem>
+              <MenuItem value={2}>2 Weeks</MenuItem>
+              <MenuItem value={4}>Month</MenuItem>
+          </Select>
           </Box>
           {missingUser.map((user) => (
             <Box
