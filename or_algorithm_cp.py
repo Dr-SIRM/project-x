@@ -733,8 +733,11 @@ class ORAlgorithm_cp:
     def pre_check_3(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        3. Vorüberprüfung: Haben die Mitarbeiter mindestens die anzahl Stunden welche sie eingeteilt werden eingegeben?
+        3. Vorüberprüfung: Haben die Teilzeit Mitarbeiter mindestens die anzahl Stunden welche sie eingeteilt werden eingegeben?
         Haben die MA mindestens die anzahl Stunden von gerechte_verteilung eingegeben?
+
+        Diese Vorüberprüfung wird wegfallen, da man das bei gerechte Verteilung bereits einbaut!
+        
         ---------------------------------------------------------------------------------------------------------------
         """
         try: 
