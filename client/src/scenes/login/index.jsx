@@ -29,7 +29,7 @@ const Login = () => {
       setLoading(true);
       await login(email, password);
       setTimeout(() => {
-        navigate('/dashboard'); 
+        navigate('/welcome'); 
       }, 2000);
     } catch (error) {
       setError('Invalid email or password');

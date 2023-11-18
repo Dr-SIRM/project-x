@@ -428,44 +428,7 @@ def new_user():
                             creation_timestamp = datetime.datetime.now()
                             )
                         
-                        
-                        
-                        session.add(data1)
-                        session.add(data2)
-                        session.add(data3)
-                        session.add(generic_admin)
-                        session.commit()
-                        session.close()
-                        
-
-                        session = get_session(get_database_uri('', company_name.lower().replace(' ', '_')))
-                        
                         data4 = User(
-                            company_id = None, 
-                            first_name = "Time",
-                            last_name = "Tab", 
-                            employment = None, 
-                            employment_level = None,
-                            company_name = admin_registration_data['company_name'], 
-                            department = None,
-                            department2 = None,
-                            department3 = None,
-                            department4 = None,
-                            department5 = None,
-                            department6 = None,
-                            department7 = None,
-                            department8 = None,
-                            department9 = None,
-                            department10 = None,
-                            access_level = "Super_Admin", 
-                            email = f"{admin_registration_data['company_name'].lower().replace(' ', '_')}@timetab.ch", 
-                            password = generate_password_hash('ProjectX2023.'),
-                            created_by = user.id, 
-                            changed_by = user.id, 
-                            creation_timestamp = datetime.datetime.now()
-                            )
-                        
-                        data5 = User(
                             company_id = None, 
                             first_name = admin_registration_data['first_name'],
                             last_name = admin_registration_data['last_name'], 
@@ -490,8 +453,71 @@ def new_user():
                             creation_timestamp = datetime.datetime.now()
                             )
                         
+                        
+                        
+                        session.add(data1)
+                        session.add(data2)
+                        session.add(data3)
                         session.add(data4)
+                        session.add(generic_admin)
+                        session.commit()
+                        session.close()
+                        
+
+                        session = get_session(get_database_uri('', company_name.lower().replace(' ', '_')))
+                        
+                        data5 = User(
+                            company_id = None, 
+                            first_name = "Time",
+                            last_name = "Tab", 
+                            employment = None, 
+                            employment_level = None,
+                            company_name = admin_registration_data['company_name'], 
+                            department = None,
+                            department2 = None,
+                            department3 = None,
+                            department4 = None,
+                            department5 = None,
+                            department6 = None,
+                            department7 = None,
+                            department8 = None,
+                            department9 = None,
+                            department10 = None,
+                            access_level = "Super_Admin", 
+                            email = f"{admin_registration_data['company_name'].lower().replace(' ', '_')}@timetab.ch", 
+                            password = generate_password_hash('ProjectX2023.'),
+                            created_by = user.id, 
+                            changed_by = user.id, 
+                            creation_timestamp = datetime.datetime.now()
+                            )
+                        
+                        data6 = User(
+                            company_id = None, 
+                            first_name = admin_registration_data['first_name'],
+                            last_name = admin_registration_data['last_name'], 
+                            employment = admin_registration_data['employment'], 
+                            employment_level = admin_registration_data['employment_level'],
+                            company_name = admin_registration_data['company_name'], 
+                            department = admin_registration_data['department'] if 'department' in admin_registration_data else None,
+                            department2 = admin_registration_data['department2'] if 'department2' in admin_registration_data else None,
+                            department3 = admin_registration_data['department3'] if 'department3' in admin_registration_data else None,
+                            department4 = None,
+                            department5 = None,
+                            department6 = None,
+                            department7 = None,
+                            department8 = None,
+                            department9 = None,
+                            department10 = None,
+                            access_level = admin_registration_data['access_level'], 
+                            email = admin_registration_data['email'], 
+                            password = generate_password_hash(admin_registration_data['password']),
+                            created_by = user.id, 
+                            changed_by = user.id, 
+                            creation_timestamp = datetime.datetime.now()
+                            )
+                        
                         session.add(data5)
+                        session.add(data6)
                         session.commit()
                         session.close()
                         print("Schema and entry created")
@@ -2042,6 +2068,8 @@ import locale
 @jwt_required()
 def get_dashboard_data():
     session, current_user = get_current_user_session()
+    today = datetime.datetime.now().date()
+    current_week_num = int(today.isocalendar()[1])
     if not current_user:
         return jsonify({'error': 'User not found'}), 404
     
@@ -2055,7 +2083,8 @@ def get_dashboard_data():
             'current_shifts': get_current_shifts(session, current_user),
             'part_time_count': get_part_time_count(session, current_user),
             'full_time_count': get_full_time_count(session, current_user),
-            'missing_user_list': get_missing_user_list(session, current_user)
+            'missing_user_list': get_missing_user_list(session, current_user),
+            'current_week_num': current_week_num
         })
     finally:
         session.close()
@@ -2140,17 +2169,25 @@ def calculate_shift_hours(start_time, end_time):
     ) / 60
 
 def get_current_week_range():
+    today = datetime.datetime.now().date()
+    start_of_week = today - datetime.timedelta(days=today.weekday())
+    end_of_week = start_of_week + datetime.timedelta(days=6)
+    return start_of_week, end_of_week
+
+
+def get_current_week_range2(selectedMissingWeek):
     if request.method == 'GET':
         selectedMissingWeek = int(request.args.get('selectedMissingWeek', None))
     else: # request.method == 'POST'
         selectedMissingWeek = int(request.json.get('selectedMissingWeek', None))
     print(selectedMissingWeek)
     today = datetime.datetime.now().date()
-    start_of_week = today - datetime.timedelta(days=today.weekday())
-    end_of_week = start_of_week + datetime.timedelta(days=6)
-    start_of_week_missing_team = today - datetime.timedelta(days=today.weekday()) + datetime.timedelta(days=7)
-    end_of_week_missing_team = start_of_week + datetime.timedelta(days=6*selectedMissingWeek) 
-    return start_of_week, end_of_week, start_of_week_missing_team, end_of_week_missing_team
+
+    start_of_week_missing_team = today - datetime.timedelta(days=today.weekday()) + datetime.timedelta(days=7*selectedMissingWeek)
+    end_of_week_missing_team = start_of_week_missing_team + datetime.timedelta(days=6) 
+    print(start_of_week_missing_team, end_of_week_missing_team)
+    return start_of_week_missing_team, end_of_week_missing_team
+
 
 def get_current_shifts(session, current_user):
     now = datetime.datetime.now()
@@ -2179,14 +2216,18 @@ def get_full_time_count(session, current_user):
     ).count()
 
 def get_missing_user_list(session, current_user):
-    start_of_week_missing_team, end_of_week_missing_team, *_ = get_current_week_range()
-    missing_fte_query = session.query(Availability.email).filter(
-        Availability.date >= start_of_week_missing_team,
-        Availability.date <= end_of_week_missing_team
-    ).subquery()
-    missing_users = session.query(User).filter(
-        not_(User.email.in_(missing_fte_query))
-    ).filter_by(company_name=current_user.company_name).all()
+    if request.method == 'GET':
+        selectedMissingWeek = int(request.args.get('selectedMissingWeek', None))
+        start_of_week_missing_team, end_of_week_missing_team, *_ = get_current_week_range2(selectedMissingWeek)
+        missing_fte_query = session.query(Availability.email).filter(
+            Availability.date >= start_of_week_missing_team,
+            Availability.date <= end_of_week_missing_team
+        ).all()
+        missing_users = session.query(User).filter(
+            not_(User.email.in_(missing_fte_query))
+        ).filter_by(company_name=current_user.company_name).all()
+        print(missing_users)
+        print(start_of_week_missing_team, end_of_week_missing_team)
     return [{'name': f'{user.first_name} {user.last_name}', 'email': user.email} for user in missing_users]
 
 
@@ -2405,3 +2446,139 @@ def create_checkout_session():
         return jsonify(id=checkout_session.id)
     except Exception as e:
         return jsonify(error=str(e)), 403
+
+def is_initial_setup_needed():
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    session = get_session(get_database_uri('', session_company))
+    is_company_empty = session.query(Company).first() is None
+    is_opening_hours_empty = session.query(OpeningHours).first() is None
+    is_solverreq_empty = session.query(SolverRequirement).first() is None
+    # Add a similar check for SolverReq table
+    return is_company_empty or is_opening_hours_empty or is_solverreq_empty
+
+@app.route('/api/check_initial_setup', methods=['POST', 'GET'])
+@jwt_required()
+def check_initial_setup():
+
+    react_user = get_jwt_identity()
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    session = get_session(get_database_uri('', session_company))
+    user = session.query(User).filter_by(email=react_user).first()
+    weekdays = {0:'Montag', 1:'Dienstag', 2:'Mittwoch', 3:'Donnerstag', 4:'Freitag', 5:'Samstag', 6:'Sonntag'}
+    day_num = 7
+
+
+    if request.method == 'POST':
+        initial_data = request.get_json()
+        print(initial_data)
+        session = get_session(get_database_uri('', user.company_name.lower().replace(' ', '_')))
+
+        new_company_data = Company(
+            company_name=user.company_name,
+            weekly_hours=initial_data['weekly_hours'],
+            shifts=initial_data['shifts'],
+            department=initial_data['department'] if initial_data.get('department') else None,
+            department2=initial_data['department2'] if initial_data.get('department2') else None,
+            department3=initial_data['department3'] if initial_data.get('department3') else None,
+            department4=None,
+            department5=None,
+            department6=None,
+            department7=None,
+            department8=None,
+            department9=None,
+            department10=None,
+            created_by=user.id,
+            changed_by=user.id,
+            creation_timestamp=datetime.datetime.now()
+        )
+        session.merge(new_company_data)
+
+        # Create list to hold new OpeningHours entries
+        new_opening_hours_entries = []
+
+        for i in range(day_num):
+            entry1 = request.json.get(f'day_{i}_0')
+            entry2 = request.json.get(f'day_{i}_1')
+            entry3 = request.json.get(f'day_{i}_2')
+            entry4 = request.json.get(f'day_{i}_3')
+            
+            if entry1:
+                new_entry1 = get_time_str(entry1) if entry1 else None
+                new_entry2 = get_time_str(entry2) if entry2 else None
+                new_entry3 = get_time_str(entry3) if entry3 else None
+                new_entry4 = get_time_str(entry4) if entry4 else None
+
+                new_weekday = weekdays[i]
+                
+                # Create new OpeningHours entry
+                opening = OpeningHours(
+                    company_name=user.company_name,
+                    weekday=new_weekday,
+                    start_time=new_entry1,
+                    end_time=new_entry2,
+                    start_time2=new_entry3,
+                    end_time2=new_entry4,
+                    created_by=user.id,
+                    changed_by=user.id,
+                    creation_timestamp=datetime.datetime.now()
+                )
+                
+                # Append to list of new entries
+                new_opening_hours_entries.append(opening)
+
+
+        # Bulk insert all new OpeningHours entries and commit
+        session.bulk_save_objects(new_opening_hours_entries)
+
+        new_solverreq_data = SolverRequirement(       
+            company_name = user.company_name,
+            weekly_hours=initial_data['weekly_hours'],
+            shifts=initial_data['shifts'],
+            desired_min_time_day = initial_data['desired_min_time_day'],
+            desired_max_time_day = initial_data['desired_max_time_day'],
+            min_time_day = initial_data['min_time_day'],
+            max_time_day = initial_data['max_time_day'],
+            desired_max_time_week = initial_data['weekly_hours'],
+            max_time_week = initial_data['max_time_week'],
+            hour_devider = initial_data['hour_divider'],
+            fair_distribution = initial_data['fair_distribution'],
+            week_timeframe = initial_data['week_timeframe'],
+            subsequent_workingdays = initial_data['subsequent_workingdays'],
+            daily_deployment = initial_data['daily_deployment'],
+            time_per_deployment = initial_data['time_per_deployment'],
+            nb1 = initial_data['nb1'],
+            nb2 = initial_data['nb2'],
+            nb3 = initial_data['nb3'],
+            nb4 = initial_data['nb4'],
+            nb5 = initial_data['nb5'],
+            nb6 = initial_data['nb6'],
+            nb7 = initial_data['nb7'],
+            nb8 = initial_data['nb8'],
+            nb9 = initial_data['nb9'],
+            nb10 = initial_data['nb10'],
+            nb11 = initial_data['nb11'],
+            nb12 = initial_data['nb12'],
+            nb13 = 0,
+            nb14 = 0,
+            nb15 = 0,
+            nb16 = 0,
+            nb17 = 0,
+            nb18 = 0,
+            nb19 = 0,
+            nb20 = 0,
+            created_by = user.company_id,
+            changed_by = user.company_id,
+            creation_timestamp = datetime.datetime.now(),
+            update_timestamp = datetime.datetime.now()
+            )
+        
+        session.add(new_solverreq_data)
+        session.commit()
+        session.close()   
+
+    return jsonify({'initialSetupNeeded': is_initial_setup_needed()})
+
+
+    
