@@ -1190,7 +1190,7 @@ def run_solver():
         
         errors = []  # Eine Liste um alle Fehler zu speichern
         
-        for i in range(1, 3):  # Assuming you have 6 pre-checks
+        for i in range(1, 5):  # Assuming you have 6 pre-checks
             pre_check_result = getattr(or_algo_cp, f'pre_check_{i}')()
             socketio.emit('pre_check_update', {
                 'pre_check_number': i,

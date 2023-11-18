@@ -98,7 +98,7 @@ class DataProcessing:
 
         # Zeitraum selbst manipulieren
         self.start_date = "2023-11-13"
-        self.end_date = "2023-11-19"
+        self.end_date = "2023-11-26"
 
         print("start_date: ", self.start_date)
         print("end_time: ", self.end_date)

@@ -288,7 +288,7 @@ const Dashboard = () => {
             p="15px"
           >
             <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-              {t('dashboard.nextShifts')} 
+              {t('dashboard.Availability')} 
             </Typography>
             <Select
               labelId="simple-select-label"

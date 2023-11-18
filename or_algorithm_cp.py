@@ -561,6 +561,7 @@ class ORAlgorithm_cp:
         for key, value in self.verfügbarkeit.items():
             print("MA_id: ", key)
             print("Wert: ", value)
+        print(self.verfügbarkeit)
         print("3. self.kosten: ", self.kosten)
         print("4. self.max_zeit: ", self.max_zeit)
         print("5. self.min_zeit: ", self.min_zeit)
@@ -730,77 +731,96 @@ class ORAlgorithm_cp:
             return {"success": False, "name": "Pre-check_2", "message": str(e)}
 
 
+
     def pre_check_3(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        3. Vorüberprüfung: Haben die Teilzeit Mitarbeiter mindestens die anzahl Stunden welche sie eingeteilt werden eingegeben?
-        Haben die MA mindestens die anzahl Stunden von gerechte_verteilung eingegeben?
-
-        Diese Vorüberprüfung wird wegfallen, da man das bei gerechte Verteilung bereits einbaut!
-        
-        ---------------------------------------------------------------------------------------------------------------
-        """
-        try: 
-            errors = []
-
-            for index, ma_id in enumerate(self.mitarbeiter):
-                if self.employment[index] == 'Temp':
-                    total_hours_week = sum(sum(self.verfügbarkeit[ma_id][day]) for day in range(self.calc_time))
-                    if total_hours_week < self.gerechte_verteilung[index]:
-                        errors.append(
-                            f"Temp-Mitarbeiter {ma_id} hat nur {total_hours_week} Stunden in der Woche eingetragen. "
-                            f"Das ist weniger als die erforderliche Gesamtstundenzahl von {self.gerechte_verteilung[index]} Stunden."
-                        )
-            if errors:
-                raise ValueError("Folgende Fehler wurden gefunden:\n" + "\n".join(errors))
-
-            return {"success": True, "name": "Pre-check_3", "message": "All checks are successful!"}
-        except ValueError as e:
-            return {"success": False, "name": "Pre-check_3", "message": str(e)}
-
-    def pre_check_4(self):
-        """
-        ---------------------------------------------------------------------------------------------------------------
-        4. Vorüberprüfung: Haben alle Mitarbeiter zusammen genug Stunden eingeplant, um ihre Planung zu erfüllen?
-        Haben alle MA zusammen genug Stunden eingegeben, um die verteilbaren Stunden zu erreichen?
+        3. Vorüberprüfung: Haben alle Mitarbeiter zusammen genug Stunden eingeplant, um ihre Planung zu erfüllen?
         ---------------------------------------------------------------------------------------------------------------
         """
         try: 
             total_hours_available = sum(self.gesamtstunden_verfügbarkeit)
-            toleranz = 1 # Wenn man möchte, das die eingegebenen Stunden der MA höher sein müssen als die verteilbaren_stunden
+            toleranz = 1000 # Wenn man möchte, das die eingegebenen Stunden der MA höher sein müssen als die verteilbaren_stunden
 
             if total_hours_available < self.verteilbare_stunden * toleranz:
-                pass
-                raise ValueError(f"Die Mitarbeiter haben insgesamt nicht genug Stunden eingegeben, um die verteilbaren Stunden zu erreichen. Benötigte Stunden: {self.verteilbare_stunden}, eingegebene Stunden: {total_hours_available}, Toleranz: {toleranz}")
+
+                # Die Zeiteinheiten in Ganze Stunden umrechnen
+                full_hours_verteilbare_stunden =  self.verteilbare_stunden / self.hour_devider
+                full_hours_available = total_hours_available / self.hour_devider
+
+                raise ValueError(f"Die Mitarbeiter haben insgesamt nicht genug Stunden eingegeben, um die verteilbaren Stunden zu erreichen. Benötigte Stunden: {full_hours_verteilbare_stunden}, eingegebene Stunden: {full_hours_available}, Toleranz: {toleranz}")
+            
+            return {"success": True, "name": "Pre-check_3", "message": "All checks are successful!"}
+        except ValueError as e:
+            return {"success": False, "name": "Pre-check_3", "message": str(e)}
+
+
+    def pre_check_4(self):
+        """
+        ---------------------------------------------------------------------------------------------------------------
+        4. Vorüberprüfung: Stehen zu jeder Zeit mindestens die Anzahl Mitarbeiter mit dem entsprechenden Skill zur Verfügung, die Sie eingeplant haben?
+        ---------------------------------------------------------------------------------------------------------------
+        """
+        try: 
+            # Anzahl der Tage bestimmen
+            num_days = len(self.verfügbarkeit[next(iter(self.verfügbarkeit))])
+
+            # Erstellen eines Dictionaries zur Speicherung der Verfügbarkeit pro Skill für jeden Tag
+            # Die Länge der inneren Listen entspricht der Länge der Verfügbarkeitslisten in self.verfügbarkeit
+            skill_availability = {skill: [[] for _ in range(num_days)] for skill in self.skills}
+
+            # Das skill_availability Dict befüllen mit der Anzahl Verfügbarkeiten von MA pro Stunde pro Skill
+            for mitarbeiter, skills in self.mitarbeiter_s.items():
+                verfuegbarkeit = self.verfügbarkeit[mitarbeiter]
+                for day_index, day in enumerate(verfuegbarkeit):
+                    for skill in skills:
+                        if len(skill_availability[skill][day_index]) == 0:  # Erste Initialisierung der inneren Listen
+                            skill_availability[skill][day_index] = [0] * len(day)
+                        for hour, available in enumerate(day):
+                            # Erhöhung der Verfügbarkeitsanzahl für jede Stunde, in der der Mitarbeiter verfügbar ist
+                            if available:
+                                skill_availability[skill][day_index][hour] += 1
+
+            # Zählen von welchen Skill an welchem Tag zu welcher Stunde wieviele Mitarbeiter "fehlen"
+            unmet_requirements = []
+            for skill in self.min_anwesend:
+                for day_index, day_requirements in enumerate(self.min_anwesend[skill]):
+                    for hour, required_count in day_requirements.items():
+                        # Prüfen, ob die Verfügbarkeit für diesen Skill und diese Stunde unzureichend ist
+                        if hour < len(skill_availability[skill][day_index]):
+                            if skill_availability[skill][day_index][hour] < required_count:
+                                unmet_requirements.append((skill, day_index, hour, required_count))
+
+
+            # Sortieren nach "day", damit das frühste Datum als erstes angezeigt wird in der Fehlerliste
+            unmet_requirements.sort(key=lambda x: x[1])
+            
+            # Startdatum in ein datetime.date-Objekt konventieren
+            start_date = datetime.datetime.strptime(self.start_date, "%Y-%m-%d").date()
+
+            # Die unmet_requirements Liste wird transformiert, damit die Daten sauber angezeigt werden könnnen für den User
+            transformed_list = [
+                f"Tag: {['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'][day % 7]} {start_date + datetime.timedelta(days=day)}, Uhrzeit: {(self.laden_oeffnet[day % 7] + datetime.timedelta(hours=hour / self.hour_devider)).seconds // 3600}:{((self.laden_oeffnet[day % 7] + datetime.timedelta(hours=hour / self.hour_devider)).seconds % 3600) // 60:02d}, Anzahl fehlende Verfügbarkeit: {required}, Skill: {skill}"
+                for skill, day, hour, required in unmet_requirements
+            ]
+
+            # Überprüfen ob Fehler vorhanden sind
+            if len(transformed_list) > 0:
+                error_message_lines = ["An folgenden Tagen und Stunden sind weniger Mitarbeiter verfügbar als eingeplant wurden:"]
+                for fail in transformed_list:
+                    error_message_lines.append(f"{fail}")
+                raise ValueError("\n".join(error_message_lines))
+
             
             return {"success": True, "name": "Pre-check_4", "message": "All checks are successful!"}
         except ValueError as e:
             return {"success": False, "name": "Pre-check_4", "message": str(e)}
-
-
+        
+        
     def pre_check_5(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        5. Vorüberprüfung: Stehen zu jeder Zeit mindestens die Anzahl Mitarbeiter zur Verfügung, die Sie benötigten?
-        Ist zu jeder notwendigen Zeit (self.min_anwesend) die mindestanzahl Mitarbeiter verfügbar?
-        ---------------------------------------------------------------------------------------------------------------
-        """
-        try: 
-            for i in range(len(self.min_anwesend)):  # Für jeden Tag in der Woche
-                for j in range(len(self.min_anwesend[i])):  # Für jede Stunde am Tag
-                    if sum([self.verfügbarkeit[ma][i][j] for ma in self.mitarbeiter]) < self.min_anwesend[i][j]:
-                        #raise ValueError(f"Es sind nicht genügend Mitarbeiter verfügbar zur notwendigen Zeit (Tag {i+1}, Stunde {j+1}).")
-                        pass
-            
-            return {"success": True, "name": "Pre-check_5", "message": "All checks are successful!"}
-        except ValueError as e:
-            return {"success": False, "name": "Pre-check_5", "message": str(e)}
-        
-        
-    def pre_check_6(self):
-        """
-        ---------------------------------------------------------------------------------------------------------------
-        6. Vorüberprüfung: Haben die Mitarbeiter pro Tag mindestens die mindest Areitszeit pro Tag eingegeben? (bei 0 Stunden wird es ignoriert)
+        5. Vorüberprüfung: Haben die Mitarbeiter pro Tag mindestens die mindest Areitszeit pro Tag eingegeben? (bei 0 Stunden wird es ignoriert)
         Können die MA die min. Zeit täglich erreichen? Wenn 0 Stunden eingegeben wurden, läuft es durch!
         ---------------------------------------------------------------------------------------------------------------
         """
@@ -819,23 +839,23 @@ class ORAlgorithm_cp:
             if errors:
                 raise ValueError("Folgende Fehler wurden gefunden:\n" + "\n".join(errors))
             
-            return {"success": True, "name": "Pre-check_6", "message": "All checks are successful!"}
+            return {"success": True, "name": "Pre-check_5", "message": "All checks are successful!"}
         except ValueError as e:
-            return {"success": False, "name": "Pre-check_6", "message": str(e)}
+            return {"success": False, "name": "Pre-check_5", "message": str(e)}
 
 
-    def pre_check_7(self):
+    def pre_check_6(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        7. Ist die min. Zeit pro Tag so klein, dass die Stunden in der gerechten Verteilung nicht erfüllt werden können?
+        6. Ist die min. Zeit pro Tag so klein, dass die Stunden in der gerechten Verteilung nicht erfüllt werden können?
         ---------------------------------------------------------------------------------------------------------------
         """
         return None
 
-    def pre_check_8(self):
+    def pre_check_7(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        8. Ist die Toleranz der gerechten Verteilung zu klein gewählt? --> Evtl. die Bedingung weich machen!
+        7. Ist die Toleranz der gerechten Verteilung zu klein gewählt? --> Evtl. die Bedingung weich machen!
         ---------------------------------------------------------------------------------------------------------------
         """
         return None
