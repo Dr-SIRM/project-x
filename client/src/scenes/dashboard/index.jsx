@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Select, MenuItem, useTheme } from "@mui/material";
+import { Box, Typography, Select, MenuItem, useTheme, IconButton } from "@mui/material";
 import { tokens } from "../../theme";
 import { mockTransactions } from "../../data/mockData";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
@@ -16,6 +16,7 @@ import { API_BASE_URL } from "../../config";
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import '../../i18n';  
+import { SiMinutemailer } from "react-icons/si";
 
 /* Mögliche Ideen fürs Dashboard
 - Anz gearbeitete Stunden diese Woche 
@@ -45,6 +46,8 @@ const Dashboard = () => {
   const { t, i18n } = useTranslation();
   const [selectedMissingWeek, setSelectedMissingWeek] = useState(1);
   const [currentWeekNum, setCurrentWeekNum] = useState();
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
+  const [showErrorNotification, setShowErrorNotification] = useState(false);
   
   useEffect(() => {
     const fetchData = async () => {
@@ -74,6 +77,25 @@ const Dashboard = () => {
 
     fetchData();
 }, [selectedMissingWeek]);
+
+  const handleFormSubmit = async (buttonName) => {
+
+    const payload = { button: buttonName };
+    console.log("Final payload before sending to server:", payload);
+
+    try {
+      // Send the updated form values to the server for database update
+      await axios.post(`${API_BASE_URL}/api/dashboard?selectedMissingWeek=${encodeURIComponent(selectedMissingWeek)}`, payload, {
+    headers: {
+        'Authorization': `Bearer ${token}`
+        }
+    });
+      setShowSuccessNotification(true);
+    } catch (error) {
+      console.error('Error Sending Mail:', error);
+      setShowErrorNotification(true);
+    }
+  };
 
   return (
     <Box m="20px">
@@ -300,11 +322,17 @@ const Dashboard = () => {
               style={{ color: colors.grey[100], width: '120px' }}  // Assuming you want the dropdown text to be white
               size="small"
           >
-              <MenuItem value={1}>KW {currentWeekNum}</MenuItem>
-              <MenuItem value={2}>KW {currentWeekNum+1}</MenuItem>
-              <MenuItem value={3}>KW {currentWeekNum+2}</MenuItem>
-              <MenuItem value={4}>KW {currentWeekNum+3}</MenuItem>
-          </Select>
+              <MenuItem value={1}>{t('dashboard.calendar_week')} {currentWeekNum}</MenuItem>
+              <MenuItem value={2}>{t('dashboard.calendar_week')} {currentWeekNum+1}</MenuItem>
+              <MenuItem value={3}>{t('dashboard.calendar_week')} {currentWeekNum+2}</MenuItem>
+              <MenuItem value={4}>{t('dashboard.calendar_week')} {currentWeekNum+3}</MenuItem>
+            </Select>
+            <IconButton 
+                    color="inherit" 
+                    onClick={() => handleFormSubmit("Msg_Missing_Availability")}
+                >
+                    <SiMinutemailer />
+            </IconButton>
           </Box>
           {missingUser.map((user) => (
             <Box
@@ -358,11 +386,17 @@ const Dashboard = () => {
               style={{ color: colors.grey[100], width: '120px' }}  // Assuming you want the dropdown text to be white
               size="small"
           >
-              <MenuItem value={1}>KW {currentWeekNum}</MenuItem>
-              <MenuItem value={2}>KW {currentWeekNum+1}</MenuItem>
-              <MenuItem value={3}>KW {currentWeekNum+2}</MenuItem>
-              <MenuItem value={4}>KW {currentWeekNum+3}</MenuItem>
+              <MenuItem value={1}>{t('dashboard.calendar_week')} {currentWeekNum}</MenuItem>
+              <MenuItem value={2}>{t('dashboard.calendar_week')} {currentWeekNum+1}</MenuItem>
+              <MenuItem value={3}>{t('dashboard.calendar_week')} {currentWeekNum+2}</MenuItem>
+              <MenuItem value={4}>{t('dashboard.calendar_week')} {currentWeekNum+3}</MenuItem>
           </Select>
+          <IconButton 
+            color="inherit" 
+            onClick={() => {/* function to handle click and post data to server */}}
+            >
+            <SiMinutemailer />
+          </IconButton>
           </Box>
           {insufficientPlanning.map((missing_user) => (
             <Box

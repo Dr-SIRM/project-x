@@ -2162,6 +2162,25 @@ def get_dashboard_data():
     if not current_user:
         return jsonify({'error': 'User not found'}), 404
     
+    if request.method == 'POST':
+        button = request.json.get("button", None)
+        if button == "Msg_Missing_Availability":
+            missing_users = get_missing_user_list(session, current_user)
+            print("Missing User: ", missing_users)
+        
+            #recipients = ["timetab@gmx.ch" for user in missing_users]
+            recipients = [user['email'] for user in get_missing_user_list(session, current_user)]
+
+            print(recipients)
+            msg = Message('Registration Token', recipients=recipients)
+            msg.body = f"Hoi Team,\n \n" \
+            f"Bisher hast du noch keine Verfügbarkeit für die kommenden Wochen eingetragen. \n \n" \
+            F"Bitte trage deine Verfügbarkeit schnellstmöglich ein. Anderefalls können wir dich leider nicht mit einplanen. \n \n" \
+            f"Liebe Grüsse \n \n" \
+            f"Team {current_user.company_name}"
+            #mail.send(msg)
+            print(msg.body)
+    
 
     try:
         return jsonify({
@@ -2174,7 +2193,7 @@ def get_dashboard_data():
             'full_time_count': get_full_time_count(session, current_user),
             'missing_user_list': get_missing_user_list(session, current_user),
             'current_week_num': current_week_num,
-            'unavailable_times': unavailable_times(session, current_user)
+            #'unavailable_times': unavailable_times(session, current_user)
         })
     finally:
         session.close()
@@ -2306,25 +2325,29 @@ def get_full_time_count(session, current_user):
     ).count()
 
 def get_missing_user_list(session, current_user):
+    missing_users = []
     if request.method == 'GET':
         selectedMissingWeek = int(request.args.get('selectedMissingWeek', None))
-        start_of_week_missing_team, end_of_week_missing_team, *_ = get_current_week_range2(selectedMissingWeek)
-        missing_fte_query = session.query(Availability.email).filter(
-            Availability.date >= start_of_week_missing_team,
-            Availability.date <= end_of_week_missing_team
-        ).subquery()
-        missing_users = session.query(User).filter(
-            not_(User.email.in_(missing_fte_query))
-        ).filter_by(company_name=current_user.company_name).all()
-        print(missing_users)
-        print(start_of_week_missing_team, end_of_week_missing_team)
+    else: # request.method == 'POST'
+        selectedMissingWeek = int(request.json.get('selectedMissingWeek', None))
+    start_of_week_missing_team, end_of_week_missing_team, *_ = get_current_week_range2(selectedMissingWeek)
+    missing_fte_query = session.query(Availability.email).filter(
+        Availability.date >= start_of_week_missing_team,
+        Availability.date <= end_of_week_missing_team
+    ).subquery()
+    missing_users = session.query(User).filter(
+        not_(User.email.in_(missing_fte_query))
+    ).filter_by(company_name=current_user.company_name).all()
+    print(missing_users)
+    print(start_of_week_missing_team, end_of_week_missing_team)
+    
     return [{'name': f'{user.first_name} {user.last_name}', 'email': user.email} for user in missing_users]
 
 
 def unavailable_times(session, current_user):
     if request.method == 'GET':
         selectedMissingWeek = int(request.args.get('selectedMissingWeek', None))
-        start_of_week_missing_team, end_of_week_missing_team, *_ = get_current_week_range2(selectedMissingWeek)
+    start_of_week_missing_team, end_of_week_missing_team, *_ = get_current_week_range2(selectedMissingWeek)
     
     # Subquery to count available workers for each time slot
     available_workers_subquery = session.query(
@@ -2681,6 +2704,8 @@ def check_initial_setup():
         session.close()   
 
     return jsonify({'initialSetupNeeded': is_initial_setup_needed()})
+
+
 
 
     

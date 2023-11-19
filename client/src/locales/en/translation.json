@@ -27,7 +27,8 @@
     "partimeworkers": "Parttime Employees",
     "fulltimeworkers": "Fulltime Employees",
     "missing_availability": "Mising Availability",
-    "insufficient_planning": "Planning Error"
+    "insufficient_planning": "Planning Error",
+    "calendar_week": "CW"
   },
 
   "team": {
