@@ -13,27 +13,27 @@ const FAQ = () => {
   const colors = tokens(theme.palette.mode);
   return (
     <Box m="20px">
-      <Header title="FAQ" subtitle="Frequently Asked Questions Seite" />
+      <Header title="FAQ" subtitle="Frequently Asked Questions. Die Antworten werden jeweils Schriftlich und mit einem Video erklärt." />
 
       <Accordion >
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography color={colors.greenAccent[500]} variant="h5">
-            Wie können die Mitarbeiter auf den aktuellen Schichtplan zugreifen und ihre Schichtpläne einsehen?
+            Wie kann ich mein Team Verwalten?
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
           <Typography>
-          Die automatisierte Schichtplanungs-App bietet in der Regel eine Vielzahl von Funktionen, die die Planung und Verwaltung von Schichten erleichtern. Dazu können beispielsweise die automatische Schichtzuweisung auf der Grundlage von Regeln und Vorgaben, die Berücksichtigung von Abwesenheiten wie Urlaub oder Krankheit, die Integration von Schichtplänen in den Kalender der Mitarbeiter, die Möglichkeit für Mitarbeiter, Änderungen an ihren Schichten vorzunehmen, und die Generierung von Berichten und Statistiken gehören.
+          Sie können unter "Team Verwalten" Einstellungen vornehmen. Sie können die Emailadresse der Mitarbeiter ändern, die Anstellung und den Anstellungsgrad anpassen oder Abteilungen zuweisen. Ebenfalls können Sie einzelne Mitarbeiter löschen.
           </Typography>
         </AccordionDetails>
         <AccordionDetails>
           <Typography>
-            
+            Anleitungsvideo "Team Verwalten"
           </Typography>
           <iframe
-            width="560"
-            height="315"
-            src="https://www.youtube.com/embed/leIFlx3daUk"
+            width="1000"
+            height="440"
+            src="https://www.youtube.com/embed/oBKEaczB5sc"
             title="YouTube video player"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -42,7 +42,7 @@ const FAQ = () => {
 
         </AccordionDetails>
       </Accordion>
-      <Accordion defaultExpanded>
+      <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography color={colors.greenAccent[500]} variant="h5">
           Welche Funktionen bietet die automatisierte Schichtplanungs-App?
