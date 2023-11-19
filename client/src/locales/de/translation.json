@@ -145,6 +145,11 @@
 
     "shiftplan": {
     
+    },
+
+    "welcome": {
+      "title": "Willkommen auf TimeTab"
+  
     }
   }
   

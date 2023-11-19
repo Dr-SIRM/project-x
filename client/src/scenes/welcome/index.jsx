@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Button, TextField, MenuItem, Select, FormControl, InputLabel, Snackbar  } from "@mui/material";
+import { useTheme, Box, Button, TextField, MenuItem, Select, FormControl, InputLabel, Snackbar, Typography  } from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -7,8 +7,9 @@ import Header from "../../components/Header";
 import axios from 'axios';
 import { API_BASE_URL } from "../../config";
 import QuickStartPopup from '../quickstart';
-import Popup from 'reactjs-popup';
-import 'reactjs-popup/dist/index.css';
+import { useTranslation } from 'react-i18next';
+import '../../i18n'; 
+import { tokens } from "../../theme";
 
 
 const Welcome = () => {
@@ -17,6 +18,9 @@ const Welcome = () => {
     const [showErrorNotification, setShowErrorNotification] = useState(false);
     const [isLoading, setIsLoading] = useState(true); 
     const token = localStorage.getItem('session_token');
+    const { t, i18n } = useTranslation();
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
   
 
 
@@ -40,35 +44,25 @@ const Welcome = () => {
           fetchQuickStart();
         }, []);
 
-    const handleFormSubmit = async (values) => {
-    
-    Object.keys(values).forEach((key) => {
-      if (values[key] === '' || values[key] === undefined) {
-        values[key] = undefined;
-      }
-    });
-
-    try {
-      // Send the updated form values to the server for database update
-      await axios.post(`${API_BASE_URL}/api/company`, values, {
-    headers: {
-        'Authorization': `Bearer ${token}`
-        }
-    });
-      setShowSuccessNotification(true);
-    } catch (error) {
-      console.error('Error updating company details:', error);
-      setShowErrorNotification(true);
-    }
-  };
-  
-
-  
   return (
     <div>
+      <Box
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center" 
+        minHeight="100vh"
+      >
         <QuickStartPopup open={initalSetup} onClose={() => setInitalSetup(false)} />
-        <h1>Welcome to Our Application</h1>
+        <Typography 
+          variant="h1" 
+          color={colors.primary[100]} 
+          paddingBottom={"10px"}
+        >
+          {t('welcome.title')}
+        </Typography>
         {/* Additional content can go here */}
+      </Box>
     </div>
     );
   };

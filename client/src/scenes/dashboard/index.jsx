@@ -42,7 +42,7 @@ const Dashboard = () => {
   const totalHoursWorked = (hoursWorkedData && Array.isArray(hoursWorkedData)) ? hoursWorkedData.reduce((sum, item) => sum + parseFloat(item.hours_worked), 0) : 0;
   const token = localStorage.getItem('session_token'); 
   const { t, i18n } = useTranslation();
-  const [selectedMissingWeek, setSelectedMissingWeek] = useState(4);
+  const [selectedMissingWeek, setSelectedMissingWeek] = useState(1);
   const [currentWeekNum, setCurrentWeekNum] = useState();
   
   useEffect(() => {
@@ -335,23 +335,6 @@ const Dashboard = () => {
           gridRow="span 2"
           backgroundColor={colors.primary[800]}
           borderRadius="15px"
-        >
-          <Typography
-            variant="h5"
-            fontWeight="600"
-            sx={{ padding: "30px 30px 0 30px" }}
-          >
-            {t('dashboard.salesQuantity')} 
-          </Typography>
-          {/* <Box height="250px" mt="-20px">
-            <BarChart isDashboard={true} />
-          </Box> */}
-        </Box>
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[800]}
-          borderRadius="15px"
           overflow="auto"
         >
           <Box
@@ -363,8 +346,21 @@ const Dashboard = () => {
             p="15px"
           >
             <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-            {t('dashboard.whosworking')} 
+              {t('dashboard.Availability')} 
             </Typography>
+            <Select
+              labelId="simple-select-label"
+              id="simple-select"
+              value={selectedMissingWeek}
+              onChange={(e) => setSelectedMissingWeek(e.target.value)}
+              style={{ color: colors.grey[100], width: '120px' }}  // Assuming you want the dropdown text to be white
+              size="small"
+          >
+              <MenuItem value={1}>KW {currentWeekNum}</MenuItem>
+              <MenuItem value={2}>KW {currentWeekNum+1}</MenuItem>
+              <MenuItem value={3}>KW {currentWeekNum+2}</MenuItem>
+              <MenuItem value={4}>KW {currentWeekNum+3}</MenuItem>
+          </Select>
           </Box>
           {currentShifts.map((shift, i) => (
             <Box

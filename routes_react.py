@@ -2084,7 +2084,8 @@ def get_dashboard_data():
             'part_time_count': get_part_time_count(session, current_user),
             'full_time_count': get_full_time_count(session, current_user),
             'missing_user_list': get_missing_user_list(session, current_user),
-            'current_week_num': current_week_num
+            'current_week_num': current_week_num,
+            'unavailable_times': unavailable_times(session, current_user)
         })
     finally:
         session.close()
@@ -2222,7 +2223,7 @@ def get_missing_user_list(session, current_user):
         missing_fte_query = session.query(Availability.email).filter(
             Availability.date >= start_of_week_missing_team,
             Availability.date <= end_of_week_missing_team
-        ).all()
+        ).subquery()
         missing_users = session.query(User).filter(
             not_(User.email.in_(missing_fte_query))
         ).filter_by(company_name=current_user.company_name).all()
@@ -2231,36 +2232,47 @@ def get_missing_user_list(session, current_user):
     return [{'name': f'{user.first_name} {user.last_name}', 'email': user.email} for user in missing_users]
 
 
-def unavailable_times():
-    start_of_week_missing_team, end_of_week_missing_team, *_ = get_current_week_range()
+def unavailable_times(session, current_user):
+    if request.method == 'GET':
+        selectedMissingWeek = int(request.args.get('selectedMissingWeek', None))
+        start_of_week_missing_team, end_of_week_missing_team, *_ = get_current_week_range2(selectedMissingWeek)
     
-    unavailable_times = {}
-    
-    # Fetch TimeReq and Availability data (example: for a specific date)
-    time_reqs = session.query(TimeReq).filter(
-        TimeReq.date >= start_of_week_missing_team,
-        TimeReq.date <= end_of_week_missing_team,
-        TimeReq.worker >= 0
-    ).subquery()
-    availabilities = session.query(Availability).filter(
+    # Subquery to count available workers for each time slot
+    available_workers_subquery = session.query(
+        Availability.date.label('avail_date'),
+        Availability.start_time.label('avail_start_time'),
+        func.count(Availability.user_id).label('available_workers')
+    ).filter(
         Availability.date >= start_of_week_missing_team,
         Availability.date <= end_of_week_missing_team
+    ).group_by(
+        Availability.date, Availability.start_time
     ).subquery()
 
-    for time_req in time_reqs:
-        is_available = False
+    # Query to find dates and start times with insufficient workers
+    insufficient_worker_dates_and_times = session.query(
+        TimeReq.date,
+        TimeReq.start_time
+    ).filter(
+        TimeReq.date >= start_of_week_missing_team,
+        TimeReq.date <= end_of_week_missing_team
+    ).outerjoin(
+        available_workers_subquery,
+        (TimeReq.date == available_workers_subquery.c.avail_date) &
+        (TimeReq.start_time == available_workers_subquery.c.avail_start_time)
+    ).filter(
+        or_(
+            TimeReq.worker > available_workers_subquery.c.available_workers,
+            available_workers_subquery.c.available_workers == None  # No available workers
+        )
+    ).all()
 
-        for availability in availabilities:
-            # Check if time_req falls within availability time slots
-            if check_time_overlap(time_req.start_time, time_req.end_time, availability):
-                is_available = True
-                break
-
-        # if not is_available:
-        #     # Add to unavailable_times
-        #     if date_filter not in unavailable_times:
-        #         unavailable_times[date_filter] = []
-        #     unavailable_times[date_filter].append((time_req.start_time, time_req.end_time))
+    # Extracting date and time into a list
+    unavailable_times = [
+    (item.date.isoformat(), item.start_time.strftime('%H:%M:%S')) 
+    for item in insufficient_worker_dates_and_times
+]
+    print("Unavailable Times: ", unavailable_times)
 
     return unavailable_times
 
