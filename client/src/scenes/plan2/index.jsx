@@ -7,6 +7,7 @@ import {
     ListItemText,
     Typography,
     useTheme,
+    IconButton
   } from "@mui/material";
 import Header from "../../components/Header";
 import axios from 'axios';
@@ -16,6 +17,9 @@ import moment from 'moment';
 import { API_BASE_URL } from "../../config";
 import { ThreeDots } from "react-loader-spinner";
 import './GanttChart.css';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+
 
 
 const GanttChart = () => {
@@ -24,6 +28,45 @@ const GanttChart = () => {
   const [isLoading, setIsLoading] = useState(false);
   const token = localStorage.getItem('session_token');
   const [timelineBounds, setTimelineBounds] = useState({ start: moment(), end: moment() });
+  const [timelineKey, setTimelineKey] = useState(0);
+  const [currentView, setCurrentView] = useState('week');
+  const setDayView = () => {
+    const startOfDay = moment().startOf('day').hour(0).minute(0).second(0);
+    const endOfDay = moment().startOf('day').hour(23).minute(59).second(59);
+  
+    console.log('Day View - Start:', startOfDay.toString(), 'End:', endOfDay.toString());
+    setCurrentView('day');
+    setTimelineBounds({ start: startOfDay, end: endOfDay });
+    setTimelineKey(prevKey => prevKey + 1); // Update key to force re-render
+  };
+  
+  
+  
+
+  const setWeekView = () => {
+    const startOfWeek = moment().startOf('week');
+    const endOfWeek = moment().startOf('week').add(1, 'week');
+    setCurrentView('week');
+    setTimelineBounds({ start: startOfWeek, end: endOfWeek });
+    setTimelineKey(prevKey => prevKey + 1); // Update key to force re-render
+  };
+  const goToNext = () => {
+    const amount = currentView === 'day' ? 1 : 7;
+    setTimelineBounds({
+      start: timelineBounds.start.clone().add(amount, 'days'),
+      end: timelineBounds.end.clone().add(amount, 'days')
+    });
+    setTimelineKey(prevKey => prevKey + 1);
+  };
+  const goToPrevious = () => {
+    const amount = currentView === 'day' ? 1 : 7;
+    setTimelineBounds({
+      start: timelineBounds.start.clone().subtract(amount, 'days'),
+      end: timelineBounds.end.clone().subtract(amount, 'days')
+    });
+    setTimelineKey(prevKey => prevKey + 1);
+  };
+  
 
   useEffect(() => {
     const fetchShifts = async () => {
@@ -71,7 +114,7 @@ const GanttChart = () => {
         });
   
         const timelineGroups = response.data.users.map(user => ({
-            id: user.email, // Assuming email is unique for each user
+            id: user.email, 
             title: `${user.first_name} ${user.last_name}`
         }));
   
@@ -92,22 +135,36 @@ const GanttChart = () => {
   return (
     <Box m="20px" className="gantt-chart-container">
       <Header title="Schichtplan" subtitle="Schichtplan blabla" />
-    <div>
-      {isLoading ? (
-        <ThreeDots color="#2BAD60" height={80} width={80} />
-      ) : (
-        <Timeline
-          groups={groups}
-          items={shifts}
-          defaultTimeStart={timelineBounds.start}
-          defaultTimeEnd={timelineBounds.end}
-          canMove={false}
-          canResize={false}
-          // Apply inline styles to the container of the timeline
-          style={{ color: 'black', backgroundColor: 'white' }}
-        />
-      )}
-    </div>
+      <Box display="flex" justifyContent="center" alignItems="center" mb={2}>
+        <IconButton onClick={goToPrevious} color="primary">
+          <ArrowBackIosIcon />
+        </IconButton>
+        <Button onClick={setDayView} variant="contained" color="primary" sx={{ mx: 2 }}>
+          Day View
+        </Button>
+        <Button onClick={setWeekView} variant="contained" color="primary" sx={{ mx: 2 }}>
+          Week View
+        </Button>
+        <IconButton onClick={goToNext} color="primary">
+          <ArrowForwardIosIcon />
+        </IconButton>
+      </Box>
+      <div>
+        {isLoading ? (
+          <ThreeDots color="#2BAD60" height={80} width={80} />
+        ) : (
+          <Timeline
+            key={timelineKey}
+            groups={groups}
+            items={shifts}
+            defaultTimeStart={timelineBounds.start}
+            defaultTimeEnd={timelineBounds.end}
+            canMove={false}
+            canResize={false}
+            style={{ color: 'black', backgroundColor: 'white' }}
+          />
+        )}
+      </div>
     </Box>
   );
 }
