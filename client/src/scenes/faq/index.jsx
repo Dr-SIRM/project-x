@@ -15,6 +15,33 @@ const FAQ = () => {
     <Box m="20px">
       <Header title="FAQ" subtitle="Frequently Asked Questions Seite" />
 
+      <Accordion >
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography color={colors.greenAccent[500]} variant="h5">
+            Wie können die Mitarbeiter auf den aktuellen Schichtplan zugreifen und ihre Schichtpläne einsehen?
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography>
+          Die automatisierte Schichtplanungs-App bietet in der Regel eine Vielzahl von Funktionen, die die Planung und Verwaltung von Schichten erleichtern. Dazu können beispielsweise die automatische Schichtzuweisung auf der Grundlage von Regeln und Vorgaben, die Berücksichtigung von Abwesenheiten wie Urlaub oder Krankheit, die Integration von Schichtplänen in den Kalender der Mitarbeiter, die Möglichkeit für Mitarbeiter, Änderungen an ihren Schichten vorzunehmen, und die Generierung von Berichten und Statistiken gehören.
+          </Typography>
+        </AccordionDetails>
+        <AccordionDetails>
+          <Typography>
+            
+          </Typography>
+          <iframe
+            width="560"
+            height="315"
+            src="https://www.youtube.com/embed/leIFlx3daUk"
+            title="YouTube video player"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
+
+        </AccordionDetails>
+      </Accordion>
       <Accordion defaultExpanded>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography color={colors.greenAccent[500]} variant="h5">
