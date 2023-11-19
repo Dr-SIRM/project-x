@@ -37,7 +37,7 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (user) {
       localStorage.setItem('last_activity', new Date().toString());
-      navigate('/dashboard');
+      navigate('/welcome');
     }
   }, [user]);
 
@@ -80,7 +80,7 @@ const AuthProvider = ({ children }) => {
     if (user) {
       console.log('User after login:', user);
       console.log('Session token after login:', localStorage.getItem('session_token'));
-      navigate('/dashboard');
+      navigate('/welcome');
     } else {
       console.log('Back to Login');
     }  

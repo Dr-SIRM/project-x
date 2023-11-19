@@ -25,7 +25,9 @@
       "hours": "Stunden",
       "whosworking": "Wer arbeitet gerade",
       "partimeworkers": "Teilzeit MA",
-      "fulltimeworkers": "Vollzeit MA"
+      "fulltimeworkers": "Vollzeit MA",
+      "missing_availability": "Fehlende Planung",
+      "insufficient_planning": "Fehlerhafte Planung"
     },
     
     "team": {
@@ -145,6 +147,11 @@
 
     "shiftplan": {
     
+    },
+
+    "welcome": {
+      "title": "Willkommen auf TimeTab"
+  
     }
   }
   

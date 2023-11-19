@@ -10,6 +10,8 @@ import Registration from "./scenes/registration_supervisor";
 import ForgetPassword from "./scenes/forget_password";
 import Dashboard from "./scenes/dashboard";
 import Solver from "./scenes/solver";
+import Welcome from "./scenes/welcome";
+import QuickStart from "./scenes/quickstart";
 import SolverRequirement from "./scenes/solver_requirement";
 import Team from "./scenes/team";
 import Availability from "./scenes/availability";
@@ -65,6 +67,8 @@ function AppContent({ isSidebar, setIsSidebar }) {
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/payment" element={<Payment />} />
+          <Route path="/welcome" element={<PrivateRoute component={Welcome} accessLevels={["Super_Admin", "Admin", "User"]} />} />
+          <Route path="/quickstart" element={<PrivateRoute component={QuickStart} accessLevels={["Super_Admin", "Admin", "User"]} />} />
           <Route path="/dashboard" element={<PrivateRoute component={Dashboard} accessLevels={["Super_Admin", "Admin", "User"]} />} />
           <Route path="/solver" element={<PrivateRoute component={Solver} accessLevels={["Super_Admin", "Admin"]} />} />
           <Route path="/solver/requirement" element={<PrivateRoute component={SolverRequirement} accessLevels={["Super_Admin", "Admin"]} />} />

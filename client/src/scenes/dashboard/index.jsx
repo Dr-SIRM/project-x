@@ -43,6 +43,7 @@ const Dashboard = () => {
   const token = localStorage.getItem('session_token'); 
   const { t, i18n } = useTranslation();
   const [selectedMissingWeek, setSelectedMissingWeek] = useState(1);
+  const [currentWeekNum, setCurrentWeekNum] = useState();
   
   useEffect(() => {
     const fetchData = async () => {
@@ -61,6 +62,8 @@ const Dashboard = () => {
             setHoursWorkedData(response.data.hours_worked_over_time);
             setCurrentShifts(response.data.current_shifts);
             setMissingUser(response.data.missing_user_list);
+            setCurrentWeekNum(response.data.current_week_num)
+
             console.log(response.data.upcoming_shifts);
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -273,8 +276,8 @@ const Dashboard = () => {
           gridColumn="span 4"
           gridRow="span 2"
           backgroundColor={colors.primary[800]}
-          borderRadius="0px"
-          p="0px"
+          borderRadius="15px"
+          overflow="auto"
         >
           <Box
             display="flex"
@@ -285,7 +288,7 @@ const Dashboard = () => {
             p="15px"
           >
             <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-              {t('dashboard.nextShifts')} 
+              {t('dashboard.missing_availability')} 
             </Typography>
             <Select
               labelId="simple-select-label"
@@ -295,9 +298,10 @@ const Dashboard = () => {
               style={{ color: colors.grey[100], width: '120px' }}  // Assuming you want the dropdown text to be white
               size="small"
           >
-              <MenuItem value={1}>Next Week</MenuItem>
-              <MenuItem value={2}>2 Weeks</MenuItem>
-              <MenuItem value={4}>Month</MenuItem>
+              <MenuItem value={1}>KW {currentWeekNum}</MenuItem>
+              <MenuItem value={2}>KW {currentWeekNum+1}</MenuItem>
+              <MenuItem value={3}>KW {currentWeekNum+2}</MenuItem>
+              <MenuItem value={4}>KW {currentWeekNum+3}</MenuItem>
           </Select>
           </Box>
           {missingUser.map((user) => (
@@ -323,42 +327,8 @@ const Dashboard = () => {
                         {user.email} 
                     </Typography>
                 </Box>
-                
               </Box>
               ))}
-          {/* <Box
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            mt="25px"
-          >
-            <ProgressCircle size="125" />
-            <Typography
-              variant="h5"
-              color={colors.greenAccent[500]}
-              sx={{ mt: "15px" }}
-            >
-              $48,352 revenue generated
-            </Typography>
-            <Typography>Includes extra misc expenditures and costs</Typography>
-          </Box> */}
-        </Box>
-        <Box
-          gridColumn="span 4"
-          gridRow="span 2"
-          backgroundColor={colors.primary[800]}
-          borderRadius="15px"
-        >
-          <Typography
-            variant="h5"
-            fontWeight="600"
-            sx={{ padding: "30px 30px 0 30px" }}
-          >
-            {t('dashboard.salesQuantity')} 
-          </Typography>
-          {/* <Box height="250px" mt="-20px">
-            <BarChart isDashboard={true} />
-          </Box> */}
         </Box>
         <Box
           gridColumn="span 4"
@@ -376,8 +346,21 @@ const Dashboard = () => {
             p="15px"
           >
             <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
-            {t('dashboard.whosworking')} 
+              {t('dashboard.insufficient_planning')} 
             </Typography>
+            <Select
+              labelId="simple-select-label"
+              id="simple-select"
+              value={selectedMissingWeek}
+              onChange={(e) => setSelectedMissingWeek(e.target.value)}
+              style={{ color: colors.grey[100], width: '120px' }}  // Assuming you want the dropdown text to be white
+              size="small"
+          >
+              <MenuItem value={1}>KW {currentWeekNum}</MenuItem>
+              <MenuItem value={2}>KW {currentWeekNum+1}</MenuItem>
+              <MenuItem value={3}>KW {currentWeekNum+2}</MenuItem>
+              <MenuItem value={4}>KW {currentWeekNum+3}</MenuItem>
+          </Select>
           </Box>
           {currentShifts.map((shift, i) => (
             <Box
