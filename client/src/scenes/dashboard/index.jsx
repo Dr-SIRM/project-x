@@ -39,6 +39,7 @@ const Dashboard = () => {
   const [parttimeData, setPartTimeData] = useState([]); 
   const [currentShifts, setCurrentShifts] = useState([]);
   const [missingUser, setMissingUser] = useState([])
+  const [insufficientPlanning, setInsufficientPlanning] = useState([])
   const totalHoursWorked = (hoursWorkedData && Array.isArray(hoursWorkedData)) ? hoursWorkedData.reduce((sum, item) => sum + parseFloat(item.hours_worked), 0) : 0;
   const token = localStorage.getItem('session_token'); 
   const { t, i18n } = useTranslation();
@@ -62,7 +63,8 @@ const Dashboard = () => {
             setHoursWorkedData(response.data.hours_worked_over_time);
             setCurrentShifts(response.data.current_shifts);
             setMissingUser(response.data.missing_user_list);
-            setCurrentWeekNum(response.data.current_week_num)
+            setCurrentWeekNum(response.data.current_week_num);
+            setInsufficientPlanning(response.data.unavailable_times);
 
             console.log(response.data.upcoming_shifts);
         } catch (error) {
@@ -362,9 +364,9 @@ const Dashboard = () => {
               <MenuItem value={4}>KW {currentWeekNum+3}</MenuItem>
           </Select>
           </Box>
-          {currentShifts.map((shift, i) => (
+          {insufficientPlanning.map((missing_user) => (
             <Box
-              key={`${shift.name}-${i}`}
+              key={`${missing_user.date}`}
               display="flex"
               justifyContent="space-between"
               alignItems="center"
@@ -377,12 +379,12 @@ const Dashboard = () => {
                   variant="h5"
                   fontWeight="600"
                 >
-                  {shift.name}
+                  {missing_user.date}
                 </Typography>
               </Box>
               <Box>
                 <Typography color={colors.grey[100]}>
-                  {shift.start} bis {shift.end}
+                  {missing_user.time}
                 </Typography>
               </Box>
             </Box>

@@ -2344,7 +2344,8 @@ def unavailable_times(session, current_user):
         TimeReq.start_time
     ).filter(
         TimeReq.date >= start_of_week_missing_team,
-        TimeReq.date <= end_of_week_missing_team
+        TimeReq.date <= end_of_week_missing_team,
+        TimeReq.worker > 0
     ).outerjoin(
         available_workers_subquery,
         (TimeReq.date == available_workers_subquery.c.avail_date) &
@@ -2358,7 +2359,7 @@ def unavailable_times(session, current_user):
 
     # Extracting date and time into a list
     unavailable_times = [
-    (item.date.isoformat(), item.start_time.strftime('%H:%M:%S')) 
+    {'date': item.date.isoformat(), 'time': item.start_time.strftime('%H:%M:%S')} 
     for item in insufficient_worker_dates_and_times
 ]
     print("Unavailable Times: ", unavailable_times)
