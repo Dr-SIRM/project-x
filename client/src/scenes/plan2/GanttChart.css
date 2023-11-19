@@ -1,16 +1,17 @@
+.gantt-chart-container {
+    width: 100%; 
+    max-width: 1096px; /* Max-width to ensure it doesn't get too wide on large screens */
+    margin: 0 auto; /* Center the container */
+}
 
+/* Additional styles */
 .react-calendar-timeline .rct-header-root {
     background-color: #22E3B6 !important;
-    font-weight: bold
+    font-weight: bold;
 }
 
 .react-calendar-timeline .rct-header-root .rct-calendar-header .rct-dateHeader span {
     color: black !important;
-}
-
-.gantt-chart-container {
-    max-width: 1096px;
-    margin: 0 auto;
 }
 
 .react-calendar-timeline .rct-item {

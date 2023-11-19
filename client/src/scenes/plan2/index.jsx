@@ -66,6 +66,7 @@ const GanttChart = () => {
     });
     setTimelineKey(prevKey => prevKey + 1);
   };
+  
 
   useEffect(() => {
     const fetchShifts = async () => {
