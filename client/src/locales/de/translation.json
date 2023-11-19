@@ -26,7 +26,8 @@
       "whosworking": "Wer arbeitet gerade",
       "partimeworkers": "Teilzeit MA",
       "fulltimeworkers": "Vollzeit MA",
-      "missing_availability": "Fehlende Planung"
+      "missing_availability": "Fehlende Planung",
+      "insufficient_planning": "Fehlerhafte Planung"
     },
     
     "team": {
