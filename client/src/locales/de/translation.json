@@ -25,7 +25,8 @@
       "hours": "Stunden",
       "whosworking": "Wer arbeitet gerade",
       "partimeworkers": "Teilzeit MA",
-      "fulltimeworkers": "Vollzeit MA"
+      "fulltimeworkers": "Vollzeit MA",
+      "missing_availability": "Fehlende Planung"
     },
     
     "team": {

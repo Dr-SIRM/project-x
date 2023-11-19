@@ -25,7 +25,8 @@
     "hours": "hours",
     "whosworking": "Who's working",
     "partimeworkers": "Parttime Employees",
-    "fulltimeworkers": "Fulltime Employees"
+    "fulltimeworkers": "Fulltime Employees",
+    "missing_availability": "Mising Availability"
   },
 
   "team": {
