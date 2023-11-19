@@ -2062,6 +2062,95 @@ def get_shift():
 
     return jsonify(response)
 
+
+
+@app.route('/api/schichtplanung2', methods=['GET'])
+@jwt_required()
+def get_shift2():
+    react_user_email = get_jwt_identity()
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    session = get_session(get_database_uri('', session_company))
+
+    current_user = session.query(User).filter_by(email=react_user_email).first()
+    if current_user is None:
+        return jsonify({"message": "User not found"}), 404
+
+    current_company_name = current_user.company_name
+
+    DAY_MAP = {
+        'monday': 'montag',
+        'tuesday': 'dienstag',
+        'wednesday': 'mittwoch',
+        'thursday': 'donnerstag',
+        'friday': 'freitag',
+        'saturday': 'samstag',
+        'sunday': 'sonntag',
+    }
+
+    # Query users who are members of the same company
+    users = session.query(User).filter_by(company_name=current_company_name).all()
+
+    user_list = []
+    for user in users:
+        user_dict = {
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            "email": user.email,
+        }
+        user_list.append(user_dict)
+
+    # Query the opening hours for the current company
+    opening_hours_records = session.query(OpeningHours).filter_by(company_name=current_company_name).all()
+
+    opening_hours_data = {}
+    for record in opening_hours_records:
+        german_day = DAY_MAP.get(record.weekday.lower(), record.weekday.lower())
+        end_time = record.end_time2 if record.end_time2 is not None else record.end_time
+        if record.start_time is not None and end_time is not None:
+            opening_hours_data[german_day] = {
+                "start": record.start_time.strftime("%H:%M"),
+                "end": end_time.strftime("%H:%M")
+            }
+
+    # Fetching all shifts for the company
+    shift_records = session.query(Timetable).filter_by(company_name=current_company_name).all()
+
+    shift_data = []
+    for record in shift_records:
+        date_str = record.date.strftime("%Y-%m-%d") if record.date is not None else None
+        shift_data.append({
+            'email': record.email,
+            'first_name': record.first_name,
+            'last_name': record.last_name,
+            'department': record.department,
+            'date': date_str,
+            'shifts': [
+                {
+                    'start_time': record.start_time.strftime("%H:%M") if record.start_time is not None else None,
+                    'end_time': record.end_time.strftime("%H:%M") if record.end_time is not None else None
+                },
+                {
+                    'start_time': record.start_time2.strftime("%H:%M") if record.start_time2 is not None else None,
+                    'end_time': record.end_time2.strftime("%H:%M") if record.end_time2 is not None else None
+                },
+                {
+                    'start_time': record.start_time3.strftime("%H:%M") if record.start_time3 is not None else None,
+                    'end_time': record.end_time3.strftime("%H:%M") if record.end_time3 is not None else None
+                }
+            ]
+        })
+
+    response = {
+        'users': user_list,
+        'opening_hours': opening_hours_data,
+        'shifts': shift_data
+    }
+
+    session.close()
+    print(response)
+    return jsonify(response)
+
 import locale
 
 @app.route('/api/dashboard', methods=['POST', 'GET'])
@@ -2072,6 +2161,27 @@ def get_dashboard_data():
     current_week_num = int(today.isocalendar()[1])
     if not current_user:
         return jsonify({'error': 'User not found'}), 404
+    
+    print("Missing User: ", get_missing_user_list(session, current_user))
+    print("Unavailable Times: ", unavailable_times(session, current_user))
+    missing_users = get_missing_user_list(session, current_user)
+        
+    # Extract email addresses from the missing users list
+    recipients = ["timetab@gmx.ch" for user in missing_users]
+
+    if request.method == 'POST':
+        button = request.json.get("button", None)
+        if button == "Msg_Missing_Availability":
+            print(request.json)
+            session = get_session(get_database_uri('', current_user.company_name.lower().replace(' ', '_')))
+            msg = Message('Registration Token', recipients=['timetab@gmx.ch'])
+            msg.body = f"Hoi Team,\n \n" \
+            f"Bisher hast du noch keine Verfügbarkeit für die kommenden Wochen eingetragen. \n \n" \
+            F"Bitte trage deine Verfügbarkeit schnellstmöglich. Anderefalls können wir dich leider nicht mit einplanen. \n \n" \
+            f"Liebe Grüsse \n \n" \
+            f"Dein Team {current_user.company_name}"
+            #mail.send(msg)
+            print(msg.body)
     
 
     try:
@@ -2255,7 +2365,8 @@ def unavailable_times(session, current_user):
         TimeReq.start_time
     ).filter(
         TimeReq.date >= start_of_week_missing_team,
-        TimeReq.date <= end_of_week_missing_team
+        TimeReq.date <= end_of_week_missing_team,
+        TimeReq.worker > 0
     ).outerjoin(
         available_workers_subquery,
         (TimeReq.date == available_workers_subquery.c.avail_date) &
@@ -2269,7 +2380,7 @@ def unavailable_times(session, current_user):
 
     # Extracting date and time into a list
     unavailable_times = [
-    (item.date.isoformat(), item.start_time.strftime('%H:%M:%S')) 
+    {'date': item.date.isoformat(), 'time': item.start_time.strftime('%H:%M:%S')} 
     for item in insufficient_worker_dates_and_times
 ]
     print("Unavailable Times: ", unavailable_times)
@@ -2591,6 +2702,8 @@ def check_initial_setup():
         session.close()   
 
     return jsonify({'initialSetupNeeded': is_initial_setup_needed()})
+
+
 
 
     
