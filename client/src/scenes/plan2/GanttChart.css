@@ -1,0 +1,20 @@
+
+.react-calendar-timeline .rct-header-root {
+    background-color: #22E3B6 !important;
+    font-weight: bold
+}
+
+.react-calendar-timeline .rct-header-root .rct-calendar-header .rct-dateHeader span {
+    color: black !important;
+}
+
+.gantt-chart-container {
+    max-width: 1096px;
+    margin: 0 auto;
+}
+
+.react-calendar-timeline .rct-item {
+    background-color:#22E3B6 !important;
+    border: none !important;
+    border-radius: 5px;
+}
