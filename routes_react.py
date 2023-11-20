@@ -166,7 +166,7 @@ def get_data():
     departments = [dept for dept in departments if dept is not None]
 
     # Query users who are members of the same company
-    users = session.query(User).filter_by(company_name=current_company_name).all()
+    users = session.query(User).filter_by(company_name=current_company_name).filter(not_(User.access_level == "Super_Admin")).all()
 
     user_list = []
     for user in users:
@@ -863,6 +863,7 @@ def get_availability():
         company_users = session.query(User).filter(
             User.company_name == user.company_name,
             User.email != react_user
+        ).filter(not_(User.access_level == "Super_Admin")
         ).order_by(asc(User.last_name)).all()
 
         # Create a list of user details
@@ -1994,7 +1995,7 @@ def get_shift():
         start_date, end_date = None, None  # default to getting all shifts
 
     # Query users who are members of the same company
-    users = session.query(User).filter_by(company_name=current_company_name).all()
+    users = session.query(User).filter_by(company_name=current_company_name).filter(not_(User.access_level == "Super_Admin")).all()
 
     user_list = []
     for user in users:
@@ -2099,7 +2100,7 @@ def get_shift2():
     }
 
     # Query users who are members of the same company
-    users = session.query(User).filter_by(company_name=current_company_name).all()
+    users = session.query(User).filter_by(company_name=current_company_name).filter(not_(User.access_level == "Super_Admin")).all()
 
     user_list = []
     for user in users:
@@ -2233,7 +2234,7 @@ def get_current_user_session():
     return session, current_user
 
 def get_worker_count(session, current_user):
-    return session.query(User).filter_by(company_name=current_user.company_name).count()
+    return session.query(User).filter_by(company_name=current_user.company_name).filter(not_(User.access_level == "Super_Admin")).count()
 
 def get_start_time_count(session, current_user):
     return session.query(Timetable).filter(
@@ -2339,12 +2340,14 @@ def get_part_time_count(session, current_user):
     return session.query(User).filter(
         (User.company_name == current_user.company_name) &
         (User.employment == 'Temp')
+    ).filter(not_(User.access_level == "Super_Admin")
     ).count()
 
 def get_full_time_count(session, current_user):
     return session.query(User).filter(
         (User.company_name == current_user.company_name) &
         (User.employment == 'Perm')
+    ).filter(not_(User.access_level == "Super_Admin")
     ).count()
 
 def get_missing_user_list(session, current_user):
@@ -2490,7 +2493,7 @@ def user_management():
         return jsonify({"message": "User not found"}), 404
     
     current_company_name = current_user.company_name
-    users = session.query(User).filter_by(company_name=current_company_name).all()
+    users = session.query(User).filter_by(company_name=current_company_name).filter(not_(User.access_level == "Super_Admin")).all()
 
     to_dict = []  # This will hold all user data
     for user in users:
