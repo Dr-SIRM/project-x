@@ -740,7 +740,7 @@ class ORAlgorithm_cp:
         """
         try: 
             total_hours_available = sum(self.gesamtstunden_verfügbarkeit)
-            toleranz = 1000 # Wenn man möchte, das die eingegebenen Stunden der MA höher sein müssen als die verteilbaren_stunden
+            toleranz = 1 # Wenn man möchte, das die eingegebenen Stunden der MA höher sein müssen als die verteilbaren_stunden
 
             if total_hours_available < self.verteilbare_stunden * toleranz:
 
@@ -780,6 +780,7 @@ class ORAlgorithm_cp:
                             # Erhöhung der Verfügbarkeitsanzahl für jede Stunde, in der der Mitarbeiter verfügbar ist
                             if available:
                                 skill_availability[skill][day_index][hour] += 1
+
 
             # Zählen von welchen Skill an welchem Tag zu welcher Stunde wieviele Mitarbeiter "fehlen"
             unmet_requirements = []
@@ -1923,6 +1924,22 @@ class ORAlgorithm_cp:
                 self.model.Add(sum(self.skill_change[i, j, s1, s2] for s1 in self.skills for s2 in self.skills if s1 != s2 and s1 in self.mitarbeiter_s[i] and s2 in self.mitarbeiter_s[i] and s1 in self.benoetigte_skills[woche] and s2 in self.benoetigte_skills[woche]) <= 1)
         
                         
+        # -------------------------------------------------------------------------------------------------------
+        # HARTE NB (20.11.2023)
+        # NB 16 - Es dürfen max. X neue Mitarbeiter zusammen mit dem gleichen Skill arbeiten
+        # -------------------------------------------------------------------------------------------------------
+        """
+        # Der User 1 ist "neu", User 2 ist bereits eingearbeitet -> diese Liste erstellen
+        new_employ =  {'user_1@sportrock.ch': 1, 'user_2@sportrock.ch': 0}
+
+        for j in range(self.calc_time):
+                for k in range(len(self.verfügbarkeit[i][j])):
+                    woche = j // 7
+                    self.model.Add(sum(new_employ[i] * self.x[i, j, k, s] for i in self.mitarbeiter for s in self.skills if s in self.mitarbeiter_s[i]) <= 1)
+        """
+
+
+
 
 
 
