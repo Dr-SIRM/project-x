@@ -454,7 +454,7 @@ const handleExportToExcel = async () => {
 };
 
   return (
-    <Box m="20px">
+    <Box mr="50px" ml="20px">
       <Header
         title="Schichtplan"
         subtitle="Übersicht über die eingeplanten Schichten"
