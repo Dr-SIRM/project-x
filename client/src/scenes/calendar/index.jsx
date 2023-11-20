@@ -125,6 +125,7 @@ const Calendar = () => {
                   },
                   '&:hover': {
                     borderColor: 'white',
+                    backgroundColor: "#97dbc9",
                   },
                   '&.MuiButtonText': {
                     borderColor: 'white',
