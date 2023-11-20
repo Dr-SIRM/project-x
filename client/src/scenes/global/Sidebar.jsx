@@ -22,12 +22,19 @@ import axios from 'axios';
 import { API_BASE_URL } from "../../config";
 import { useTranslation } from 'react-i18next';
 import '../../i18n';  
+import './side.css';
 
-
+const isMobile = () => window.innerWidth < 768;
 const Sidebar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(isMobile());
+  const [isDropdownVisible, setIsDropdownVisible] = useState(true);
+  const toggleDropdown = () => {
+    setIsDropdownVisible(!isDropdownVisible);
+  };
+  
+
   const [selected, setSelected] = useState("Dashboard");
   const token = localStorage.getItem('session_token'); 
   const { t, i18n } = useTranslation();
@@ -60,6 +67,15 @@ const Sidebar = () => {
       .catch((error) => {
         console.error('Error fetching data: ', error);
       });
+      const handleResize = () => {
+        setIsCollapsed(isMobile());
+      };
+    
+      // Add event listener
+      window.addEventListener('resize', handleResize);
+    
+      // Call the handler right away so state gets updated with initial window size
+      handleResize();
   }, []);
 
     const Item = ({ title, to, icon, selected, setSelected, requiredAccessLevel, accessLevel }) => {
@@ -118,6 +134,7 @@ const Sidebar = () => {
       }}
       className="sidebar"
     >
+      {isDropdownVisible && (
       <ProSidebar collapsed={isCollapsed}>
         <Menu iconShape="square">
           {/* LOGO AND MENU ICON */}
@@ -350,6 +367,7 @@ const Sidebar = () => {
            )}
         </Menu>
       </ProSidebar>
+      )}
     </Box>
   );
 };
