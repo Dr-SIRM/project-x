@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useTheme, Box, Button, TextField, Snackbar, Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
+import { useTheme, Box, Button, TextField, Snackbar, InputLabel, FormControl, Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 import Header from "../../components/Header";
 import { Select, MenuItem } from "@mui/material";
 import { tokens } from "../../theme";
@@ -45,7 +45,6 @@ const Registration = ({ registration }) => {
       // Send the updated form values to the server for database update
       await axios.post(`${API_BASE_URL}/api/registration/admin`, values, {
     headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
         }
     });
@@ -82,11 +81,7 @@ const Registration = ({ registration }) => {
           </Button>
         </DialogActions>
       </Dialog>
-      <Header
-        title="Registration"
-        subtitle=""
-      />
-      <h2>Register Now</h2>
+      <Header title="Register Now" subtitle="Erstelle einen neuen User" />
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -111,238 +106,197 @@ const Registration = ({ registration }) => {
                 "& > div": { gridColumn: isNonMobile ? undefined : "span 6" },
               }}
             >
-              <Typography
-                color={colors.greenAccent[500]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "right",
-                  height: "100%",
-                }}
-              >
-                First Name
-              </Typography>
               <TextField
                 fullWidth
                 variant="filled"
                 type="text"
-                label= ""
+                label="Vorname"
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.first_name}
                 name="first_name"
                 error={!!touched.first_name && !!errors.first_name}
-                helperText={touched.first_name && errors.first_name}
+                helpertext={touched.first_name && errors.first_name}
                 sx={{ gridColumn: "span 2" }}
               />
-              <Typography
-                color={colors.greenAccent[500]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "right",
-                  height: "100%",
-                }}
-              >
-                Last Name
-              </Typography>
               <TextField
                 fullWidth
                 variant="filled"
                 type="text"
-                label= ""
+                label="Nachname"
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.last_name}
                 name="last_name"
                 error={!!touched.last_name && !!errors.last_name}
-                helperText={touched.last_name && errors.last_name}
+                helpertext={touched.last_name && errors.last_name}
                 sx={{ gridColumn: "span 2" }}
               />
               <Typography
-                color={colors.greenAccent[500]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 1",
+                  gridColumn: "span 2",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "center",
                   height: "100%",
                 }}
               >
-                Employment
-              </Typography>
-              <Select
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.employment || ''}
-                name="employment"
-                error={!!touched.employment && !!errors.employment}
-                sx={{ gridColumn: "span 2" }}
-              >
-                <MenuItem value={'Perm'}>Festangestellt</MenuItem>
-                <MenuItem value={'Temp'}>Teilzeit</MenuItem>
-              </Select>
-              <Typography
-                color={colors.greenAccent[500]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "right",
-                  height: "100%",
-                }}
-              >
-                Employment Level
-              </Typography>
-              <Select
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.employment_level || ''}
-                name="employment_level"
-                error={!!touched.employment_level && !!errors.employment_level}
-                sx={{ gridColumn: "span 2" }}
-              >
-                <MenuItem value={'1'}>100%</MenuItem>
-                <MenuItem value={'0.9'}>90%</MenuItem>
-                <MenuItem value={'0.8'}>80%</MenuItem>
-                <MenuItem value={'0.7'}>70%</MenuItem>
-                <MenuItem value={'0.6'}>60%</MenuItem>
-                <MenuItem value={'0.5'}>50%</MenuItem>
-                <MenuItem value={'0.4'}>40%</MenuItem>
-                <MenuItem value={'0.3'}>30%</MenuItem>
-                <MenuItem value={'0.2'}>20%</MenuItem>
-                <MenuItem value={'0.1'}>10%</MenuItem>
-              </Select>
-              <Typography
-                color={colors.greenAccent[500]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "right",
-                  height: "100%",
-                }}
-              >
-                Company
               </Typography>
               <TextField
                 fullWidth
                 variant="filled"
                 type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.company_name}
-                name="company_name"
-                error={!!touched.company_name && !!errors.company_name}
-                helperText={touched.company_name && errors.company_name}
-                sx={{ gridColumn: "span 2" }}
-              />
-              <Typography
-                color={colors.greenAccent[500]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "right",
-                  height: "100%",
-                }}
-              >
-                Department
-              </Typography>
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.department}
-                name="department"
-                error={!!touched.department && !!errors.department}
-                helperText={touched.department && errors.department}
-                sx={{ gridColumn: "span 2" }}
-              />
-              <Typography
-                color={colors.greenAccent[500]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "right",
-                  height: "100%",
-                }}
-              >
-                Access Level
-              </Typography>
-              <Select
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.access_level || ''}
-                name="access_level"
-                error={!!touched.access_level && !!errors.access_level}
-                sx={{ gridColumn: "span 2" }}
-              >
-                <MenuItem value={'User'}>User</MenuItem>
-                <MenuItem value={'Admin'}>Admin</MenuItem>
-                <MenuItem value={'Super_Admin'}>Super Admin</MenuItem>
-              </Select>
-              <Typography
-                color={colors.greenAccent[500]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "right",
-                  height: "100%",
-                }}
-              >
-                E-Mail
-              </Typography>
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label= ""
+                label="Email"
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.email}
                 name="email"
                 error={!!touched.email && !!errors.email}
-                helperText={touched.email && errors.email}
+                helpertext={touched.email && errors.email}
                 sx={{ gridColumn: "span 2" }}
               />
-              <Typography
-                color={colors.greenAccent[500]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "right",
-                  height: "100%",
-                }}
-              >
-                Password
-              </Typography>
               <TextField
                 fullWidth
                 variant="filled"
                 type="text"
-                label= ""
+                label="Firmennamen"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.company_name}
+                name="company_name"
+                error={!!touched.company_name && !!errors.company_name}
+                helpertext={touched.company_name && errors.company_name}
+                sx={{ gridColumn: "span 2" }}
+              />
+              <Typography
+                variant="h6"
+                sx={{
+                  gridColumn: "span 2",
+                  display: "flex",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              >
+              </Typography>
+              <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 2" }}>
+                <InputLabel id="employment-label">Anstellung</InputLabel>
+                <Select
+                  labelId="employment-label"
+                  id="employment"
+                  name="employment"
+                  value={values.employment}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.employment && !!errors.employment}
+                  helpertext={touched.employment && errors.employment}
+                  sx={{
+                    gridColumn: "span 2",
+                    '& .MuiFilledInput-input': {
+                      paddingTop: '10px',
+                      paddingBottom: '10px',
+                    },
+                    '& .MuiSelect-icon': { 
+                      color: 'black', 
+                    },
+                  }}
+                >
+                  <MenuItem value="Perm">Vollzeit</MenuItem>
+                  <MenuItem value="Temp">Teilzeit</MenuItem>
+                </Select>
+              </FormControl>
+              <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 2" }}>
+                <InputLabel id="employment-level-label">Pensum</InputLabel>
+                <Select
+                  labelId="employment-level-label"
+                  id="employment-level-select"
+                  onBlur={handleBlur}
+                  onChange={(event) => {
+                    const selectedValue = event.target.value;
+                    const decimalValue = selectedValue / 100;
+                    handleChange({
+                      target: {
+                        name: 'employment_level',
+                        value: decimalValue,
+                      },
+                    });
+                  }}
+                  value={values.employment_level ? values.employment_level * 100 : ''}
+                  name="employment_level"
+                  error={!!touched.employment_level && !!errors.employment_level}
+                  renderValue={(selected) => `${selected}%`}
+                  sx={{
+                    gridColumn: "span 2",
+                    '& .MuiFilledInput-input': {
+                      paddingTop: '10px',
+                      paddingBottom: '10px',
+                    },
+                    '& .MuiSelect-icon': { 
+                      color: 'black', 
+                    },
+                  }}
+                >
+                  {Array.from(Array(10).keys()).map((percentage) => {
+                    const value = (percentage + 1) * 10;
+                    return (
+                      <MenuItem key={percentage + 1} value={value}>
+                        {value}%
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
+              <Typography
+                variant="h6"
+                sx={{
+                  gridColumn: "span 2",
+                  display: "flex",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              >
+              </Typography>
+              <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 2" }}>
+                <InputLabel id="access_level-label">Access Level</InputLabel>
+                <Select
+                  labelId="access_level-label"
+                  id="access_level"
+                  name="access_level"
+                  value={values.access_level}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.access_level && !!errors.access_level}
+                  helpertext={touched.access_level && errors.access_level}
+                  sx={{
+                    gridColumn: "span 2",
+                    '& .MuiFilledInput-input': {
+                      paddingTop: '10px',
+                      paddingBottom: '10px',
+                    },
+                    '& .MuiSelect-icon': { 
+                      color: 'black', 
+                    },
+                  }}
+                >
+                  <MenuItem value="Admin">Admin</MenuItem>
+                  <MenuItem value="User">User</MenuItem>
+                  <MenuItem value="Super_Admin">Super Admin</MenuItem>
+                </Select>
+              </FormControl>
+              <Typography
+                variant="h6"
+                sx={{
+                  gridColumn: "span 4",
+                  display: "flex",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              >
+              </Typography>
+              <TextField
+                fullWidth
+                variant="filled"
+                type="password"
+                label="Password"
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.password}
@@ -351,23 +305,11 @@ const Registration = ({ registration }) => {
                 helperText={touched.password && errors.password}
                 sx={{ gridColumn: "span 2" }}
               />
-              <Typography
-                color={colors.greenAccent[500]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "right",
-                  height: "100%",
-                }}
-              >
-                Repeat Password
-              </Typography>
               <TextField
                 fullWidth
                 variant="filled"
-                type="text"
-                label= ""
+                type="password"
+                label="Confirm Password"
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.password2}
@@ -376,10 +318,11 @@ const Registration = ({ registration }) => {
                 helperText={touched.password2 && errors.password2}
                 sx={{ gridColumn: "span 2" }}
               />
+              {values.password !== values.password2 && touched.password2 }
             </Box>
             <></>
             
-            <Box display="flex" justifyContent="end" mt="20px">
+            <Box display="center" justifyContent="end" mt="20px">
               <Button type="submit" color="secondary" variant="contained">
                 Update
               </Button>
@@ -431,7 +374,6 @@ const checkoutSchema = yup.object().shape({
   .oneOf([yup.ref("password"), null], "Passwords must match")
   .required("required"),
   company_name: yup.string().required("required"),
-  department: yup.string().required("required"),
   employment: yup.string().required("required"),
   employment_level: yup
     .number()

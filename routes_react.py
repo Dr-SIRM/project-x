@@ -857,7 +857,7 @@ def get_availability():
 
     # Create Drop Down Based Access Level
     if user.access_level == "User":
-        user_list = f"{user.first_name}, {user.last_name}, {user.email}"
+        user_list = [f"{user.first_name}, {user.last_name}, {user.email}"]
     else:
         # Query all users from the same company, excluding the current user
         company_users = session.query(User).filter(
@@ -869,6 +869,7 @@ def get_availability():
         # Create a list of user details
         user_list = [f"{user.first_name}, {user.last_name}, {user.email}" for user in company_users]
     
+    print(user_list)
 
     if request.method == 'GET':
         selected_user = request.args.get('selectedUser', None)
@@ -1433,20 +1434,17 @@ def solver_req():
 def get_registration():   
     if request.method =='POST':
         registration_data = request.get_json()
-        print(registration_data)
         if registration_data['password'] != registration_data['password2']:
             return jsonify({'message': 'Password are not matching'}), 200
         else:
             token = RegistrationToken.query.filter_by(token=registration_data['token'], email=registration_data['email']).first()
-            print("tada")
-            session = get_session(get_database_uri('', token.company_name.lower().replace(' ', '_')))
             if token is None:
                 return jsonify({'message': 'Token does not exist'}), 200
             else:
-                creation_date = datetime.datetime.now()
-                hash = generate_password_hash(registration_data['password'])
 
-                data = User( 
+                session = get_session(get_database_uri('', 'timetab'))
+
+                data1 = User( 
                     company_id = None, 
                     first_name = registration_data['first_name'],
                     last_name = registration_data['last_name'],
@@ -1465,109 +1463,313 @@ def get_registration():
                     department9 = token.department9,
                     department10 = token.department10,
                     email = token.email, 
-                    password = hash,
-                    created_by = user.id, 
-                    changed_by = user.id, 
-                    creation_timestamp = creation_date
+                    password = generate_password_hash(registration_data['password']),
+                    created_by = None, 
+                    changed_by = None, 
+                    creation_timestamp = datetime.datetime.now()
                     )
 
-                try:
-                    session.add(data)
-                    session.commit()
-                    session.close()
-                    
-                    return jsonify({'message': 'Succesful Registration'}), 200
-                except:
-                    session.rollback()
-                    return jsonify({'message': 'Registration went wrong!'}), 200
+                data2 = OverviewUser( 
+                    email = token.email, 
+                    company_name = token.company_name,
+                    password = generate_password_hash(registration_data['password']),
+                    access_level = token.access_level,
+                    creation_timestamp = datetime.datetime.now()
+                    )
+                
+                
+                session.add(data1)
+                session.add(data2)
+                session.commit()
+                session.close()
+
+                session = get_session(get_database_uri('', token.company_name.lower().replace(' ', '_')))
+
+                data3 = User(
+                    company_id = None, 
+                    first_name = registration_data['first_name'],
+                    last_name = registration_data['last_name'],
+                    employment = token.employment,
+                    employment_level = token.employment_level,
+                    company_name = token.company_name, 
+                    access_level = token.access_level, 
+                    department = token.department,
+                    department2 = token.department2,
+                    department3 = token.department3,
+                    department4 = token.department4,
+                    department5 = token.department5,
+                    department6 = token.department6,
+                    department7 = token.department7,
+                    department8 = token.department8,
+                    department9 = token.department9,
+                    department10 = token.department10,
+                    email = token.email, 
+                    password = generate_password_hash(registration_data['password']),
+                    created_by = None, 
+                    changed_by = None, 
+                    creation_timestamp = datetime.datetime.now()
+                    )
+
+                session.add(data3)
+                session.commit()
+                session.close()
+
 
 
     return jsonify({'message': 'Get Ready!'}), 200
 
 
-# @app.route('/api/registration/admin', methods = ['GET', 'POST'])
-# def get_admin_registration():
+@app.route('/api/registration/admin', methods = ['GET', 'POST'])
+def get_admin_registration():
 
-#     react_user = get_jwt_identity()
-#     jwt_data = get_jwt()
-#     session_company = jwt_data.get("company_name").lower().replace(' ', '_')
-#     session = get_session(get_database_uri('', session_company))
-#     user = session.query(User).filter_by(email=react_user).first()
+    if request.method =='POST':
+        admin_registration_data = request.get_json()
+        existing_company = OverviewCompany.query.filter_by(company_name=admin_registration_data['company_name']).first()  
+        if admin_registration_data['password'] != admin_registration_data['password2']:
+            return jsonify({'message': 'Password are not matching'}), 200
+        else:
+            if existing_company:
 
-#     departments = (
-#         session.query(Company)
-#         .filter_by(company_name=user.company)
-#         .with_entities(
-#             Company.department,
-#             Company.department2,
-#             Company.department3,
-#             Company.department4,
-#             Company.department5,
-#             Company.department6,
-#             Company.department7,
-#             Company.department8,
-#             Company.department9,
-#             Company.department10
-#         )
-#         .all()
-#     )
+                session = get_session(get_database_uri('', "timetab"))
+            
+                data1 = OverviewUser( 
+                            email = admin_registration_data['email'], 
+                            company_name = admin_registration_data['company_name'], 
+                            password = generate_password_hash(admin_registration_data['password']),
+                            access_level = admin_registration_data['access_level'], 
+                            creation_timestamp = datetime.datetime.now()
+                            )
+                
+                data2 = User(
+                            company_id = None, 
+                            first_name = admin_registration_data['first_name'],
+                            last_name = admin_registration_data['last_name'], 
+                            employment = admin_registration_data['employment'], 
+                            employment_level = admin_registration_data['employment_level'],
+                            company_name = admin_registration_data['company_name'], 
+                            department = None,
+                            department2 = None,
+                            department3 = None,
+                            department4 = None,
+                            department5 = None,
+                            department6 = None,
+                            department7 = None,
+                            department8 = None,
+                            department9 = None,
+                            department10 = None,
+                            access_level = admin_registration_data['access_level'], 
+                            email = admin_registration_data['email'], 
+                            password = generate_password_hash(admin_registration_data['password']),
+                            created_by = None, 
+                            changed_by = None, 
+                            creation_timestamp = datetime.datetime.now()
+                            )
+                
+                session.add(data1)
+                session.add(data2)
+                session.commit()
+                session.close()
 
-#     # Flatten the list of departments and filter out None values
-#     department_list = [department for department in departments if department is not None]
-#     print(department_list)
+                session = get_session(get_database_uri('', admin_registration_data['company_name'].lower().replace(' ', '_')))
 
-#     if request.method =='POST':
-#         admin_registration_data = request.get_json()
-#         session = get_session(get_database_uri('', company_name.lower().replace(' ', '_')))
-#         companies_list = ["TimeTab AG", "TimeTab GmbH", "TimeTab CoKG", "LeckMichFett"]
-#         for i in companies_list:
-#             if i == admin_registration_data['company_name']:
-#                 if admin_registration_data['password'] != admin_registration_data['password2']:
-#                     return jsonify({'message': 'Password are not matching'}), 200
-#                 else:
-#                     original_bind = app.config['SQLALCHEMY_BINDS']['dynamic']
-#                     creation_date = datetime.datetime.now()
-#                     hash = generate_password_hash(admin_registration_data['password'])
+                data3 = User(
+                            company_id = None, 
+                            first_name = admin_registration_data['first_name'],
+                            last_name = admin_registration_data['last_name'], 
+                            employment = admin_registration_data['employment'], 
+                            employment_level = admin_registration_data['employment_level'],
+                            company_name = admin_registration_data['company_name'], 
+                            department = None,
+                            department2 = None,
+                            department3 = None,
+                            department4 = None,
+                            department5 = None,
+                            department6 = None,
+                            department7 = None,
+                            department8 = None,
+                            department9 = None,
+                            department10 = None,
+                            access_level = admin_registration_data['access_level'], 
+                            email = admin_registration_data['email'], 
+                            password = generate_password_hash(admin_registration_data['password']),
+                            created_by = None, 
+                            changed_by = None, 
+                            creation_timestamp = datetime.datetime.now()
+                            )
 
-#                     last_company_id = User.query.filter_by(company_name=admin_registration_data['company_name']).order_by(User.company_id.desc()).first()
-#                     if last_company_id is None:
-#                         new_company_id = 10000
-#                     else:
-#                         new_company_id = last_company_id.company_id + 1
+                session.add(data3)
+                session.commit()
+                session.close()
+                return jsonify({'message': 'Successful Registration'}), 200
+            else:
+                schema_name = f"schema_{admin_registration_data['company_name'].lower().replace(' ', '_')}"
+                with db.engine.connect() as connection:
+                    try:
+                        connection.execute(text(f"CREATE SCHEMA `{schema_name}`;"))
+                        connection.commit()  # Commit the changes
+                    except Exception as e:
+                        print(str(e))
+                        return jsonify({'message': 'Failed to create schema'}), 500
 
-#                     data = User( 
-#                                 company_id = new_company_id, 
-#                                 first_name = admin_registration_data['first_name'],
-#                                 last_name = admin_registration_data['last_name'], 
-#                                 employment = admin_registration_data['employment'], 
-#                                 employment_level = admin_registration_data['employment_level'],
-#                                 company_name = admin_registration_data['company_name'], 
-#                                 department = admin_registration_data['department'],
-#                                 access_level = admin_registration_data['access_level'], 
-#                                 email = admin_registration_data['email'], 
-#                                 password = hash,
-#                                 created_by = new_company_id, 
-#                                 changed_by = new_company_id, 
-#                                 creation_timestamp = creation_date
-#                                 )
+                    # Clone entire schema
+                    original_schema = 'schema_timetab'
+                    query = text("SELECT table_name FROM information_schema.tables WHERE table_schema = :schema")
+                    try:
+                        tables = connection.execute(query, {'schema': original_schema}).fetchall()
+                        for table in tables:
+                            table_name = table[0]
+                            connection.execute(text(f"CREATE TABLE `{schema_name}`.`{table_name}` LIKE `{original_schema}`.`{table_name}`;"))
+                        connection.commit()  # Commit the changes after cloning the schema
+                        
+                        session = get_session(get_database_uri('', "timetab"))
 
-#                     try:
-#                         session.add(data)
-#                         session.commit()
-#                     except:
-#                         session.rollback()
-#                         return jsonify({'message': 'Registration went wrong!'}), 200
-#             else:
-#                 return jsonify({'message': 'This company name already exists'}), 200
+                        data1 = OverviewUser( 
+                            email = admin_registration_data['email'], 
+                            company_name = admin_registration_data['company_name'], 
+                            password = generate_password_hash(admin_registration_data['password']),
+                            access_level = admin_registration_data['access_level'], 
+                            creation_timestamp = datetime.datetime.now()
+                            )
+                        
+                        data2 = OverviewCompany( 
+                            company_name = admin_registration_data['company_name'], 
+                            subscription = 'Test', 
+                            creation_timestamp = datetime.datetime.now()
+                            )
+                        
+                        generic_admin = OverviewUser( 
+                            email = f"{admin_registration_data['company_name'].lower().replace(' ', '_')}@timetab.ch", 
+                            company_name = admin_registration_data['company_name'], 
+                            password = generate_password_hash('ProjectX2023.'),
+                            access_level = 'Super_Admin', 
+                            creation_timestamp = datetime.datetime.now()
+                            )
+                        
+                        data3 = User( 
+                            company_id = None, 
+                            first_name = "Time",
+                            last_name = "Tab", 
+                            employment = None, 
+                            employment_level = None,
+                            company_name = admin_registration_data['company_name'], 
+                            department = None,
+                            department2 = None,
+                            department3 = None,
+                            department4 = None,
+                            department5 = None,
+                            department6 = None,
+                            department7 = None,
+                            department8 = None,
+                            department9 = None,
+                            department10 = None,
+                            access_level = "Super_Admin", 
+                            email = f"{admin_registration_data['company_name'].lower().replace(' ', '_')}@timetab.ch", 
+                            password = generate_password_hash('ProjectX2023.'),
+                            created_by = None, 
+                            changed_by = None, 
+                            creation_timestamp = datetime.datetime.now()
+                            )
+                        
+                        data4 = User(
+                            company_id = None, 
+                            first_name = admin_registration_data['first_name'],
+                            last_name = admin_registration_data['last_name'], 
+                            employment = admin_registration_data['employment'], 
+                            employment_level = admin_registration_data['employment_level'],
+                            company_name = admin_registration_data['company_name'], 
+                            department = None,
+                            department2 = None,
+                            department3 = None,
+                            department4 = None,
+                            department5 = None,
+                            department6 = None,
+                            department7 = None,
+                            department8 = None,
+                            department9 = None,
+                            department10 = None,
+                            access_level = admin_registration_data['access_level'], 
+                            email = admin_registration_data['email'], 
+                            password = generate_password_hash(admin_registration_data['password']),
+                            created_by = None, 
+                            changed_by = None, 
+                            creation_timestamp = datetime.datetime.now()
+                            )
+                        
+                        
+                        
+                        session.add(data1)
+                        session.add(data2)
+                        session.add(data3)
+                        session.add(data4)
+                        session.add(generic_admin)
+                        session.commit()
+                        session.close()
+                        
+
+                        session = get_session(get_database_uri('', admin_registration_data['company_name'].lower().replace(' ', '_')))
+                        
+                        data5 = User(
+                            company_id = None, 
+                            first_name = "Time",
+                            last_name = "Tab", 
+                            employment = None, 
+                            employment_level = None,
+                            company_name = admin_registration_data['company_name'], 
+                            department = None,
+                            department2 = None,
+                            department3 = None,
+                            department4 = None,
+                            department5 = None,
+                            department6 = None,
+                            department7 = None,
+                            department8 = None,
+                            department9 = None,
+                            department10 = None,
+                            access_level = "Super_Admin", 
+                            email = f"{admin_registration_data['company_name'].lower().replace(' ', '_')}@timetab.ch", 
+                            password = generate_password_hash('ProjectX2023.'),
+                            created_by = None, 
+                            changed_by = None, 
+                            creation_timestamp = datetime.datetime.now()
+                            )
+                        
+                        data6 = User(
+                            company_id = None, 
+                            first_name = admin_registration_data['first_name'],
+                            last_name = admin_registration_data['last_name'], 
+                            employment = admin_registration_data['employment'], 
+                            employment_level = admin_registration_data['employment_level'],
+                            company_name = admin_registration_data['company_name'], 
+                            department = None,
+                            department2 = None,
+                            department3 = None,
+                            department4 = None,
+                            department5 = None,
+                            department6 = None,
+                            department7 = None,
+                            department8 = None,
+                            department9 = None,
+                            department10 = None,
+                            access_level = admin_registration_data['access_level'], 
+                            email = admin_registration_data['email'], 
+                            password = generate_password_hash(admin_registration_data['password']),
+                            created_by = None, 
+                            changed_by = None, 
+                            creation_timestamp = datetime.datetime.now()
+                            )
+                        
+                        session.add(data5)
+                        session.add(data6)
+                        session.commit()
+                        session.close()
+                        print("Schema and entry created")
                     
-    
-#     user_dict={
-#     'department_list': department_list,
-#     }
+                    except Exception as e:
+                        print(str(e))
+                        return jsonify({'message': 'Failed to clone schema'}), 500
+                
+   
 
-#     session.close()
-
-#     return jsonify(user_dict)
                 
 
 def get_temp_timereq_dict(template_name, day_num, daily_slots, hour_divider, minutes, company_name, full_day):
