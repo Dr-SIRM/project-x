@@ -11,17 +11,23 @@ const AuthProvider = ({ children }) => {
 
 
   const checkTokenExpiration = () => {
-    const lastActivity = new Date(localStorage.getItem('last_activity'));
-    const now = new Date();
-    const difference = now - lastActivity;
-    const differenceInMinutes = Math.floor(difference / 1000 / 60);
-
-    if (differenceInMinutes >= 30) {
-      localStorage.removeItem('session_token');
-      localStorage.removeItem('last_activity');
-      localStorage.removeItem('user');
-      setUser(null);
-      navigate('/login');
+    const lastActivity = localStorage.getItem('last_activity');
+    const sessionToken = localStorage.getItem('session_token');
+  
+    // Proceed only if both session token and last activity are present
+    if (sessionToken && lastActivity) {
+      const lastActivityDate = new Date(lastActivity);
+      const now = new Date();
+      const difference = now - lastActivityDate;
+      const differenceInMinutes = Math.floor(difference / 1000 / 60);
+  
+      if (differenceInMinutes >= 30) {
+        localStorage.removeItem('session_token');
+        localStorage.removeItem('last_activity');
+        localStorage.removeItem('user');
+        setUser(null);
+        navigate('/login');
+      }
     }
   };
 
@@ -96,6 +102,29 @@ const AuthProvider = ({ children }) => {
       logout(); // Logout the user if token refresh fails
     }
   };
+
+  useEffect(() => {
+    const handleRefreshToken = async () => {
+      try {
+        await handleRefreshToken();
+      } catch (error) {
+        console.error("Token refresh failed:", error);
+      }
+    };
+  
+    const handleLogout = () => {
+      logout();
+    };
+  
+    window.addEventListener("refreshToken", handleRefreshToken);
+    window.addEventListener("logout", handleLogout);
+
+    
+    return () => {
+      window.removeEventListener("refreshToken", handleRefreshToken);
+      window.removeEventListener("logout", handleLogout);
+    };
+  }, []);
 
   useEffect(() => {
     const storedToken = localStorage.getItem('session_token');

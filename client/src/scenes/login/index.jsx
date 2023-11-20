@@ -91,6 +91,13 @@ const Login = () => {
           )}
           <Box mb={2} mt={2}>
             <Typography variant="body2" style={{ fontStyle: 'cursive' }}>
+              <Link href="/token_registration" style={{ textDecoration: 'none', color: 'black' }}>
+                Registration via Invite Token
+              </Link>
+            </Typography>
+          </Box>
+          <Box mb={2} mt={2}>
+            <Typography variant="body2" style={{ fontStyle: 'cursive' }}>
               <Link href="/forget_password" style={{ textDecoration: 'none', color: 'black' }}>
                 Forgot Password?
               </Link>

@@ -1131,9 +1131,9 @@ def get_invite():
             email=invite_data['email'], 
             token=random_token, 
             company_name=invite_data['company_name'], 
-            department=invite_data['department'], 
-            department2 =invite_data['department2'],
-            department3 =invite_data['department3'],
+            department = invite_data['department'] if 'department' in invite_data else None, 
+            department2 = invite_data['department2'] if 'department2' in invite_data else None,
+            department3 = invite_data['department3'] if 'department3' in invite_data else None,
             department4 = None,
             department5 = None,
             department6 = None,
@@ -1433,10 +1433,12 @@ def solver_req():
 def get_registration():   
     if request.method =='POST':
         registration_data = request.get_json()
+        print(registration_data)
         if registration_data['password'] != registration_data['password2']:
             return jsonify({'message': 'Password are not matching'}), 200
         else:
             token = RegistrationToken.query.filter_by(token=registration_data['token'], email=registration_data['email']).first()
+            print("tada")
             session = get_session(get_database_uri('', token.company_name.lower().replace(' ', '_')))
             if token is None:
                 return jsonify({'message': 'Token does not exist'}), 200
