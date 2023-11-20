@@ -393,7 +393,7 @@ const Dashboard = () => {
           </Select>
           <IconButton 
             color="inherit" 
-            onClick={() => {/* function to handle click and post data to server */}}
+            onClick={() => handleFormSubmit("Msg_Insufficient_Planning")}
             >
             <SiMinutemailer />
           </IconButton>
@@ -424,7 +424,51 @@ const Dashboard = () => {
             </Box>
           ))}
         </Box>
-
+        <Box
+          gridColumn="span 4"
+          gridRow="span 2"
+          backgroundColor={colors.primary[800]}
+          borderRadius="15px"
+          overflow="auto"
+        >
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            borderBottom={`4px solid ${colors.primary[500]}`}
+            colors={colors.grey[100]}
+            p="15px"
+          >
+            <Typography color={colors.grey[100]} variant="h5" fontWeight="600">
+            {t('dashboard.whosworking')} 
+            </Typography>
+          </Box>
+          {currentShifts.map((shift, i) => (
+            <Box
+              key={`${shift.name}-${i}`}
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              borderBottom={`4px solid ${colors.primary[500]}`}
+              p="15px"
+            >
+              <Box flexGrow={1}>
+                <Typography
+                  color={colors.greenAccent[500]}
+                  variant="h5"
+                  fontWeight="600"
+                >
+                  {shift.name}
+                </Typography>
+              </Box>
+              <Box>
+                <Typography color={colors.grey[100]}>
+                  {shift.start} bis {shift.end}
+                </Typography>
+              </Box>
+            </Box>
+          ))}
+        </Box>
 
       </Box>
     </Box>
