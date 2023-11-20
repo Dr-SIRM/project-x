@@ -204,7 +204,7 @@ const renderShifts = (worker) => {
 
   const currentTimePercentage = getCurrentTimePercentage();
   const currentTimeLineStyle = {
-      left: `${currentTimePercentage}%`,
+      left: `${currentTimePercentage -2.1}%`,
   };
 
   return (
@@ -227,28 +227,47 @@ const renderShifts = (worker) => {
 };
 
 
-  const getTimelineLabels = () => {
-    const today = new Date(currentDay);
-    const weekday = today.toLocaleDateString('de-DE', { weekday: 'long' });
-    const hours = openingHours[weekday.toLowerCase()];
+const getTimelineLabels = () => {
+  const today = new Date(currentDay);
+  const weekday = today.toLocaleDateString('de-DE', { weekday: 'long' });
+  const hours = openingHours[weekday.toLowerCase()];
 
-    if (!hours || view !== 'day') {
-        return [];     
-    }
+  if (!hours || view !== 'day') {
+      return [];
+  }
 
-    const startHour = parseInt(hours.start.split(":")[0], 10);
-    const endHour = parseInt(hours.end.split(":")[0], 10);
-    let totalDuration = endHour >= startHour 
-                        ? endHour - startHour 
-                        : (24 - startHour) + endHour;
+  const startHour = parseInt(hours.start.split(":")[0], 10);
+  const endHour = parseInt(hours.end.split(":")[0], 10);
+  const endMinutes = parseInt(hours.end.split(":")[1], 10);
 
-    const timelineLabels = [];
-    for (let i = 0; i <= totalDuration; i++) {
-        let adjustedHour = (startHour + i) % 24;
-        timelineLabels.push(formatTime(adjustedHour));
-    }
-    return timelineLabels;
-  };
+  let totalHours = endHour - startHour;
+  if (totalHours < 0) totalHours += 24; // Adjust for overnight hours
+
+  let totalIntervals = totalHours * 2;
+  if (endMinutes === 30) {
+      totalIntervals++; // Include the additional half-hour interval
+  }
+
+  const timelineLabels = [];
+  for (let i = 0; i <= totalIntervals; i++) {
+      let adjustedHour = (startHour + Math.floor(i / 2)) % 24;
+      let minutes = (i % 2) * 30;
+
+      // Add label for full hours and for the last interval if it's a half-hour
+      if (minutes === 0 || (i === totalIntervals && endMinutes === 30)) {
+          timelineLabels.push(formatTime1(adjustedHour, minutes));
+      } else {
+          // For half-hour intervals without labels, push a placeholder or empty string
+          timelineLabels.push("");
+      }
+  }
+
+  return timelineLabels;
+};
+
+const formatTime1 = (hour, minutes = 0) => {
+  return `${String(hour).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+};
 
 
 
