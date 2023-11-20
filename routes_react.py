@@ -5,7 +5,7 @@ from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
 import random
 from models import db
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt, create_refresh_token
 from app import app, mail, get_database_uri
 from openpyxl import Workbook
 import io
@@ -60,9 +60,12 @@ def login_react():
     response = make_response(jsonify({'session_token': session_token}))
     response.set_cookie('session_token', session_token, httponly=True, secure=True)
 
+    refresh_token = create_refresh_token(identity=email)
+
     # Save User Data and token
     response = {
         'session_token': session_token,
+        'refresh_token': refresh_token,
         'user': {
             'email': user.email,
             'company': user.company_name,
@@ -71,6 +74,13 @@ def login_react():
     }
 
     return jsonify(response)
+
+@app.route('/api/token/refresh', methods=['POST'])
+@jwt_required(refresh=True) 
+def refresh():
+    current_user = get_jwt_identity()
+    new_token = create_access_token(identity=current_user)
+    return jsonify({'session_token': new_token})
 
 
 @app.route('/api/current_react_user')

@@ -16,7 +16,7 @@ const AuthProvider = ({ children }) => {
     const difference = now - lastActivity;
     const differenceInMinutes = Math.floor(difference / 1000 / 60);
 
-    if (differenceInMinutes >= 60) {
+    if (differenceInMinutes >= 30) {
       localStorage.removeItem('session_token');
       localStorage.removeItem('last_activity');
       localStorage.removeItem('user');
@@ -37,7 +37,7 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (user) {
       localStorage.setItem('last_activity', new Date().toString());
-      navigate('/welcome');
+      navigate('/login');
     }
   }, [user]);
 
@@ -58,6 +58,7 @@ const AuthProvider = ({ children }) => {
       console.log('Server response:', data);
       if (data.session_token) {
         localStorage.setItem('session_token', data.session_token);
+        localStorage.setItem('refresh_token', data.refresh_token);
         localStorage.setItem('user', JSON.stringify(data.user));
         setUser(data.user);  // Set user here only after token validation
       } else {
@@ -68,6 +69,34 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+  const refreshAccessToken = async () => {
+    try {
+      const refreshToken = localStorage.getItem('refresh_token');
+      const response = await fetch(`${API_BASE_URL}/api/token/refresh`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      if (data.session_token) {
+        localStorage.setItem('session_token', data.session_token);
+      } else {
+        throw new Error('Failed to refresh token');
+      }
+    } catch (error) {
+      console.error('Error refreshing token:', error);
+      // Handle token refresh failure (e.g., redirect to login)
+      logout(); // Logout the user if token refresh fails
+    }
+  };
+
   useEffect(() => {
     const storedToken = localStorage.getItem('session_token');
     const storedUser = localStorage.getItem('user');
@@ -75,6 +104,11 @@ const AuthProvider = ({ children }) => {
       setUser(JSON.parse(storedUser));  // Initialize the user state
     }
   }, []);
+
+  useEffect(() => {
+    const interval = setInterval(checkTokenExpiration, 1000 * 60); // Check every minute
+    return () => clearInterval(interval); // Clear interval on unmount
+  }, []); 
 
   useEffect(() => {
     if (user) {
@@ -89,12 +123,19 @@ const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('session_token');
+    localStorage.removeItem('refresh_token');
     localStorage.removeItem('user');
     navigate('/login');
   };
 
+  const updateUserActivity = () => {
+    if (user) {
+      localStorage.setItem('last_activity', new Date().toString());
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, error, setError }}>
+    <AuthContext.Provider value={{ user, login, logout, error, setError, updateUserActivity, refreshAccessToken }}>
       {children}
     </AuthContext.Provider>
   );

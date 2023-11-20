@@ -1,3 +1,5 @@
+import React from 'react';
+import './axiosConfig';
 import { useState, useEffect, useContext } from "react";
 import { BrowserRouter as Router, Routes, Route, Outlet } from "react-router-dom";
 import AuthProvider, { AuthContext } from "./AuthContext";
