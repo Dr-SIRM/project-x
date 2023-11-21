@@ -20069,1928 +20069,1378 @@ constraints {
   }
 }
 constraints {
-  linear {
-    vars: [550, 0]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [551, 1]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [552, 2]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [553, 3]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [554, 4]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [555, 5]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [556, 6]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [557, 7]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [558, 8]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [559, 9]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [560, 10]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [561, 11]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [562, 12]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [563, 13]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [564, 14]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [565, 15]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [566, 16]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [567, 17]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [568, 18]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [569, 19]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [570, 20]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [571, 21]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [572, 22]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [573, 23]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [574, 24]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [575, 25]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [576, 26]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [577, 27]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [578, 28]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [579, 29]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [580, 30]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [581, 31]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [582, 32]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [583, 33]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [584, 34]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [585, 35]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [586, 36]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [587, 37]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [588, 38]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [589, 39]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [590, 40]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [591, 41]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [592, 42]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [593, 43]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [594, 44]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [595, 45]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [596, 46]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [597, 47]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [598, 48]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [599, 49]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [600, 50]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [601, 51]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [602, 52]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [603, 53]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [604, 54]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [605, 55]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [606, 56]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [607, 57]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [608, 58]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [609, 59]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [610, 60]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [611, 61]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [612, 62]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [613, 63]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [614, 64]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [615, 65]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [616, 66]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [617, 67]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [618, 68]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [619, 69]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [620, 70]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [621, 71]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [622, 72]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [623, 73]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [624, 74]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [625, 75]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [626, 76]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [627, 77]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [628, 78]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [629, 79]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [630, 80]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [631, 81]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [632, 82]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [633, 83]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [634, 84]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [635, 85]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [636, 86]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [637, 87]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [638, 88]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [639, 89]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [640, 90]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [641, 91]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [642, 92]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [643, 93]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [644, 94]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [645, 95]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [646, 96]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [647, 97]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [648, 98]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [649, 99]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [650, 100]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [651, 101]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [652, 102]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [653, 103]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [654, 104]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [655, 105]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [656, 106]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [657, 107]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [658, 108]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [659, 109]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [660, 110]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [661, 111]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [662, 112]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [663, 113]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [664, 114]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [665, 115]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [666, 116]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [667, 117]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [668, 118]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [669, 119]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [670, 120]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [671, 121]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [672, 122]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [673, 123]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [674, 124]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [675, 125]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [676, 126]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [677, 127]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [678, 128]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [679, 129]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [680, 130]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [681, 131]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [682, 132]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [683, 133]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [684, 134]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [685, 135]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [686, 136]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [687, 137]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [688, 138]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [689, 139]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [690, 140]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [691, 141]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [692, 142]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [693, 143]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [694, 144]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [695, 145]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [696, 146]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [697, 147]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [698, 148]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [699, 149]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [700, 150]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [701, 151]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [702, 152]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [703, 153]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [704, 154]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [705, 155]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [706, 156]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [707, 157]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [708, 158]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [709, 159]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [710, 160]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [711, 161]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [712, 162]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [713, 163]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [714, 164]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [715, 165]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [716, 166]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [717, 167]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [718, 168]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [719, 169]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [720, 170]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [721, 171]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [722, 172]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [723, 173]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [724, 174]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [725, 175]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [726, 176]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [727, 177]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [728, 178]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [729, 179]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [730, 180]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [731, 181]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [732, 182]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [733, 183]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [734, 184]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [735, 185]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [736, 186]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [737, 187]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [738, 188]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [739, 189]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [740, 190]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [741, 191]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [742, 192]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [743, 193]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [744, 194]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [745, 195]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [746, 196]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [747, 197]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [748, 198]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [749, 199]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [750, 200]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [751, 201]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [752, 202]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [753, 203]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [754, 204]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [755, 205]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [756, 206]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [757, 207]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [758, 208]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [759, 209]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [760, 210]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [761, 211]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [762, 212]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [763, 213]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [764, 214]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [765, 215]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [766, 216]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [767, 217]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [768, 218]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [769, 219]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [770, 220]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [771, 221]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [772, 222]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [773, 223]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [774, 224]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [775, 225]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [776, 226]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [777, 227]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [778, 228]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [779, 229]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [780, 230]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [781, 231]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [782, 232]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [783, 233]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [784, 234]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [785, 235]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [786, 236]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [787, 237]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [788, 238]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [789, 239]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [790, 240]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [791, 241]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [792, 242]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [793, 243]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [794, 244]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [795, 245]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [796, 246]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [797, 247]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [798, 248]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [799, 249]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [800, 250]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [801, 251]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [802, 252]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [803, 253]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [804, 254]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [805, 255]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [806, 256]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [807, 257]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [808, 258]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [809, 259]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [810, 260]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [811, 261]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [812, 262]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [813, 263]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [814, 264]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [815, 265]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [816, 266]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [817, 267]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [818, 268]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [819, 269]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [820, 270]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [821, 271]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [822, 272]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [823, 273]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 constraints {
-  linear {
-    vars: [824, 274]
-    coeffs: [1, 1]
-    domain: [-9223372036854775808, 1]
+  bool_or {
+    literals: [3010]
   }
 }
 objective {

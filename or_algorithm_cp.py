@@ -63,26 +63,24 @@ To-Do Liste:
  - (erl) TimeReq in data_processing anpassen, soabld Phu Planung fertiggestellt hat.
  - (erl) MA mit verschiedenen Profilen - Department (Koch, Service, ..)
  - (erl) Alle NB's mit Schichten umbauen.
+ - (erl) Wenn man gar keine time_req eingegeben hat, hällt dann Vorüberprüfung 1 stand?
+ - (erl) Solvingzeit mit der Zeit automaitsch abbrechen
  
 
  To-Do's 
  -------------------------------
- - Solvingzeit mit der Zeit automaitsch abbrechen, Datenbank mit Variabeln befüllen und Daten ziehen
-
- - (*)  Wenn man gar keine time_req eingegeben hat, hällt dann Vorüberprüfung 1 stand?
-
- - (*) self.subsequent_workingdays_max, self.skills_per_day(1 oder 0) in die Datenbank einpflegen und ziehen
+ - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden??
 
  - self.max_time_week darf niemals grösser als self.weekly hours gewählt werden!
  - self.daily_deployment soll nur 1 oder 2 werden können
  - self.skills_per_day soll nur 1 oder 0 werden können
 
+  - Solvingzeitraum selbst anwählen können
 
- 
+
+
  --- PRIO 2 ---
  -------------------------------
- - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden??
- - Solvingzeitraum selbst anwählen können
  - (*) NB9 mit 3 Schichten fertigbauen
  -------------------------------
 
@@ -850,28 +848,12 @@ class ORAlgorithm_cp:
     def pre_check_5(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        5. Vorüberprüfung: Haben die Mitarbeiter pro Tag mindestens die mindest Areitszeit pro Tag eingegeben? (bei 0 Stunden wird es ignoriert)
-        Können die MA die min. Zeit täglich erreichen? Wenn 0 Stunden eingegeben wurden, läuft es durch!
+        5. Vorüberprüfung: Erweiterte Überprüfung 4 mit den "In Einarbeitung" Mitarbeitern
         ---------------------------------------------------------------------------------------------------------------
         """
-        try:
-            errors = []
-            for i, ma in enumerate(self.mitarbeiter):
-                for day in range(self.calc_time):
-                    total_hours = sum(self.verfügbarkeit[ma][day])
-                    if 0 < total_hours < self.min_time_day:
-                        errors.append(
-                            f"{' '.join(self.user_names[i])} hat am Tag {day+1} nur {int(total_hours / self.hour_divider)} Stunden eingetragen. "
-                            f"Das ist weniger als die Mindestarbeitszeit von {int(self.min_time_day / self.hour_divider)} Stunden."
-                        )
 
-
-            if errors:
-                raise ValueError("Folgende Fehler wurden gefunden:\n" + "\n".join(errors))
-            
-            return {"success": True, "name": "Pre-check_5", "message": "All checks are successful!"}
-        except ValueError as e:
-            return {"success": False, "name": "Pre-check_5", "message": str(e)}
+        # DIE VORÜBERPRÜFUNG NOCH CODEN
+        
 
 
     def pre_check_6(self):
@@ -897,9 +879,10 @@ class ORAlgorithm_cp:
         """
         self.model = cp_model.CpModel()
         self.solver = cp_model.CpSolver()
-        
-        self.solver.parameters.max_time_in_seconds = 500 # Der Solver stoppt nach 500s
-        self.gap_to_stop = 1                             # Der Solver stoppt unter diesem GAP
+
+        mitarbeiter_anzahl = len(self.mitarbeiter)
+        self.solver.parameters.max_time_in_seconds = 100 * mitarbeiter_anzahl       # Der Solver stoppt nach 100s * Mitarbeiteranzahl
+        self.gap_to_stop = 1                                                        # Der Solver stoppt unter diesem GAP
         # self.solver.parameters.num_search_workers = 4 # Anzahl Kerne --> noch genau testen was das optimum ist (CPU-Auslastung beachten!)
 
 

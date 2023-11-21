@@ -13,17 +13,18 @@ const FAQ = () => {
   const colors = tokens(theme.palette.mode);
   return (
     <Box m="20px">
-      <Header title="FAQ" subtitle="Frequently Asked Questions. Die Antworten werden jeweils Schriftlich und mit einem Video erklärt." />
+      <Header title="FAQ" subtitle="Frequently Asked Questions. Die Antworten werden jeweils schriftlich und mit einem Video erklärt." />
 
-      <Accordion >
+      {/* Frage 1 */}
+      <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography color={colors.greenAccent[500]} variant="h5">
-            Wie kann ich mein Team Verwalten?
+            Wie kann ich mein Team verwalten?
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
           <Typography>
-          Sie können unter "Team Verwalten" Einstellungen vornehmen. Sie können die Emailadresse der Mitarbeiter ändern, die Anstellung und den Anstellungsgrad anpassen oder Abteilungen zuweisen. Ebenfalls können Sie einzelne Mitarbeiter löschen.
+            Sie können unter "Team Verwalten" Einstellungen vornehmen. Sie können die Emailadresse der Mitarbeiter ändern, die Anstellung und den Anstellungsgrad anpassen oder Abteilungen zuweisen. Ebenfalls können Sie einzelne Mitarbeiter löschen.
           </Typography>
         </AccordionDetails>
         <AccordionDetails>
@@ -39,66 +40,146 @@ const FAQ = () => {
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           ></iframe>
-
         </AccordionDetails>
       </Accordion>
+
+      {/* Frage 2 */}
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography color={colors.greenAccent[500]} variant="h5">
-          Welche Funktionen bietet die automatisierte Schichtplanungs-App?
+            Welche Funktionen bietet die automatisierte Schichtplanungs-App?
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
           <Typography>
-          Die automatisierte Schichtplanungs-App bietet in der Regel eine Vielzahl von Funktionen, die die Planung und Verwaltung von Schichten erleichtern. Dazu können beispielsweise die automatische Schichtzuweisung auf der Grundlage von Regeln und Vorgaben, die Berücksichtigung von Abwesenheiten wie Urlaub oder Krankheit, die Integration von Schichtplänen in den Kalender der Mitarbeiter, die Möglichkeit für Mitarbeiter, Änderungen an ihren Schichten vorzunehmen, und die Generierung von Berichten und Statistiken gehören.
+            Die automatisierte Schichtplanungs-App bietet in der Regel eine Vielzahl von Funktionen, die die Planung und Verwaltung von Schichten erleichtern.
           </Typography>
         </AccordionDetails>
-      </Accordion>
-      <Accordion >
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography color={colors.greenAccent[500]} variant="h5">
-          Wie funktioniert die automatisierte Schichtplanung und wie werden die Schichten automatisch zugewiesen?
-          </Typography>
-        </AccordionSummary>
         <AccordionDetails>
           <Typography>
-          Die automatisierte Schichtplanung basiert in der Regel auf Regeln und Vorgaben, die von den Administratoren oder Managern der Schichtplanungs-App festgelegt werden. Diese Regeln können beispielsweise die Anzahl der Arbeitsstunden pro Tag oder Woche, die Schichtpräferenzen der Mitarbeiter oder die Verfügbarkeit von Mitarbeitern zu bestimmten Zeiten und an bestimmten Tagen umfassen. Auf der Grundlage dieser Regeln und Vorgaben werden die Schichten automatisch zugewiesen, wobei die Schichtplanungs-App darauf achten wird, dass alle Regeln eingehalten werden und alle Mitarbeiter fair berücksichtigt werden.
+            Anleitungsvideo "Funktionen der Schichtplanungs-App"
           </Typography>
+          <iframe
+            width="1000"
+            height="440"
+            src="https://www.youtube.com/embed/VIDEO_ID_2"
+            title="YouTube video player"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
         </AccordionDetails>
       </Accordion>
-      <Accordion >
+
+      {/* Frage 3 */}
+      <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography color={colors.greenAccent[500]} variant="h5">
-          Ist es möglich, manuell Änderungen an den automatisch zugewiesenen Schichten vorzunehmen?
+            Wie funktioniert die automatisierte Schichtplanung und wie werden die Schichten automatisch zugewiesen?
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
           <Typography>
-          Nein, es ist nicht möglich, manuell Änderungen an den automatisch zugewiesenen Schichten vorzunehmen. Die automatisierte Schichtplanungs-App basiert vollständig auf Algorithmen und Regeln, die von den Administratoren oder Managern der App festgelegt wurden. Die Schichten werden automatisch zugewiesen, um sicherzustellen, dass alle Regeln und Vorgaben eingehalten werden und alle Mitarbeiter fair berücksichtigt werden. Wenn Änderungen erforderlich sind, können diese nur von den Administratoren oder Managern der App vorgenommen werden.
+            Die automatisierte Schichtplanung basiert in der Regel auf Regeln und Vorgaben, die von den Administratoren oder Managern der Schichtplanungs-App festgelegt werden.
           </Typography>
         </AccordionDetails>
-      </Accordion>
-      <Accordion >
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography color={colors.greenAccent[500]} variant="h5">
-          Wie werden Abwesenheiten wie Urlaub oder Krankheit in der automatisierten Schichtplanung berücksichtigt?
-          </Typography>
-        </AccordionSummary>
         <AccordionDetails>
           <Typography>
-          Abwesenheiten wie Urlaub oder Krankheit werden in der automatisierten Schichtplanung in der Regel berücksichtigt, indem sie als Parameter in die Schichtplanung einbezogen werden. Beispielsweise kann ein Mitarbeiter, der im Urlaub ist, für die betreffenden Tage automatisch von der Schichtplanung ausgeschlossen werden, oder ein Mitarbeiter, der krank ist, kann automatisch von der Schichtplanung für einen bestimmten Zeitraum ausgeschlossen werden. Die genauen Regeln und Vorgaben für die Berücksichtigung von Abwesenheiten hängen von den Anforderungen der jeweiligen Schichtplanungs-App ab.
+            Anleitungsvideo "Automatische Schichtplanung"
           </Typography>
+          <iframe
+            width="1000"
+            height="440"
+            src="https://www.youtube.com/embed/VIDEO_ID_3"
+            title="YouTube video player"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
         </AccordionDetails>
       </Accordion>
-      <Accordion >
+
+      {/* Frage 4 */}
+      <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography color={colors.greenAccent[500]} variant="h5">
-          Wie können die Mitarbeiter auf den aktuellen Schichtplan zugreifen und ihre Schichtpläne einsehen?
+            Ist es möglich, manuell Änderungen an den automatisch zugewiesenen Schichten vorzunehmen?
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
           <Typography>
-          Die Mitarbeiter können in der Regel auf den aktuellen Schichtplan über eine mobile App oder eine Webanwendung zugreifen, die von der automatisierten Schichtplanungs-App bereitgestellt wird. Nachdem sich die Mitarbeiter angemeldet haben, können sie ihren Schichtplan einsehen und gegebenenfalls Änderungen an ihren Schichten beantragen, beispielsweise wenn sie einen Tausch mit einem anderen Mitarbeiter durchführen möchten oder wenn sie eine Abwesenheit anmelden müssen. In einigen Fällen können die Mitarbeiter auch automatische Benachrichtigungen erhalten, wenn Änderungen an ihrem Schichtplan vorgenommen wurden oder wenn neue Schichten zugewiesen wurden.          </Typography>
+            Nein, es ist nicht möglich, manuell Änderungen an den automatisch zugewiesenen Schichten vorzunehmen.
+          </Typography>
+        </AccordionDetails>
+        <AccordionDetails>
+          <Typography>
+            Anleitungsvideo "Manuelle Änderungen an Schichten"
+          </Typography>
+          <iframe
+            width="1000"
+            height="440"
+            src="https://www.youtube.com/embed/VIDEO_ID_4"
+            title="YouTube video player"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
+        </AccordionDetails>
+      </Accordion>
+
+      {/* Frage 5 */}
+      <Accordion>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography color={colors.greenAccent[500]} variant="h5">
+            Wie werden Abwesenheiten wie Urlaub oder Krankheit in der automatisierten Schichtplanung berücksichtigt?
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography>
+            Abwesenheiten wie Urlaub oder Krankheit werden in der automatisierten Schichtplanung in der Regel berücksichtigt, indem sie als Parameter in die Schichtplanung einbezogen werden.
+          </Typography>
+        </AccordionDetails>
+        <AccordionDetails>
+          <Typography>
+            Anleitungsvideo "Berücksichtigung von Abwesenheiten"
+          </Typography>
+          <iframe
+            width="1000"
+            height="440"
+            src="https://www.youtube.com/embed/VIDEO_ID_5"
+            title="YouTube video player"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
+        </AccordionDetails>
+      </Accordion>
+
+      {/* Frage 6 */}
+      <Accordion>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography color={colors.greenAccent[500]} variant="h5">
+            Wie können die Mitarbeiter auf den aktuellen Schichtplan zugreifen und ihre Schichtpläne einsehen?
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography>
+            Die Mitarbeiter können in der Regel auf den aktuellen Schichtplan über eine mobile App oder eine Webanwendung zugreifen, die von der automatisierten Schichtplanungs-App bereitgestellt wird.
+          </Typography>
+        </AccordionDetails>
+        <AccordionDetails>
+          <Typography>
+            Anleitungsvideo "Zugriff auf den Schichtplan für Mitarbeiter"
+          </Typography>
+          <iframe
+            width="1000"
+            height="440"
+            src="https://www.youtube.com/embed/VIDEO_ID_6"
+            title="YouTube video player"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
         </AccordionDetails>
       </Accordion>
     </Box>
