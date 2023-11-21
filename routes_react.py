@@ -184,6 +184,7 @@ def get_data():
             'department2': user.department2,
             'department3': user.department3,
             'employment_level': user.employment_level,
+            'in_training': user.in_training,
         }
         user_list.append(user_dict)
 
@@ -216,6 +217,7 @@ def update_user(user_id):
     user.first_name = data.get('first_name', user.first_name)
     user.last_name = data.get('last_name', user.last_name)
     user.email = data.get('email', user.email)
+    user.in_training = data.get('in_training', user.in_training)
     user.employment = data.get('employment', user.employment)
     user.department = data.get('department1', user.department)
     user.department2 = data.get('department2', user.department2)

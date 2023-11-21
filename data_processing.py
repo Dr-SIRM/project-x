@@ -32,6 +32,7 @@ class DataProcessing:
         self.solver_requirements = None
         self.binary_availability = None
         self.user_names = None
+        self.new_employees = None
         self.session = None
 
         
@@ -48,7 +49,7 @@ class DataProcessing:
         self.binaere_liste()
         self.get_employment_skills()
         self.get_solver_requirement()
-        self.user_name_list()
+        self.user_name_and_training()
         self.close_session()
 
 
@@ -403,7 +404,7 @@ class DataProcessing:
  
 
     def get_shift_weeklyhours_emp_lvl(self):
-        """ In dieser Funktion wird als Key die user_id verwendet und die shift, employment_level und weekly_hours aus der Datenbank gezogen """
+        """ In dieser Funktion wird als Key die emails verwendet und die shift, employment_level und weekly_hours aus der Datenbank gezogen """
 
         # company_name filtern aus der Datenkbank
         user = self.session.query(User).filter_by(email=self.current_user_email).first()
@@ -520,8 +521,11 @@ class DataProcessing:
             'fair_distribution': solver_requirement.fair_distribution,
             'week_timeframe': solver_requirement.week_timeframe,
             'subsequent_workingdays': solver_requirement.subsequent_workingdays,
+            'subsequent_workingdays_max': solver_requirement.subsequent_workingdays_max,
             'daily_deployment': solver_requirement.daily_deployment,
             'time_per_deployment': solver_requirement.time_per_deployment,
+            'new_fte_per_slot': solver_requirement.new_fte_per_slot,
+            'skills_per_day': solver_requirement.skills_per_day,
             'nb1': solver_requirement.nb1,
             'nb2': solver_requirement.nb2,
             'nb3': solver_requirement.nb3,
@@ -545,24 +549,31 @@ class DataProcessing:
         }
 
 
-    def user_name_list(self):
-        """ In dieser Funktion werden alle user Vor- und Nachnamen der company geozgen und in einer Liste gespeichert """
+    def user_name_and_training(self):
+        """ In dieser Funktion werden alle User-Vor- und Nachnamen der Company geholt und in einer Liste gespeichert,
+        sowie ein Dictionary erstellt, das angibt, ob ein User in der Einarbeitung ist oder nicht. """
 
-        # Eine Liste mit allen ids der user erstellen (Reihenfolge gleich wie später)
+        # Eine Liste mit allen E-Mail-Adressen der User erstellen
         user_emails = [user_email for user_email in self.binary_availability]
 
         # Liste für alle Vor- und Nachnamen der User
         self.user_names = []
+        # Dict für die Angabe, ob ein User neu ist oder nicht
+        self.new_employees = {}
 
         for email in user_emails:
-            # user mit bestimmter ID aus der Datenbank abrufen
+            # User mit bestimmter E-Mail-Adresse aus der Datenbank abrufen
             user = self.session.query(User).filter_by(email=email).first()
-            
-            # Überprüfen, ob ein Benutzer gefunden wurde
+
             if user is not None:
                 self.user_names.append((user.first_name, user.last_name))
+
+                # 1, wenn user.in_training == 'X' ist, sonst 0
+                self.new_employees[email] = 1 if user.in_training == 'X' else 0
             else:
                 self.user_names.append((None, None))
+                self.new_employees[email] = 0
+
 
 
     def close_session(self):

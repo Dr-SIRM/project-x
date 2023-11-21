@@ -7,6 +7,7 @@ import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettin
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import Checkbox from '@mui/material/Checkbox';
 import Header from "../../components/Header";
 import { ThreeDots } from "react-loader-spinner"; 
 import axios from "axios";
@@ -108,6 +109,30 @@ const Team = () => {
 
   const getUserDepartments = (user) => {
     return [user.department, user.department2, user.department3].filter(Boolean);
+  };
+
+  const handleInTrainingChange = async (event, id) => {
+    // Determine the new value for in_training based on the checkbox state
+    const newValue = event.target.checked ? 'X' : 'None'; // Adjust this based on how your backend expects the data
+  
+    try {
+      // Send the updated value to the server
+      await axios.put(`${API_BASE_URL}/api/users/update/${id}`, { in_training: newValue }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+  
+      // Re-fetch the data from the server or update the state locally
+      const response = await axios.get(`${API_BASE_URL}/api/users`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      setUsers(response.data.users); // Update the users state with the fresh data from the server
+    } catch (error) {
+      console.error('Error updating in_training status:', error);
+    }
   };
   
   const editingCellIdRef = useRef(null);  // Create a ref to store the id of the cell being edited
@@ -378,6 +403,21 @@ const handleConfirmDelete = async () => {
       },
     },
     {
+      field: "in_training",
+      headerName: t('team.columns.in_training'),
+      flex: 1,
+      align: 'center', // Align the cell content to the center
+      headerAlign: 'center', 
+      renderCell: (params) => (
+        <Checkbox
+          checked={params.value === 'X' || params.value === true}
+          onChange={(event) => handleInTrainingChange(event, params.id)}
+          color="primary"
+        />
+      ),
+    },
+    
+    {
       field: "access_level",
       headerName: t('team.columns.access_level'),
       flex: 1,
@@ -471,7 +511,7 @@ const handleConfirmDelete = async () => {
             backgroundColor: colors.primary[100],
           },
           "& .MuiCheckbox-root": {
-            color: `${colors.greenAccent[200]} !important`,
+            color: `${colors.greenAccent[900]} !important`,
           },
         }}
         
