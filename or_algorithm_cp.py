@@ -72,8 +72,10 @@ To-Do Liste:
  - (*)  Wenn man gar keine time_req eingegeben hat, hällt dann Vorüberprüfung 1 stand?
 
  - (*) self.subsequent_workingdays_max, self.skills_per_day(1 oder 0) in die Datenbank einpflegen und ziehen
+
  - self.max_time_week darf niemals grösser als self.weekly hours gewählt werden!
  - self.daily_deployment soll nur 1 oder 2 werden können
+ - self.skills_per_day soll nur 1 oder 0 werden können
 
 
  
@@ -129,9 +131,12 @@ class ORAlgorithm_cp:
         self.gerechte_verteilung = []                       # 14
         self.fair_distribution = None                       # 15
         self.subsequent_workingdays = None                  # 16
+        self.subsequent_workingdays_max = None              # 16.5
         self.daily_deployment = None                        # 17
         self.time_per_deployment = None                     # 18
-        self.benoetigte_skills = []                         # 19
+        self.new_fte_per_slot = None                        # 19
+        self.skills_per_day = None                          # 20
+        self.benoetigte_skills = []                         # 30
 
         self.desired_max_time_day = None
         self.max_time_day = None
@@ -487,10 +492,16 @@ class ORAlgorithm_cp:
         self.fair_distribution = self.fair_distribution / 100      # Prozentumrechnung
 
         # -- 16 ------------------------------------------------------------------------------------------------------------
-        # Maximale Arbeitstage in Folge
+        # Maximale Arbeitstage in Folge (Weiche NB)
         key = "subsequent_workingdays"
         if key in self.solver_requirements:
             self.subsequent_workingdays = self.solver_requirements[key]
+
+        # -- 16.5 ------------------------------------------------------------------------------------------------------------
+        # Maximale Arbeitstage in Folge (Weiche NB)
+        key = "subsequent_workingdays_max"
+        if key in self.solver_requirements:
+            self.subsequent_workingdays_max = self.solver_requirements[key]
 
         # -- 17 ------------------------------------------------------------------------------------------------------------
         # Anzahl Arbeitseinsätze pro Tag
@@ -505,6 +516,18 @@ class ORAlgorithm_cp:
             self.time_per_deployment = self.solver_requirements[key]
 
         # -- 19 ------------------------------------------------------------------------------------------------------------
+        # Max. Anzahl "In Einarbeitung" Mitarbeiter in einer Stunde am Arbeiten
+        key = "new_fte_per_slot"
+        if key in self.solver_requirements:
+            self.new_fte_per_slot = self.solver_requirements[key]
+        
+        # -- 20 ------------------------------------------------------------------------------------------------------------
+        # Max. Anzahl "In Einarbeitung" Mitarbeiter in einer Stunde am Arbeiten
+        key = "skills_per_day"
+        if key in self.solver_requirements:
+            self.skills_per_day = self.solver_requirements[key]
+
+        # -- 30 ------------------------------------------------------------------------------------------------------------
         # Alle Skills pro Woche die im Zeitraum benötigt werden in einer Liste zusammenfassen. 
 
         # Initialisieren von self.benoetigte_skills als Liste von leeren Listen für jede Woche
@@ -577,9 +600,13 @@ class ORAlgorithm_cp:
         print("14. self.gerechte_verteilung: ", self.gerechte_verteilung)
         print("15. self.fair_distribution: ", self.fair_distribution)
         print("16. self.subsequent_workingdays: ", self.subsequent_workingdays)
+        print("16.5. self.subsequent_workingdays_max: ", self.subsequent_workingdays_max)
         print("17. self.daily_deployment: ", self.daily_deployment)
         print("18. self.time_per_deployment: ", self.time_per_deployment)
-        print("19. self.benoetigte_skills: ", self.benoetigte_skills)
+        print("19. self.new_fte_per_slot: ", self.new_fte_per_slot)
+        print("20. self.skills_per_day: ", self.skills_per_day)
+        
+        print("30. self.benoetigte_skills: ", self.benoetigte_skills)
 
 
     def pre_check_programmer(self):
@@ -1792,10 +1819,6 @@ class ORAlgorithm_cp:
         # HARTE NB (08.10.2023)
         # NB 10 - Max. Anzahl an Arbeitstagen in Folge -> Obergrenze
         # -------------------------------------------------------------------------------------------------------
-    
-        # Diese Variable noch in der Datenbank implementieren
-        self.subsequent_workingdays_max = 7
-
         for i in self.mitarbeiter:
             for j in range(self.calc_time - self.subsequent_workingdays_max):
                 # Rollfenster-Technik:
@@ -1892,11 +1915,8 @@ class ORAlgorithm_cp:
         # HARTE NB (02.11.2023)
         # NB 14 - Mehrere Skills an einem Tag ausführen J/N
         # -------------------------------------------------------------------------------------------------------
-        # Abfragen ob bei mehreren Skills die Mitarbeiter innerhalb von einem Tag die Skills wechseln dürfen.
-        # Wenn nein, wird diese NB aktiviert
-        # Das muss noch in die Datenbank eingebaut werden
-        self.skills_per_day = 0
 
+        # Entweder 0 oder 1. Wenn 1:
         # Maximal einen Skill pro Tag
         if self.skills_per_day == 1:
             for i in self.mitarbeiter:
@@ -1926,18 +1946,23 @@ class ORAlgorithm_cp:
                         
         # -------------------------------------------------------------------------------------------------------
         # HARTE NB (20.11.2023)
-        # NB 16 - Es dürfen max. X neue Mitarbeiter zusammen mit dem gleichen Skill arbeiten
+        # NB 16 - Es dürfen max. X "In Einarbeitung" Mitarbeiter zusammen mit dem gleichen Skill arbeiten
         # -------------------------------------------------------------------------------------------------------
-        """
+        
         # Der User 1 ist "neu", User 2 ist bereits eingearbeitet -> diese Liste erstellen
         new_employ =  {'user_1@sportrock.ch': 1, 'user_2@sportrock.ch': 0}
 
+        # Für jeden Tag zur jeder Stunde mit jedem benötigten Skill
         for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
                     woche = j // 7
-                    self.model.Add(sum(new_employ[i] * self.x[i, j, k, s] for i in self.mitarbeiter for s in self.skills if s in self.mitarbeiter_s[i]) <= 1)
-        """
+                    if self.benoetigte_skills[woche]:
+                        for s in self.benoetigte_skills[woche]:
+                            if s in self.mitarbeiter_s[i]:  # Prüfen, ob der Mitarbeiter den Skill hat
 
+                                # Die Summe der neuen Mitarbeiter pro Tag pro Stunde pro Skill darf nicht grösser 1 sein
+                                self.model.Add(sum(new_employ[i] * self.x[i, j, k, s] for i in self.mitarbeiter) <= 1)
+        
 
 
 
