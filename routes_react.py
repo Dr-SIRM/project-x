@@ -1344,9 +1344,8 @@ def solver_req():
     #Submit Solver Requirements
     if request.method =='POST':
         solver_req_data = request.get_json()
-        print(solver_req_data)
         session = get_session(get_database_uri('', user.company_name.lower().replace(' ', '_')))
-        data_deletion = SolverRequirement.query.filter_by(company_name=user.company_name)
+        data_deletion = session.query(SolverRequirement).filter_by(company_name=user.company_name)
         if solver_requirement:
             data_deletion.delete()
             session.commit()
