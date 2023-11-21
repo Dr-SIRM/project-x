@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { useTheme, Box, Button, TextField, Snackbar, Typography } from "@mui/material";
+import ReactPhoneInput from 'react-phone-input-material-ui';
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -8,6 +9,8 @@ import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import axios from 'axios';
 import { API_BASE_URL } from "../../config";
+import { useTranslation } from 'react-i18next';
+import '../../i18n';  
 
 
 
@@ -19,6 +22,7 @@ const Token_Registration = ({ token_registration }) => {
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [tokenRegData, settokenRegData] = useState({});
   const token = localStorage.getItem('session_token'); // Get the session token from local storage
+  const { t, i18n } = useTranslation();
 
   
 
@@ -28,7 +32,7 @@ const Token_Registration = ({ token_registration }) => {
       // Send the updated form values to the server for database update
       await axios.post(`${API_BASE_URL}/api/token_registration`, values, {
     headers: {
-        ///'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
         }
     });
@@ -43,10 +47,9 @@ const Token_Registration = ({ token_registration }) => {
   return (
     <Box m="20px">
       <Header
-        title="Registration"
-        subtitle=""
+        title={t('registration.title')}
+        subtitle={t('registration.subtitle')}
       />
-      <h2>Register Now</h2>
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -72,16 +75,15 @@ const Token_Registration = ({ token_registration }) => {
               }}
             >
               <Typography
-                color={colors.greenAccent[500]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "left",
                   height: "100%",
                 }}
               >
-                Token
+                {t('registration.token')}
               </Typography>
               <TextField
                 fullWidth
@@ -94,10 +96,9 @@ const Token_Registration = ({ token_registration }) => {
                 name="token"
                 error={!!touched.token && !!errors.token}
                 helperText={touched.token && errors.token}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
               />
               <Typography
-                color={colors.greenAccent[500]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -106,7 +107,7 @@ const Token_Registration = ({ token_registration }) => {
                   height: "100%",
                 }}
               >
-                E-Mail
+                {t('registration.email')}
               </Typography>
               <TextField
                 fullWidth
@@ -119,10 +120,19 @@ const Token_Registration = ({ token_registration }) => {
                 name="email"
                 error={!!touched.email && !!errors.email}
                 helperText={touched.email && errors.email}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
               />
               <Typography
-                color={colors.greenAccent[500]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 2",
+                  display: "flex",
+                  alignItems: "right",
+                  height: "100%",
+                }}
+              >
+              </Typography>
+              <Typography
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -131,7 +141,7 @@ const Token_Registration = ({ token_registration }) => {
                   height: "100%",
                 }}
               >
-                First Name
+                {t('registration.first_name')}
               </Typography>
               <TextField
                 fullWidth
@@ -144,10 +154,9 @@ const Token_Registration = ({ token_registration }) => {
                 name="first_name"
                 error={!!touched.first_name && !!errors.first_name}
                 helperText={touched.first_name && errors.first_name}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
               />
               <Typography
-                color={colors.greenAccent[500]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -156,7 +165,7 @@ const Token_Registration = ({ token_registration }) => {
                   height: "100%",
                 }}
               >
-                Last Name
+                {t('registration.last_name')}
               </Typography>
               <TextField
                 fullWidth
@@ -169,10 +178,19 @@ const Token_Registration = ({ token_registration }) => {
                 name="last_name"
                 error={!!touched.last_name && !!errors.last_name}
                 helperText={touched.last_name && errors.last_name}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
               />
               <Typography
-                color={colors.greenAccent[500]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 2",
+                  display: "flex",
+                  alignItems: "right",
+                  height: "100%",
+                }}
+              >
+              </Typography>
+              <Typography
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -181,7 +199,41 @@ const Token_Registration = ({ token_registration }) => {
                   height: "100%",
                 }}
               >
-                Password
+                {t('registration.phone_number')}
+              </Typography>
+              <TextField
+                fullWidth
+                variant="filled"
+                label= ""
+                onBlur={handleBlur}
+                onChange={handleChange}
+                defaultCountry={'us'}
+                value={values.phone_number}
+                name="phone_number"
+                error={!!touched.phone_number && !!errors.phone_number}
+                helperText={touched.phone_number && errors.phone_number}
+                sx={{ gridColumn: "span 1" }}
+              />
+              <Typography
+                variant="h6"
+                sx={{
+                  gridColumn: "span 4",
+                  display: "flex",
+                  alignItems: "right",
+                  height: "100%",
+                }}
+              >
+              </Typography>
+              <Typography
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "right",
+                  height: "100%",
+                }}
+              >
+                {t('registration.password')}
               </Typography>
               <TextField
                 fullWidth
@@ -194,10 +246,9 @@ const Token_Registration = ({ token_registration }) => {
                 name="password"
                 error={!!touched.password && !!errors.password}
                 helperText={touched.password && errors.password}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
               />
               <Typography
-                color={colors.greenAccent[500]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -206,7 +257,7 @@ const Token_Registration = ({ token_registration }) => {
                   height: "100%",
                 }}
               >
-                Repeat Password
+                {t('registration.password2')}
               </Typography>
               <TextField
                 fullWidth
@@ -219,14 +270,14 @@ const Token_Registration = ({ token_registration }) => {
                 name="password2"
                 error={!!touched.password2 && !!errors.password2}
                 helperText={touched.password2 && errors.password2}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
               />
             </Box>
             <></>
             
             <Box display="flex" justifyContent="end" mt="20px">
               <Button type="submit" color="secondary" variant="contained">
-                Update
+              {t('button.update')}
               </Button>
             </Box>
           </form>
@@ -235,7 +286,7 @@ const Token_Registration = ({ token_registration }) => {
       <Snackbar
         open={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
-        message="Successful Registered!"
+        message={t('registration.success')}
         autoHideDuration={3000}
         sx={{
           backgroundColor: "green !important",
@@ -250,7 +301,7 @@ const Token_Registration = ({ token_registration }) => {
       <Snackbar
         open={showErrorNotification}
         onClose={() => setShowErrorNotification(false)}
-        message="Error occurred - Token and E-Mail does not match!"
+        message={t('registration.no_success')}
         autoHideDuration={3000}
         sx={{
           backgroundColor: "red !important",

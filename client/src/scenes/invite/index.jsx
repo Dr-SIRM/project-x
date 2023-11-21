@@ -9,6 +9,8 @@ import { tokens } from "../../theme";
 import { ThreeDots } from "react-loader-spinner"; 
 import axios from 'axios';
 import { API_BASE_URL } from "../../config";
+import { useTranslation } from 'react-i18next';
+import '../../i18n';  
 
 
 
@@ -22,6 +24,8 @@ const Invite = ({ invite }) => {
   const [inviteData, setinviteData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const token = localStorage.getItem('session_token'); // Get the session token from local storage
+  const { t, i18n } = useTranslation();
+
 
   useEffect(() => {
     const fetchInvite = async () => {
@@ -71,8 +75,8 @@ const Invite = ({ invite }) => {
   return (
     <Box m="20px">
       <Header
-        title="Einladen"
-        subtitle="Lade dein Teammitglieder ein"
+        title={t('registration.invite_title')}
+        subtitle={t('registration.invite_subtitle')}
       />  
 
       <Formik
@@ -119,7 +123,7 @@ const Invite = ({ invite }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                E-Mail
+                {t('registration.email')}
               </Typography>
               <TextField
                 fullWidth
@@ -153,7 +157,7 @@ const Invite = ({ invite }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Firma
+                {t('registration.company_name')}
               </Typography>
               <TextField
                 fullWidth
@@ -174,7 +178,7 @@ const Invite = ({ invite }) => {
                   },
                 }}
               />
-                            <Typography
+              <Typography
                 
                 variant="h6"
                 sx={{
@@ -187,7 +191,7 @@ const Invite = ({ invite }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Department 1
+                {t('registration.skills1')}
               </Typography>
               <Select
                 fullWidth
@@ -208,7 +212,7 @@ const Invite = ({ invite }) => {
                   },
                 }}
               >
-                <MenuItem value="">Wählen Sie eine Abteilung</MenuItem>
+                <MenuItem value="">{t('registration.skill_selection')}</MenuItem>
                 {department_list.map((department) => (
                   <MenuItem key={department} value={department}>
                     {department}
@@ -228,7 +232,7 @@ const Invite = ({ invite }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Department 2
+                {t('registration.skill2')}
               </Typography>
               <Select
                 fullWidth
@@ -249,7 +253,7 @@ const Invite = ({ invite }) => {
                   },
                 }}
               >
-                <MenuItem value="">Wählen Sie eine Abteilung</MenuItem>
+                <MenuItem value="">{t('registration.skill_selection')}</MenuItem>
                 {department_list.map((department) => (
                   <MenuItem key={department} value={department}>
                     {department}
@@ -269,7 +273,7 @@ const Invite = ({ invite }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Department 3
+                {t('registration.skill3')}
               </Typography>
               <Select
                 fullWidth
@@ -290,12 +294,47 @@ const Invite = ({ invite }) => {
                   },
                 }}
               >
-                <MenuItem value="">Wählen Sie eine Abteilung</MenuItem>
+                <MenuItem value="">{t('registration.skill_selection')}</MenuItem>
                 {department_list.map((department) => (
                   <MenuItem key={department} value={department}>
                     {department}
                   </MenuItem>
                 ))}
+              </Select>
+              <Typography
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center", 
+                  height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
+                }}
+              >
+                {t('registration.in_training')} 
+              </Typography>
+              <Select
+                fullWidth
+                variant="filled"
+                type="text"
+                label= ""
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.in_training}
+                name="in_training"
+                error={!!touched.in_training && !!errors.in_training}
+                helperText={touched.in_training && errors.in_training}
+                sx={{
+                  gridColumn: "span 2",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
+              >
+                <MenuItem value={'X'}>X</MenuItem>
               </Select>
               <Typography
                 
@@ -310,7 +349,7 @@ const Invite = ({ invite }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Anstellung
+                {t('registration.employment')}
               </Typography>
               <Select
                 fullWidth
@@ -331,8 +370,8 @@ const Invite = ({ invite }) => {
                   },
                 }}
               >
-                <MenuItem value={'Perm'}>Festangestellt</MenuItem>
-                <MenuItem value={'Temp'}>Teilzeit</MenuItem>
+                <MenuItem value={'Perm'}>{t('registration.full_time')}</MenuItem>
+                <MenuItem value={'Temp'}>{t('registration.part_time')}</MenuItem>
               </Select>
               <Typography
                 
@@ -347,7 +386,7 @@ const Invite = ({ invite }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Anstellungsgrad
+                {t('registration.employment_level')}
               </Typography>
               <Select
                 fullWidth
@@ -395,7 +434,7 @@ const Invite = ({ invite }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Zugriffslevel
+                {t('registration.access_level')}
               </Typography>
               <Select
                 fullWidth
@@ -427,7 +466,7 @@ const Invite = ({ invite }) => {
             
             <Box display="flex" justifyContent="end" mt="20px">
               <Button type="submit" color="primary" variant="contained">
-                Update
+              {t('button.update')}
               </Button>
             </Box>
           </form>
@@ -436,7 +475,7 @@ const Invite = ({ invite }) => {
       <Snackbar
         open={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
-        message="Invititation E-Mail is send!"
+        message={t('registration.success_invite')}
         autoHideDuration={3000}
         sx={{
           backgroundColor: "green !important",
@@ -451,7 +490,7 @@ const Invite = ({ invite }) => {
       <Snackbar
         open={showErrorNotification}
         onClose={() => setShowErrorNotification(false)}
-        message="Error occurred - E-Mail is already in use!"
+        message={t('registration.no_success_invite')}
         autoHideDuration={3000}
         sx={{
           backgroundColor: "red !important",

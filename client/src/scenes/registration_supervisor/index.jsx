@@ -158,14 +158,14 @@ const Registration = ({ registration }) => {
               <TextField
                 fullWidth
                 variant="filled"
-                type="text"
-                label="Firmennamen"
+                label= "Telefonnummer"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.company_name}
-                name="company_name"
-                error={!!touched.company_name && !!errors.company_name}
-                helpertext={touched.company_name && errors.company_name}
+                defaultCountry={'us'}
+                value={values.phone_number}
+                name="phone_number"
+                error={!!touched.phone_number && !!errors.phone_number}
+                helperText={touched.phone_number && errors.phone_number}
                 sx={{ gridColumn: "span 2" }}
               />
               <Typography
@@ -178,6 +178,19 @@ const Registration = ({ registration }) => {
                 }}
               >
               </Typography>
+              <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label="Firmennamen"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.company_name}
+                name="company_name"
+                error={!!touched.company_name && !!errors.company_name}
+                helpertext={touched.company_name && errors.company_name}
+                sx={{ gridColumn: "span 2" }}
+              />
               <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 2" }}>
                 <InputLabel id="employment-label">Anstellung</InputLabel>
                 <Select
@@ -204,6 +217,16 @@ const Registration = ({ registration }) => {
                   <MenuItem value="Temp">Teilzeit</MenuItem>
                 </Select>
               </FormControl>
+              <Typography
+                variant="h6"
+                sx={{
+                  gridColumn: "span 2",
+                  display: "flex",
+                  alignItems: "center",
+                  height: "100%",
+                }}
+              >
+              </Typography>
               <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 2" }}>
                 <InputLabel id="employment-level-label">Pensum</InputLabel>
                 <Select
@@ -245,16 +268,6 @@ const Registration = ({ registration }) => {
                   })}
                 </Select>
               </FormControl>
-              <Typography
-                variant="h6"
-                sx={{
-                  gridColumn: "span 2",
-                  display: "flex",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              >
-              </Typography>
               <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 2" }}>
                 <InputLabel id="access_level-label">Access Level</InputLabel>
                 <Select
@@ -285,7 +298,7 @@ const Registration = ({ registration }) => {
               <Typography
                 variant="h6"
                 sx={{
-                  gridColumn: "span 4",
+                  gridColumn: "span 2",
                   display: "flex",
                   alignItems: "center",
                   height: "100%",

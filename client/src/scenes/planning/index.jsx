@@ -453,11 +453,11 @@ const TimeReq = ({ timereq }) => {
         <Tooltip 
           title={
           <>
-          <span style={{ fontWeight: 'bold' }}>Speicher deine Vorlage</span><br />
+          <span style={{ fontWeight: 'bold' }}>{t('info.title_template')}</span><br />
           <br />
-          1. Trage deine Verfügbarkeiten unten ein<br />
-          2. Wähle einen Vorlagenamen aus der Drop-Down Liste<br />
-          3.Speicher deine Vorlage über den Save Template Knopf</>}>
+          {t('info.title_template_step1')}<br />
+          {t('info.title_template_step2')}<br />
+          {t('info.title_template_step3')}</>}>
           <InfoOutlinedIcon style={{ color: 'black' }} />
         </Tooltip>
         </Box>
@@ -545,7 +545,7 @@ const TimeReq = ({ timereq }) => {
                 onClick={() => EnteredSlots(columnIndex)}
                 sx={{ marginBottom: '10px', marginTop: '10px' }} 
               >
-                Enter
+                {t('button.submit')}
               </Button>
 
               <Box sx={{
@@ -671,7 +671,7 @@ const TimeReq = ({ timereq }) => {
       <Snackbar
         open={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
-        message="Registration successful"
+        message={t('notification.success_timereq')}
         autoHideDuration={3000}
         sx={{
           backgroundColor: "green !important",
@@ -686,7 +686,7 @@ const TimeReq = ({ timereq }) => {
       <Snackbar
         open={showMissingNotification}
         onClose={() => setShowMissingNotification(false)}
-        message="Please select a Department"
+        message={t('notification.timereq_selection')}
         autoHideDuration={3000}
         sx={{
           backgroundColor: "red !important",
@@ -701,7 +701,7 @@ const TimeReq = ({ timereq }) => {
       <Snackbar
         open={showErrorNotification}
         onClose={() => setShowErrorNotification(false)}
-        message="Error occurred - Your shifts might already be in use"
+        message={t('notification.no_success_timereq')}
         autoHideDuration={3000}
         sx={{
           backgroundColor: "red !important",

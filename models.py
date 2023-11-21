@@ -41,6 +41,8 @@ class User(db.Model, UserMixin):
     last_name = db.Column(db.String(100), index=True, unique=False)
     employment = db.Column(db.String(100), index=True, unique=False)
     email = db.Column(db.String(200), index=True, unique=True)
+    phone_number = db.Column(db.String(200), index=True, unique=True)
+    in_training = db.Column(db.String(200), index=True, unique=False)
     password = db.Column(db.String(200))
     employment_level = db.Column(db.Float, index=True, unique=False)
     company_name = db.Column(db.String(200), index=True, unique=False)
@@ -61,7 +63,7 @@ class User(db.Model, UserMixin):
     update_timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
 
 
-    def __init__(self, company_id, first_name, last_name, employment, email, password, employment_level, company_name, department,
+    def __init__(self, company_id, first_name, last_name, employment, email, phone_number, in_training, password, employment_level, company_name, department,
                  department2, department3, department4, department5, department6, department7, department8, department9, department10,
                  access_level, created_by, changed_by, creation_timestamp):
         self.company_id = company_id
@@ -69,6 +71,8 @@ class User(db.Model, UserMixin):
         self.last_name = last_name
         self.employment = employment
         self.email = email
+        self.phone_number = phone_number
+        self.in_training = in_training
         self.password = password
         self.employment_level = employment_level
         self.company_name = company_name
@@ -335,6 +339,7 @@ class RegistrationToken(db.Model, UserMixin):
     email = db.Column(db.String(200), index=True, unique=False)
     token = db.Column(db.String(6), index=True, unique=False)
     company_name = db.Column(db.String(200), index=True, unique=False)
+    in_training = db.Column(db.String(200), index=True, unique=False)
     employment = db.Column(db.String(200), index=True, unique=False)
     employment_level = db.Column(db.Float, index=True, unique=False)
     department = db.Column(db.String(200), index=True, unique=False)
@@ -351,13 +356,14 @@ class RegistrationToken(db.Model, UserMixin):
     created_by = db.Column(db.Integer, index=True, unique=False)
     creation_timestamp = db.Column(db.DateTime, default=datetime.datetime.now)
 
-    def __init__(self, email, token, company_name, employment, employment_level, department, department2, department3, department4, 
+    def __init__(self, email, token, company_name, employment, employment_level, in_training, department, department2, department3, department4, 
                  department5, department6, department7, department8, department9, department10, access_level, created_by):
         self.email = email
         self.token = token
         self.company_name = company_name
         self.employment = employment
         self.employment_level = employment_level
+        self.in_training = in_training
         self.department = department
         self.department2 = department2
         self.department3 = department3
@@ -399,12 +405,15 @@ class SolverRequirement(db.Model, UserMixin):
     max_time_day = db.Column(db.Integer, index=True, unique=False)
     desired_max_time_week = db.Column(db.Integer, index=True, unique=False)
     max_time_week = db.Column(db.Integer, index=True, unique=False)
-    hour_devider = db.Column(db.Integer, index=True, unique=False)
+    hour_divider = db.Column(db.Integer, index=True, unique=False)
     fair_distribution = db.Column(db.Integer, index=True, unique=False)
     week_timeframe = db.Column(db.Integer, index=True, unique=False)
     subsequent_workingdays = db.Column(db.Integer, index=True, unique=False)
+    subsequent_workingdays_max = db.Column(db.Integer, index=True, unique=False)
     daily_deployment = db.Column(db.Integer, index=True, unique=False)
     time_per_deployment = db.Column(db.Integer, index=True, unique=False)
+    new_fte_per_slot = db.Column(db.Integer, index=True, unique=False)
+    skills_per_day = db.Column(db.Integer, index=True, unique=False)
     nb1 = db.Column(db.Integer, index=True, unique=False)
     nb2 = db.Column(db.Integer, index=True, unique=False)
     nb3 = db.Column(db.Integer, index=True, unique=False)
@@ -433,9 +442,10 @@ class SolverRequirement(db.Model, UserMixin):
 
 
     def __init__(self, company_name, weekly_hours, shifts, desired_min_time_day, desired_max_time_day, 
-                 min_time_day, max_time_day, desired_max_time_week, max_time_week, hour_devider, 
-                 fair_distribution, week_timeframe, subsequent_workingdays, daily_deployment, time_per_deployment, nb1, nb2, nb3, nb4, nb5, nb6, nb7, nb8, nb9, nb10, 
-                 nb11, nb12, nb13, nb14, nb15, nb16, nb17, nb18, nb19, nb20, created_by, changed_by, 
+                 min_time_day, max_time_day, desired_max_time_week, max_time_week, hour_divider, 
+                 fair_distribution, week_timeframe, subsequent_workingdays, daily_deployment, time_per_deployment, 
+                 new_fte_per_slot, subsequent_workingdays_max, skills_per_day, nb1, nb2, nb3, nb4, nb5, nb6, nb7, 
+                 nb8, nb9, nb10, nb11, nb12, nb13, nb14, nb15, nb16, nb17, nb18, nb19, nb20, created_by, changed_by, 
                  creation_timestamp, update_timestamp):
         self.company_name = company_name
         self.weekly_hours = weekly_hours
@@ -446,12 +456,15 @@ class SolverRequirement(db.Model, UserMixin):
         self.max_time_day = max_time_day
         self.desired_max_time_week = desired_max_time_week
         self.max_time_week = max_time_week
-        self.hour_devider = hour_devider
+        self.hour_divider = hour_divider
         self.fair_distribution = fair_distribution
         self.week_timeframe = week_timeframe
         self.subsequent_workingdays = subsequent_workingdays
+        self.subsequent_workingdays_max = subsequent_workingdays_max
         self.daily_deployment = daily_deployment
         self.time_per_deployment = time_per_deployment
+        self.new_fte_per_slot = new_fte_per_slot
+        self.skills_per_day = skills_per_day
 
         self.nb1 = nb1
         self.nb2 = nb2
@@ -497,7 +510,7 @@ class SolverAnalysis(db.Model, UserMixin):
     self_user_employment = db.Column(db.Text)
     self_solver_requirements = db.Column(db.Text)
     self_week_timeframe = db.Column(db.Text)
-    self_hour_devider = db.Column(db.Text)
+    self_hour_divider = db.Column(db.Text)
     self_mitarbeiter = db.Column(db.Text)
     self_verfügbarkeit = db.Column(db.Text)
     self_kosten = db.Column(db.Text)
@@ -572,7 +585,7 @@ class SolverAnalysis(db.Model, UserMixin):
     def __init__(self, usecase, self_current_user_id, self_user_availability, self_opening_hours, 
                self_laden_oeffnet, self_laden_schliesst, self_binary_availability, self_company_shifts, 
                self_weekly_hours, self_employment_lvl, self_time_req, self_user_employment, 
-               self_solver_requirements, self_week_timeframe, self_hour_devider, self_mitarbeiter, 
+               self_solver_requirements, self_week_timeframe, self_hour_divider, self_mitarbeiter, 
                self_verfügbarkeit, self_kosten, self_max_zeit, self_min_zeit, self_max_time_week, 
                self_calc_time, self_employment_lvl_exact, self_employment, 
                self_verteilbare_stunden, self_gesamtstunden_verfügbarkeit, self_min_anwesend, 
@@ -599,7 +612,7 @@ class SolverAnalysis(db.Model, UserMixin):
         self.self_user_employment = self_user_employment
         self.self_solver_requirements = self_solver_requirements
         self.self_week_timeframe = self_week_timeframe
-        self.self_hour_devider = self_hour_devider
+        self.self_hour_divider = self_hour_divider
         self.self_mitarbeiter = self_mitarbeiter
         self.self_verfügbarkeit = self_verfügbarkeit
         self.self_kosten = self_kosten

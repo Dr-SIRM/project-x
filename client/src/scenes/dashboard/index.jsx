@@ -465,7 +465,7 @@ const Dashboard = () => {
               </Box>
               <Box>
                 <Typography color={colors.grey[100]}>
-                  {shift.start} bis {shift.end}
+                  {shift.start} {shift.end} {shift.end}
                 </Typography>
               </Box>
             </Box>

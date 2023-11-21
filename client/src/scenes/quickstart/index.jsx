@@ -9,6 +9,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTranslation } from 'react-i18next';
 import Header from "../../components/Header";
 import { tokens } from "../../theme";
+import '../../i18n';  
 
 const QuickStartPopup = ({ open, onClose }) => {
     const token = localStorage.getItem('session_token');
@@ -66,8 +67,11 @@ const QuickStartPopup = ({ open, onClose }) => {
         hour_divider: '',
         week_timeframe: '',
         subsequent_workingdays: '',
+        subsequent_workingdays_max: '',
         daily_deployment: '',
         time_per_deployment: '',
+        subsequent_workingdays_max: '',
+        skills_per_day: '',
         nb1: '',
         nb2: '',
         nb3: '',
@@ -891,7 +895,7 @@ const QuickStartPopup = ({ open, onClose }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
                 >
-                  {t('solverreq.maxworkingdayinarow')}
+                  {t('solverreq.subsequent_workingdays')}
                 </Typography>
                 <TextField
                 fullWidth
@@ -900,6 +904,41 @@ const QuickStartPopup = ({ open, onClose }) => {
                 label=''
                 name="subsequent_workingdays"
                 value={formData.subsequent_workingdays}
+                onChange={handleInputChange}
+
+                sx={{
+                  gridColumn: "span 1",
+                  maxWidth: '150px',
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '0px',
+                    paddingBottom: '2px',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                }}
+                />
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 5",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  {t('solverreq.subsequent_workingdays_max')}
+                </Typography>
+                <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label=''
+                name="subsequent_workingdays_max"
+                value={formData.subsequent_workingdays_max}
                 onChange={handleInputChange}
 
                 sx={{
@@ -1005,6 +1044,76 @@ const QuickStartPopup = ({ open, onClose }) => {
                 }}
                 />
                 <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 5",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  {t('solverreq.new_fte_per_slot')}
+                </Typography>
+                <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label=''
+                name="new_fte_per_slot"
+                value={formData.new_fte_per_slot}
+                onChange={handleInputChange}
+
+                sx={{
+                  gridColumn: "span 1",
+                  maxWidth: '150px',
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '0px',
+                    paddingBottom: '2px',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                }}
+                />
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 5",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  {t('solverreq.skills_per_day')}
+                </Typography>
+                <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label=''
+                name="skills_per_day"
+                value={formData.skills_per_day}
+                onChange={handleInputChange}
+
+                sx={{
+                  gridColumn: "span 1",
+                  maxWidth: '150px',
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '0px',
+                    paddingBottom: '2px',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                }}
+                />
+                <Typography
                   color={colors.primary[100]}
                   variant=""
                   sx={{
@@ -1051,7 +1160,7 @@ const QuickStartPopup = ({ open, onClose }) => {
                         height: "100%",
                         }}
                     >
-                        Ja, ist mir egal
+                        {t('solverreq.low_ranking')}
                     </Typography>
                     <Typography
                         color={colors.primary[100]}
@@ -1064,7 +1173,7 @@ const QuickStartPopup = ({ open, onClose }) => {
                         height: "100%",
                         }}
                     >
-                        Nein lieber nicht
+                        {t('solverreq.high_ranking')}
                     </Typography>
 
                     {/* New Line */}
@@ -1081,7 +1190,7 @@ const QuickStartPopup = ({ open, onClose }) => {
                         backgroundColor: "#f0f0f0", 
                         }}
                     >
-                        Dürfen mehr Mitarbeiter pro Zeiteinheit eingeplant werden als nötig?
+                        {t('solverreq.nb1')}
                     </Typography>
                     <ToggleButtonGroup
                         value={formData.nb1}
@@ -1132,7 +1241,7 @@ const QuickStartPopup = ({ open, onClose }) => {
                         backgroundColor: "#f0f0f0", 
                         }}
                     >
-                        Darf die maximale Arbietszeit pro Woche überschritten werden?
+                        {t('solverreq.nb2')}
                     </Typography>
                     <ToggleButtonGroup
                         value={formData.nb2}
@@ -1183,7 +1292,7 @@ const QuickStartPopup = ({ open, onClose }) => {
                         backgroundColor: "#f0f0f0", 
                         }}
                     >
-                        Darf die minimale Arbeitzeit pro Tag unterschritten werden?
+                        {t('solverreq.nb3')}
                     </Typography>
                     <ToggleButtonGroup
                         value={formData.nb3}
@@ -1234,7 +1343,7 @@ const QuickStartPopup = ({ open, onClose }) => {
                         backgroundColor: "#f0f0f0", 
                         }}
                     >
-                        Darf die maximale Arbeitzeit pro Tag überschritten werden?
+                        {t('solverreq.nb4')}
                     </Typography>
                     <ToggleButtonGroup
                         value={formData.nb4}
@@ -1285,7 +1394,7 @@ const QuickStartPopup = ({ open, onClose }) => {
                         backgroundColor: "#f0f0f0", 
                         }}
                     >
-                        Darf die Arbeitstundenwoche bei Vollzeitangestellten Mitarbeiter unterschritten werden?
+                        {t('solverreq.nb5')}
                     </Typography>
                     <ToggleButtonGroup
                         value={formData.nb5}
@@ -1337,7 +1446,7 @@ const QuickStartPopup = ({ open, onClose }) => {
                         backgroundColor: "#f0f0f0", 
                         }}
                     >
-                        Darf die Arbeitstundenwoche bei Vollzeitangestellten Mitarbeiter überschritten werden?
+                        {t('solverreq.nb6')}
                     </Typography>
                     <ToggleButtonGroup
                         value={formData.nb6}
@@ -1411,7 +1520,7 @@ const QuickStartPopup = ({ open, onClose }) => {
                         height: "100%",
                         }}
                     >
-                        Ja, ist mir egal
+                        {t('solverreq.low_ranking')}
                     </Typography>
                     <Typography
                         color={colors.primary[100]}
@@ -1424,7 +1533,7 @@ const QuickStartPopup = ({ open, onClose }) => {
                         height: "100%",
                         }}
                     >
-                        Nein lieber nicht
+                        {t('solverreq.high_ranking')}
                     </Typography>
 
                     {/* New Line */}
@@ -1442,7 +1551,7 @@ const QuickStartPopup = ({ open, onClose }) => {
                         backgroundColor: "#f0f0f0", 
                         }}
                     >
-                        Jeder Mitarbeiter soll in der gleichen Schicht innerhalb einer Woche arbeiten
+                        {t('solverreq.nb7')}
                     </Typography>
                     <ToggleButtonGroup
                         value={formData.nb7}
@@ -1493,7 +1602,7 @@ const QuickStartPopup = ({ open, onClose }) => {
                         backgroundColor: "#f0f0f0", 
                         }}
                     >
-                        Über mehrere Wochen sollen Mitarbeiter Wechselschichtig arbeiten
+                        {t('solverreq.nb8')}
                     </Typography>
                     <ToggleButtonGroup
                         value={formData.nb8}
@@ -1544,7 +1653,7 @@ const QuickStartPopup = ({ open, onClose }) => {
                         backgroundColor: "#f0f0f0", 
                         }}
                     >
-                        Pro Schicht muss eine Mindestanzahl an Stunden gearbeitet werden
+                        {t('solverreq.nb9')}
                     </Typography>
                     <ToggleButtonGroup
                         value={formData.nb9}
@@ -1595,7 +1704,7 @@ const QuickStartPopup = ({ open, onClose }) => {
                         backgroundColor: "#f0f0f0", 
                         }}
                     >
-                        Maximale Arbeitstage in Folge darf überschritten werden
+                        {t('solverreq.nb10')}
                     </Typography>
                     <ToggleButtonGroup
                         value={formData.nb10}
@@ -1646,7 +1755,7 @@ const QuickStartPopup = ({ open, onClose }) => {
                         backgroundColor: "#f0f0f0", 
                         }}
                     >
-                        Nebenbedingung 11
+                        {t('solverreq.nb11')}
                     </Typography>
                     <ToggleButtonGroup
                         value={formData.nb11}
@@ -1697,7 +1806,7 @@ const QuickStartPopup = ({ open, onClose }) => {
                         backgroundColor: "#f0f0f0", 
                         }}
                     >
-                        Nebenbedingung 12
+                        {t('solverreq.nb12')}
                     </Typography>
                     <ToggleButtonGroup
                         value={formData.nb12}
@@ -1745,17 +1854,17 @@ const QuickStartPopup = ({ open, onClose }) => {
         >
             {currentStep > 1 && (
                 <Button variant="outlined" onClick={handleBack} style={{ marginRight: '10px' }}>
-                    Back
+                    {t('button.back')}
                 </Button>
             )}
             {currentStep < 5 && (
                 <Button variant="contained" color="primary" onClick={handleNext}>
-                    Next
+                    {t('button.next')}
                 </Button>
             )}
             {currentStep === 5 && (
                 <Button variant="contained" color="secondary" onClick={handleSubmit}>
-                    Submit
+                    {t('button.submit')}
                 </Button>
             )}
         </Box>

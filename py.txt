@@ -62,7 +62,7 @@ def get_required_workforce():
     weekdays = {0: 'Monday', 1: 'Tuesday', 2: 'Wednesday', 3: 'Thursday', 4: 'Friday', 5: 'Saturday', 6: 'Sunday'}
     today = datetime.date.today()
     solverreq = SolverRequirement.query.filter_by(company_name=user.company_name).first()
-    hour_divider = solverreq.hour_devider
+    hour_divider = solverreq.hour_divider
     full_day = (24 * hour_divider) - 1
     minutes = 60 / hour_divider
     day_num = 7   

@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { tokens } from "../../theme";
 import { AuthContext } from "../../AuthContext";
 import { API_BASE_URL } from "../../config";
+import { useTranslation } from 'react-i18next';
+import '../../i18n';  
 
 const Login = () => {
   const { login, error, setError } = useContext(AuthContext); // Fetch error and setError from the context
@@ -15,6 +17,7 @@ const Login = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     if (error) {
@@ -54,7 +57,7 @@ const Login = () => {
         right: '10px'
       }}
     >
-      Zurück
+      {t('button.back')}
     </Button>
       <Header title="Login" subtitle="" />
       <Box width="300px" p={2}>
@@ -62,7 +65,7 @@ const Login = () => {
           <Box mb={2}>
             <TextField
               type="email"
-              label="Email"
+              label={t('login.email')}
               fullWidth
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -71,7 +74,7 @@ const Login = () => {
           <Box mb={2}>
             <TextField
               type="password"
-              label="Password"
+              label={t('login.password')}
               fullWidth
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -92,14 +95,14 @@ const Login = () => {
           <Box mb={2} mt={2}>
             <Typography variant="body2" style={{ fontStyle: 'cursive' }}>
               <Link href="/token_registration" style={{ textDecoration: 'none', color: 'black' }}>
-                Registration via Invite Token
+              {t('login.token_registration')}
               </Link>
             </Typography>
           </Box>
           <Box mb={2} mt={2}>
             <Typography variant="body2" style={{ fontStyle: 'cursive' }}>
               <Link href="/forget_password" style={{ textDecoration: 'none', color: 'black' }}>
-                Forgot Password?
+              {t('login.forgot_password')}
               </Link>
             </Typography>
           </Box>
