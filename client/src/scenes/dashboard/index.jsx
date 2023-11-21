@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Select, MenuItem, useTheme, IconButton } from "@mui/material";
+import { Box, Typography, Select, MenuItem, useTheme, IconButton, useMediaQuery } from "@mui/material";
 import { tokens } from "../../theme";
 import { mockTransactions } from "../../data/mockData";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
@@ -48,6 +48,8 @@ const Dashboard = () => {
   const [currentWeekNum, setCurrentWeekNum] = useState();
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // Check for mobile view
+  
   
   useEffect(() => {
     const fetchData = async () => {
@@ -121,13 +123,13 @@ const Dashboard = () => {
       {/* GRID & CHARTS */}
       <Box
         display="grid"
-        gridTemplateColumns="repeat(12, 1fr)"
+        gridTemplateColumns={isMobile ? "1fr" : "repeat(12, 1fr)"}
         gridAutoRows="140px"
         gap="20px"
       >
         {/* ROW 1 */}
         <Box
-          gridColumn="span 3"
+          gridColumn={isMobile ? "span 12" : "span 3"}
           backgroundColor={colors.primary[800]}
           borderRadius="15px"  
           display="flex"
@@ -147,7 +149,7 @@ const Dashboard = () => {
           />
         </Box>
         <Box
-          gridColumn="span 3"
+          gridColumn={isMobile ? "span 12" : "span 3"}
           backgroundColor={colors.primary[800]}
           borderRadius="15px"
           display="flex"
@@ -167,7 +169,7 @@ const Dashboard = () => {
           />
         </Box>
         <Box
-          gridColumn="span 3"
+          gridColumn={isMobile ? "span 12" : "span 3"}
           backgroundColor={colors.primary[800]}
           borderRadius="15px"
           display="flex"
@@ -187,7 +189,7 @@ const Dashboard = () => {
           />
         </Box>
         <Box
-          gridColumn="span 3"
+          gridColumn={isMobile ? "span 12" : "span 3"}
           backgroundColor={colors.primary[800]}
           borderRadius="15px"
           display="flex"
@@ -209,7 +211,7 @@ const Dashboard = () => {
 
         {/* ROW 2 */}
         <Box
-          gridColumn="span 8"
+          gridColumn={isMobile ? "span 12" : "span 8"}
           gridRow="span 2"
           backgroundColor={colors.primary[800]}
           borderRadius="15px"
@@ -244,7 +246,7 @@ const Dashboard = () => {
           </Box>
         </Box>
         <Box
-          gridColumn="span 4"
+          gridColumn={isMobile ? "span 12" : "span 4"}
           gridRow="span 2"
           backgroundColor={colors.primary[800]}
           borderRadius="15px"
@@ -297,7 +299,7 @@ const Dashboard = () => {
         </Box>
         {/* ROW 3 */}
         <Box
-          gridColumn="span 4"
+          gridColumn={isMobile ? "span 12" : "span 4"}
           gridRow="span 2"
           backgroundColor={colors.primary[800]}
           borderRadius="15px"
@@ -361,7 +363,7 @@ const Dashboard = () => {
               ))}
         </Box>
         <Box
-          gridColumn="span 4"
+          gridColumn={isMobile ? "span 12" : "span 4"}
           gridRow="span 2"
           backgroundColor={colors.primary[800]}
           borderRadius="15px"
@@ -425,7 +427,7 @@ const Dashboard = () => {
           ))}
         </Box>
         <Box
-          gridColumn="span 4"
+          gridColumn={isMobile ? "span 12" : "span 4"}
           gridRow="span 2"
           backgroundColor={colors.primary[800]}
           borderRadius="15px"
