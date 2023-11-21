@@ -9,6 +9,8 @@ import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import axios from 'axios';
 import { API_BASE_URL } from "../../config";
+import { useTranslation } from 'react-i18next';
+import '../../i18n';  
 
 
 
@@ -20,6 +22,7 @@ const Token_Registration = ({ token_registration }) => {
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [tokenRegData, settokenRegData] = useState({});
   const token = localStorage.getItem('session_token'); // Get the session token from local storage
+  const { t, i18n } = useTranslation();
 
   
 
@@ -44,8 +47,8 @@ const Token_Registration = ({ token_registration }) => {
   return (
     <Box m="20px">
       <Header
-        title="Registration"
-        subtitle="Register Now"
+        title={t('registration.title')}
+        subtitle={t('registration.subtitle')}
       />
 
       <Formik
@@ -80,7 +83,7 @@ const Token_Registration = ({ token_registration }) => {
                   height: "100%",
                 }}
               >
-                Token
+                {t('registration.token')}
               </Typography>
               <TextField
                 fullWidth
@@ -104,7 +107,7 @@ const Token_Registration = ({ token_registration }) => {
                   height: "100%",
                 }}
               >
-                E-Mail
+                {t('registration.email')}
               </Typography>
               <TextField
                 fullWidth
@@ -138,7 +141,7 @@ const Token_Registration = ({ token_registration }) => {
                   height: "100%",
                 }}
               >
-                First Name
+                {t('registration.first_name')}
               </Typography>
               <TextField
                 fullWidth
@@ -162,7 +165,7 @@ const Token_Registration = ({ token_registration }) => {
                   height: "100%",
                 }}
               >
-                Last Name
+                {t('registration.last_name')}
               </Typography>
               <TextField
                 fullWidth
@@ -196,7 +199,7 @@ const Token_Registration = ({ token_registration }) => {
                   height: "100%",
                 }}
               >
-                Phone Number
+                {t('registration.phone_number')}
               </Typography>
               <TextField
                 fullWidth
@@ -230,7 +233,7 @@ const Token_Registration = ({ token_registration }) => {
                   height: "100%",
                 }}
               >
-                Password
+                {t('registration.password')}
               </Typography>
               <TextField
                 fullWidth
@@ -254,7 +257,7 @@ const Token_Registration = ({ token_registration }) => {
                   height: "100%",
                 }}
               >
-                Repeat Password
+                {t('registration.password2')}
               </Typography>
               <TextField
                 fullWidth
@@ -274,7 +277,7 @@ const Token_Registration = ({ token_registration }) => {
             
             <Box display="flex" justifyContent="end" mt="20px">
               <Button type="submit" color="secondary" variant="contained">
-                Update
+              {t('button.update')}
               </Button>
             </Box>
           </form>
@@ -283,7 +286,7 @@ const Token_Registration = ({ token_registration }) => {
       <Snackbar
         open={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
-        message="Successful Registered!"
+        message={t('registration.success')}
         autoHideDuration={3000}
         sx={{
           backgroundColor: "green !important",
@@ -298,7 +301,7 @@ const Token_Registration = ({ token_registration }) => {
       <Snackbar
         open={showErrorNotification}
         onClose={() => setShowErrorNotification(false)}
-        message="Error occurred - Token and E-Mail does not match!"
+        message={t('registration.no_success')}
         autoHideDuration={3000}
         sx={{
           backgroundColor: "red !important",

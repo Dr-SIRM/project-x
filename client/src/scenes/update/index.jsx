@@ -8,7 +8,8 @@ import { ThreeDots } from "react-loader-spinner";
 import axios from 'axios';
 import { API_BASE_URL } from "../../config";
 import { tokens } from "../../theme";
-
+import { useTranslation } from 'react-i18next';
+import '../../i18n'; 
 
 
 const Update = () => {
@@ -20,6 +21,7 @@ const Update = () => {
   const [userData, setUserData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const token = localStorage.getItem('session_token'); // Get the session token from local storage
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -66,7 +68,7 @@ const Update = () => {
 
   return (
     <Box m="20px">
-      <Header title="PERSONAL UPDATE" subtitle="Aktualisiere deine persönlichen Daten" />
+      <Header title={t('registration.update_title')} subtitle="" />
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -101,7 +103,7 @@ const Update = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Vorname"
+                label={t('registration.first_name')}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.first_name}
@@ -114,7 +116,7 @@ const Update = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Nachname"
+                label={t('registration.last_name')}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.last_name}
@@ -127,7 +129,7 @@ const Update = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Email"
+                label={t('registration.email')}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.email}
@@ -139,7 +141,7 @@ const Update = () => {
               <TextField
                 fullWidth
                 variant="filled"
-                label= "Phone"
+                label= {t('registration.phone_number')}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 defaultCountry={'us'}
@@ -153,7 +155,7 @@ const Update = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label= "Password"
+                label= {t('registration.password')}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.password}
@@ -166,7 +168,7 @@ const Update = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label= "Repeat Password"
+                label= {t('registration.password2')}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.password2}
@@ -179,7 +181,7 @@ const Update = () => {
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
               <Button type="submit" color="primary" variant="contained">
-                Update
+              {t('button.update')}
               </Button>
             </Box>
           </form>
@@ -188,7 +190,7 @@ const Update = () => {
       <Snackbar
         open={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
-        message="Update erfolgreich"
+        message={t('notification.success_update')}
         autoHideDuration={3000}
         sx={{
           backgroundColor: "green !important", 
@@ -203,7 +205,7 @@ const Update = () => {
       <Snackbar
         open={showErrorNotification}
         onClose={() => setShowErrorNotification(false)}
-        message="Update nicht erfolgreich"
+        message={t('notification.no_success_update')}
         autoHideDuration={3000}
         sx={{
           backgroundColor: "red !important", 

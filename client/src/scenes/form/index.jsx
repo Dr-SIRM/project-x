@@ -6,6 +6,8 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import axios from 'axios';
 import { API_BASE_URL } from "../../config";
+import { useTranslation } from 'react-i18next';
+import '../../i18n'; 
 
 
 const Form = () => {
@@ -16,6 +18,7 @@ const Form = () => {
   const [isLoading, setIsLoading] = useState(true); 
   const token = localStorage.getItem('session_token');
   const [department_list, setDepartmentList] = useState([]);
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -56,7 +59,7 @@ const Form = () => {
 
   return (
     <Box m="20px">
-      <Header title="NEUER USER" subtitle="Erstelle einen neuen User" />
+      <Header title={t('registration.title')} subtitle={t('registration.subtitle')} />
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -84,7 +87,7 @@ const Form = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Vorname"
+                label={t('registration.first_name')}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.first_name}
@@ -97,7 +100,7 @@ const Form = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Nachname"
+                label={t('registration.last_name')}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.last_name}
@@ -110,7 +113,7 @@ const Form = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Email"
+                label={t('registration.email')}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.email}
@@ -122,7 +125,7 @@ const Form = () => {
               <TextField
                 fullWidth
                 variant="filled"
-                label= "Telefonnummer"
+                label= {t('registration.phone_number')}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 defaultCountry={'us'}
@@ -146,7 +149,7 @@ const Form = () => {
                 sx={{ gridColumn: "span 4" }}
               />
               <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 4" }}>
-                <InputLabel id="employment-label">Anstellung</InputLabel>
+                <InputLabel id="employment-label">{t('registration.employment')}</InputLabel>
                 <Select
                   labelId="employment-label"
                   id="employment"
@@ -167,12 +170,12 @@ const Form = () => {
                     },
                   }}
                 >
-                  <MenuItem value="Perm">Vollzeit</MenuItem>
-                  <MenuItem value="Temp">Teilzeit</MenuItem>
+                  <MenuItem value="Perm">{t('registration.full_time')}</MenuItem>
+                  <MenuItem value="Temp">{t('registration.part_time')}</MenuItem>
                 </Select>
               </FormControl>
               <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 4" }}>
-                <InputLabel id="employment-level-label">Pensum</InputLabel>
+                <InputLabel id="employment-level-label">{t('registration.employment_level')}</InputLabel>
                 <Select
                   labelId="employment-level-label"
                   id="employment-level-select"
@@ -213,7 +216,7 @@ const Form = () => {
                 </Select>
               </FormControl>
               <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 4" }}>
-                <InputLabel id="department-label">Abteilung</InputLabel>
+                <InputLabel id="department-label">{t('registration.skill1')}</InputLabel>
                 <Select
                   labelId="department-label"
                   id="department"
@@ -234,7 +237,7 @@ const Form = () => {
                     },
                   }}
                 >
-                  <MenuItem value="">Wählen Sie eine Abteilung</MenuItem>
+                  <MenuItem value="">{t('registration.skill_selection')}</MenuItem>
                   {department_list.map((department) => (
                     <MenuItem key={department} value={department}>
                       {department}
@@ -243,7 +246,7 @@ const Form = () => {
                 </Select>
               </FormControl>
               <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 4" }}>
-                <InputLabel id="department2-label">Abteilung 2</InputLabel>
+                <InputLabel id="department2-label">{t('registration.skill2')}</InputLabel>
                 <Select
                   labelId="department2-label"
                   id="department2"
@@ -264,7 +267,7 @@ const Form = () => {
                     },
                   }}
                 >
-                  <MenuItem value="">Wählen Sie eine Abteilung</MenuItem>
+                  <MenuItem value="">{t('registration.skill_selection')}</MenuItem>
                   {department_list.map((department) => (
                     <MenuItem key={department} value={department}>
                       {department}
@@ -273,7 +276,7 @@ const Form = () => {
                 </Select>
               </FormControl>
               <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 4" }}>
-                <InputLabel id="department3-label">Abteilung 3</InputLabel>
+                <InputLabel id="department3-label">{t('registration.skill3')}</InputLabel>
                 <Select
                   labelId="department3-label"
                   id="department3"
@@ -294,7 +297,7 @@ const Form = () => {
                     },
                   }}
                 >
-                  <MenuItem value="">Wählen Sie eine Abteilung</MenuItem>
+                  <MenuItem value="">{t('registration.skill_selection')}</MenuItem>
                   {department_list.map((department) => (
                     <MenuItem key={department} value={department}>
                       {department}
@@ -303,7 +306,7 @@ const Form = () => {
                 </Select>
               </FormControl>
               <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 4" }}>
-                <InputLabel id="access_level-label">Access Level</InputLabel>
+                <InputLabel id="access_level-label">{t('registration.access_level')}</InputLabel>
                 <Select
                   labelId="access_level-label"
                   id="access_level"
@@ -333,7 +336,7 @@ const Form = () => {
                 fullWidth
                 variant="filled"
                 type="password"
-                label="Password"
+                label={t('registration.password')}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.password}
@@ -346,7 +349,7 @@ const Form = () => {
                 fullWidth
                 variant="filled"
                 type="password"
-                label="Confirm Password"
+                label={t('registration.password2')}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.password2}
@@ -359,7 +362,7 @@ const Form = () => {
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
               <Button type="submit" color="primary" variant="contained">
-                Create New User
+              {t('button.new_user')}
               </Button>
             </Box>
           </form>
@@ -368,7 +371,7 @@ const Form = () => {
       <Snackbar
         open={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
-        message="Registration successful"
+        message={t('registration.success')}
         autoHideDuration={3000}
         sx={{
           backgroundColor: "green !important", 
@@ -383,7 +386,7 @@ const Form = () => {
       <Snackbar
         open={showErrorNotification}
         onClose={() => setShowErrorNotification(false)}
-        message="Error occurred - Your email might already be in use"
+        message={t('registration.no_success')}
         autoHideDuration={3000}
         sx={{
           backgroundColor: "red !important", 

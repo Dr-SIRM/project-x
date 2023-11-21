@@ -351,10 +351,10 @@ useEffect(() => {
               <Tooltip
                 title={
                   <div style={{ fontSize: '15px' }}> 
-                    <span style={{ ontSize: '10px' }}>Speicher deine Vorlage</span><br /><br />
-                    1. Trage deine Verfügbarkeiten unten ein<br />
-                    2. Wähle einen Vorlagenamen aus der Drop-Down Liste<br />
-                    3. Speicher deine Vorlage über den Save Template Knopf
+                    <span style={{ ontSize: '10px' }}>{t('info.title_template')}</span><br /><br />
+                    {t('info.availability_template_step1')}<br />
+                    {t('info.availability_template_step2')}<br />
+                    {t('info.availability_template_step3')}
                   </div>
                 }
                 sx={{
@@ -592,7 +592,7 @@ useEffect(() => {
               }
             }}
           >
-            {t('availabilty.submit')}
+            {t('button.submit')}
           </Button>
             </Box>
           </form>

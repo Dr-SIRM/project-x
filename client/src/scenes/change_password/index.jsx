@@ -63,7 +63,7 @@ const ChangePassword = () => {
 
   return (
     <Box m="20px">
-      <Header title="Änderung Passwort" subtitle="Aktualisiere dein Passwort" />
+      <Header title={t('change_password.title')} subtitle={t('change_password.subtitle')} />
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -88,7 +88,7 @@ const ChangePassword = () => {
                 fullWidth
                 variant="filled"
                 type="password"
-                label="Password"
+                label={t('change_password.password')}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.password}
@@ -101,7 +101,7 @@ const ChangePassword = () => {
                 fullWidth
                 variant="filled"
                 type="password"
-                label="Confirm Password"
+                label={t('change_password.password2')}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.password2}
@@ -115,7 +115,7 @@ const ChangePassword = () => {
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
               <Button type="submit" color="secondary" variant="contained">
-                Update
+              {t('button.update')}
               </Button>
             </Box>
           </form>
@@ -124,7 +124,7 @@ const ChangePassword = () => {
       <Snackbar
         open={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
-        message="Update erfolgreich"
+        message={t('change_password.success')}
         autoHideDuration={3000}
         sx={{
           backgroundColor: "green !important", 
@@ -139,7 +139,7 @@ const ChangePassword = () => {
       <Snackbar
         open={showErrorNotification}
         onClose={() => setShowErrorNotification(false)}
-        message="Update nicht erfolgreich"
+        message={t('change_password.no_success')}
         autoHideDuration={3000}
         sx={{
           backgroundColor: "red !important", 

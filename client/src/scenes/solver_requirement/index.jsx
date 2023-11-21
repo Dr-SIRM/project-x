@@ -766,7 +766,7 @@ const SolverReq = ({ solverreq }) => {
             <br></br>
             <br></br>
             <br></br>
-            <Typography variant="h4">Zusatzanforderungen</Typography> 
+            <Typography variant="h4">{t('solverreq.title2')}</Typography> 
               <br></br>
               <Box
               display="grid"
@@ -797,7 +797,7 @@ const SolverReq = ({ solverreq }) => {
                   height: "100%",
                 }}
               >
-                Ja, ist mir egal
+                {t('solverreq.low_ranking')}
               </Typography>
               <Typography
                 color={colors.primary[100]}
@@ -810,7 +810,7 @@ const SolverReq = ({ solverreq }) => {
                   height: "100%",
                 }}
               >
-                Nein lieber nicht
+                {t('solverreq.high_ranking')}
               </Typography>
               <Typography
                 color={colors.primary[100]}
@@ -847,7 +847,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Dürfen mehr Mitarbeiter pro Zeiteinheit eingeplant werden als nötig?
+                {t('solverreq.nb1')}
               </Typography>
               <ToggleButtonGroup
                 value={values.nb1}
@@ -919,7 +919,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Darf die maximale Arbietszeit pro Woche überschritten werden?
+                {t('solverreq.nb2')}
               </Typography>
               <ToggleButtonGroup
                 value={values.nb2}
@@ -991,7 +991,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Darf die minimale Arbeitzeit pro Tag unterschritten werden?
+                {t('solverreq.nb3')}
               </Typography>
               <ToggleButtonGroup
                 value={values.nb3}
@@ -1062,7 +1062,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Darf die maximale Arbeitzeit pro Tag überschritten werden?
+                {t('solverreq.nb4')}
               </Typography>
               <ToggleButtonGroup
                 value={values.nb4}
@@ -1133,7 +1133,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Darf die Arbeitstundenwoche bei Vollzeitangestellten Mitarbeiter unterschritten werden?
+                {t('solverreq.nb5')}
               </Typography>
               <ToggleButtonGroup
                 value={values.nb5}
@@ -1204,7 +1204,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Darf die Arbeitstundenwoche bei Vollzeitangestellten Mitarbeiter überschritten werden?
+                {t('solverreq.nb6')}
               </Typography>
               <ToggleButtonGroup
                 value={values.nb6}
@@ -1275,7 +1275,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Jeder Mitarbeiter soll in der gleichen Schicht innerhalb einer Woche arbeiten
+                {t('solverreq.nb7')}
               </Typography>
               <ToggleButtonGroup
                 value={values.nb7}
@@ -1346,7 +1346,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Über mehrere Wochen sollen Mitarbeiter Wechselschichtig arbeiten
+                {t('solverreq.nb8')}
               </Typography>
               <ToggleButtonGroup
                 value={values.nb8}
@@ -1417,7 +1417,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Pro Schicht muss eine Mindestanzahl an Stunden gearbeitet werden
+                {t('solverreq.nb9')}
               </Typography>
               <ToggleButtonGroup
                 value={values.nb9}
@@ -1488,7 +1488,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Maximale Arbeitstage in Folge darf überschritten werden
+                {t('solverreq.nb10')}
               </Typography>
               <ToggleButtonGroup
                 value={values.nb10}
@@ -1559,7 +1559,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Nebenbedingung 11
+                {t('solverreq.nb11')}
               </Typography>
               <ToggleButtonGroup
                 value={values.nb11}
@@ -1630,7 +1630,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                Nebenbedingung 12
+                {t('solverreq.nb12')}
               </Typography>
               <ToggleButtonGroup
                 value={values.nb12}
@@ -1683,7 +1683,7 @@ const SolverReq = ({ solverreq }) => {
                 type="submit" 
                 color="primary" 
                 variant="contained">
-                Submit
+                {t('button.submit')}
               </Button>
             </Box>
           </form>
@@ -1692,7 +1692,7 @@ const SolverReq = ({ solverreq }) => {
       <Snackbar
         open={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
-        message="Solver Requirements Successfully Saved!"
+        message={t('notification.success_timereq')}
         autoHideDuration={3000}
         sx={{
           backgroundColor: "green !important",
@@ -1707,7 +1707,7 @@ const SolverReq = ({ solverreq }) => {
       <Snackbar
         open={showErrorNotification}
         onClose={() => setShowErrorNotification(false)}
-        message="Error occurred - Solver Requirements Not Saved Yet!"
+        message={t('notification.no_success_timereq')}
         autoHideDuration={3000}
         sx={{
           backgroundColor: "red !important",

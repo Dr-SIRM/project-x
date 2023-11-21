@@ -3,11 +3,14 @@ import { Box, Typography, TextField, Button, Alert, useTheme, Link, CircularProg
 import Header from "../../components/Header";
 import axios from "axios";
 import { API_BASE_URL } from "../../config";
+import { useTranslation } from 'react-i18next';
+import '../../i18n';  
 
 function ForgetPassword() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const { t, i18n } = useTranslation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,13 +36,13 @@ function ForgetPassword() {
       alignItems="center" 
       minHeight="100vh"
     >
-    <Header title="Passwort vergessen" subtitle="" />
+    <Header title={t('forget_password.title')} subtitle="" />
     <Box width="300px" p={2}>
       <form onSubmit={handleSubmit}>
         <Box mb={2}>
           <TextField
             type="email"
-            label="Email"
+            label={t('forget_password.email')}
             fullWidth
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -52,10 +55,11 @@ function ForgetPassword() {
             ) : (
               'Zurücksetzen'
             )}
+            {t('forget_password.reset')}
           </Button>
           <Box mb={2}>
             <Button variant="contained" href="/login" fullWidth style={{ textDecoration: 'none', color: 'inherit', marginTop: '20px' }}>
-              Zurück
+            {t('forget_password.back')}
             </Button>
           </Box>
       </form>

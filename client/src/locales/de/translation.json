@@ -28,7 +28,8 @@
       "fulltimeworkers": "Vollzeit MA",
       "missing_availability": "Fehlende Planung",
       "insufficient_planning": "Fehlerhafte Planung",
-      "calendar_week": "KW"
+      "calendar_week": "KW",
+      "until": "bis"
     },
     
     "team": {
@@ -77,6 +78,7 @@
 
     "solverreq": {
       "title": "Solver Anforderungen",
+      "title2": "Zusatz Anforderung",
       "subtitle": "Bestimme deinen Einsatzplan nach deinen Bedürfnissen!",
       "Mindestanforderungen": "Mindestanforderungen",
       "wishedminworkinghoursperday": "Gewünschte Mindestanzahl Arbeitsstunden pro Tag",
@@ -92,7 +94,29 @@
       "countofshiftsperday": "Anzahl Arbeitseinsätze pro Tag",
       "minhoursperworkingshift": "Mindestunden pro Arbeitsblock",
       "new_fte_per_slot": "Maximale Anzahl neue Mitarbeiter pro Einsatz",
-      "skills_per_day": "Maximale Anzahl Tätigkeitswechsel pro Tag"
+      "skills_per_day": "Maximale Anzahl Tätigkeitswechsel pro Tag",
+      "low_ranking": "Trifft zu",
+      "high_ranking": "Trifft nicht zu",
+      "nb1": "Es dürfen mehr Mitarbeiter pro Zeiteinheit eingeplant werden, als nötig",
+      "nb2": "Die maximale Arbeitszeit pro Woche darf überschritten werden",
+      "nb3": "Die minimale Arbeitszeit pro Tag darf unterschritten werden",
+      "nb4": "Die maximale Arbeitszeit pro Tag darf überschritten werden",
+      "nb5": "Die MIndest Arbeitsstundenwoche eines Vollzeitmitarbeiters darf unterschritten werden",
+      "nb6": "Die Maximal Arbeitsstundenwoche eines Vollzeitmitarbeiters darf überschritten werden",
+      "nb7": "Arbeitsschichten dürfen innerhalb einer Woche nicht geändert werden",
+      "nb8": "Über mehrere Wochen sollen Wechselschichten eingehalten werden",
+      "nb9": "Die Mindestanzahl Stunden darf pro Arbeitsschicht pro Tag nicht unterschritten werden",
+      "nb10": "Die maximale Anzahl Arbeitstage in Folge darf überschritten werden",
+      "nb11": "Nebenbedingung 11",
+      "nb12": "Nebenbedingung 12",
+      "nb13": "Nebenbedingung 13",
+      "nb14": "Nebenbedingung 14",
+      "nb15": "Nebenbedingung 15",
+      "nb16": "Nebenbedingung 16",
+      "nb17": "Nebenbedingung 17",
+      "nb18": "Nebenbedingung 18",
+      "nb19": "Nebenbedingung 19",
+      "nb20": "Nebenbedingung 20"
     },
 
     "availabilty" : {
@@ -156,6 +180,91 @@
     "welcome": {
       "title": "Willkommen auf TimeTab"
   
+    },
+
+    "info": {
+      "title_template": "Speicher deine Vorlage",
+      "title_template_step1": "1. Trage deine Verfügbarkeiten unten ein",
+      "title_template_step2": "2. Wähle einen Vorlagenamen aus der Drop-Down Liste",
+      "title_template_step3": "3. Speicher deine Vorlage über den Save Template Knopf"
+    },
+
+    "change_password": {
+      "title": "Änderung Passwort",
+      "subtitle": "Aktualisiere dein Passwort",
+      "password": "Passwort",
+      "password2": "Bestätige dein Password",
+      "success": "Erfolgreich Aktualisiert",
+      "no_success": "Aktualisierung Fehlgeschlagen"
+    },
+
+    "button": {
+      "submit": "Einreichen",
+      "update": "Aktualisieren",
+      "new_user": "Erstelle einen Neuen Nutzer",
+      "reset": "Zurücksetzen",
+      "back": "Zurück",
+      "next": "Weiter"
+    },
+
+    "forget_password": {
+      "title": "Passwort Vergessen",
+      "email": "Email",
+      "reset": "Zurücksetzen",
+      "back": "Zurück"
+    },
+
+    "registration": {
+      "title": "Registration",
+      "subtitle": "Erstelle Einen Neuen User",
+      "invite_title": "Einladen",
+      "invite_subtitle": "Lade deine Teammitglieder ein",
+      "update_title": "Aktualisierung Persönliche Daten",
+      "first_name": "Vorname",
+      "last_name": "Nachname",
+      "email": "Email",
+      "phone_number": "Telefonnummer",
+      "company_name": "Firmenname",
+      "employment": "Anstellung",
+      "employment_level": "Anstellungsgrad",
+      "part_time": "Teilzeit MA",
+      "full_time": "Vollzeit MA",
+      "skill1": "Fähigkeit 1",
+      "skill2": "Fähigkeit 2",
+      "skill3": "Fähigkeit 3",
+      "skill4": "Fähigkeit 4",
+      "skill5": "Fähigkeit 5",
+      "skill6": "Fähigkeit 6",
+      "skill7": "Fähigkeit 7",
+      "skill8": "Fähigkeit 8",
+      "skill9": "Fähigkeit 9",
+      "skill10": "Fähigkeit 10",
+      "skill_selection": "Wähle Eine Fähigkeit",
+      "in_training": "Einarbeitung",
+      "password": "Passwort",
+      "password2": "Bestätige dein Password",
+      "access_level": "Zugriffsberechtigung",
+      "token": "Token",
+      "success": "Erfolgreich Registriert",
+      "no_success": "Registrierung Fehlgeschlagen",
+      "success_invite": "Einladung Erfolgreich Verschickt",
+      "no_success_invite": "Einladung Fehlgeschlagen"
+    },
+
+    "login": {
+      "email": "Email",
+      "password": "Passwort",
+      "forgot_password": "Passwort Vergessen?",
+      "token_registration": "Registrierung mit Token"
+    },
+
+    "notification": {
+      "success_timereq": "Eingabe Erfolgreich",
+      "no_success_timereq": "Eingabe Fehlgeschlagen",
+      "timereq_selection": "Bitte Wähle Eine Fähigkeit",
+      "success_update": "Aktualisierung Erfolgreich",
+      "no_success_update": "Aktualisierung Fehlgeschlagen"
     }
+
   }
   

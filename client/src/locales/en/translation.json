@@ -28,7 +28,8 @@
     "fulltimeworkers": "Fulltime Employees",
     "missing_availability": "Mising Availability",
     "insufficient_planning": "Planning Error",
-    "calendar_week": "CW"
+    "calendar_week": "CW",
+    "until": "until"
   },
 
   "team": {
@@ -77,6 +78,7 @@
 
   "solverreq": {
     "title": "Solver Requirements",
+    "title2": "Additional Requirements",
     "subtitle": "Determine your deployment plan according to your needs!",
     "Mindestanforderungen": "Minimum Requirements",
     "wishedminworkinghoursperday": "Desired minimum number of working hours per day",
@@ -92,7 +94,29 @@
     "countofshiftsperday": "Number of work shifts per day",
     "minhoursperworkingshift": "Minimum hours per work shift",
     "new_fte_per_slot": "Maximum new employees per time slot",
-    "skills_per_day": "Maximum skill changes per day"
+    "skills_per_day": "Maximum skill changes per day",
+    "low_ranking": "Satisfied",
+    "high_ranking": "Not Satisfied",
+    "nb1": "Es dürfen mehr Mitarbeiter pro Zeiteinheit eingeplant werden, als nötig",
+    "nb2": "Die maximale Arbeitszeit pro Woche darf überschritten werden",
+    "nb3": "Die minimale Arbeitszeit pro Tag darf unterschritten werden",
+    "nb4": "Die maximale Arbeitszeit pro Tag darf überschritten werden",
+    "nb5": "Die MIndest Arbeitsstundenwoche eines Vollzeitmitarbeiters darf unterschritten werden",
+    "nb6": "Die Maximal Arbeitsstundenwoche eines Vollzeitmitarbeiters darf überschritten werden",
+    "nb7": "Arbeitsschichten dürfen innerhalb einer Woche nicht geändert werden",
+    "nb8": "Über mehrere Wochen sollen Wechselschichten eingehalten werden",
+    "nb9": "Die Mindestanzahl Stunden darf pro Arbeitsschicht pro Tag nicht unterschritten werden",
+    "nb10": "Die maximale Anzahl Arbeitstage in Folge darf überschritten werden",
+    "nb11": "Constraint 11",
+    "nb12": "Constraint 12",
+    "nb13": "Constraint 13",
+    "nb14": "Constraint 14",
+    "nb15": "Constraint 15",
+    "nb16": "Constraint 16",
+    "nb17": "Constraint 17",
+    "nb18": "Constraint 18",
+    "nb19": "Constraint 19",
+    "nb20": "Constraint 20"
   },
 
   "availabilty" : {
@@ -155,6 +179,91 @@
   "welcome": {
     "title": "Welcome on TimeTab"
 
+  },
+
+  "info": {
+    "title_template": "Save Your Template",
+    "availability_template_step1": "1. Enter your availabilities below",
+    "availability_template_step2": "2. Choose one of the defined template names from the drop down list",
+    "availability_template_step3": "3. Save your template by clicking on Save Template"
+  },
+
+  "change_password": {
+    "title": "Change Password",
+    "subtitle": "Update Your Password",
+    "password": "Password",
+    "password2": "Confirm Password",
+    "success": "Successful Updated",
+    "no_success": "Update Failed"
+  },
+
+  "button": {
+    "submit": "Submit",
+    "update": "Update",
+    "new_user": "Create New User",
+    "reset": "Reset",
+    "back": "Back",
+    "next": "Next"
+  },
+
+  "forget_password": {
+    "title": "Forgot Password",
+    "email": "Email",
+    "reset": "Reset",
+    "back": "Back",
+    "next": "Next"
+  },
+
+  "registration": {
+    "title": "Registration",
+    "subtitle": "Create A New User",
+    "invite_title": "Invite",
+    "invite_subtitle": "Invite New Team Members",
+    "update_title": "Update Your Personal Data",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "email": "E-Mail",
+    "phone_number": "Phone Number",
+    "company_name": "Company Name",
+    "employment": "Employment",
+    "employment_level": "Employment Level",
+    "part_time": "Part Time",
+    "full_time": "Full Time",
+    "skill1": "Skill 1",
+    "skill2": "Skill 2",
+    "skill3": "Skill 3",
+    "skill4": "Skill 4",
+    "skill5": "Skill 5",
+    "skill6": "Skill 6",
+    "skill7": "Skill 7",
+    "skill8": "Skill 8",
+    "skill9": "Skill 9",
+    "skill10": "Skill 10",
+    "skill_selection": "Select A Skill",
+    "in_training": "Training",
+    "password": "Password",
+    "password2": "Confirm Password",
+    "access_level": "Access Level",
+    "token": "Token",
+    "success": "Successful Registered",
+    "no_success": "Failed Registration",
+    "success_invite": "Invite Successful Sent",
+    "no_success_invite": "Invitation Failed"
+  },
+
+  "login": {
+    "email": "E-Mail",
+    "password": "Password",
+    "forgot_password": "Forgot Password?",
+    "token_registration": "Registration With Token"
+  },
+
+  "notification": {
+    "success_timereq": "Successful Entered",
+    "no_success_timereq": "Failed",
+    "timereq_selection": "Choose A Skill",
+    "success_update": "Update Successful",
+    "no_success_update": "Failed Updated"
   }
 
 }
