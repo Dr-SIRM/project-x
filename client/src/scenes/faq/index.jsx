@@ -19,6 +19,34 @@ const FAQ = () => {
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography color={colors.greenAccent[500]} variant="h5">
+            Was ist auf dem Dashboard alles ersichtlich?
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography>
+            Auf dem Dashboard (Für User und Admin ein seperates FAQ?)
+          </Typography>
+        </AccordionDetails>
+        <AccordionDetails>
+          <Typography>
+            Anleitungsvideo "Team Verwalten"
+          </Typography>
+          <iframe
+            width="1000"
+            height="440"
+            src="https://www.youtube.com/embed/VIDEO_ID_1"
+            title="YouTube video player"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
+        </AccordionDetails>
+      </Accordion>
+
+      {/* Frage 2 */}
+      <Accordion>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography color={colors.greenAccent[500]} variant="h5">
             Wie kann ich mein Team verwalten?
           </Typography>
         </AccordionSummary>
@@ -35,34 +63,6 @@ const FAQ = () => {
             width="1000"
             height="440"
             src="https://www.youtube.com/embed/oBKEaczB5sc"
-            title="YouTube video player"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          ></iframe>
-        </AccordionDetails>
-      </Accordion>
-
-      {/* Frage 2 */}
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography color={colors.greenAccent[500]} variant="h5">
-            Welche Funktionen bietet die automatisierte Schichtplanungs-App?
-          </Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography>
-            Die automatisierte Schichtplanungs-App bietet in der Regel eine Vielzahl von Funktionen, die die Planung und Verwaltung von Schichten erleichtern.
-          </Typography>
-        </AccordionDetails>
-        <AccordionDetails>
-          <Typography>
-            Anleitungsvideo "Funktionen der Schichtplanungs-App"
-          </Typography>
-          <iframe
-            width="1000"
-            height="440"
-            src="https://www.youtube.com/embed/VIDEO_ID_2"
             title="YouTube video player"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
