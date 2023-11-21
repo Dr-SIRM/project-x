@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import Popup from 'reactjs-popup';
+import 'reactjs-popup/dist/index.css';
 import axios from 'axios';
 import './plan.css';
-import { Box, IconButton, Button, Typography, Chip, Avatar } from "@mui/material";
+import { Box, IconButton, Button, Typography, Chip, Avatar, Select, MenuItem } from "@mui/material";
 import Header from "../../components/Header";
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { ThreeDots } from "react-loader-spinner"; 
 import { API_BASE_URL } from "../../config";
+import { useTranslation } from 'react-i18next';
+import '../../i18n';  
 
 const GanttChart = () => {
   const [view, setView] = useState('day');
@@ -14,6 +18,10 @@ const GanttChart = () => {
   const token = localStorage.getItem('session_token');
   const [openingHours, setOpeningHours] = useState({});
   const [currentDay, setCurrentDay] = useState(new Date());
+  const [open, setOpen] = useState(false);
+  const closeModal = () => setOpen(false);
+  const [currentWeekNum, setCurrentWeekNum] = useState();
+  const { t, i18n } = useTranslation();
   const BUTTON_STYLE = {
     borderColor: "white",
     "&.MuiButtonOutlined": {
@@ -50,6 +58,7 @@ const GanttChart = () => {
           }
         });
         const responseData = response.data;
+        setCurrentWeekNum(responseData.current_week_num);
         console.log("API Response Data:", responseData);
   
         if (responseData && responseData.shifts) {
@@ -434,7 +443,7 @@ const renderWeekShifts = (day) => {
 
 
 //export excel
-const handleExportToExcel = async () => {
+const handleExportToExcel = async (selectedFields) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/api/download`, { 
       headers: {
@@ -463,7 +472,7 @@ const handleExportToExcel = async () => {
         <Button variant="outlined"
                 color="inherit"
                 size="small"
-                onClick={handleExportToExcel} 
+                onClick={() => setOpen(true)} // Open popup on button click
                 sx={{
                   borderColor: 'black',
                   height: '20px',
@@ -481,7 +490,54 @@ const handleExportToExcel = async () => {
                 <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20" height="20" viewBox="0 0 48 48">
                 <path fill="#4CAF50" d="M41,10H25v28h16c0.553,0,1-0.447,1-1V11C42,10.447,41.553,10,41,10z"></path><path fill="#FFF" d="M32 15H39V18H32zM32 25H39V28H32zM32 30H39V33H32zM32 20H39V23H32zM25 15H30V18H25zM25 25H30V28H25zM25 30H30V33H25zM25 20H30V23H25z"></path><path fill="#2E7D32" d="M27 42L6 38 6 10 27 6z"></path><path fill="#FFF" d="M19.129,31l-2.411-4.561c-0.092-0.171-0.186-0.483-0.284-0.938h-0.037c-0.046,0.215-0.154,0.541-0.324,0.979L13.652,31H9.895l4.462-7.001L10.274,17h3.837l2.001,4.196c0.156,0.331,0.296,0.725,0.42,1.179h0.04c0.078-0.271,0.224-0.68,0.439-1.22L19.237,17h3.515l-4.199,6.939l4.316,7.059h-3.74V31z"></path>
                 </svg>
-                </Button>
+          </Button>
+          <Popup open={open} closeOnDocumentClick onClose={closeModal}>
+          <div className="modal">
+            {/* Popup content */}
+            <div className="content">
+              <Typography variant="h5" fontWeight="600">
+                Export Zeitraum
+              </Typography>
+              <Select
+                labelId="simple-select-label"
+                id="simple-select"
+                label="Start Woche"
+                ///value={selectedMissingWeek}
+                ///onChange={(e) => setSelectedMissingWeek(e.target.value)}
+                style={{ width: '120px' }}  // Assuming you want the dropdown text to be white
+                size="small"
+            >
+                <MenuItem value={1}>{t('dashboard.calendar_week')} {currentWeekNum}</MenuItem>
+                <MenuItem value={2}>{t('dashboard.calendar_week')} {currentWeekNum+1}</MenuItem>
+                <MenuItem value={3}>{t('dashboard.calendar_week')} {currentWeekNum+2}</MenuItem>
+                <MenuItem value={4}>{t('dashboard.calendar_week')} {currentWeekNum+3}</MenuItem>
+              </Select>
+              <Select
+                labelId="simple-select-label"
+                id="simple-select"
+                label="Ende Woche"
+                ///value={selectedMissingWeek}
+                ///onChange={(e) => setSelectedMissingWeek(e.target.value)}
+                style={{ width: '120px' }}  // Assuming you want the dropdown text to be white
+                size="small"
+            >
+                <MenuItem value={1}>{t('dashboard.calendar_week')} {currentWeekNum+2}</MenuItem>
+                <MenuItem value={2}>{t('dashboard.calendar_week')} {currentWeekNum+3}</MenuItem>
+                <MenuItem value={3}>{t('dashboard.calendar_week')} {currentWeekNum+4}</MenuItem>
+                <MenuItem value={4}>{t('dashboard.calendar_week')} {currentWeekNum+5}</MenuItem>
+              </Select>
+            </div>
+            <div className="actions">
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleExportToExcel}
+              >
+                Confirm & Download
+              </Button>
+            </div>
+          </div>
+        </Popup>
         
       </div>
       <div className="gantt-container">
