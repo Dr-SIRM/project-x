@@ -1951,6 +1951,9 @@ class ORAlgorithm_cp:
         # NB 16 - Es dürfen max. X "In Einarbeitung" Mitarbeiter zusammen mit dem gleichen Skill arbeiten
         # -------------------------------------------------------------------------------------------------------
         
+        # self.new_employees = {'user_1@sportrock.ch': 1, 'user_2@sportrock.ch': 0} 
+        # self.new_fte_per_slot = 1
+
         # Für jeden Tag zur jeder Stunde mit jedem benötigten Skill
         for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
@@ -1958,9 +1961,8 @@ class ORAlgorithm_cp:
                     if self.benoetigte_skills[woche]:
                         for s in self.benoetigte_skills[woche]:
                             if s in self.mitarbeiter_s[i]:  # Prüfen, ob der Mitarbeiter den Skill hat
-
-                                # Die Summe der neuen Mitarbeiter pro Tag pro Stunde pro Skill darf nicht grösser 1 sein
-                                self.model.Add(sum(self.new_employees[i] * self.x[i, j, k, s] for i in self.mitarbeiter) <= 1)
+                                # Die Summe der neuen Mitarbeiter pro Tag pro Stunde pro Skill darf nicht größer 1 sein
+                                self.model.Add(sum(self.x[i, j, k, s] for i in self.mitarbeiter if self.new_employees[i] == 1) <= self.new_fte_per_slot)
         
 
 
