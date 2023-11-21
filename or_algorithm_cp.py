@@ -112,6 +112,7 @@ class ORAlgorithm_cp:
         self.user_skills = dp.user_skills                   # 115
         self.skills = dp.skills                             # 116
         self.user_holidays = dp.user_holidays               # 117
+        self.new_employees = dp.new_employees               # 118
 
         # Attribute der Methode "create_variables"
         self.mitarbeiter = None                             # 1
@@ -574,6 +575,7 @@ class ORAlgorithm_cp:
         print("115. self.user_skills: ", self.user_skills)
         print("116. self.skills: ", self.skills)
         print("117. self.user_holidays: ", self.user_holidays)
+        print("118. self.new_employees: ", self.new_employees)
         print()
         
         print("Attribute der Methode create_variables:")
@@ -605,7 +607,7 @@ class ORAlgorithm_cp:
         print("18. self.time_per_deployment: ", self.time_per_deployment)
         print("19. self.new_fte_per_slot: ", self.new_fte_per_slot)
         print("20. self.skills_per_day: ", self.skills_per_day)
-        
+
         print("30. self.benoetigte_skills: ", self.benoetigte_skills)
 
 
@@ -1949,9 +1951,6 @@ class ORAlgorithm_cp:
         # NB 16 - Es dürfen max. X "In Einarbeitung" Mitarbeiter zusammen mit dem gleichen Skill arbeiten
         # -------------------------------------------------------------------------------------------------------
         
-        # Der User 1 ist "neu", User 2 ist bereits eingearbeitet -> diese Liste erstellen
-        new_employ =  {'user_1@sportrock.ch': 1, 'user_2@sportrock.ch': 0}
-
         # Für jeden Tag zur jeder Stunde mit jedem benötigten Skill
         for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
@@ -1961,7 +1960,7 @@ class ORAlgorithm_cp:
                             if s in self.mitarbeiter_s[i]:  # Prüfen, ob der Mitarbeiter den Skill hat
 
                                 # Die Summe der neuen Mitarbeiter pro Tag pro Stunde pro Skill darf nicht grösser 1 sein
-                                self.model.Add(sum(new_employ[i] * self.x[i, j, k, s] for i in self.mitarbeiter) <= 1)
+                                self.model.Add(sum(self.new_employees[i] * self.x[i, j, k, s] for i in self.mitarbeiter) <= 1)
         
 
 
