@@ -1530,7 +1530,7 @@ def get_registration():
                     department10 = token.department10,
                     email = token.email, 
                     phone_number = registration_data['phone_number'] if 'phone_number' in registration_data else None,
-                    in_training = None,
+                    in_training = token.in_training,
                     password = generate_password_hash(registration_data['password']),
                     created_by = None, 
                     changed_by = None, 
