@@ -135,42 +135,43 @@ const Calendar = () => {
                 </Button>
       </Box>
       <Box display={{ xs: 'block', md: 'flex' }} justifyContent="space-between">
-        <Box
-          flex={{ xs: '1 1 100%', md: '1 1 20%' }}
-          backgroundColor={colors.primary[100]}
-          p="15px"
-          borderRadius="4px"
-          style={{ maxHeight: 'calc(8 * 60px + 10px)', overflowY: 'auto' }}
-        >
-          <Typography variant="h5" color={"white"}>Events</Typography>
-          <List>
-            {currentEvents.map((event) => (
-              <ListItem
-                key={event.id}
-                sx={{
-                  backgroundColor: colors.greenAccent[600],
-                  borderColor: colors.grey[900],
-                  margin: "10px 0",
-                  borderRadius: "2px",
-                  color: "white"
-                }}
-              >
-                <ListItemText
-                  primary={event.title}
-                  secondary={
-                    <Typography>
-                      {formatDate(event.start, {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </Typography>
-                  }
-                />
-              </ListItem>
-            ))}
-          </List>
-        </Box>
+      <Box
+  flex={{ xs: '1 1 100%', md: '1 1 20%' }}
+  backgroundColor={colors.primary[100]}
+  p="15px"
+  borderRadius="4px"
+  style={{ maxHeight: 'calc(8 * 60px + 10px)', overflowY: 'auto', display: isMobile ? 'none' : 'block' }}
+>
+  <Typography variant="h5" color={"white"}>Events</Typography>
+  <List>
+    {currentEvents.map((event) => (
+      <ListItem
+        key={event.id}
+        sx={{
+          backgroundColor: colors.greenAccent[600],
+          borderColor: colors.grey[900],
+          margin: "10px 0",
+          borderRadius: "2px",
+          color: "white"
+        }}
+      >
+        <ListItemText
+          primary={event.title}
+          secondary={
+            <Typography>
+              {formatDate(event.start, {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })}
+            </Typography>
+          }
+        />
+      </ListItem>
+    ))}
+  </List>
+</Box>
+
         <Box flex={{ xs: '1 1 100%', md: '1 1 80%' }} ml={{ md: "15px" }}>
           <FullCalendar
             slotLabelFormat={{ hour: '2-digit', minute: '2-digit', hour12: false }}

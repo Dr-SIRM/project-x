@@ -1344,9 +1344,8 @@ def solver_req():
     #Submit Solver Requirements
     if request.method =='POST':
         solver_req_data = request.get_json()
-        print(solver_req_data)
         session = get_session(get_database_uri('', user.company_name.lower().replace(' ', '_')))
-        data_deletion = SolverRequirement.query.filter_by(company_name=user.company_name)
+        data_deletion = session.query(SolverRequirement).filter_by(company_name=user.company_name)
         if solver_requirement:
             data_deletion.delete()
             session.commit()
@@ -2203,6 +2202,8 @@ def get_shift():
     session_company = jwt_data.get("company_name").lower().replace(' ', '_')
     session = get_session(get_database_uri('', session_company))
     current_user = session.query(User).filter_by(email=react_user_email).first()
+    today = datetime.date.today()
+    current_week_num = int(today.isocalendar()[1])
 
     if current_user is None:
         return jsonify({"message": "User not found"}), 404
@@ -2314,7 +2315,8 @@ def get_shift():
     response = {
         'users': user_list,
         'opening_hours': opening_hours_data,
-        'shifts': shift_data
+        'shifts': shift_data,
+        'current_week_num': current_week_num
     }
 
     session.close()

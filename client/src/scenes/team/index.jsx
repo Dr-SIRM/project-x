@@ -78,6 +78,18 @@ const Team = () => {
           onClose={handleClose}
           renderValue={(selected) => selected.join(', ')}
           MenuProps={{ PaperProps: { style: { maxHeight: 48 * 4.5 + 8, width: 250 } } }}
+          sx={{
+            '& .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            // Add more styling as needed
+          }}
         >
           {departments.map((department) => (
             <MenuItem key={department} value={department}>

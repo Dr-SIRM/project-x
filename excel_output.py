@@ -360,9 +360,6 @@ def create_excel_output(current_user_email):
         ws.cell(row=legend_row, column=3, value=department).font = Font(size=10)
 
 
-
-
-
     # In-memory bytes stream
     output = io.BytesIO()
     wb.save(output)
