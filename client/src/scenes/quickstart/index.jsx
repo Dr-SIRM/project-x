@@ -66,8 +66,11 @@ const QuickStartPopup = ({ open, onClose }) => {
         hour_divider: '',
         week_timeframe: '',
         subsequent_workingdays: '',
+        subsequent_workingdays_max: '',
         daily_deployment: '',
         time_per_deployment: '',
+        subsequent_workingdays_max: '',
+        skills_per_day: '',
         nb1: '',
         nb2: '',
         nb3: '',
@@ -891,7 +894,7 @@ const QuickStartPopup = ({ open, onClose }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
                 >
-                  {t('solverreq.maxworkingdayinarow')}
+                  {t('solverreq.subsequent_workingdays')}
                 </Typography>
                 <TextField
                 fullWidth
@@ -900,6 +903,41 @@ const QuickStartPopup = ({ open, onClose }) => {
                 label=''
                 name="subsequent_workingdays"
                 value={formData.subsequent_workingdays}
+                onChange={handleInputChange}
+
+                sx={{
+                  gridColumn: "span 1",
+                  maxWidth: '150px',
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '0px',
+                    paddingBottom: '2px',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                }}
+                />
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 5",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  {t('solverreq.subsequent_workingdays_max')}
+                </Typography>
+                <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label=''
+                name="subsequent_workingdays_max"
+                value={formData.subsequent_workingdays_max}
                 onChange={handleInputChange}
 
                 sx={{
@@ -990,6 +1028,76 @@ const QuickStartPopup = ({ open, onClose }) => {
                 label=''
                 name="time_per_deployment"
                 value={formData.time_per_deployment}
+                onChange={handleInputChange}
+
+                sx={{
+                  gridColumn: "span 1",
+                  maxWidth: '150px',
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '0px',
+                    paddingBottom: '2px',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                }}
+                />
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 5",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  {t('solverreq.new_fte_per_slot')}
+                </Typography>
+                <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label=''
+                name="new_fte_per_slot"
+                value={formData.new_fte_per_slot}
+                onChange={handleInputChange}
+
+                sx={{
+                  gridColumn: "span 1",
+                  maxWidth: '150px',
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '0px',
+                    paddingBottom: '2px',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                }}
+                />
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 5",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  {t('solverreq.skills_per_day')}
+                </Typography>
+                <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label=''
+                name="skills_per_day"
+                value={formData.skills_per_day}
                 onChange={handleInputChange}
 
                 sx={{

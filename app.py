@@ -367,7 +367,7 @@ def set_db_test():
         max_time_day=9,
         desired_max_time_week=42,
         max_time_week=45,
-        hour_devider=1,
+        hour_divider=1,
         fair_distribution=30,
         week_timeframe=1,
         nb1=5, nb2=5, nb3=5, nb4=5, nb5=5, nb6=5, nb7=5, nb8=0,

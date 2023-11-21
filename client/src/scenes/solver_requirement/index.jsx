@@ -80,12 +80,15 @@ const SolverReq = ({ solverreq }) => {
           max_time_day: solverData.max_time_day,
           desired_max_time_week: solverData.desired_max_time_week,
           max_time_week: solverData.max_time_week,
-          hour_devider: String(solverData.hour_devider),
+          hour_divider: String(solverData.hour_divider),
           fair_distribution: solverData.fair_distribution,
           week_timeframe: String(solverData.week_timeframe),
           subsequent_workingdays: solverData.subsequent_workingdays,
+          subsequent_workingdays_max: solverData.subsequent_workingdays_max,
           daily_deployment: solverData.daily_deployment,
           time_per_deployment: solverData.time_per_deployment,
+          subsequent_workingdays_max: solverData.subsequent_workingdays_max,
+          skills_per_day: solverData.skills_per_day,
           nb1: String(solverData.nb1),
           nb2: String(solverData.nb2),
           nb3: String(solverData.nb3),
@@ -430,11 +433,11 @@ const SolverReq = ({ solverreq }) => {
                   labelId="hour_divider-label"
                   id="hour_divider"
                   name="hour_divider"
-                  value={values.hour_devider}
+                  value={values.hour_divider}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  error={!!touched.hour_devider && !!errors.hour_devider}
-                helperText={touched.hour_devider && errors.hour_devider}
+                  error={!!touched.hour_divider && !!errors.hour_divider}
+                helperText={touched.hour_divider && errors.hour_divider}
                   sx={{
                     gridColumn: "span 1",
                     '& .MuiFilledInput-input': {
@@ -518,7 +521,7 @@ const SolverReq = ({ solverreq }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
                 >
-                  {t('solverreq.maxworkingdayinarow')}
+                  {t('solverreq.subsequent_workingdays')}
                 </Typography>
                 <TextField
                 fullWidth
@@ -531,6 +534,43 @@ const SolverReq = ({ solverreq }) => {
                 name="subsequent_workingdays"
                 error={!!touched.subsequent_workingdays && !!errors.subsequent_workingdays}
                 helperText={touched.subsequent_workingdays && errors.subsequent_workingdays}
+                sx={{
+                  gridColumn: "span 1",
+                  maxWidth: '150px',
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '0px',
+                    paddingBottom: '2px',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                }}
+                />
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 5",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  {t('solverreq.subsequent_workingdays_max')}
+                </Typography>
+                <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label=''
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.subsequent_workingdays_max}
+                name="subsequent_workingdays_max"
+                error={!!touched.subsequent_workingdays_max && !!errors.subsequent_workingdays_max}
+                helperText={touched.subsequent_workingdays_max && errors.subsequent_workingdays_max}
                 sx={{
                   gridColumn: "span 1",
                   maxWidth: '150px',
@@ -647,6 +687,80 @@ const SolverReq = ({ solverreq }) => {
                     height: "100%",
                   }}
                 ></Typography>
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 5",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  {t('solverreq.new_fte_per_slot')}
+                </Typography>
+                <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label=''
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.new_fte_per_slot}
+                name="new_fte_per_slot"
+                error={!!touched.new_fte_per_slot && !!errors.new_fte_per_slot}
+                helperText={touched.new_fte_per_slot && errors.new_fte_per_slot}
+                sx={{
+                  gridColumn: "span 1",
+                  maxWidth: '150px',
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '0px',
+                    paddingBottom: '2px',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                }}
+                />
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 5",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  {t('solverreq.skills_per_day')}
+                </Typography>
+                <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label=''
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.skills_per_day}
+                name="skills_per_day"
+                error={!!touched.skills_per_day && !!errors.skills_per_day}
+                helperText={touched.skills_per_day && errors.skills_per_day}
+                sx={{
+                  gridColumn: "span 1",
+                  maxWidth: '150px',
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '0px',
+                    paddingBottom: '2px',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                }}
+                />
                 
             </Box>
             <br></br>

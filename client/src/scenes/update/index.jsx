@@ -74,6 +74,7 @@ const Update = () => {
           first_name: userData.first_name,
           last_name: userData.last_name,
           email: userData.email,
+          phone_number: userData.phone_number,
           employment_level: userData.employment_level,
           department: userData.department,
         }}
@@ -133,6 +134,19 @@ const Update = () => {
                 name="email"
                 error={!!touched.email && !!errors.email}
                 helpertext={touched.email && errors.email}
+                sx={{ gridColumn: "span 2" }}
+              />
+              <TextField
+                fullWidth
+                variant="filled"
+                label= "Phone"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                defaultCountry={'us'}
+                value={values.phone_number}
+                name="phone_number"
+                error={!!touched.phone_number && !!errors.phone_number}
+                helperText={touched.phone_number && errors.phone_number}
                 sx={{ gridColumn: "span 2" }}
               />
               <TextField

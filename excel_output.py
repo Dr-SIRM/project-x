@@ -115,9 +115,9 @@ def create_excel_output(current_user_email):
     print("times: ", times)
     # ----------------------------------------------------------------------------------
 
-    # Abfrage, um hour_devider abzurufen
+    # Abfrage, um hour_divider abzurufen
     solver_requirement = session.query(SolverRequirement).filter_by(company_name=company_name).first()
-    hour_devider = solver_requirement.hour_devider if solver_requirement else None
+    hour_divider = solver_requirement.hour_divider if solver_requirement else None
 
 
     """
@@ -237,10 +237,10 @@ def create_excel_output(current_user_email):
 
 
     # Funktion zur Generierung der Stunden
-    def generate_hours(start_time, end_time, hour_devider):
+    def generate_hours(start_time, end_time, hour_divider):
         current_time = start_time
         times = []
-        delta = timedelta(minutes=60//hour_devider)
+        delta = timedelta(minutes=60//hour_divider)
         while current_time < end_time:
             times.append(current_time.strftime('%H:%M'))
             current_time += delta
@@ -258,7 +258,7 @@ def create_excel_output(current_user_email):
             end_time = (datetime.min + end_time2_obj).time()
         print("end_time: ", end_time)
 
-        # hours = generate_hours(datetime.combine(datetime.today(), start_time), datetime.combine(datetime.today(), end_time), hour_devider)
+        # hours = generate_hours(datetime.combine(datetime.today(), start_time), datetime.combine(datetime.today(), end_time), hour_divider)
         # Erstellen eines datetime-Objekts für start_time und end_time
         start_datetime = datetime.combine(datetime.today(), start_time)
         end_datetime = datetime.combine(datetime.today(), end_time)
@@ -267,7 +267,7 @@ def create_excel_output(current_user_email):
         if end_datetime < start_datetime:
             end_datetime += timedelta(days=1)
 
-        hours = generate_hours(start_datetime, end_datetime, hour_devider)
+        hours = generate_hours(start_datetime, end_datetime, hour_divider)
         print("hours: ", hours)
 
         row_index = 5
@@ -296,8 +296,8 @@ def create_excel_output(current_user_email):
                         start_time = (datetime.min + start_time).time()
                         end_time = (datetime.min + end_time).time()
                         
-                        start_col = col_index - len(hours) + (datetime.combine(datetime.today(), start_time) - datetime.combine(datetime.today(), (datetime.min + start_time_obj).time())).seconds // (60 * 60 // hour_devider)
-                        end_col = start_col + (datetime.combine(datetime.today(), end_time) - datetime.combine(datetime.today(), start_time)).seconds // (60 * 60 // hour_devider) - 1
+                        start_col = col_index - len(hours) + (datetime.combine(datetime.today(), start_time) - datetime.combine(datetime.today(), (datetime.min + start_time_obj).time())).seconds // (60 * 60 // hour_divider)
+                        end_col = start_col + (datetime.combine(datetime.today(), end_time) - datetime.combine(datetime.today(), start_time)).seconds // (60 * 60 // hour_divider) - 1
 
                         # Färben der Zellen, Einfügen der Abteilungsinitialen und Formatierung
                         for col in range(start_col, end_col + 1):
@@ -316,8 +316,8 @@ def create_excel_output(current_user_email):
                             start_time2 = (datetime.min + start_time2).time()
                             end_time2 = (datetime.min + end_time2).time()
 
-                            start_col2 = col_index - len(hours) + (datetime.combine(datetime.today(), start_time2) - datetime.combine(datetime.today(), (datetime.min + start_time_obj).time())).seconds // (60 * 60 // hour_devider)
-                            end_col2 = start_col2 + (datetime.combine(datetime.today(), end_time2) - datetime.combine(datetime.today(), start_time2)).seconds // (60 * 60 // hour_devider) - 1
+                            start_col2 = col_index - len(hours) + (datetime.combine(datetime.today(), start_time2) - datetime.combine(datetime.today(), (datetime.min + start_time_obj).time())).seconds // (60 * 60 // hour_divider)
+                            end_col2 = start_col2 + (datetime.combine(datetime.today(), end_time2) - datetime.combine(datetime.today(), start_time2)).seconds // (60 * 60 // hour_divider) - 1
 
                             # Färben der Zellen, Einfügen der Abteilungsinitialen und Formatierung für die zweite Schicht
                             for col in range(start_col2, end_col2 + 1):

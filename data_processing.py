@@ -15,7 +15,7 @@ class DataProcessing:
         # Attribute
         self.current_user_email = current_user_email
         self.week_timeframe = None
-        self.hour_devider = None
+        self.hour_divider = None
         self.start_date = None
         self.end_date = None
         self.opening_hours = None
@@ -64,17 +64,17 @@ class DataProcessing:
     def solving_period(self):
         """
         In dieser Methode wird das aktuelle Datum gezogen, anschliessend der nächste Montag gefunden.
-        Ebenfalls werden die zwei Werte "week_timeframe" und "hour_devider" aus der Datenbank gezogen.
+        Ebenfalls werden die zwei Werte "week_timeframe" und "hour_divider" aus der Datenbank gezogen.
         """
 
         # company_name filtern aus der Datenkbank
         user = self.session.query(User).filter_by(email=self.current_user_email).first()
         company_name = user.company_name
 
-        # week_timeframe und hour_devider filtern aus der Datenkbank
+        # week_timeframe und hour_divider filtern aus der Datenkbank
         solver_req = self.session.query(SolverRequirement).filter_by(company_name=company_name).first()
         self.week_timeframe = solver_req.week_timeframe
-        self.hour_devider = solver_req.hour_devider
+        self.hour_divider = solver_req.hour_divider
 
         # Holen Sie sich das heutige Datum
         today = datetime.today()
@@ -183,8 +183,8 @@ class DataProcessing:
 
 
     def time_to_int(self, t):
-        # Divisor basierend auf self.hour_devider erzeugen
-        divisor = 3600 / self.hour_devider
+        # Divisor basierend auf self.hour_divider erzeugen
+        divisor = 3600 / self.hour_divider
 
         # Typ "timedelta"
         if isinstance(t, timedelta):
@@ -332,8 +332,8 @@ class DataProcessing:
             TimeReq.date.between(self.start_date, self.end_date)
         ).all()
 
-        # Bestimmt den Divisor basierend auf self.hour_devider
-        divisor = 3600 / self.hour_devider
+        # Bestimmt den Divisor basierend auf self.hour_divider
+        divisor = 3600 / self.hour_divider
 
         # Verschachteltes Wörterbuch, wobei das äussere Wörterbuch die Daten und das innere die Stunden und Anforderungen pro Skill enthält.
         time_req_dict = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
@@ -430,7 +430,7 @@ class DataProcessing:
                 weekday_index = date.weekday()
                 num_hours = self.opening_hours[weekday_index]
                 binary_list = [0] * num_hours
-                divisor = 3600 / self.hour_devider
+                divisor = 3600 / self.hour_divider
 
                 def update_binary_list(start_time, end_time):
                     if start_time is None or end_time is None:
@@ -516,7 +516,7 @@ class DataProcessing:
             'max_time_day': solver_requirement.max_time_day,
             'desired_max_time_week': solver_requirement.desired_max_time_week,
             'max_time_week': solver_requirement.max_time_week,
-            'hour_devider': solver_requirement.hour_devider,
+            'hour_divider': solver_requirement.hour_divider,
             'fair_distribution': solver_requirement.fair_distribution,
             'week_timeframe': solver_requirement.week_timeframe,
             'subsequent_workingdays': solver_requirement.subsequent_workingdays,

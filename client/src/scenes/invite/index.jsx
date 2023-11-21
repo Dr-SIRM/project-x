@@ -298,6 +298,41 @@ const Invite = ({ invite }) => {
                 ))}
               </Select>
               <Typography
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center", 
+                  height: "100%",
+                  padding: "0 8px", 
+                  backgroundColor: "#f0f0f0", 
+                }}
+              >
+                Einarbeitung 
+              </Typography>
+              <Select
+                fullWidth
+                variant="filled"
+                type="text"
+                label= ""
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.in_training}
+                name="in_training"
+                error={!!touched.in_training && !!errors.in_training}
+                helperText={touched.in_training && errors.in_training}
+                sx={{
+                  gridColumn: "span 2",
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '10px',
+                    paddingBottom: '10px',
+                  },
+                }}
+              >
+                <MenuItem value={'X'}>X</MenuItem>
+              </Select>
+              <Typography
                 
                 variant="h6"
                 sx={{

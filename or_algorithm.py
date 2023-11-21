@@ -75,7 +75,7 @@ class ORAlgorithm:
         self.user_employment = dp.user_employment           # 110
         self.solver_requirements = dp.solver_requirements   # 111
         self.week_timeframe = dp.week_timeframe             # 112
-        self.hour_devider = dp.hour_devider                 # 113
+        self.hour_divider = dp.hour_divider                 # 113
 
         # Attribute der Methode "create_variables"
         self.mitarbeiter = None                             # 1
@@ -84,7 +84,7 @@ class ORAlgorithm:
         self.max_zeit = None                                # 4
         self.min_zeit = None                                # 5
         self.max_time_week = None                           # 6   
-        #self.weekly_hours (* self.hour_devider)            # 7
+        #self.weekly_hours (* self.hour_divider)            # 7
         self.calc_time = None                               # 8
         self.employment_lvl_exact = []                      # 9
         self.employment = []                                # 10
@@ -210,12 +210,12 @@ class ORAlgorithm:
         key = "desired_max_time_day"
         if key in self.solver_requirements:
             self.desired_max_time_day = self.solver_requirements[key]
-        self.desired_max_time_day = self.desired_max_time_day * self.hour_devider
+        self.desired_max_time_day = self.desired_max_time_day * self.hour_divider
 
         key = "max_time_day"
         if key in self.solver_requirements:
             self.max_time_day = self.solver_requirements[key]
-        self.max_time_day = self.max_time_day * self.hour_devider             
+        self.max_time_day = self.max_time_day * self.hour_divider             
         
         # Es wird weiterhin ein dict generiert, falls in Zukunft die max_time pro MA verschieden wird
         self.max_zeit = {ma: self.desired_max_time_day for ma in self.mitarbeiter}  # Maximale Arbeitszeit pro Tag
@@ -224,12 +224,12 @@ class ORAlgorithm:
         key = "desired_min_time_day"
         if key in self.solver_requirements:
             self.desired_min_time_day = self.solver_requirements[key]
-        self.desired_min_time_day = self.desired_min_time_day * self.hour_devider      
+        self.desired_min_time_day = self.desired_min_time_day * self.hour_divider      
 
         key = "min_time_day"
         if key in self.solver_requirements:
             self.min_time_day = self.solver_requirements[key]
-        self.min_time_day = self.min_time_day * self.hour_devider                  
+        self.min_time_day = self.min_time_day * self.hour_divider                  
 
         # Es wird weiterhin ein dict generiert, falls in Zukunft die min_time pro MA verschieden wird
         self.min_zeit = {ma: self.desired_min_time_day for ma in self.mitarbeiter}  # Minimale Arbeitszeit pro Tag
@@ -240,10 +240,10 @@ class ORAlgorithm:
         if key in self.solver_requirements:
             self.max_time_week = self.solver_requirements[key]
 
-        self.max_time_week = self.max_time_week * self.hour_devider
+        self.max_time_week = self.max_time_week * self.hour_divider
 
         # -- 7 ------------------------------------------------------------------------------------------------------------
-        self.weekly_hours = self.weekly_hours * self.hour_devider                    
+        self.weekly_hours = self.weekly_hours * self.hour_divider                    
 
         # -- 8 ------------------------------------------------------------------------------------------------------------
         # Berechnung der calc_time (Anzahl Tage an denen die MA eingeteilt werden)
@@ -357,7 +357,7 @@ class ORAlgorithm:
         print("110. user_employment: ", self.user_employment) 
         print("111. solver_requirements: ", self.solver_requirements)
         print("112. week_timeframe: ", self.week_timeframe)
-        print("113. self.hour_devider: ", self.hour_devider)
+        print("113. self.hour_divider: ", self.hour_divider)
         print()
         
         print("Attribute der Methode create_variables:")
@@ -709,13 +709,13 @@ class ORAlgorithm:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
                     # Die Kosten werden multipliziert
-                    self.objective.SetCoefficient(self.x[i, j, k], self.kosten[i] / self.hour_devider)
+                    self.objective.SetCoefficient(self.x[i, j, k], self.kosten[i] / self.hour_divider)
 
         # Kosten Weiche NB1
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                     for k in range(len(self.verfügbarkeit[i][j])):
-                        self.objective.SetCoefficient(self.nb1_violation[j, k], self.penalty_cost_nb1 / self.hour_devider)
+                        self.objective.SetCoefficient(self.nb1_violation[j, k], self.penalty_cost_nb1 / self.hour_divider)
 
         # Kosten Weiche NB2
         for i in self.mitarbeiter:
@@ -756,7 +756,7 @@ class ORAlgorithm:
         for i in self.mitarbeiter:
             for j in range(self.calc_time):
                 for k in range(len(self.verfügbarkeit[i][j])):
-                    self.objective.SetCoefficient(self.nb9_violation[i, j, k], self.penalty_cost_nb9 / self.hour_devider)
+                    self.objective.SetCoefficient(self.nb9_violation[i, j, k], self.penalty_cost_nb9 / self.hour_divider)
 
         # Kosten für Weiche NB10 "Max. Anzahl an Arbeitstagen in Folge"
         for i in self.mitarbeiter:
@@ -1279,7 +1279,7 @@ class ORAlgorithm:
         
         """
         # HARTE NB
-        self.min_working_hour_per_block = 4 * self.hour_devider
+        self.min_working_hour_per_block = 4 * self.hour_divider
         
         if self.working_blocks == 2:
             for i in self.mitarbeiter:
@@ -1299,7 +1299,7 @@ class ORAlgorithm:
         """
         
         # WEICHE NB
-        self.min_working_hour_per_block = 2 * self.hour_devider
+        self.min_working_hour_per_block = 2 * self.hour_divider
 
         if self.working_blocks == 2:
             for i in self.mitarbeiter:
@@ -1380,12 +1380,12 @@ class ORAlgorithm:
 
 
         # Kosten für die Einstellung von Mitarbeitern
-        self.hiring_costs = sum((self.kosten[i] / self.hour_devider) * self.x[i, j, k].solution_value() for i in self.mitarbeiter for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[i][j])))
+        self.hiring_costs = sum((self.kosten[i] / self.hour_divider) * self.x[i, j, k].solution_value() for i in self.mitarbeiter for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[i][j])))
 
         # Strafen für die Verletzung der weichen Nebenbedingungen
         # (Damit die Werte für das Testing in die Datenbank eingespeist werden können):
         self.violation_nb1 = sum(self.nb1_violation[j, k].solution_value() for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])))
-        self.nb1_penalty_costs = (self.penalty_cost_nb1 / self.hour_devider) * self.violation_nb1
+        self.nb1_penalty_costs = (self.penalty_cost_nb1 / self.hour_divider) * self.violation_nb1
 
         self.violation_nb2 = sum(self.nb2_violation[i][week].solution_value() for i in self.mitarbeiter for week in range(1, self.week_timeframe + 1))
         self.nb2_penalty_costs = self.penalty_cost_nb2 * self.violation_nb2
@@ -1409,7 +1409,7 @@ class ORAlgorithm:
         self.nb8_penalty_costs = self.penalty_cost_nb8 * self.violation_nb8
 
         self.violation_nb9 = sum(self.nb9_violation[i, j, k].solution_value() for i in self.mitarbeiter for j in range(self.calc_time) for k in range(len(self.verfügbarkeit[i][j])))
-        self.nb9_penalty_costs = (self.penalty_cost_nb9 / self.hour_devider) * self.violation_nb9
+        self.nb9_penalty_costs = (self.penalty_cost_nb9 / self.hour_divider) * self.violation_nb9
 
         self.violation_nb10 = sum(self.nb10_violation[i, j].solution_value() for i in self.mitarbeiter for j in range(self.calc_time))
         self.nb10_penalty_costs = self.penalty_cost_nb10 * self.violation_nb10
@@ -1569,10 +1569,10 @@ class ORAlgorithm:
                     print(f"Berechnete Schichten für Benutzer-ID {user_id}, Tag-Index {day_index}: {shifts}")
 
                     # Divisor bestimmen
-                    divisor = 3600 / self.hour_devider
+                    divisor = 3600 / self.hour_divider
 
                     for shift_index, (start_time, end_time) in enumerate(shifts):
-                        opening_time_in_units = int(self.laden_oeffnet[day_index].total_seconds() * self.hour_devider / 3600)
+                        opening_time_in_units = int(self.laden_oeffnet[day_index].total_seconds() * self.hour_divider / 3600)
                         start_time += opening_time_in_units
                         end_time += opening_time_in_units
 
@@ -1585,8 +1585,8 @@ class ORAlgorithm:
                                 last_name=user.last_name,
                                 company_name=user.company_name,
                                 date=date,
-                                start_time=datetime.datetime.combine(date, datetime.time(hour=int(start_time // self.hour_devider), minute=int((start_time % self.hour_devider) * 60 / self.hour_devider))),
-                                end_time=datetime.datetime.combine(date, datetime.time(hour=int(end_time // self.hour_devider), minute=int((end_time % self.hour_devider) * 60 / self.hour_devider))),
+                                start_time=datetime.datetime.combine(date, datetime.time(hour=int(start_time // self.hour_divider), minute=int((start_time % self.hour_divider) * 60 / self.hour_divider))),
+                                end_time=datetime.datetime.combine(date, datetime.time(hour=int(end_time // self.hour_divider), minute=int((end_time % self.hour_divider) * 60 / self.hour_divider))),
                                 start_time2=None,
                                 end_time2=None,
                                 start_time3=None,
@@ -1598,8 +1598,8 @@ class ORAlgorithm:
                             db.session.add(new_entry)
 
                         elif shift_index == 1:
-                            new_entry.start_time2 = datetime.datetime.combine(date, datetime.time(hour=int(start_time // self.hour_devider), minute=int((start_time % self.hour_devider) * 60 / self.hour_devider)))
-                            new_entry.end_time2 = datetime.datetime.combine(date, datetime.time(hour=int(end_time // self.hour_devider), minute=int((end_time % self.hour_devider) * 60 / self.hour_devider)))
+                            new_entry.start_time2 = datetime.datetime.combine(date, datetime.time(hour=int(start_time // self.hour_divider), minute=int((start_time % self.hour_divider) * 60 / self.hour_divider)))
+                            new_entry.end_time2 = datetime.datetime.combine(date, datetime.time(hour=int(end_time // self.hour_divider), minute=int((end_time % self.hour_divider) * 60 / self.hour_divider)))
 
                         # new_entry der Datenbank hinzufügen
                         db.session.add(new_entry)
@@ -1629,7 +1629,7 @@ class ORAlgorithm:
             self_user_employment = self.user_employment,
             self_solver_requirements = str(self.solver_requirements),
             self_week_timeframe = self.week_timeframe,
-            self_hour_devider = self.hour_devider,
+            self_hour_divider = self.hour_divider,
             self_mitarbeiter = str(self.mitarbeiter),
             self_verfügbarkeit = str(self.verfügbarkeit),
             self_kosten = str(self.kosten),

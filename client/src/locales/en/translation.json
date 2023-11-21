@@ -87,9 +87,12 @@
     "differencetodistribution": "Degree of deviation for fair distribution",
     "hourunit": "Hour unit",
     "calculationtimeframe": "Calculation timeframe",
-    "maxworkingdayinarow": "Maximum working days in a row",
+    "subsequent_workingdays": "Working days in a row",
+    "subsequent_workingdays_max": "Maximum working days in a row",
     "countofshiftsperday": "Number of work shifts per day",
-    "minhoursperworkingshift": "Minimum hours per work shift"
+    "minhoursperworkingshift": "Minimum hours per work shift",
+    "new_fte_per_slot": "Maximum new employees per time slot",
+    "skills_per_day": "Maximum skill changes per day"
   },
 
   "availabilty" : {

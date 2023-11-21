@@ -122,7 +122,7 @@ def current_react_user():
 
 #     general_dict = {
 #         'id': user.id,
-#         'hour_divider': timereq.hour_devider,
+#         'hour_divider': timereq.hour_divider,
 #     }
 
 #     return jsonify(general_dict)
@@ -176,6 +176,8 @@ def get_data():
             'last_name': user.last_name,
             'company_name': user.company_name,
             'email': user.email,
+            'phone': user.phone_number,
+            'in_training': user.in_training,
             'access_level': user.access_level,
             'employment': user.employment,
             'department': user.department,
@@ -326,7 +328,9 @@ def new_user():
                             department9 = None,
                             department10 = None,
                             access_level = admin_registration_data['access_level'], 
-                            email = admin_registration_data['email'], 
+                            email = admin_registration_data['email'],
+                            phone_number = admin_registration_data['phone_number'] if 'phone_number' in admin_registration_data else None,
+                            in_training = admin_registration_data['in_training'], 
                             password = generate_password_hash(admin_registration_data['password']),
                             created_by = user.id, 
                             changed_by = user.id, 
@@ -359,6 +363,8 @@ def new_user():
                             department10 = None,
                             access_level = admin_registration_data['access_level'], 
                             email = admin_registration_data['email'], 
+                            phone_number = admin_registration_data['phone_number'] if 'phone_number' in admin_registration_data else None,
+                            in_training = admin_registration_data['in_training'], 
                             password = generate_password_hash(admin_registration_data['password']),
                             created_by = user.id, 
                             changed_by = user.id, 
@@ -431,7 +437,9 @@ def new_user():
                             department9 = None,
                             department10 = None,
                             access_level = "Super_Admin", 
-                            email = f"{admin_registration_data['company_name'].lower().replace(' ', '_')}@timetab.ch", 
+                            email = f"{admin_registration_data['company_name'].lower().replace(' ', '_')}@timetab.ch",
+                            phone_number = None,
+                            in_training = None,  
                             password = generate_password_hash('ProjectX2023.'),
                             created_by = user.id, 
                             changed_by = user.id, 
@@ -457,6 +465,8 @@ def new_user():
                             department10 = None,
                             access_level = admin_registration_data['access_level'], 
                             email = admin_registration_data['email'], 
+                            phone_number = admin_registration_data['phone_number'] if 'phone_number' in admin_registration_data else None,
+                            in_training = admin_registration_data['in_training'], 
                             password = generate_password_hash(admin_registration_data['password']),
                             created_by = user.id, 
                             changed_by = user.id, 
@@ -495,6 +505,8 @@ def new_user():
                             department10 = None,
                             access_level = "Super_Admin", 
                             email = f"{admin_registration_data['company_name'].lower().replace(' ', '_')}@timetab.ch", 
+                            phone_number = None,
+                            in_training = None, 
                             password = generate_password_hash('ProjectX2023.'),
                             created_by = user.id, 
                             changed_by = user.id, 
@@ -520,6 +532,8 @@ def new_user():
                             department10 = None,
                             access_level = admin_registration_data['access_level'], 
                             email = admin_registration_data['email'], 
+                            phone_number = admin_registration_data['phone_number'] if 'phone_number' in admin_registration_data else None,
+                            in_training = admin_registration_data['in_training'], 
                             password = generate_password_hash(admin_registration_data['password']),
                             created_by = user.id, 
                             changed_by = user.id, 
@@ -563,6 +577,7 @@ def react_update():
             user.first_name = user_data.get('first_name', user.first_name)
             user.last_name = user_data.get('last_name', user.last_name)
             user.email = user_data.get('email', user.email)
+            user.phone_number = user_data.get('phone_number', user.phone_number)
             if user_data['password'] != user_data['password2']:
                 return jsonify({'message': 'Password are not matching'}), 200
             else:
@@ -582,6 +597,7 @@ def react_update():
         'first_name': user.first_name,
         'last_name': user.last_name,
         'email': user.email,
+        'phone_number': user.phone_number,
         'password': user.password,
     }
 
@@ -631,21 +647,15 @@ def get_time_str(time_str):
 def get_company():
     react_user = get_jwt_identity()
     jwt_data = get_jwt()
-    print("JWT: ", jwt_data)
     session_company = jwt_data.get("company_name").lower().replace(' ', '_')
-    print("SESSION Company: ", session_company)
     session = get_session(get_database_uri('', session_company))
     current_schema = app.config['SQLALCHEMY_DATABASE_URI']
-    print(f"Current Schema in some_route_handler: {current_schema}")
     inspector = inspect(session.bind)
     current_schema = inspector.default_schema_name
-    print(f"Current Schema in fetch_data: {current_schema}")
     user = session.query(User).filter_by(email=react_user).first()
     opening_hours = session.query(OpeningHours).filter_by(company_name=jwt_data.get("company_name")).first()
     weekdays = {0:'Montag', 1:'Dienstag', 2:'Mittwoch', 3:'Donnerstag', 4:'Freitag', 5:'Samstag', 6:'Sonntag'}
     company = session.query(Company).filter_by(company_name=jwt_data.get("company_name")).first()
-    print("User Company: ", user.company_name)
-    print("Company: ", company)
     day_num = 7
     company_id = user.company_id
     creation_date = datetime.datetime.now()
@@ -958,10 +968,10 @@ def get_availability():
                         if new_entry['entry1']:
                             availability_hours = new_entry['entry1'].hour
                             availability_minutes = new_entry['entry1'].minute
-                            total_availability_start = availability_hours * solverreq.hour_devider + availability_minutes
+                            total_availability_start = availability_hours * solverreq.hour_divider + availability_minutes
                             opening_hours = opening.start_time.hour
                             opening_minutes = opening.start_time.minute
-                            total_opening_start = opening_hours * solverreq.hour_devider + opening_minutes
+                            total_opening_start = opening_hours * solverreq.hour_divider + opening_minutes
                             if total_availability_start == 0:
                                 new_entry[f'entry{j + 1}'] = get_time_str(entry) if entry else None
                             elif total_availability_start < total_opening_start:
@@ -1052,7 +1062,7 @@ def get_availability():
         'day_num': day_num,
         'temp_dict': temp_dict,
         'week_start': week_start,
-        'hour_divider': solverreq.hour_devider,
+        'hour_divider': solverreq.hour_divider,
         'user_list': user_list,
         'template1_dict': get_temp_availability_dict("Template 1", user.email, day_num, weekdays),
         'template2_dict': get_temp_availability_dict("Template 2", user.email, day_num, weekdays),
@@ -1144,6 +1154,7 @@ def get_invite():
             department10 = None,
             employment=invite_data['employment'], 
             employment_level=invite_data['employment_level'], 
+            in_training=invite_data['in_training'] if 'in_training' in invite_data else None, 
             access_level=invite_data['access_level'], 
             created_by=user.company_id)
 
@@ -1258,12 +1269,15 @@ def solver_req():
         max_time_day = ""
         desired_max_time_week = ""
         max_time_week = ""
-        hour_devider = ""
+        hour_divider = ""
         fair_distribution = ""
         week_timeframe = ""
         subsequent_workingdays = ""
         daily_deployment = ""
         time_per_deployment = ""
+        new_fte_per_slot = "" 
+        subsequent_workingdays_max = ""
+        skills_per_day = ""
         nb1 = ""
         nb2 = ""
         nb3 = ""
@@ -1294,12 +1308,15 @@ def solver_req():
         max_time_day = solver_requirement.max_time_day
         desired_max_time_week = company.weekly_hours
         max_time_week = solver_requirement.max_time_week
-        hour_devider = solver_requirement.hour_devider
+        hour_divider = solver_requirement.hour_divider
         fair_distribution = solver_requirement.fair_distribution
         week_timeframe = solver_requirement.week_timeframe
         subsequent_workingdays = solver_requirement.subsequent_workingdays
         daily_deployment = solver_requirement.daily_deployment
         time_per_deployment = solver_requirement.time_per_deployment
+        new_fte_per_slot = solver_requirement.new_fte_per_slot 
+        subsequent_workingdays_max = solver_requirement.subsequent_workingdays_max
+        skills_per_day = solver_requirement.skills_per_day
         nb1 = solver_requirement.nb1
         nb2 = solver_requirement.nb2
         nb3 = solver_requirement.nb3
@@ -1343,12 +1360,15 @@ def solver_req():
                                 max_time_day = solver_req_data['max_time_day'],
                                 desired_max_time_week = solver_req_data['desired_max_time_week'],
                                 max_time_week = solver_req_data['max_time_week'],
-                                hour_devider = solver_req_data['hour_devider'],
+                                hour_divider = solver_req_data['hour_divider'],
                                 fair_distribution = solver_req_data['fair_distribution'],
                                 week_timeframe = solver_req_data['week_timeframe'],
                                 subsequent_workingdays = solver_req_data['subsequent_workingdays'],
                                 daily_deployment = solver_req_data['daily_deployment'],
                                 time_per_deployment = solver_req_data['time_per_deployment'],
+                                new_fte_per_slot = solver_req_data['new_fte_per_slot'],
+                                subsequent_workingdays_max = solver_req_data['subsequent_workingdays_max'],
+                                skills_per_day = solver_req_data['skills_per_day'],
                                 nb1 = solver_req_data['nb1'],
                                 nb2 = solver_req_data['nb2'],
                                 nb3 = solver_req_data['nb3'],
@@ -1394,12 +1414,15 @@ def solver_req():
     "max_time_day": max_time_day,
     "desired_max_time_week": desired_max_time_week,
     "max_time_week": max_time_week,
-    "hour_devider": hour_devider,
+    "hour_divider": hour_divider,
     "fair_distribution": fair_distribution,
     "week_timeframe": week_timeframe,
     "subsequent_workingdays": subsequent_workingdays,
     "daily_deployment": daily_deployment,
     "time_per_deployment": time_per_deployment,
+    "new_fte_per_slot": new_fte_per_slot, 
+    "subsequent_workingdays_max": subsequent_workingdays_max,
+    "skills_per_day": skills_per_day,
     "nb1": nb1,
     "nb2": nb2,
     "nb3": nb3,
@@ -1463,6 +1486,8 @@ def get_registration():
                     department9 = token.department9,
                     department10 = token.department10,
                     email = token.email, 
+                    phone_number = registration_data['phone_number'] if 'phone_number' in registration_data else None,
+                    in_training = token.in_training,
                     password = generate_password_hash(registration_data['password']),
                     created_by = None, 
                     changed_by = None, 
@@ -1504,6 +1529,8 @@ def get_registration():
                     department9 = token.department9,
                     department10 = token.department10,
                     email = token.email, 
+                    phone_number = registration_data['phone_number'] if 'phone_number' in registration_data else None,
+                    in_training = None,
                     password = generate_password_hash(registration_data['password']),
                     created_by = None, 
                     changed_by = None, 
@@ -1559,6 +1586,8 @@ def get_admin_registration():
                             department10 = None,
                             access_level = admin_registration_data['access_level'], 
                             email = admin_registration_data['email'], 
+                            phone_number = admin_registration_data['phone_number'] if 'phone_number' in admin_registration_data else None,
+                            in_training = None,
                             password = generate_password_hash(admin_registration_data['password']),
                             created_by = None, 
                             changed_by = None, 
@@ -1591,6 +1620,8 @@ def get_admin_registration():
                             department10 = None,
                             access_level = admin_registration_data['access_level'], 
                             email = admin_registration_data['email'], 
+                            phone_number = admin_registration_data['phone_number'] if 'phone_number' in admin_registration_data else None,
+                            in_training = None,
                             password = generate_password_hash(admin_registration_data['password']),
                             created_by = None, 
                             changed_by = None, 
@@ -1664,6 +1695,8 @@ def get_admin_registration():
                             department10 = None,
                             access_level = "Super_Admin", 
                             email = f"{admin_registration_data['company_name'].lower().replace(' ', '_')}@timetab.ch", 
+                            phone_number = None,
+                            in_training = None,
                             password = generate_password_hash('ProjectX2023.'),
                             created_by = None, 
                             changed_by = None, 
@@ -1689,6 +1722,8 @@ def get_admin_registration():
                             department10 = None,
                             access_level = admin_registration_data['access_level'], 
                             email = admin_registration_data['email'], 
+                            phone_number = admin_registration_data['phone_number'] if 'phone_number' in admin_registration_data else None,
+                            in_training = None,
                             password = generate_password_hash(admin_registration_data['password']),
                             created_by = None, 
                             changed_by = None, 
@@ -1727,6 +1762,8 @@ def get_admin_registration():
                             department10 = None,
                             access_level = "Super_Admin", 
                             email = f"{admin_registration_data['company_name'].lower().replace(' ', '_')}@timetab.ch", 
+                            phone_number = None,
+                            in_training = None,
                             password = generate_password_hash('ProjectX2023.'),
                             created_by = None, 
                             changed_by = None, 
@@ -1752,6 +1789,8 @@ def get_admin_registration():
                             department10 = None,
                             access_level = admin_registration_data['access_level'], 
                             email = admin_registration_data['email'], 
+                            phone_number = admin_registration_data['phone_number'] if 'phone_number' in admin_registration_data else None,
+                            in_training = None,
                             password = generate_password_hash(admin_registration_data['password']),
                             created_by = None, 
                             changed_by = None, 
@@ -1767,6 +1806,8 @@ def get_admin_registration():
                     except Exception as e:
                         print(str(e))
                         return jsonify({'message': 'Failed to clone schema'}), 500
+
+    return jsonify({'message': 'Successful registered'}), 500
                 
    
 
@@ -1838,7 +1879,7 @@ def get_required_workforce():
     weekdays = {0: 'Montag', 1: 'Dienstag', 2: 'Mittwoch', 3: 'Donnerstag', 4: 'Freitag', 5: 'Samstag', 6: 'Sonntag'}
     today = datetime.date.today()
     solverreq = session.query(SolverRequirement).filter_by(company_name=user.company_name).first()
-    hour_divider = solverreq.hour_devider
+    hour_divider = solverreq.hour_divider
     full_day = (24 * hour_divider) -1
     minutes = 60 / hour_divider
     day_num = 7   
@@ -2895,12 +2936,16 @@ def check_initial_setup():
             max_time_day = initial_data['max_time_day'],
             desired_max_time_week = initial_data['weekly_hours'],
             max_time_week = initial_data['max_time_week'],
-            hour_devider = initial_data['hour_divider'],
+            hour_divider = initial_data['hour_divider'],
             fair_distribution = initial_data['fair_distribution'],
             week_timeframe = initial_data['week_timeframe'],
             subsequent_workingdays = initial_data['subsequent_workingdays'],
             daily_deployment = initial_data['daily_deployment'],
             time_per_deployment = initial_data['time_per_deployment'],
+            new_fte_per_slot = initial_data['new_fte_per_slot'],
+            subsequent_workingdays_max = initial_data['subsequent_workingdays_max'],
+            skills_per_day = initial_data['skills_per_day'],
+
             nb1 = initial_data['nb1'],
             nb2 = initial_data['nb2'],
             nb3 = initial_data['nb3'],

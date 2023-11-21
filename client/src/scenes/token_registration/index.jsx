@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { useTheme, Box, Button, TextField, Snackbar, Typography } from "@mui/material";
+import ReactPhoneInput from 'react-phone-input-material-ui';
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -28,7 +29,7 @@ const Token_Registration = ({ token_registration }) => {
       // Send the updated form values to the server for database update
       await axios.post(`${API_BASE_URL}/api/token_registration`, values, {
     headers: {
-        ///'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
         }
     });
@@ -44,9 +45,8 @@ const Token_Registration = ({ token_registration }) => {
     <Box m="20px">
       <Header
         title="Registration"
-        subtitle=""
+        subtitle="Register Now"
       />
-      <h2>Register Now</h2>
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -72,12 +72,11 @@ const Token_Registration = ({ token_registration }) => {
               }}
             >
               <Typography
-                color={colors.greenAccent[500]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
-                  alignItems: "right",
+                  alignItems: "left",
                   height: "100%",
                 }}
               >
@@ -94,10 +93,9 @@ const Token_Registration = ({ token_registration }) => {
                 name="token"
                 error={!!touched.token && !!errors.token}
                 helperText={touched.token && errors.token}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
               />
               <Typography
-                color={colors.greenAccent[500]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -119,10 +117,19 @@ const Token_Registration = ({ token_registration }) => {
                 name="email"
                 error={!!touched.email && !!errors.email}
                 helperText={touched.email && errors.email}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
               />
               <Typography
-                color={colors.greenAccent[500]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 2",
+                  display: "flex",
+                  alignItems: "right",
+                  height: "100%",
+                }}
+              >
+              </Typography>
+              <Typography
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -144,10 +151,9 @@ const Token_Registration = ({ token_registration }) => {
                 name="first_name"
                 error={!!touched.first_name && !!errors.first_name}
                 helperText={touched.first_name && errors.first_name}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
               />
               <Typography
-                color={colors.greenAccent[500]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -169,10 +175,53 @@ const Token_Registration = ({ token_registration }) => {
                 name="last_name"
                 error={!!touched.last_name && !!errors.last_name}
                 helperText={touched.last_name && errors.last_name}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
               />
               <Typography
-                color={colors.greenAccent[500]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 2",
+                  display: "flex",
+                  alignItems: "right",
+                  height: "100%",
+                }}
+              >
+              </Typography>
+              <Typography
+                variant="h6"
+                sx={{
+                  gridColumn: "span 1",
+                  display: "flex",
+                  alignItems: "right",
+                  height: "100%",
+                }}
+              >
+                Phone Number
+              </Typography>
+              <TextField
+                fullWidth
+                variant="filled"
+                label= ""
+                onBlur={handleBlur}
+                onChange={handleChange}
+                defaultCountry={'us'}
+                value={values.phone_number}
+                name="phone_number"
+                error={!!touched.phone_number && !!errors.phone_number}
+                helperText={touched.phone_number && errors.phone_number}
+                sx={{ gridColumn: "span 1" }}
+              />
+              <Typography
+                variant="h6"
+                sx={{
+                  gridColumn: "span 4",
+                  display: "flex",
+                  alignItems: "right",
+                  height: "100%",
+                }}
+              >
+              </Typography>
+              <Typography
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -194,10 +243,9 @@ const Token_Registration = ({ token_registration }) => {
                 name="password"
                 error={!!touched.password && !!errors.password}
                 helperText={touched.password && errors.password}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
               />
               <Typography
-                color={colors.greenAccent[500]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
@@ -219,7 +267,7 @@ const Token_Registration = ({ token_registration }) => {
                 name="password2"
                 error={!!touched.password2 && !!errors.password2}
                 helperText={touched.password2 && errors.password2}
-                sx={{ gridColumn: "span 2" }}
+                sx={{ gridColumn: "span 1" }}
               />
             </Box>
             <></>

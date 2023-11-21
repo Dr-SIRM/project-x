@@ -87,9 +87,12 @@
       "differencetodistribution": "Abweichungsgrad zur gerechten Verteilung",
       "hourunit": "Stundeneinheit",
       "calculationtimeframe": "Berechnungszeitraum",
-      "maxworkingdayinarow": "Maximale Arbeitstage in Folge",
+      "subsequent_workingdays": "Arbeitstage in Folge",
+      "subsequent_workingdays_max": "Maximale Arbeitstage in Folge",
       "countofshiftsperday": "Anzahl Arbeitseinsätze pro Tag",
-      "minhoursperworkingshift": "Mindestunden pro Arbeitsblock"
+      "minhoursperworkingshift": "Mindestunden pro Arbeitsblock",
+      "new_fte_per_slot": "Maximale Anzahl neue Mitarbeiter pro Einsatz",
+      "skills_per_day": "Maximale Anzahl Tätigkeitswechsel pro Tag"
     },
 
     "availabilty" : {
