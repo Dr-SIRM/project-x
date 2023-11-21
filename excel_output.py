@@ -30,8 +30,8 @@ def create_excel_output(current_user_email):
     """
 
     # Achtung, start_date muss immer ein Montag sein!
-    start_date = "2023-11-13"
-    end_date = "2023-11-19"
+    start_date = "2023-11-27"
+    end_date = "2023-12-03"
 
 
     # Neue Session starten

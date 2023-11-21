@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useRef  } from 'react';
 import { Box, Typography, useTheme, Select, MenuItem } from "@mui/material";
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, InputLabel,OutlinedInput, Checkbox, FormControl, ListItemText } from '@mui/material';
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import Checkbox from '@mui/material/Checkbox';
 import Header from "../../components/Header";
 import { ThreeDots } from "react-loader-spinner"; 
 import axios from "axios";
@@ -48,6 +47,93 @@ const Team = () => {
   
     fetchUser();
   }, []);
+
+  const DepartmentSelect = ({ departments, selectedDepartments, onDropdownClose, userId }) => {
+    // Initialize local state with selectedDepartments
+    const [tempSelectedDepartments, setTempSelectedDepartments] = useState(selectedDepartments);
+  
+    const handleChange = (event) => {
+      setTempSelectedDepartments(event.target.value); // Update temp state
+    };
+  
+    const handleClose = () => {
+      onDropdownClose(tempSelectedDepartments, userId); // Call parent handler when dropdown is closed
+    };
+  
+    useEffect(() => {
+      setTempSelectedDepartments(selectedDepartments); // Sync with external changes
+    }, [selectedDepartments]);
+  
+    return (
+      <FormControl sx={{ m: 1, width: 300 }}>
+        {!selectedDepartments.length && (
+        <InputLabel id="department-select-label">Department</InputLabel>
+        )}
+        <Select
+          labelId="department-select-label"
+          id="department-multi-select"
+          multiple
+          value={tempSelectedDepartments}
+          onChange={handleChange}
+          onClose={handleClose}
+          renderValue={(selected) => selected.join(', ')}
+          MenuProps={{ PaperProps: { style: { maxHeight: 48 * 4.5 + 8, width: 250 } } }}
+        >
+          {departments.map((department) => (
+            <MenuItem key={department} value={department}>
+              <Checkbox checked={tempSelectedDepartments.indexOf(department) > -1} />
+              <ListItemText primary={department} />
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    );
+  };
+
+  const handleDepartmentDropdownClose = async (selectedDepartments, userId) => {
+    const departmentData = {};
+
+    selectedDepartments.forEach((dept, index) => {
+    departmentData[`department${index + 1}`] = dept;
+    });
+    try {
+      await axios.put(`${API_BASE_URL}/api/users/update/${userId}`, departmentData, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+  
+      setUsers(prevUsers => prevUsers.map(user => user.id === userId ? { ...user, ...departmentData } : user));
+    } catch (error) {
+      console.error('Error updating user:', error);
+    }
+  };
+
+  const getUserDepartments = (user) => {
+    return [user.department, user.department2, user.department3].filter(Boolean);
+  };
+
+  const handleInTrainingChange = async (event, id) => {
+    // Determine the new value for in_training based on the checkbox state
+    const newValue = event.target.checked ? 'X' : 'None'; // Adjust this based on how your backend expects the data
+  
+    try {
+      // Send the updated value to the server
+      await axios.put(`${API_BASE_URL}/api/users/update/${id}`, { in_training: newValue }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+  
+      // Re-fetch the data from the server or update the state locally
+      const response = await axios.get(`${API_BASE_URL}/api/users`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      setUsers(response.data.users); // Update the users state with the fresh data from the server
+    } catch (error) {
+      console.error('Error updating in_training status:', error);
+    }
+  };
   
   const editingCellIdRef = useRef(null);  // Create a ref to store the id of the cell being edited
 
@@ -149,93 +235,17 @@ const handleEmploymentChange = async (event, id) => {
   }
 };
 
-const handleDepartmentChange = async (event, id) => {
-  const newValue = event.target.value;
-
+const handleDepartmentChange = async (newValues, userId) => {
   try {
-      // Send the modified data to the server
-      await axios.put(`${API_BASE_URL}/api/users/update/${id}`, { department: newValue }, {
-          headers: {
-              'Authorization': `Bearer ${token}`
-          }
-      });
-
-      // Re-fetch the data from the server
-      const response = await axios.get(`${API_BASE_URL}/api/users`, {
-          headers: {
-              'Authorization': `Bearer ${token}`
-          }
-      });
-      setUsers(response.data.users);  // Update the users state with the fresh data from the server
-
-  } catch (error) {
-      console.error('Error updating user:', error);
-  }
-};
-const handleInTrainingChange = async (event, id) => {
-  // Determine the new value for in_training based on the checkbox state
-  const newValue = event.target.checked ? 'X' : 'None'; // Adjust this based on how your backend expects the data
-
-  try {
-    // Send the updated value to the server
-    await axios.put(`${API_BASE_URL}/api/users/update/${id}`, { in_training: newValue }, {
+    await axios.put(`${API_BASE_URL}/api/users/update/${userId}`, { department: newValues }, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
     });
 
-    // Re-fetch the data from the server or update the state locally
-    const response = await axios.get(`${API_BASE_URL}/api/users`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    setUsers(response.data.users); // Update the users state with the fresh data from the server
-  } catch (error) {
-    console.error('Error updating in_training status:', error);
-  }
-};
-
-const handleDepartment2Change = async (event, id) => {
-  const newValue = event.target.value;
-
-  try {
-    // Send the modified data to the server
-    await axios.put(`${API_BASE_URL}/api/users/update/${id}`, { department2: newValue }, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
-    // Re-fetch the data from the server
-    const response = await axios.get(`${API_BASE_URL}/api/users`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    setUsers(response.data.users);  // Update the users state with the fresh data from the server
-  } catch (error) {
-    console.error('Error updating user:', error);
-  }
-};
-const handleDepartment3Change = async (event, id) => {
-  const newValue = event.target.value;
-
-  try {
-    // Send the modified data to the server
-    await axios.put(`${API_BASE_URL}/api/users/update/${id}`, { department3: newValue }, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-
-    // Re-fetch the data from the server
-    const response = await axios.get(`${API_BASE_URL}/api/users`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    setUsers(response.data.users);  // Update the users state with the fresh data from the server
+    setUsers(prevUsers => prevUsers.map(user => 
+      user.id === userId ? { ...user, departments: newValues } : user
+    ));
   } catch (error) {
     console.error('Error updating user:', error);
   }
@@ -376,100 +386,21 @@ const handleConfirmDelete = async () => {
     },
 
     {
-      field: "department",
+      field: "departments",
       headerName: t('team.columns.department'),
       flex: 1.2,
       editable: false,
-      renderCell: (params) => (
-        <Select
-          value={params.value}  // this will be the current department for the user from the backend
-          onChange={(event) => handleDepartmentChange(event, params.id)}
-          sx={{
-            width: '100%',
-            backgroundColor: 'white !important',
-            '& .MuiOutlinedInput-notchedOutline': {
-              border: 'none',
-            },
-            '&:hover .MuiOutlinedInput-notchedOutline': {
-              border: 'none',
-            },
-            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-              border: 'none',
-            },
-          }}
-        >
-          <MenuItem value="">---</MenuItem>
-          {departments.map((department) => (
-            <MenuItem key={department} value={department}>
-              {department}
-            </MenuItem>
-          ))}
-        </Select>
-      ),
-    },
-    {
-      field: "department2",
-      headerName: t('team.columns.department2'),
-      flex: 1.2,
-      editable: false,
-      renderCell: (params) => (
-        <Select
-          value={params.value}  // this will be the current department2 for the user from the backend
-          onChange={(event) => handleDepartment2Change(event, params.id)}
-          sx={{
-            width: '100%',
-            backgroundColor: 'white !important',
-            '& .MuiOutlinedInput-notchedOutline': {
-              border: 'none',
-            },
-            '&:hover .MuiOutlinedInput-notchedOutline': {
-              border: 'none',
-            },
-            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-              border: 'none',
-            },
-          }}
-        >
-          <MenuItem value="">---</MenuItem>
-          {departments.map((department) => (
-            <MenuItem key={department} value={department}>
-              {department}
-            </MenuItem>
-          ))}
-        </Select>
-      ),
-    },
-    {
-      field: "department3",
-      headerName: t('team.columns.department3'),
-      flex: 1.2,
-      editable: false,
-      renderCell: (params) => (
-        <Select
-          value={params.value}  // this will be the current department2 for the user from the backend
-          onChange={(event) => handleDepartment3Change(event, params.id)}
-          sx={{
-            width: '100%',
-            backgroundColor: 'white !important',
-            '& .MuiOutlinedInput-notchedOutline': {
-              border: 'none',
-            },
-            '&:hover .MuiOutlinedInput-notchedOutline': {
-              border: 'none',
-            },
-            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-              border: 'none',
-            },
-          }}
-        >
-          <MenuItem value="">---</MenuItem>
-          {departments.map((department) => (
-            <MenuItem key={department} value={department}>
-              {department}
-            </MenuItem>
-          ))}
-        </Select>
-      ),
+      renderCell: (params) => {
+        const userDepartments = getUserDepartments(users.find(user => user.id === params.id));
+        return (
+          <DepartmentSelect
+            departments={departments}
+            selectedDepartments={userDepartments}
+            onDropdownClose={handleDepartmentDropdownClose}
+            userId={params.id}
+          />
+        );
+      },
     },
     {
       field: "in_training",
