@@ -203,6 +203,7 @@ def get_data():
 @jwt_required()
 def update_user(user_id):
     data = request.get_json()
+    print(request.json)
     jwt_data = get_jwt()
     session_company = jwt_data.get("company_name").lower().replace(' ', '_')
     session = get_session(get_database_uri('', session_company))
@@ -216,7 +217,7 @@ def update_user(user_id):
     user.last_name = data.get('last_name', user.last_name)
     user.email = data.get('email', user.email)
     user.employment = data.get('employment', user.employment)
-    user.department = data.get('department', user.department)
+    user.department = data.get('department1', user.department)
     user.department2 = data.get('department2', user.department2)
     user.department3 = data.get('department3', user.department3)
 
