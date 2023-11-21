@@ -66,7 +66,9 @@ const Team = () => {
   
     return (
       <FormControl sx={{ m: 1, width: 300 }}>
+        {!selectedDepartments.length && (
         <InputLabel id="department-select-label">Department</InputLabel>
+        )}
         <Select
           labelId="department-select-label"
           id="department-multi-select"
@@ -74,9 +76,20 @@ const Team = () => {
           value={tempSelectedDepartments}
           onChange={handleChange}
           onClose={handleClose}
-          input={<OutlinedInput label="Department" />}
           renderValue={(selected) => selected.join(', ')}
           MenuProps={{ PaperProps: { style: { maxHeight: 48 * 4.5 + 8, width: 250 } } }}
+          sx={{
+            '& .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              border: 'none',
+            },
+            // Add more styling as needed
+          }}
         >
           {departments.map((department) => (
             <MenuItem key={department} value={department}>
