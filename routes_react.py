@@ -44,18 +44,13 @@ def get_session(uri):
 def login_react():
     email = request.json.get('email')
     password = request.json.get('password')
-    print(email)
-    print(password)
 
     user = OverviewUser.query.filter_by(email=email).first()
     if not user or not check_password_hash(user.password, password):
         return jsonify({'error': 'Invalid email or password'}), 401
-    print("Login User: ", user)
-    print("Login Company: ", user.company_name)
     # Generate the JWT token
     additional_claims = {"company_name": user.company_name}
     session_token = create_access_token(identity=email, additional_claims=additional_claims)
-    print("Token: ", session_token)
 
     # Return the session token
     response = make_response(jsonify({'session_token': session_token}))
@@ -79,8 +74,10 @@ def login_react():
 @app.route('/api/token/refresh', methods=['POST'])
 @jwt_required(refresh=True) 
 def refresh():
+    print("Request Token data:", request.json)
     current_user = get_jwt_identity()
     new_token = create_access_token(identity=current_user)
+    print("New Token: ", new_token)
     return jsonify({'session_token': new_token})
 
 

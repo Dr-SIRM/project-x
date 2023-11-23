@@ -10,35 +10,35 @@ const AuthProvider = ({ children }) => {
   const [error, setError] = useState('');
 
 
-  const checkTokenExpiration = () => {
-    const lastActivity = localStorage.getItem('last_activity');
-    const sessionToken = localStorage.getItem('session_token');
+  // const checkTokenExpiration = () => {
+  //   const lastActivity = localStorage.getItem('last_activity');
+  //   const sessionToken = localStorage.getItem('session_token');
   
-    // Proceed only if both session token and last activity are present
-    if (sessionToken && lastActivity) {
-      const lastActivityDate = new Date(lastActivity);
-      const now = new Date();
-      const difference = now - lastActivityDate;
-      const differenceInMinutes = Math.floor(difference / 1000 / 60);
+  //   // Proceed only if both session token and last activity are present
+  //   if (sessionToken && lastActivity) {
+  //     const lastActivityDate = new Date(lastActivity);
+  //     const now = new Date();
+  //     const difference = now - lastActivityDate;
+  //     const differenceInMinutes = Math.floor(difference / 1000 / 60);
   
-      if (differenceInMinutes >= 30) {
-        localStorage.removeItem('session_token');
-        localStorage.removeItem('last_activity');
-        localStorage.removeItem('user');
-        setUser(null);
-        navigate('/login');
-      }
-    }
-  };
+  //     if (differenceInMinutes >= 60) {
+  //       localStorage.removeItem('session_token');
+  //       localStorage.removeItem('last_activity');
+  //       localStorage.removeItem('user');
+  //       setUser(null);
+  //       navigate('/login');
+  //     }
+  //   }
+  // };
 
-  useEffect(() => {
-    checkTokenExpiration();
+  // useEffect(() => {
+  //   checkTokenExpiration();
 
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
+  //   const storedUser = localStorage.getItem('user');
+  //   if (storedUser) {
+  //     setUser(JSON.parse(storedUser));
+  //   }
+  // }, []);
 
   useEffect(() => {
     if (user) {
@@ -77,14 +77,16 @@ const AuthProvider = ({ children }) => {
 
   const refreshAccessToken = async () => {
     try {
-      const refreshToken = localStorage.getItem('refresh_token');
+      const refreshToken = localStorage.getItem('session_token');
       const response = await fetch(`${API_BASE_URL}/api/token/refresh`, {
         method: "POST",
         headers: {
+          "Authorization": `Bearer ${refreshToken}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ refresh_token: refreshToken }),
       });
+
+      console.log('Refresh Token:', response);
   
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -106,7 +108,7 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const handleRefreshToken = async () => {
       try {
-        await handleRefreshToken();
+        await refreshAccessToken(); // Call the refresh token function
       } catch (error) {
         console.error("Token refresh failed:", error);
       }
@@ -118,8 +120,7 @@ const AuthProvider = ({ children }) => {
   
     window.addEventListener("refreshToken", handleRefreshToken);
     window.addEventListener("logout", handleLogout);
-
-    
+  
     return () => {
       window.removeEventListener("refreshToken", handleRefreshToken);
       window.removeEventListener("logout", handleLogout);
@@ -134,10 +135,10 @@ const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(checkTokenExpiration, 1000 * 60); // Check every minute
-    return () => clearInterval(interval); // Clear interval on unmount
-  }, []); 
+  // useEffect(() => {
+  //   const interval = setInterval(checkTokenExpiration, 1000 * 60); // Check every minute
+  //   return () => clearInterval(interval); // Clear interval on unmount
+  // }, []); 
 
   useEffect(() => {
     if (user) {
