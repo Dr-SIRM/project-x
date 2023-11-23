@@ -87,6 +87,7 @@ const SolverReq = ({ solverreq }) => {
           subsequent_workingdays_max: solverData.subsequent_workingdays_max,
           daily_deployment: solverData.daily_deployment,
           time_per_deployment: solverData.time_per_deployment,
+          new_fte_per_slot: solverData.new_fte_per_slot,
           subsequent_workingdays_max: solverData.subsequent_workingdays_max,
           skills_per_day: solverData.skills_per_day,
           nb1: String(solverData.nb1),
