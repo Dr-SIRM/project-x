@@ -69,6 +69,7 @@ To-Do Liste:
 
  To-Do's 
  -------------------------------
+ - Vorüberprüfung 1 anpassen
  - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden??
 
  - self.max_time_week darf niemals grösser als self.weekly hours gewählt werden!
@@ -668,6 +669,12 @@ class ORAlgorithm_cp:
                            wieviele Mitarbeiter benötigt werden?
         ---------------------------------------------------------------------------------------------------------------
         """
+
+
+        # Anpassen, wenn der Betrieb an einem Tag geschlossen hat kommt ein Fehler!
+
+
+
         # Funktion um Zeitwerte umzurechnen ---------------------------------------------------------------------------
         def time_to_int(t):
             # Divisor basierend auf self.hour_divider erzeugen

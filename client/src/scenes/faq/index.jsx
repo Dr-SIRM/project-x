@@ -6,182 +6,379 @@ import AccordionDetails from "@mui/material/AccordionDetails";
 import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { tokens } from "../../theme";
-import { API_BASE_URL } from "../../config";
 
 const FAQ = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  // Erhöhen der Schriftgröße für die FAQ-Texte
+  const largerText = { fontSize: '1rem' };
+
   return (
     <Box m="20px">
-      <Header title="FAQ" subtitle="Frequently Asked Questions. Die Antworten werden jeweils schriftlich und mit einem Video erklärt." />
+      <Header title="FAQ" subtitle="Häufig gestellte Fragen. Fragen und Antworten werden pro Thema schriftlich und mit Videoanleitungen erklärt." />
 
-      {/* Frage 1 */}
+      {/* Allgemeiner Ablauf */}
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography color={colors.greenAccent[500]} variant="h5">
-            Was ist auf dem Dashboard alles ersichtlich?
+          <Typography color={colors.redAccent[400]} variant="h5">
+          Planungserstellung Schritt für Schritt: Ein Schnellführer
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Typography>
-            Auf dem Dashboard (Für User und Admin ein seperates FAQ?)
+          <Typography style={largerText}>
+            Frage: Was ist der allgemeine Ablauf, damit der Algorithmus von TimeTab mir einen optimalen Schichtplan erstellt?
+            <br />
+            <br />
+            1. fsfkldslk
+            <br />
+            2. fsfkldslk
+            <br />
+            3. fsfkldslk
+            <br />
+            4. fsfkldslk
           </Typography>
         </AccordionDetails>
+
         <AccordionDetails>
-          <Typography>
-            Anleitungsvideo "Team Verwalten"
-          </Typography>
           <iframe
             width="1000"
             height="440"
-            src="https://www.youtube.com/embed/VIDEO_ID_1"
+            src="https://www.youtube.com/embed/YOUR_VIDEO_ID_FOR_DASHBOARD"
             title="YouTube video player"
             frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           ></iframe>
         </AccordionDetails>
       </Accordion>
 
-      {/* Frage 2 */}
+      {/* Dashboard */}
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography color={colors.greenAccent[500]} variant="h5">
-            Wie kann ich mein Team verwalten?
+            Dashboard
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Typography>
-            Sie können unter "Team Verwalten" Einstellungen vornehmen. Sie können die Emailadresse der Mitarbeiter ändern, die Anstellung und den Anstellungsgrad anpassen oder Abteilungen zuweisen. Ebenfalls können Sie einzelne Mitarbeiter löschen.
+          <Typography style={largerText}>
+            Frage: Was kann ich dem Dashboard alles entnehmen?
+            <br />
+            Antwort: 
           </Typography>
         </AccordionDetails>
         <AccordionDetails>
-          <Typography>
-            Anleitungsvideo "Team Verwalten"
+          <Typography style={largerText}>
+            Frage: Was bedeutet "Fehlende Planung" und "Fehlerhafte Planung" und was kann ich damit machen?
+            <br />
+            Antwort: 
           </Typography>
+        </AccordionDetails>
+        <AccordionDetails>
+          <iframe
+            width="1000"
+            height="440"
+            src="https://www.youtube.com/embed/YOUR_VIDEO_ID_FOR_DASHBOARD"
+            title="YouTube video player"
+            frameBorder="0"
+            allowFullScreen
+          ></iframe>
+        </AccordionDetails>
+      </Accordion>
+
+      {/* Solver */}
+      <Accordion>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography color={colors.greenAccent[500]} variant="h5">
+            Solver
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography style={largerText}>
+            Frage: Was muss ich tun, bevor ich den automatischen Planungssolver starte?
+            <br />
+            Antwort:
+          </Typography>
+        </AccordionDetails>
+        <AccordionDetails>
+          <Typography style={largerText}>
+            Frage: Wie funktioniert die Vorüberprüfung und was wird dabei geprüft?
+            <br />
+            Antwort:
+          </Typography>
+        </AccordionDetails>
+        <AccordionDetails>
+          <iframe
+            width="1000"
+            height="440"
+            src="https://www.youtube.com/embed/YOUR_VIDEO_ID_FOR_SOLVER"
+            title="YouTube video player"
+            frameBorder="0"
+            allowFullScreen
+          ></iframe>
+        </AccordionDetails>
+      </Accordion>
+
+      {/* Solver-Anforderungen */}
+      <Accordion>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography color={colors.greenAccent[500]} variant="h5">
+            Solver-Anforderungen
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography style={largerText}>
+            Frage: 
+            <br />
+            Antwort: ...
+          </Typography>
+        </AccordionDetails>
+        <AccordionDetails>
+          <Typography style={largerText}>
+            Frage: 
+            <br />
+            Antwort:
+          </Typography>
+        </AccordionDetails>
+        <AccordionDetails>
+          <iframe
+            width="1000"
+            height="440"
+            src="https://www.youtube.com/embed/YOUR_VIDEO_ID_FOR_SOLVER_REQUIREMENTS"
+            title="YouTube video player"
+            frameBorder="0"
+            allowFullScreen
+          ></iframe>
+        </AccordionDetails>
+      </Accordion>
+
+      {/* Team verwalten */}
+      <Accordion>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography color={colors.greenAccent[100]} variant="h5">
+            Team verwalten
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography style={largerText}>
+            Frage: 
+            <br />
+            Antwort: ...
+          </Typography>
+        </AccordionDetails>
+        <AccordionDetails>
+          <Typography style={largerText}>
+            Frage: 
+            <br />
+            Antwort:
+          </Typography>
+        </AccordionDetails>
+        <AccordionDetails>
           <iframe
             width="1000"
             height="440"
             src="https://www.youtube.com/embed/oBKEaczB5sc"
             title="YouTube video player"
             frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           ></iframe>
         </AccordionDetails>
       </Accordion>
 
-      {/* Frage 3 */}
+      {/* Benutzerverwaltung */}
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography color={colors.greenAccent[500]} variant="h5">
-            Wie funktioniert die automatisierte Schichtplanung und wie werden die Schichten automatisch zugewiesen?
+          <Typography color={colors.greenAccent[100]} variant="h5">
+            Benutzerverwaltung
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Typography>
-            Die automatisierte Schichtplanung basiert in der Regel auf Regeln und Vorgaben, die von den Administratoren oder Managern der Schichtplanungs-App festgelegt werden.
+          <Typography style={largerText}>
+            Frage: Wo finde ich die geplanten Verfügbarkeiten und Schichten der Mitarbeiter?
+            <br />
+            Antwort:
           </Typography>
         </AccordionDetails>
         <AccordionDetails>
-          <Typography>
-            Anleitungsvideo "Automatische Schichtplanung"
-          </Typography>
           <iframe
             width="1000"
             height="440"
-            src="https://www.youtube.com/embed/VIDEO_ID_3"
+            src="https://www.youtube.com/embed/YOUR_VIDEO_ID_FOR_USER_MANAGEMENT"
             title="YouTube video player"
             frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           ></iframe>
         </AccordionDetails>
       </Accordion>
 
-      {/* Frage 4 */}
+      {/* Einladen */}
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography color={colors.greenAccent[500]} variant="h5">
-            Ist es möglich, manuell Änderungen an den automatisch zugewiesenen Schichten vorzunehmen?
+          <Typography color={colors.greenAccent[100]} variant="h5">
+            Einladen
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Typography>
-            Nein, es ist nicht möglich, manuell Änderungen an den automatisch zugewiesenen Schichten vorzunehmen.
+          <Typography style={largerText}>
+            Frage: Wie lade ich neue Teammitglieder ein und wie funktioniert der Registrierungsprozess mit dem Token?
+            <br />
+            Antwort:
           </Typography>
         </AccordionDetails>
         <AccordionDetails>
-          <Typography>
-            Anleitungsvideo "Manuelle Änderungen an Schichten"
-          </Typography>
           <iframe
             width="1000"
             height="440"
-            src="https://www.youtube.com/embed/VIDEO_ID_4"
+            src="https://www.youtube.com/embed/YOUR_VIDEO_ID_FOR_USER_MANAGEMENT"
             title="YouTube video player"
             frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           ></iframe>
         </AccordionDetails>
       </Accordion>
 
-      {/* Frage 5 */}
+      {/* Verfügbarkeit */}
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography color={colors.greenAccent[500]} variant="h5">
-            Wie werden Abwesenheiten wie Urlaub oder Krankheit in der automatisierten Schichtplanung berücksichtigt?
+            Verfügbarkeit
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Typography>
-            Abwesenheiten wie Urlaub oder Krankheit werden in der automatisierten Schichtplanung in der Regel berücksichtigt, indem sie als Parameter in die Schichtplanung einbezogen werden.
+          <Typography style={largerText}>
+            Frage:
+            <br />
+            Antwort:
           </Typography>
         </AccordionDetails>
         <AccordionDetails>
-          <Typography>
-            Anleitungsvideo "Berücksichtigung von Abwesenheiten"
-          </Typography>
           <iframe
             width="1000"
             height="440"
-            src="https://www.youtube.com/embed/VIDEO_ID_5"
+            src="https://www.youtube.com/embed/YOUR_VIDEO_ID_FOR_USER_MANAGEMENT"
             title="YouTube video player"
             frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           ></iframe>
         </AccordionDetails>
       </Accordion>
 
-      {/* Frage 6 */}
+      {/* Unternehmen */}
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Typography color={colors.greenAccent[500]} variant="h5">
-            Wie können die Mitarbeiter auf den aktuellen Schichtplan zugreifen und ihre Schichtpläne einsehen?
+            Unternehmen
           </Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <Typography>
-            Die Mitarbeiter können in der Regel auf den aktuellen Schichtplan über eine mobile App oder eine Webanwendung zugreifen, die von der automatisierten Schichtplanungs-App bereitgestellt wird.
+          <Typography style={largerText}>
+            Frage:
+            <br />
+            Antwort:
           </Typography>
         </AccordionDetails>
         <AccordionDetails>
-          <Typography>
-            Anleitungsvideo "Zugriff auf den Schichtplan für Mitarbeiter"
-          </Typography>
           <iframe
             width="1000"
             height="440"
-            src="https://www.youtube.com/embed/VIDEO_ID_6"
+            src="https://www.youtube.com/embed/YOUR_VIDEO_ID_FOR_USER_MANAGEMENT"
             title="YouTube video player"
             frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           ></iframe>
         </AccordionDetails>
       </Accordion>
+
+      {/* Planung */}
+      <Accordion>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography color={colors.greenAccent[500]} variant="h5">
+            Planung
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography style={largerText}>
+            Frage:
+            <br />
+            Antwort:
+          </Typography>
+        </AccordionDetails>
+        <AccordionDetails>
+          <iframe
+            width="1000"
+            height="440"
+            src="https://www.youtube.com/embed/YOUR_VIDEO_ID_FOR_USER_MANAGEMENT"
+            title="YouTube video player"
+            frameBorder="0"
+            allowFullScreen
+          ></iframe>
+        </AccordionDetails>
+      </Accordion>
+
+      {/* Schichtplan */}
+      <Accordion>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography color={colors.greenAccent[100]} variant="h5">
+            Schichtplan
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography style={largerText}>
+            Frage:
+            <br />
+            Antwort:
+          </Typography>
+        </AccordionDetails>
+        <AccordionDetails>
+          <iframe
+            width="1000"
+            height="440"
+            src="https://www.youtube.com/embed/YOUR_VIDEO_ID_FOR_USER_MANAGEMENT"
+            title="YouTube video player"
+            frameBorder="0"
+            allowFullScreen
+          ></iframe>
+        </AccordionDetails>
+      </Accordion>
+
+      {/* Kalender */}
+      <Accordion>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography color={colors.greenAccent[100]} variant="h5">
+            Kalender
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography style={largerText}>
+            Frage:
+            <br />
+            Antwort:
+          </Typography>
+        </AccordionDetails>
+        <AccordionDetails>
+          <iframe
+            width="1000"
+            height="440"
+            src="https://www.youtube.com/embed/YOUR_VIDEO_ID_FOR_USER_MANAGEMENT"
+            title="YouTube video player"
+            frameBorder="0"
+            allowFullScreen
+          ></iframe>
+        </AccordionDetails>
+      </Accordion>
+
+
+      {/* Schlusssatz */}
+      <Typography variant="h5" style={{ marginTop: '20px' }}>
+        Sie haben Ihre Frage im FAQ nicht gefunden? Dann kontaktieren Sie uns direkt.
+      </Typography>
+
+      {/* Auf die E-Mail-Adresse verweisen */}
+      <Typography variant="h5" style={{ marginTop: '20px' }}>
+        <a href="mailto:timetab@gmx.ch" style={{ color: colors.greenAccent[700], textDecoration: 'underline' }}>
+          ihre-email@beispiel.de
+        </a>
+      </Typography>
+
     </Box>
   );
 };
