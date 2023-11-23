@@ -13,6 +13,7 @@ from excel_output import create_excel_output
 from sqlalchemy import func, extract, not_, and_, or_, asc, desc, text, create_engine, inspect, case, exists
 from sqlalchemy.orm import scoped_session, sessionmaker
 import stripe
+import math
 
 
 #Import of Database
@@ -1922,8 +1923,6 @@ def get_required_workforce():
             closing_times.append(slot)
 
     daily_slots = max(closing_times) * hour_divider
-    print("Max: ", daily_slots)
-    print("Max: ", closing_times)
 
     # Calculation Min Working Day
     opening_times = []
@@ -1943,8 +1942,6 @@ def get_required_workforce():
             opening_times.append(slot)
     
     min_opening = min(opening_times)* hour_divider
-    print("Min: ", min_opening)
-    print("Min: ", opening_times)
 
     # Week with adjustments
     monday = today - datetime.timedelta(days=today.weekday())
@@ -1968,7 +1965,6 @@ def get_required_workforce():
         TimeReq.date.between(week_start, end_date)
     ).all()
 
-    print(request.args.get('selectedDepartment'))
 
     # Convert all_time_reqs to a dictionary for quick lookup
     time_req_lookup = {(rec.date, rec.start_time): rec.worker for rec in all_time_reqs}
@@ -2048,7 +2044,7 @@ def get_required_workforce():
 
             # Delete existing TimeReq entries for the week
             new_dates = [monday + datetime.timedelta(days=i) + datetime.timedelta(days=week_adjustment) for i in range(day_num)]
-            TimeReq.query.filter(
+            session.query(TimeReq).filter(
                 TimeReq.company_name == user.company_name,
                 TimeReq.department == workforce_data['department'] if 'department' in workforce_data else None,
                 TimeReq.date.in_(new_dates)
@@ -2064,9 +2060,9 @@ def get_required_workforce():
                     if opening_details == None:
                         pass
                     else:
-                        opening_hours = opening_details.start_time.hour
-                        opening_minutes = opening_details.start_time.minute
-                        total_hours = opening_hours * hour_divider + opening_minutes
+                        opening_hours = opening_details.start_time.hour * hour_divider
+                        opening_minutes = math.ceil(opening_details.start_time.minute /60 * hour_divider)
+                        total_hours = opening_hours + opening_minutes
                         if quarter < (total_hours):
                             pass
                         else:
@@ -2110,7 +2106,6 @@ def get_required_workforce():
                                     else:
                                         capacity = 0
                                    
-
                             new_record = TimeReq(
                                 company_name=user.company_name,
                                 department=workforce_data['department'],
@@ -2122,7 +2117,6 @@ def get_required_workforce():
                                 creation_timestamp=creation_date
                             )
                             new_records.append(new_record)
-
             session.bulk_save_objects(new_records)
             session.commit()
             session.close()
