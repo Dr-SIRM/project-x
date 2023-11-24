@@ -234,8 +234,6 @@ def create_excel_output(current_user_email, start, end):
     last_data_row = row - 1  # Da row nach dem letzten Eintrag erhöht wurde, reduzieren wir es um 1.
 
 
-
-
     # Funktion zur Generierung der Stunden
     def generate_hours(start_time, end_time, hour_divider):
         current_time = start_time
@@ -248,15 +246,16 @@ def create_excel_output(current_user_email, start, end):
     
     # Stunden für jeden Tag hinzufügen
     col_index = 7  # Beginne in Spalte G
+
+    print("times: ", times)
+
     for time_info in times:
         weekday, start_time_obj, end_time_obj, end_time2_obj = time_info
         start_time = (datetime.min + start_time_obj).time()
-        print("start_time: ", start_time)
         if end_time2_obj is None:
             end_time = (datetime.min + end_time_obj).time()
         else:
             end_time = (datetime.min + end_time2_obj).time()
-        print("end_time: ", end_time)
 
         # hours = generate_hours(datetime.combine(datetime.today(), start_time), datetime.combine(datetime.today(), end_time), hour_divider)
         # Erstellen eines datetime-Objekts für start_time und end_time
