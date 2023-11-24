@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, Typography, CircularProgress, Snackbar } from "@mui/material";
+import { Box, Button, Typography, CircularProgress, Snackbar, MenuItem, InputLabel, Select } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { Formik } from "formik";
@@ -19,6 +19,8 @@ const Solver = () => {
     ]);
     const [showSuccessNotification, setShowSuccessNotification] = useState(false);
     const [showErrorNotification, setShowErrorNotification] = useState(false);
+    const [selectedWeek, setSelectedWeek] = useState();
+    const token = localStorage.getItem('session_token');
 
     // "Hook" in react, wir dazu genutzt, Nebeneffekte in funktionalen Komponenten zu verwalten
     useEffect(() => {
@@ -43,9 +45,12 @@ const Solver = () => {
         };
     }, []);
 
+    const handleWeekChange = (event) => {
+        setSelectedWeek(event.target.value);
+      };
+
     const handleFormSubmit = async (values) => {
       try {
-          const token = localStorage.getItem('session_token');  // Get the session token from local storage
           const response = await axios.post(`${API_BASE_URL}/api/solver`, { ...values, solverButtonClicked: true }, {
               headers: {
                   'Authorization': `Bearer ${token}`,  // Add authorization header
@@ -68,21 +73,25 @@ const Solver = () => {
     return (
         <Box m="20px">
             <Typography variant="h3">TimeTab Solver</Typography>
-            <Formik
-                onSubmit={handleFormSubmit}
-                enableReinitialize={true}
-                initialValues={{}}
-            >
-                {({ handleSubmit }) => (
-                    <form onSubmit={handleSubmit}>
-                        <Box display="flex" justifyContent="end" mt="20px">
-                            <Button type="submit" color="primary" variant="contained">
-                                Solve
-                            </Button>
-                        </Box>
-                    </form>
-                )}
-            </Formik>
+            <div style={{ display: 'flex', gap: '5px', marginTop: '30px', marginBottom: '30px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <InputLabel id="start-week-label" style={{ marginLeft: '20px', marginBottom: '5px' }}>Wählbereich</InputLabel> {/* Label for the first select */}
+                </div>
+                    <Select
+                        labelId="simple-select-label"
+                        id="simple-select"
+                        value={selectedWeek}
+                        onChange={handleWeekChange}
+                        style={{ width: '120px' }}  // Assuming you want the dropdown text to be white
+                        size="small"
+                    >
+                        <MenuItem value={1}>1</MenuItem>
+                        <MenuItem value={2}>2</MenuItem>
+                        <MenuItem value={3}>3</MenuItem>
+                        <MenuItem value={4}>4</MenuItem>
+                        <MenuItem value={4}>5</MenuItem>
+                    </Select>
+            </div>
             <div>
             {loadingSteps.map((step, index) => (
                 <div key={index} style={{ marginTop: "10px", display: "flex", alignItems: "flex-start" }}>
@@ -103,6 +112,21 @@ const Solver = () => {
                     </div>
                 </div>
             ))}
+            <Formik
+                onSubmit={handleFormSubmit}
+                enableReinitialize={true}
+                initialValues={{}}
+            >
+                {({ handleSubmit }) => (
+                    <form onSubmit={handleSubmit}>
+                        <Box display="flex" justifyContent="end" mt="20px" style={{ display: 'flex', gap: '10px', marginTop: '40px' }}>
+                            <Button type="submit" color="primary" variant="contained">
+                                Solve
+                            </Button>
+                        </Box>
+                    </form>
+                )}
+            </Formik>
             </div>
             <Snackbar
                 open={showSuccessNotification}

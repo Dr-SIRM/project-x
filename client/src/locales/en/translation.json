@@ -174,7 +174,9 @@
   },
 
   "shiftplan": {
-
+    "export_timerange": "Export Timerange",
+    "start_week": "Start Week",
+    "end_week": "End Week"
   },
 
   "welcome": {
@@ -212,7 +214,8 @@
     "email": "Email",
     "reset": "Reset",
     "back": "Back",
-    "next": "Next"
+    "next": "Next",
+    "confirm_export": "Confirm and Download"
   },
 
   "registration": {

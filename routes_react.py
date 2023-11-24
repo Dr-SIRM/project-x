@@ -1204,6 +1204,8 @@ def run_solver():
     solver_data = request.get_json()
     print("JSON Payload:", solver_data)  # Log payload
 
+    session.close()
+
     if 'solverButtonClicked' in solver_data and solver_data['solverButtonClicked']:
         dp = DataProcessing(user.email)
         dp.run()
@@ -1240,7 +1242,6 @@ def run_solver():
         print("Solver button was not clicked")  # Log if button wasn’t clicked
         return jsonify({'message': 'Solver button was not clicked'}), 200
     
-    session.close()
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000)  # Adjust host and port as needed
