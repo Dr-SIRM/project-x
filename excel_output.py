@@ -24,14 +24,14 @@ def time_to_timedelta(t):
     return timedelta(hours=t.hour, minutes=t.minute, seconds=t.second)
 
 
-def create_excel_output(current_user_email):
+def create_excel_output(current_user_email, start, end):
     """
     In dieser Funktion werden relevante gesolvte Daten aus der Datenbank gezogen und eine Excelausgabe daraus generiert.
     """
 
     # Achtung, start_date muss immer ein Montag sein!
-    start_date = "2023-11-27"
-    end_date = "2023-12-03"
+    start_date = str(start)
+    end_date = str(end)
 
 
     # Neue Session starten
