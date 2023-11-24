@@ -65,11 +65,11 @@ To-Do Liste:
  - (erl) Alle NB's mit Schichten umbauen.
  - (erl) Wenn man gar keine time_req eingegeben hat, hällt dann Vorüberprüfung 1 stand?
  - (erl) Solvingzeit mit der Zeit automaitsch abbrechen
+ - (erl) Vorüberprüfung 1 anpassen (Wenn der Betrieb an einem Tag geschlossen ist dann sollen diese Tage ignoriert werden)
  
 
  To-Do's 
  -------------------------------
- - Vorüberprüfung 1 anpassen
  - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden??
 
  - self.max_time_week darf niemals grösser als self.weekly hours gewählt werden!
@@ -264,7 +264,7 @@ class ORAlgorithm_cp:
         # self.output_result_excel() # Diese Methode wird in Zukunft nicht mehr benötigt
         self.plot_costs_excel()
         self.save_data_in_database()
-        # self.save_data_in_database_testing()
+        # self.save_data_in_database_testing() # Evtl. etwas vereinfachen für das Testing, oder einfach weniger Daten reingeben
 
 
     def create_variables(self):
@@ -707,13 +707,15 @@ class ORAlgorithm_cp:
                 # Wochentag als Index (0 = Montag, 1 = Dienstag, usw.) erhalten
                 weekday_index = current_date.weekday()
 
-                # Prüft, ob der Tag ein Arbeitstag ist (Basierend auf den Öffnungszeiten)
-                if self.laden_oeffnet[weekday_index] is not None and self.laden_schliesst[weekday_index] is not None:
-                    time_req_dict = self.time_req.get(current_date, {})
+                # Überprüfen, ob der Betrieb an diesem Tag geschlossen ist
+                if self.opening_hours[weekday_index % len(self.opening_hours)] == 0:
+                    continue  # Überspringen, wenn der Betrieb geschlossen ist
+
+                time_req_dict = self.time_req.get(current_date, {})
                     
-                    # Prüft, ob für den Tag Stunden in mindestens einer Abteilung geplant sind
-                    if all(not dept_hours for dept_hours in time_req_dict.values()):
-                        fehlende_stunden.append(current_date)
+                # Prüft, ob für den Tag Stunden in mindestens einer Abteilung geplant sind
+                if all(not dept_hours for dept_hours in time_req_dict.values()):
+                    fehlende_stunden.append(current_date)
 
             if fehlende_stunden:
                 error_message_lines = ["An folgenden Tagen wurden keine Stunden für irgendeine Abteilung geplant:"]
