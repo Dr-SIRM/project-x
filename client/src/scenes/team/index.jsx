@@ -105,9 +105,9 @@ const Team = () => {
   const handleDepartmentDropdownClose = async (selectedDepartments, userId) => {
     const departmentData = {};
 
-    selectedDepartments.forEach((dept, index) => {
-    departmentData[`department${index + 1}`] = dept;
-    });
+    for (let i = 0; i < 3; i++) { // Assuming a maximum of 3 departments
+      departmentData[`department${i + 1}`] = selectedDepartments[i] || null;
+    }
     try {
       await axios.put(`${API_BASE_URL}/api/users/update/${userId}`, departmentData, {
         headers: { 'Authorization': `Bearer ${token}` }
