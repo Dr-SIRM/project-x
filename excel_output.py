@@ -29,7 +29,7 @@ def create_excel_output(current_user_email):
     In dieser Funktion werden relevante gesolvte Daten aus der Datenbank gezogen und eine Excelausgabe daraus generiert.
     """
 
-    # Achtung, start_date muss immer ein Montag sein!
+    # Achtung, start_date muss immer ein Montag sein!   
     start_date = "2023-11-27"
     end_date = "2023-12-03"
 

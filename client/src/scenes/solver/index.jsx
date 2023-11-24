@@ -14,8 +14,8 @@ const Solver = () => {
         { label: "2. Vorüberprüfung: Stehen die Vollzeit Mitarbeiter mind. Wochenarbeitsstunden * Anzahl Berechungswochen zur Verfügung (bei Ferien werden die Stunden abgezogen)?", status: null },
         { label: "3. Vorüberprüfung: Haben alle Mitarbeiter zusammen genug Stunden eingeplant, um ihre Planung zu erfüllen?", status: null },
         { label: "4. Vorüberprüfung: Stehen zu jeder Zeit mindestens die Anzahl Mitarbeiter mit dem entsprechenden Skill zur Verfügung, die Sie eingeplant haben? ", status: null },
-        { label: "5. Vorüberprüfung: ", status: null },
-        { label: "6. Vorüberprüfung: ", status: null }
+        // { label: "5. Vorüberprüfung: ", status: null },
+        // { label: "6. Vorüberprüfung: ", status: null }
     ]);
     const [showSuccessNotification, setShowSuccessNotification] = useState(false);
     const [showErrorNotification, setShowErrorNotification] = useState(false);

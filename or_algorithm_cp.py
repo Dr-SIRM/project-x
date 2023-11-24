@@ -816,17 +816,35 @@ class ORAlgorithm_cp:
                             # Erhöhung der Verfügbarkeitsanzahl für jede Stunde, in der der Mitarbeiter verfügbar ist
                             if available:
                                 skill_availability[skill][day_index][hour] += 1
-
+                
 
             # Zählen von welchen Skill an welchem Tag zu welcher Stunde wieviele Mitarbeiter "fehlen"
             unmet_requirements = []
+
             for skill in self.min_anwesend:
                 for day_index, day_requirements in enumerate(self.min_anwesend[skill]):
                     for hour, required_count in day_requirements.items():
-                        # Prüfen, ob die Verfügbarkeit für diesen Skill und diese Stunde unzureichend ist
-                        if hour < len(skill_availability[skill][day_index]):
-                            if skill_availability[skill][day_index][hour] < required_count:
-                                unmet_requirements.append((skill, day_index, hour, required_count))
+                        # Prüfen, ob der Skill in skill_availability vorhanden ist
+                        if skill in skill_availability:
+                            # Dann prüfen, ob der Tag in skill_availability für diesen Skill vorhanden ist
+                            if day_index < len(skill_availability[skill]):
+                                # Prüfen, ob die Stunde in skill_availability für diesen Tag und Skill vorhanden ist
+                                if hour < len(skill_availability[skill][day_index]):
+                                    # Verfügbarkeit für diese Stunde ermitteln
+                                    available_count = skill_availability[skill][day_index][hour]
+                                else:
+                                    # Wenn die Stunde nicht vorhanden ist, wird die Verfügbarkeit als 0 angenommen
+                                    available_count = 0
+                            else:
+                                # Wenn der Tag nicht vorhanden ist, wird die Verfügbarkeit als 0 angenommen
+                                available_count = 0
+                        else:
+                            # Wenn der Skill nicht vorhanden ist, wird die Verfügbarkeit als 0 angenommen
+                            available_count = 0
+
+                        # Prüfen, ob die Verfügbarkeit unzureichend ist
+                        if available_count < required_count:
+                            unmet_requirements.append((skill, day_index, hour, required_count))
 
 
             # Sortieren nach "day", damit das frühste Datum als erstes angezeigt wird in der Fehlerliste
@@ -840,6 +858,7 @@ class ORAlgorithm_cp:
                 f"Tag: {['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'][day % 7]} {start_date + datetime.timedelta(days=day)}, Uhrzeit: {(self.laden_oeffnet[day % 7] + datetime.timedelta(hours=hour / self.hour_divider)).seconds // 3600}:{((self.laden_oeffnet[day % 7] + datetime.timedelta(hours=hour / self.hour_divider)).seconds % 3600) // 60:02d}, Anzahl fehlende Verfügbarkeit: {required}, Skill: {skill}"
                 for skill, day, hour, required in unmet_requirements
             ]
+            
 
             # Überprüfen ob Fehler vorhanden sind
             if len(transformed_list) > 0:
