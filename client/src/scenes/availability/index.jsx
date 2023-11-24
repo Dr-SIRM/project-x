@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { useTheme, Box, Button, TextField, Snackbar, Typography, ButtonGroup, IconButton, useMediaQuery } from "@mui/material";
+import { useTheme, Box, Button, TextField, Snackbar, Typography, ButtonGroup, IconButton } from "@mui/material";
 import { Select, MenuItem, FormControl, InputLabel, Checkbox } from "@mui/material";
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { Formik } from "formik";
 import * as yup from "yup";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import { ThreeDots } from "react-loader-spinner"; 
@@ -47,8 +48,6 @@ const Availability = ({ availability }) => {
   const [user_list, setUserList] = useState([]);
   const [checkedBoxes, setCheckedBoxes] = useState([]);
   const { t, i18n } = useTranslation();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
 
   useEffect(() => {
     setActiveTemplateData(availabilityData.temp_dict);
@@ -421,155 +420,155 @@ useEffect(() => {
                 </Select>
         </Box>
             <Box
-              display="grid"
-              gap="30px"
-              gridTemplateColumns={isMobile ? "1fr" : "repeat(12, 1fr)"}
+      display="grid"
+      gap="30px"
+      gridTemplateColumns="repeat(7, minmax(0, 1fr))"
+      sx={{
+        "& > div": { gridColumn: isNonMobile ? undefined : "span 6" },
+      }}
+    >
+      <Typography
+        variant="h6"
+        sx={{
+          gridColumn: "span 1",
+          display: "flex",
+          alignItems: "center",
+          height: "100%",
+          justifyContent: "center",
+        }}
+      >
+        {t('availabilty.weekday')}
+      </Typography>
+      <Typography
+        variant="h6"
+        sx={{
+          gridColumn: "span 1",
+          display: "flex",
+          alignItems: "center",
+          height: "100%",
+          justifyContent: "center",
+        }}
+      >
+        {t('availabilty.holiday')}
+      </Typography>
+      <Typography
+        variant="h6"
+        sx={{
+          gridColumn: "span 1",
+          display: "flex",
+          alignItems: "center",
+          height: "100%",
+        }}
+      >
+        {t('availabilty.startime1')}
+      </Typography>
+      <Typography
+        variant="h6"
+        sx={{
+          gridColumn: "span 1",
+          display: "flex",
+          alignItems: "center",
+          height: "100%",
+        }}
+      >
+        {t('availabilty.endtime1')}
+      </Typography>
+      {additionalTimes >= 1 && (
+        <>
+          <Typography
+            variant="h6"
+            sx={{
+              gridColumn: "span 1",
+              display: "flex",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            {t('availabilty.startime2')}
+          </Typography>
+          <Typography
+            variant="h6"
+            sx={{
+              gridColumn: "span 1",
+              display: "flex",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            {t('availabilty.endtime2')}
+          </Typography>
+        </>
+      )}
+      
+      {Array.from({ length: availabilityData.day_num }).map((_, rowIndex) => (
+        <Box
+          display="grid"
+          gridTemplateColumns="repeat(7, minmax(0, 1fr))"
+          gap="10px"  
+          sx={{ gridColumn: "span 7" }}
+        >
+          <Typography
+            key={`number-${rowIndex}`}
+            color={colors.primary[100]}
+            variant=""
+            sx={{
+              gridColumn: "span 1",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center", // Center the text horizontally
+              height: "100%",
+              padding: "0 8px", // Add padding to the sides of the text
+              backgroundColor: "#f0f0f0", // You can set a light background color to distinguish it from other elements
+            }}
+          >
+            {availabilityData && availabilityData.weekdays
+              ? availabilityData.weekdays[rowIndex]
+              : ""}
+          </Typography>
+          <Checkbox
+            name={`checkbox_${rowIndex}`}
+            checked={values[`checkbox_${rowIndex}`]}
+            onChange={(e) => {
+              setFieldValue(`checkbox_${rowIndex}`, e.target.checked); // Directly use setFieldValue
+              handleCheckboxChange(setFieldValue, `checkbox_${rowIndex}`, e.target.checked);
+          }}
+            disableRipple
+            sx={{ 
+              gridColumn: "span 1", 
+              color: "black"
+            }}
+          />
+          {Array.from({ length: 2 + additionalTimes * 2 }).map((_, columnIndex) => (
+            <TextField
+              key={`day_${rowIndex}_${columnIndex}`}
+              fullWidth
+              variant="filled"
+              type="time"
+              inputProps={{ step }}
+              onBlur={handleBlur}
+              onChange={handleChange}
+              value={values[`day_${rowIndex}_${columnIndex}`]}
+              name={`day_${rowIndex}_${columnIndex}`}
+              error={
+                !!touched[`day_${rowIndex}_${columnIndex}`] &&
+                !!errors[`day_${rowIndex}_${columnIndex}`]
+              }
+              helperText={
+                touched[`day_${rowIndex}_${columnIndex}`] &&
+                errors[`day_${rowIndex}_${columnIndex}`]
+              }
               sx={{
-                "& > div": { gridColumn: isNonMobile ? undefined : "span 6" },
+                gridColumn: "span 1",
+                '& .MuiFilledInput-input': {
+                  paddingTop: '10px',
+                  paddingBottom: '10px',
+                },
               }}
-            >
-              <Typography
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "center",
-                  height: "100%",
-                  justifyContent: "center",
-                }}
-              >
-                {t('availabilty.weekday')}
-              </Typography>
-              <Typography
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "center",
-                  height: "100%",
-                  justifyContent: "center",
-                }}
-              >
-                {t('availabilty.holiday')}
-              </Typography>
-              <Typography
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              >
-                {t('availabilty.startime1')}
-              </Typography>
-              <Typography
-                variant="h6"
-                sx={{
-                  gridColumn: "span 1",
-                  display: "flex",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              >
-                {t('availabilty.endtime1')}
-              </Typography>
-              {additionalTimes >= 1 && (
-                <>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      gridColumn: "span 1",
-                      display: "flex",
-                      alignItems: "center",
-                      height: "100%",
-                    }}
-                  >
-                    {t('availabilty.startime2')}
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      gridColumn: "span 1",
-                      display: "flex",
-                      alignItems: "center",
-                      height: "100%",
-                    }}
-                  >
-                    {t('availabilty.endtime2')}
-                  </Typography>
-                </>
-              )}
-              
-              {Array.from({ length: availabilityData.day_num }).map((_, rowIndex) => (
-                <Box
-                  display="grid"
-                  gridTemplateColumns="repeat(7, minmax(0, 1fr))"
-                  gap="10px"  
-                  sx={{ gridColumn: "span 1" }}
-                >
-                  <Typography
-                    key={`number-${rowIndex}`}
-                    color={colors.primary[100]}
-                    variant=""
-                    sx={{
-                      gridColumn: "span 1",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center", // Center the text horizontally
-                      height: "100%",
-                      padding: "0 8px", // Add padding to the sides of the text
-                      backgroundColor: "#f0f0f0", // You can set a light background color to distinguish it from other elements
-                    }}
-                  >
-                    {availabilityData && availabilityData.weekdays
-                      ? availabilityData.weekdays[rowIndex]
-                      : ""}
-                  </Typography>
-                  <Checkbox
-                    name={`checkbox_${rowIndex}`}
-                    checked={values[`checkbox_${rowIndex}`]}
-                    onChange={(e) => {
-                      setFieldValue(`checkbox_${rowIndex}`, e.target.checked); // Directly use setFieldValue
-                      handleCheckboxChange(setFieldValue, `checkbox_${rowIndex}`, e.target.checked);
-                  }}
-                    disableRipple
-                    sx={{ 
-                      gridColumn: "span 1", 
-                      color: "black"
-                    }}
-                  />
-                  {Array.from({ length: 2 + additionalTimes * 2 }).map((_, columnIndex) => (
-                    <TextField
-                      key={`day_${rowIndex}_${columnIndex}`}
-                      fullWidth
-                      variant="filled"
-                      type="time"
-                      inputProps={{ step }}
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      value={values[`day_${rowIndex}_${columnIndex}`]}
-                      name={`day_${rowIndex}_${columnIndex}`}
-                      error={
-                        !!touched[`day_${rowIndex}_${columnIndex}`] &&
-                        !!errors[`day_${rowIndex}_${columnIndex}`]
-                      }
-                      helperText={
-                        touched[`day_${rowIndex}_${columnIndex}`] &&
-                        errors[`day_${rowIndex}_${columnIndex}`]
-                      }
-                      sx={{
-                        gridColumn: "span 1",
-                        '& .MuiFilledInput-input': {
-                          paddingTop: '10px',
-                          paddingBottom: '10px',
-                        },
-                      }}
-                    />
-                  ))}
-                </Box>
-              ))}
-           </Box>
+            />
+          ))}
+        </Box>
+      ))}
+    </Box>
             <Box display="flex" justifyContent="end" mt="20px">
             <Button onClick={handleAddTime} color="primary" variant="contained" sx={{ marginRight: '10px' }}>
             {t('availabilty.addtime')}
