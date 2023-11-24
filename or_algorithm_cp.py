@@ -65,11 +65,11 @@ To-Do Liste:
  - (erl) Alle NB's mit Schichten umbauen.
  - (erl) Wenn man gar keine time_req eingegeben hat, hällt dann Vorüberprüfung 1 stand?
  - (erl) Solvingzeit mit der Zeit automaitsch abbrechen
+ - (erl) Vorüberprüfung 1 anpassen (Wenn der Betrieb an einem Tag geschlossen ist dann sollen diese Tage ignoriert werden)
  
 
  To-Do's 
  -------------------------------
- - Vorüberprüfung 1 anpassen
  - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden??
 
  - self.max_time_week darf niemals grösser als self.weekly hours gewählt werden!
@@ -264,7 +264,7 @@ class ORAlgorithm_cp:
         # self.output_result_excel() # Diese Methode wird in Zukunft nicht mehr benötigt
         self.plot_costs_excel()
         self.save_data_in_database()
-        # self.save_data_in_database_testing()
+        # self.save_data_in_database_testing() # Evtl. etwas vereinfachen für das Testing, oder einfach weniger Daten reingeben
 
 
     def create_variables(self):
@@ -707,13 +707,15 @@ class ORAlgorithm_cp:
                 # Wochentag als Index (0 = Montag, 1 = Dienstag, usw.) erhalten
                 weekday_index = current_date.weekday()
 
-                # Prüft, ob der Tag ein Arbeitstag ist (Basierend auf den Öffnungszeiten)
-                if self.laden_oeffnet[weekday_index] is not None and self.laden_schliesst[weekday_index] is not None:
-                    time_req_dict = self.time_req.get(current_date, {})
+                # Überprüfen, ob der Betrieb an diesem Tag geschlossen ist
+                if self.opening_hours[weekday_index % len(self.opening_hours)] == 0:
+                    continue  # Überspringen, wenn der Betrieb geschlossen ist
+
+                time_req_dict = self.time_req.get(current_date, {})
                     
-                    # Prüft, ob für den Tag Stunden in mindestens einer Abteilung geplant sind
-                    if all(not dept_hours for dept_hours in time_req_dict.values()):
-                        fehlende_stunden.append(current_date)
+                # Prüft, ob für den Tag Stunden in mindestens einer Abteilung geplant sind
+                if all(not dept_hours for dept_hours in time_req_dict.values()):
+                    fehlende_stunden.append(current_date)
 
             if fehlende_stunden:
                 error_message_lines = ["An folgenden Tagen wurden keine Stunden für irgendeine Abteilung geplant:"]
@@ -814,17 +816,35 @@ class ORAlgorithm_cp:
                             # Erhöhung der Verfügbarkeitsanzahl für jede Stunde, in der der Mitarbeiter verfügbar ist
                             if available:
                                 skill_availability[skill][day_index][hour] += 1
-
+                
 
             # Zählen von welchen Skill an welchem Tag zu welcher Stunde wieviele Mitarbeiter "fehlen"
             unmet_requirements = []
+
             for skill in self.min_anwesend:
                 for day_index, day_requirements in enumerate(self.min_anwesend[skill]):
                     for hour, required_count in day_requirements.items():
-                        # Prüfen, ob die Verfügbarkeit für diesen Skill und diese Stunde unzureichend ist
-                        if hour < len(skill_availability[skill][day_index]):
-                            if skill_availability[skill][day_index][hour] < required_count:
-                                unmet_requirements.append((skill, day_index, hour, required_count))
+                        # Prüfen, ob der Skill in skill_availability vorhanden ist
+                        if skill in skill_availability:
+                            # Dann prüfen, ob der Tag in skill_availability für diesen Skill vorhanden ist
+                            if day_index < len(skill_availability[skill]):
+                                # Prüfen, ob die Stunde in skill_availability für diesen Tag und Skill vorhanden ist
+                                if hour < len(skill_availability[skill][day_index]):
+                                    # Verfügbarkeit für diese Stunde ermitteln
+                                    available_count = skill_availability[skill][day_index][hour]
+                                else:
+                                    # Wenn die Stunde nicht vorhanden ist, wird die Verfügbarkeit als 0 angenommen
+                                    available_count = 0
+                            else:
+                                # Wenn der Tag nicht vorhanden ist, wird die Verfügbarkeit als 0 angenommen
+                                available_count = 0
+                        else:
+                            # Wenn der Skill nicht vorhanden ist, wird die Verfügbarkeit als 0 angenommen
+                            available_count = 0
+
+                        # Prüfen, ob die Verfügbarkeit unzureichend ist
+                        if available_count < required_count:
+                            unmet_requirements.append((skill, day_index, hour, required_count))
 
 
             # Sortieren nach "day", damit das frühste Datum als erstes angezeigt wird in der Fehlerliste
@@ -838,6 +858,7 @@ class ORAlgorithm_cp:
                 f"Tag: {['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'][day % 7]} {start_date + datetime.timedelta(days=day)}, Uhrzeit: {(self.laden_oeffnet[day % 7] + datetime.timedelta(hours=hour / self.hour_divider)).seconds // 3600}:{((self.laden_oeffnet[day % 7] + datetime.timedelta(hours=hour / self.hour_divider)).seconds % 3600) // 60:02d}, Anzahl fehlende Verfügbarkeit: {required}, Skill: {skill}"
                 for skill, day, hour, required in unmet_requirements
             ]
+
 
             # Überprüfen ob Fehler vorhanden sind
             if len(transformed_list) > 0:
@@ -855,18 +876,32 @@ class ORAlgorithm_cp:
     def pre_check_5(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        5. Vorüberprüfung: Erweiterte Überprüfung 4 mit den "In Einarbeitung" Mitarbeitern
+        5. Vorüberprüfung: Sind ausreichend Mannstunden von den Mitarbeitern, die Arbeitsstunden eingeplant haben, für den zu lösenden Zeitraum verfügbar?
         ---------------------------------------------------------------------------------------------------------------
         """
+        try:
+            mannstunden = 0
+            for i, lvl in enumerate(self.employment_lvl_exact):
+                mannstunden_per_user = lvl * self.weekly_hours
 
-        # DIE VORÜBERPRÜFUNG NOCH CODEN
+                if self.gesamtstunden_verfügbarkeit[i] < mannstunden_per_user:
+                    mannstunden += self.gesamtstunden_verfügbarkeit[i]
+                else:
+                    mannstunden += mannstunden_per_user
+
+            if mannstunden < self.verteilbare_stunden:
+                raise ValueError(f"Insgesamt stehen {mannstunden / self.hour_divider} Mannstunden zur Verfügung. Das sind weniger als die benötigten {self.verteilbare_stunden / self.hour_divider} Stunden. ")
         
+            return {"success": True, "name": "Pre-check_5", "message": "All checks are successful!"}
+        except ValueError as e:
+            return {"success": False, "name": "Pre-check_5", "message": str(e)}
+
 
 
     def pre_check_6(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        6. Ist die min. Zeit pro Tag so klein, dass die Stunden in der gerechten Verteilung nicht erfüllt werden können?
+        6. 
         ---------------------------------------------------------------------------------------------------------------
         """
         return None
@@ -874,7 +909,7 @@ class ORAlgorithm_cp:
     def pre_check_7(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        7. Ist die Toleranz der gerechten Verteilung zu klein gewählt? --> Evtl. die Bedingung weich machen!
+        7. 
         ---------------------------------------------------------------------------------------------------------------
         """
         return None

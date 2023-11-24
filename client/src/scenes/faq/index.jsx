@@ -330,18 +330,18 @@ const FAQ = () => {
         </AccordionSummary>
         <AccordionDetails>
           <Typography style={questionStyle}>
-            Was genau sind 'Wochenstunden'?
+            Was bedeutet der Begriff 'Wochenstunden' im Kontext der Arbeitszeitplanung?
           </Typography>
           <Typography style={answerStyle}>
-            Die Wochenstunden entsprechen der wöchentlichen Arbeitszeit bei einer Vollzeitanstellung von 100 %. Wenn ein Mitarbeiter zu 100 % angestellt ist, berücksichtigt der Algorithmus bei der Erstellung des optimalen Schichtplans, dass der Mitarbeiter entsprechend seiner Wochenstunden eingeplant wird.
+            Unter 'Wochenstunden' versteehen wir die Gesamtzahl der Arbeitsstunden, die ein Mitarbeiter bei einer Vollzeitbeschäftigung (100 % Anstellung) in einer Woche leistet. Bei der Erstellung des Schichtplans berücksichtigt unser Algorithmus die Wochenstunden eines zu 100 % angestellten Mitarbeiters, um sicherzustellen, dass seine Arbeitszeit entsprechend seiner Vertragsvereinbarung verteilt wird.
           </Typography>
         </AccordionDetails>
         <AccordionDetails>
           <Typography style={questionStyle}>
-            Was beudetet 'Schichten'?
+            Was ist unter dem Begriff 'Schichten' zu verstehen und wie funktioniert die Einteilung?
           </Typography>
           <Typography style={answerStyle}>
-            Sie haben die Möglichkeit, zwischen 1, 2 oder 3 Schichten zu wählen. Wenn Sie 2 Schichten auswählen, bedeutet das, dass Ihre täglichen Arbeitsstunden auf zwei Schichten aufgeteilt werden, zum Beispiel Morgenschicht und Abendschicht. Bei 3 Schichten wird der Tag in 3 gleich lange Schichten aufgeteilt. Hier ist ein Beispiel: Angenommen, Ihr Betrieb ist täglich 14 Stunden geöffnet, und Sie wählen 2 Schichten aus. Dies bedeutet, dass die ersten 7 Stunden als 1. Schicht und die restlichen 7 Stunden als 2. Schicht betrachtet werden. Der Algorithmus achtet bei der Erstellung des optimalen Schichtplans darauf, dass Mitarbeiter in einer Woche vorzugsweise in derselben Schicht arbeiten, zum Beispiel immer in der ersten Schicht. Wenn Sie den Schichtplan über 2 Wochen generieren lassen, wechseln die Schichten der Mitarbeiter zwischen den Wochen, um die Fairness zu gewährleisten.
+            Mit 'Schichten' beziehen wir uns auf die Einteilung der täglichen Arbeitsstunden in verschiedene Arbeitsperioden. Sie können zwischen 1, 2 oder 3 Schichten wählen. Bei 2 Schichten wird der Arbeitstag beispielsweise in eine Morgenschicht und eine Abendschicht aufgeteilt. Bei 3 Schichten teilt sich der Tag in drei gleich lange Arbeitsperioden. Zum Beispiel: Wenn Ihr Betrieb täglich 14 Stunden geöffnet ist und Sie sich für 2 Schichten entscheiden, dann umfasst die erste Schicht die ersten 7 Stunden und die zweite Schicht die restlichen 7 Stunden. Unser Algorithmus plant die Mitarbeiter so ein, dass sie, wenn möglich, in einer Woche stets in derselben Schicht eingesetzt werden. Bei der Planung über mehrere Wochen hinweg wechseln die Schichten der Mitarbeiter, um eine faire Verteilung zu gewährleisten.
           </Typography>
         </AccordionDetails>
         <AccordionDetails>
@@ -366,18 +366,18 @@ const FAQ = () => {
         </AccordionSummary>
         <AccordionDetails>
           <Typography style={questionStyle}>
-            Wie genau gehe ich vor um anzugeben, wieviele Mitarbeiter mit dem entsprechenden Skill zu einer Zeit benötigt werden?
+            Was sind die Schritte, um die benötigte Anzahl von Mitarbeitern mit spezifischen Fähigkeiten zu planen?
           </Typography>
           <Typography style={answerStyle}>
-            Planen Sie Ihre Arbeitswoche, indem Sie oben links die gewünschte Fähigkeit auswählen und dann die Anzahl der Mitarbeiter pro Tag eingeben, die benötigt werden. Wählen Sie anschliessend die Zeitblöcke aus, in denen diese Mitarbeiter benötigt werden. Achten Sie darauf, diesen Prozess täglich für jede geplante Woche durchzuführen. Sobald Sie die Stunden für einen Tag eingegeben haben, können Sie diese einreichen und den nächsten Tag bearbeiten. Wiederholen Sie diesen Schritt für alle erforderlichen Fähigkeiten und Wochen. Sobald Sie alle Daten für eine Fähigkeit erfasst haben, können Sie diese Informationen gesammelt einreichen.
+            Um die benötigte Anzahl von Mitarbeitern mit bestimmten Fähigkeiten zu planen, beginnen Sie, indem Sie die entsprechende Fähigkeit oben links auswählen. Geben Sie dann die Anzahl der Mitarbeiter ein, die an jedem Tag benötigt werden. Wählen Sie danach die spezifischen Zeitblöcke aus, in denen diese Mitarbeiter erforderlich sind. Diesen Vorgang sollten Sie täglich für jede Woche wiederholen. Nachdem Sie die Stundenangaben für einen Tag gemacht haben, reichen Sie diese ein und fahren mit dem nächsten Tag fort. Diesen Prozess wiederholen Sie für jede benötigte Fähigkeit und jede Woche. Sobald Sie alle Angaben für eine Woche komplettiert haben, können Sie die gesamten Daten einreichen.
           </Typography>
         </AccordionDetails>
         <AccordionDetails>
           <Typography style={questionStyle}>
-            Wie kann ich eine Vorlage speichern? 
+            Wie kann ich eine personalisierte Vorlage speichern und wieder verwenden? 
           </Typography>
           <Typography style={answerStyle}>
-            Um eine Vorlage zu speichern, geben Sie zunächst alle gewünschten Informationen ein. Anschließend wählen Sie die gewünschte Vorlage aus (Vorlage 1, Vorlage 2 oder Vorlage 3), in die Sie die Daten speichern möchten. Klicken Sie dann auf 'Vorlage speichern'. Nun können Sie ganz einfach auf die entsprechende Vorlage klicken, und Ihre voreingestellte Vorlage wird sofort angezeigt. Alles, was Sie dann noch tun müssen, ist, die Daten einzureichen.
+            Um eine personalisierte Vorlage zu speichern, tragen Sie zuerst alle benötigten Informationen ein. Wählen Sie dann aus den verfügbaren Optionen (Vorlage 1, Vorlage 2, Vorlage 3) die gewünschte Vorlage aus, in der Sie Ihre Daten speichern möchten. Klicken Sie auf 'Vorlage speichern', um Ihre Eingaben zu sichern. Um die gespeicherte Vorlage zu verwenden, klicken Sie einfach darauf, und die voreingestellten Informationen werden geladen. Anschliessend müssen Sie nur noch die Daten einreichen.
           </Typography>
         </AccordionDetails>
         <AccordionDetails>
@@ -405,7 +405,7 @@ const FAQ = () => {
             Wie kann ich einen Schichtplan als Exceldatei herunterladen?
           </Typography>
           <Typography style={answerStyle}>
-          Klicken Sie einfach oben links auf 'Export Excel'. Anschliessend können Sie den gewünschten Zeitraum für den Schichtplan auswählen. Bitte stellen Sie sicher, dass dieser Schichtplan bereits erstellt wurde. Nachdem Sie die Auswahl getroffen haben, wird die Datei auf Ihren Computer heruntergeladen. Sie können die Datei dann weiterverwenden oder sie auf Ihrem Computer speichern.
+            Um Ihren Schichtplan als Excel-Datei herunterzuladen, klicken Sie bitte auf die Option 'Export Excel', die Sie oben links auf dieser Seite finden. Wählen Sie anschließend den Zeitraum aus, für den der Schichtplan exportiert werden soll. Stellen Sie sicher, dass der Schichtplan für den ausgewählten Zeitraum bereits erstellt wurde. Nachdem Sie Ihre Auswahl getroffen haben, beginnt der Download der Excel-Datei automatisch. Sie können die heruntergeladene Datei dann auf Ihrem Computer speichern und bei Bedarf für weitere Zwecke nutzen oder bearbeiten.
           </Typography>
         </AccordionDetails>
         <AccordionDetails>
@@ -441,7 +441,7 @@ const FAQ = () => {
             Was für Informationen kann ich dem Kalender entnehmen?
           </Typography>
           <Typography style={answerStyle}>
-            In Ihrem Kalender können Sie und Ihre Mitarbeiter sehen, wann Sie eingeplant sind, und zwar sowohl auf täglicher, wöchentlicher als auch monatlicher Basis.
+            In Ihrem Kalender wird Ihnen und Ihren Mitarbeitern eine klare Übersicht Ihrer geplanten Arbeitseinsätze geboten. Diese Ansicht ist sowohl auf Tages-, Wochen- als auch Monatsbasis verfügbar, was eine effiziente Planung und Koordination Ihrer Einsätze ermöglicht. S
           </Typography>
         </AccordionDetails>
         <AccordionDetails>

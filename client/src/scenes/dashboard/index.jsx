@@ -18,16 +18,6 @@ import { useTranslation } from 'react-i18next';
 import '../../i18n';  
 import { SiMinutemailer } from "react-icons/si";
 
-/* Mögliche Ideen fürs Dashboard
-- Anz gearbeitete Stunden diese Woche 
-- Anz MA - done
-- Eingeplante Schichten - done
-- Wer arbeitet gerade 
-- Schichtplan gesolved ja nein für 1 Woche 2 Wochen 3 Wochen 4 Wochen (Recent Transaction)
-- Digramm Tage/Stunden/ MA Stunden
-- Download button ausblenden - done
-*/
-
 
 const Dashboard = () => {
   const theme = useTheme();
