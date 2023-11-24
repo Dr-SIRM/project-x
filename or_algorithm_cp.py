@@ -858,7 +858,7 @@ class ORAlgorithm_cp:
                 f"Tag: {['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'][day % 7]} {start_date + datetime.timedelta(days=day)}, Uhrzeit: {(self.laden_oeffnet[day % 7] + datetime.timedelta(hours=hour / self.hour_divider)).seconds // 3600}:{((self.laden_oeffnet[day % 7] + datetime.timedelta(hours=hour / self.hour_divider)).seconds % 3600) // 60:02d}, Anzahl fehlende Verfügbarkeit: {required}, Skill: {skill}"
                 for skill, day, hour, required in unmet_requirements
             ]
-            
+
 
             # Überprüfen ob Fehler vorhanden sind
             if len(transformed_list) > 0:
@@ -876,18 +876,32 @@ class ORAlgorithm_cp:
     def pre_check_5(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        5. Vorüberprüfung: Erweiterte Überprüfung 4 mit den "In Einarbeitung" Mitarbeitern
+        5. Vorüberprüfung: Sind ausreichend Mannstunden von den Mitarbeitern, die Arbeitsstunden eingeplant haben, für den zu lösenden Zeitraum verfügbar?
         ---------------------------------------------------------------------------------------------------------------
         """
+        try:
+            mannstunden = 0
+            for i, lvl in enumerate(self.employment_lvl_exact):
+                mannstunden_per_user = lvl * self.weekly_hours
 
-        # DIE VORÜBERPRÜFUNG NOCH CODEN
+                if self.gesamtstunden_verfügbarkeit[i] < mannstunden_per_user:
+                    mannstunden += self.gesamtstunden_verfügbarkeit[i]
+                else:
+                    mannstunden += mannstunden_per_user
+
+            if mannstunden < self.verteilbare_stunden:
+                raise ValueError(f"Insgesamt stehen {mannstunden / self.hour_divider} Mannstunden zur Verfügung. Das sind weniger als die benötigten {self.verteilbare_stunden / self.hour_divider} Stunden. ")
         
+            return {"success": True, "name": "Pre-check_5", "message": "All checks are successful!"}
+        except ValueError as e:
+            return {"success": False, "name": "Pre-check_5", "message": str(e)}
+
 
 
     def pre_check_6(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        6. Ist die min. Zeit pro Tag so klein, dass die Stunden in der gerechten Verteilung nicht erfüllt werden können?
+        6. 
         ---------------------------------------------------------------------------------------------------------------
         """
         return None
@@ -895,7 +909,7 @@ class ORAlgorithm_cp:
     def pre_check_7(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        7. Ist die Toleranz der gerechten Verteilung zu klein gewählt? --> Evtl. die Bedingung weich machen!
+        7. 
         ---------------------------------------------------------------------------------------------------------------
         """
         return None
