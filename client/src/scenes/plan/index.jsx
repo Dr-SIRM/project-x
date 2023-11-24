@@ -535,10 +535,11 @@ const handleExportToExcel = async () => {
                 style={{ width: '120px' }}  // Assuming you want the dropdown text to be white
                 size="small"
             >
-                <MenuItem value={1}>{t('dashboard.calendar_week')} {currentWeekNum+2}</MenuItem>
-                <MenuItem value={2}>{t('dashboard.calendar_week')} {currentWeekNum+3}</MenuItem>
-                <MenuItem value={3}>{t('dashboard.calendar_week')} {currentWeekNum+4}</MenuItem>
-                <MenuItem value={4}>{t('dashboard.calendar_week')} {currentWeekNum+5}</MenuItem>
+                <MenuItem value={1}>{t('dashboard.calendar_week')} {currentWeekNum}</MenuItem>
+                <MenuItem value={2}>{t('dashboard.calendar_week')} {currentWeekNum+1}</MenuItem>
+                <MenuItem value={3}>{t('dashboard.calendar_week')} {currentWeekNum+2}</MenuItem>
+                <MenuItem value={4}>{t('dashboard.calendar_week')} {currentWeekNum+3}</MenuItem>
+                <MenuItem value={4}>{t('dashboard.calendar_week')} {currentWeekNum+4}</MenuItem>
               </Select>
             </div>
             <div className="actions">
