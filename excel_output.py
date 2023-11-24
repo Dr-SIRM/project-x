@@ -112,7 +112,25 @@ def create_excel_output(current_user_email, start, end):
         for record in opening
     ]
     
-    print("times: ", times)
+    # Differenz zwischen den Daten in Tagen berechnen
+    date_diff = datetime.strptime(end_date, "%Y-%m-%d") - datetime.strptime(start_date, "%Y-%m-%d")
+    weeks_diff = date_diff.days // 7
+
+    # Erweitern der times Liste für jede zusätzliche Woche
+    extended_times = times[:]
+    for i in range(1, weeks_diff + 1):
+        for day in times:
+            new_day = (
+                day[0],  # Wochentag bleibt gleich
+                day[1],  # start_time bleibt gleich
+                day[2],  # end_time bleibt gleich
+                day[3]   # end_time2 bleibt gleich, falls vorhanden
+            )
+            extended_times.append(new_day)
+
+    # Wieder in times umwadeln
+    times = extended_times
+
     # ----------------------------------------------------------------------------------
 
     # Abfrage, um hour_divider abzurufen
@@ -247,8 +265,6 @@ def create_excel_output(current_user_email, start, end):
     # Stunden für jeden Tag hinzufügen
     col_index = 7  # Beginne in Spalte G
 
-    print("times: ", times)
-
     for time_info in times:
         weekday, start_time_obj, end_time_obj, end_time2_obj = time_info
         start_time = (datetime.min + start_time_obj).time()
@@ -267,7 +283,6 @@ def create_excel_output(current_user_email, start, end):
             end_datetime += timedelta(days=1)
 
         hours = generate_hours(start_datetime, end_datetime, hour_divider)
-        print("hours: ", hours)
 
         row_index = 5
         
