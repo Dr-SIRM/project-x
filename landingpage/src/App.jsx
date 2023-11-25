@@ -25,9 +25,10 @@ const App = () => (
                 <Stats />
                 <Business />
                 <Billing />
-                <CardDeal />
+                {/* <CardDeal /> */}
                 <CTA />
-                <Testimonials />
+                {/* Contact Formular */}
+                {/* <Testimonials /> */}
                 <Footer />
               </div>
             </div>
