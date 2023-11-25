@@ -117,7 +117,9 @@
       "nb17": "Nebenbedingung 17",
       "nb18": "Nebenbedingung 18",
       "nb19": "Nebenbedingung 19",
-      "nb20": "Nebenbedingung 20"
+      "nb20": "Nebenbedingung 20",
+      "yup_max_week_1": "Maximale Stunden dürfen ",
+      "yup_max_week_2": "Stunden nicht unterschreiten"
     },
 
     "availabilty" : {
