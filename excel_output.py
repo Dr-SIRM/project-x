@@ -24,14 +24,14 @@ def time_to_timedelta(t):
     return timedelta(hours=t.hour, minutes=t.minute, seconds=t.second)
 
 
-def create_excel_output(current_user_email):
+def create_excel_output(current_user_email, start, end):
     """
     In dieser Funktion werden relevante gesolvte Daten aus der Datenbank gezogen und eine Excelausgabe daraus generiert.
     """
 
     # Achtung, start_date muss immer ein Montag sein!
-    start_date = "2023-11-27"
-    end_date = "2023-12-03"
+    start_date = str(start)
+    end_date = str(end)
 
 
     # Neue Session starten
@@ -112,7 +112,25 @@ def create_excel_output(current_user_email):
         for record in opening
     ]
     
-    print("times: ", times)
+    # Differenz zwischen den Daten in Tagen berechnen
+    date_diff = datetime.strptime(end_date, "%Y-%m-%d") - datetime.strptime(start_date, "%Y-%m-%d")
+    weeks_diff = date_diff.days // 7
+
+    # Erweitern der times Liste für jede zusätzliche Woche
+    extended_times = times[:]
+    for i in range(1, weeks_diff + 1):
+        for day in times:
+            new_day = (
+                day[0],  # Wochentag bleibt gleich
+                day[1],  # start_time bleibt gleich
+                day[2],  # end_time bleibt gleich
+                day[3]   # end_time2 bleibt gleich, falls vorhanden
+            )
+            extended_times.append(new_day)
+
+    # Wieder in times umwadeln
+    times = extended_times
+
     # ----------------------------------------------------------------------------------
 
     # Abfrage, um hour_divider abzurufen
@@ -234,8 +252,6 @@ def create_excel_output(current_user_email):
     last_data_row = row - 1  # Da row nach dem letzten Eintrag erhöht wurde, reduzieren wir es um 1.
 
 
-
-
     # Funktion zur Generierung der Stunden
     def generate_hours(start_time, end_time, hour_divider):
         current_time = start_time
@@ -248,15 +264,14 @@ def create_excel_output(current_user_email):
     
     # Stunden für jeden Tag hinzufügen
     col_index = 7  # Beginne in Spalte G
+
     for time_info in times:
         weekday, start_time_obj, end_time_obj, end_time2_obj = time_info
         start_time = (datetime.min + start_time_obj).time()
-        print("start_time: ", start_time)
         if end_time2_obj is None:
             end_time = (datetime.min + end_time_obj).time()
         else:
             end_time = (datetime.min + end_time2_obj).time()
-        print("end_time: ", end_time)
 
         # hours = generate_hours(datetime.combine(datetime.today(), start_time), datetime.combine(datetime.today(), end_time), hour_divider)
         # Erstellen eines datetime-Objekts für start_time und end_time
@@ -268,7 +283,6 @@ def create_excel_output(current_user_email):
             end_datetime += timedelta(days=1)
 
         hours = generate_hours(start_datetime, end_datetime, hour_divider)
-        print("hours: ", hours)
 
         row_index = 5
         

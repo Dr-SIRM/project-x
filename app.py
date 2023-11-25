@@ -94,10 +94,7 @@ def jwt_required_optional(fn):
 @app.before_request
 @jwt_required_optional
 def before_request():
-    print("Before request is being called")  # Debug print
     react_user = get_jwt_identity() if 'Authorization' in request.headers else None
-    print(f"React User: {react_user}")  # Debug print
-    print(f"Request Method: {request.method}")
 
     session_company = "timetab"  # Default schema name
 
@@ -108,12 +105,10 @@ def before_request():
             dynamic_bind_uri = get_database_uri(session_company, None)
             app.config['SQLALCHEMY_DATABASE_URI'] = dynamic_bind_uri
             app.config['SQLALCHEMY_BINDS']['dynamic'] = dynamic_bind_uri
-            print("Dynamic bind new:", dynamic_bind_uri)  # Debug print
     else:
         dynamic_bind_uri = get_database_uri(session_company, None)
         app.config['SQLALCHEMY_DATABASE_URI'] = dynamic_bind_uri
         app.config['SQLALCHEMY_BINDS']['dynamic'] = dynamic_bind_uri
-    print(f"Final Schema Used: {app.config['SQLALCHEMY_DATABASE_URI']}")
 
     
 

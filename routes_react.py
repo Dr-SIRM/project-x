@@ -74,7 +74,7 @@ def login_react():
 @app.route('/api/token/refresh', methods=['POST'])
 @jwt_required(refresh=True) 
 def refresh():
-    print("Request Token data:", request.json)
+    print("Request data:", request.json)
     current_user = get_jwt_identity()
     new_token = create_access_token(identity=current_user)
     print("New Token: ", new_token)
@@ -1204,6 +1204,8 @@ def run_solver():
     solver_data = request.get_json()
     print("JSON Payload:", solver_data)  # Log payload
 
+    session.close()
+
     if 'solverButtonClicked' in solver_data and solver_data['solverButtonClicked']:
         dp = DataProcessing(user.email)
         dp.run()
@@ -1214,7 +1216,7 @@ def run_solver():
         
         errors = []  # Eine Liste um alle Fehler zu speichern
         
-        for i in range(1, 5):  # Assuming you have 6 pre-checks
+        for i in range(1, 6):  # Assuming you have 6 pre-checks
             pre_check_result = getattr(or_algo_cp, f'pre_check_{i}')()
             socketio.emit('pre_check_update', {
                 'pre_check_number': i,
@@ -1240,7 +1242,6 @@ def run_solver():
         print("Solver button was not clicked")  # Log if button wasn’t clicked
         return jsonify({'message': 'Solver button was not clicked'}), 200
     
-    session.close()
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000)  # Adjust host and port as needed
@@ -2710,11 +2711,26 @@ def get_calendar():
 def get_excel():
     react_user = get_jwt_identity()
     jwt_data = get_jwt()
+    print("Downlaod Data: ", request.json)
     session_company = jwt_data.get("company_name").lower().replace(' ', '_')
     session = get_session(get_database_uri('', session_company))
     user = session.query(User).filter_by(email=react_user).first()
+    download_data = request.get_json()
+    today = datetime.datetime.today()
+    start_week = download_data['startWeek']
+    end_week = download_data['endWeek']
 
-    output = create_excel_output(user.email)
+    # Calculate the start date
+    start_date_delta = datetime.timedelta(weeks=start_week - 1)
+    start_date = (today.date() - datetime.timedelta(days=today.weekday())) + start_date_delta
+
+    # Calculate the end date
+    end_date_delta = datetime.timedelta(weeks=end_week - 1, days=6)
+    end_date = (today.date() - datetime.timedelta(days=today.weekday())) + end_date_delta
+
+    print("Dates: ", start_date, end_date)
+
+    output = create_excel_output(user.email, start_date, end_date)
 
     session.close()
     

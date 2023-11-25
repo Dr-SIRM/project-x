@@ -686,7 +686,7 @@ const TimeReq = ({ timereq }) => {
       <Snackbar
         open={showMissingNotification}
         onClose={() => setShowMissingNotification(false)}
-        message={t('notification.timereq_selection')}
+        message={t('notification.success_timereq')}
         autoHideDuration={3000}
         sx={{
           backgroundColor: "red !important",
