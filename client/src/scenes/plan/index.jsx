@@ -574,11 +574,11 @@ const handleExportToExcel = async () => {
                     style={{ width: '120px' }}  // Assuming you want the dropdown text to be white
                     size="small"
                 >
-                    <MenuItem value={1}>{t('dashboard.calendar_week')} {currentWeekNum} - Mo {newDate(mondayDate, 0)}</MenuItem>
-                    <MenuItem value={2}>{t('dashboard.calendar_week')} {currentWeekNum+1} - Mo {newDate(mondayDate, 7)}</MenuItem>
-                    <MenuItem value={3}>{t('dashboard.calendar_week')} {currentWeekNum+2} - Mo {newDate(mondayDate, 14)}</MenuItem>
-                    <MenuItem value={4}>{t('dashboard.calendar_week')} {currentWeekNum+3} - Mo {newDate(mondayDate, 21)}</MenuItem>
-                    <MenuItem value={5}>{t('dashboard.calendar_week')} {currentWeekNum+4} - Mo {newDate(mondayDate, 28)}</MenuItem>
+                    <MenuItem value={1}>{t('dashboard.calendar_week')} {currentWeekNum} - So {newDate(mondayDate, 6)}</MenuItem>
+                    <MenuItem value={2}>{t('dashboard.calendar_week')} {currentWeekNum+1} - So {newDate(mondayDate, 13)}</MenuItem>
+                    <MenuItem value={3}>{t('dashboard.calendar_week')} {currentWeekNum+2} - So {newDate(mondayDate, 20)}</MenuItem>
+                    <MenuItem value={4}>{t('dashboard.calendar_week')} {currentWeekNum+3} - So {newDate(mondayDate, 27)}</MenuItem>
+                    <MenuItem value={5}>{t('dashboard.calendar_week')} {currentWeekNum+4} - So {newDate(mondayDate, 34)}</MenuItem>
                   </Select>
                 </div>
             </div>
