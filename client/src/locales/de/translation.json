@@ -175,7 +175,9 @@
     },
 
     "shiftplan": {
-    
+      "export_timerange": "Export Zeitraum",
+      "start_week": "Start Woche",
+      "end_week": "Ende Woche"
     },
 
     "welcome": {
@@ -205,7 +207,9 @@
       "new_user": "Erstelle einen Neuen Nutzer",
       "reset": "Zurücksetzen",
       "back": "Zurück",
-      "next": "Weiter"
+      "next": "Weiter",
+      "confirm_export": "Bestätigen und Herunterladen",
+      "solve": "TimeTab"
     },
 
     "forget_password": {
@@ -264,7 +268,24 @@
       "no_success_timereq": "Eingabe Fehlgeschlagen",
       "timereq_selection": "Bitte Wähle Eine Fähigkeit",
       "success_update": "Aktualisierung Erfolgreich",
-      "no_success_update": "Aktualisierung Fehlgeschlagen"
+      "no_success_update": "Aktualisierung Fehlgeschlagen",
+      "succes_solver": "Der Solver wurde erfolgreich gestartet!",
+      "no_success_solver": "Der Solver wurde gestoppt!"
+    },
+
+    "solver": {
+      "title": "TimeTab Solver",
+      "selection_area": "Wähle deine Start Woche zur TimeTab Berechnung: ",
+      "week": "KW",
+      "precheck1": "1. Vorüberprüfung: Haben Sie für mindestens eine Fähigkeit im Berechnungszeitraum unter Planung eigetragen, wieviele Mitarbeiter benötigt werden?",
+      "precheck2": "2. Vorüberprüfung: Stehen die Vollzeit Mitarbeiter mind. Wochenarbeitsstunden * Anzahl Berechungswochen zur Verfügung (bei Ferien werden die Stunden abgezogen)?",
+      "precheck3": "3. Vorüberprüfung: Haben alle Mitarbeiter zusammen genug Stunden eingeplant, um ihre Planung zu erfüllen?",
+      "precheck4": "4. Vorüberprüfung: Stehen zu jeder Zeit mindestens die Anzahl Mitarbeiter mit dem entsprechenden Skill zur Verfügung, die Sie eingeplant haben? ",
+      "precheck5": "5. Vorüberprüfung: Sind ausreichend Mannstunden von den Mitarbeitern, die Arbeitsstunden eingeplant haben, für den zu lösenden Zeitraum verfügbar? ",
+      "precheck6": " ",
+      "success_message": "Gratuliere dein Plan ist erstellt",
+      "error_message": "Leider ist die Erstellung fehlgeschlagen. Bitte kontrollier die logs."
+  
     }
 
   }

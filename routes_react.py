@@ -1193,16 +1193,17 @@ from or_algorithm_cp import ORAlgorithm_cp
 @app.route('/api/solver', methods=['POST'])
 @jwt_required()
 def run_solver():
-    print("Request received", request.method)  # Log the type of request received
 
     react_user = get_jwt_identity()
     jwt_data = get_jwt()
     session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+
     session = get_session(get_database_uri('', session_company))
     user = session.query(User).filter_by(email=react_user).first()
 
     solver_data = request.get_json()
-    print("JSON Payload:", solver_data)  # Log payload
+
+    session.close()
 
     if 'solverButtonClicked' in solver_data and solver_data['solverButtonClicked']:
         dp = DataProcessing(user.email)
@@ -1240,7 +1241,8 @@ def run_solver():
         print("Solver button was not clicked")  # Log if button wasn’t clicked
         return jsonify({'message': 'Solver button was not clicked'}), 200
     
-    session.close()
+
+    
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000)  # Adjust host and port as needed

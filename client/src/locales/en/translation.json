@@ -174,7 +174,9 @@
   },
 
   "shiftplan": {
-
+    "export_timerange": "Export Timerange",
+    "start_week": "Start Week",
+    "end_week": "End Week"
   },
 
   "welcome": {
@@ -204,7 +206,8 @@
     "new_user": "Create New User",
     "reset": "Reset",
     "back": "Back",
-    "next": "Next"
+    "next": "Next",
+    "solve": "TimeTab"
   },
 
   "forget_password": {
@@ -212,7 +215,8 @@
     "email": "Email",
     "reset": "Reset",
     "back": "Back",
-    "next": "Next"
+    "next": "Next",
+    "confirm_export": "Confirm and Download"
   },
 
   "registration": {
@@ -262,9 +266,26 @@
   "notification": {
     "success_timereq": "Successful Entered",
     "no_success_timereq": "Failed",
-    "timereq_selection": "Choose A Skill",
+    "timereq_selection": "Select A Skill",
     "success_update": "Update Successful",
-    "no_success_update": "Failed Updated"
+    "no_success_update": "Failed Updated",
+    "succes_solver": "Time Schedule successful Planned",
+    "no_success_solver": "Solver Stopped"
+  },
+
+  "solver": {
+    "title": "TimeTab Solver",
+    "selection_area": "Select your solving week: ",
+    "week": "CW",
+    "precheck1": "1. Vorüberprüfung: Haben Sie für mindestens eine Fähigkeit im Berechnungszeitraum unter Planung eigetragen, wieviele Mitarbeiter benötigt werden?",
+    "precheck2": "2. Vorüberprüfung: Stehen die Vollzeit Mitarbeiter mind. Wochenarbeitsstunden * Anzahl Berechungswochen zur Verfügung (bei Ferien werden die Stunden abgezogen)?",
+    "precheck3": "3. Vorüberprüfung: Haben alle Mitarbeiter zusammen genug Stunden eingeplant, um ihre Planung zu erfüllen?",
+    "precheck4": "4. Vorüberprüfung: Stehen zu jeder Zeit mindestens die Anzahl Mitarbeiter mit dem entsprechenden Skill zur Verfügung, die Sie eingeplant haben? ",
+    "precheck5": "5. Vorüberprüfung: Sind ausreichend Mannstunden von den Mitarbeitern, die Arbeitsstunden eingeplant haben, für den zu lösenden Zeitraum verfügbar? ",
+    "precheck6": " ",
+    "success_message": "Congratulation is plan is created",
+    "error_message": "Creation is failed. Please check logs."
+
   }
 
 }

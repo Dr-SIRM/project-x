@@ -48,6 +48,7 @@ const Availability = ({ availability }) => {
   const [user_list, setUserList] = useState([]);
   const [checkedBoxes, setCheckedBoxes] = useState([]);
   const { t, i18n } = useTranslation();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     setActiveTemplateData(availabilityData.temp_dict);
@@ -170,7 +171,7 @@ useEffect(() => {
   
 
   return (
-    <Box m="20px">
+    <Box m={isMobile ? "10px" : "20px"}>
       <Header
         title={t('availabilty.title')}
         subtitle={t('availabilty.subtitle')}
@@ -215,7 +216,7 @@ useEffect(() => {
         }) => (
           <form onSubmit={handleSubmit}>
             
-            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', marginBottom: '1rem' }}>
+            <Box sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: 'center', justifyContent: 'flex-start', width: '100%', marginBottom: '1rem' }}>
             <FormControl fullWidth variant="filled" sx={{ width: '250px' }}>
               <InputLabel id="user-label">{t('availabilty.user')}</InputLabel>
               <Select
@@ -422,11 +423,12 @@ useEffect(() => {
             <Box
       display="grid"
       gap="30px"
-      gridTemplateColumns="repeat(7, minmax(0, 1fr))"
-      sx={{
-        "& > div": { gridColumn: isNonMobile ? undefined : "span 6" },
-      }}
-    >
+      gridTemplateColumns={isMobile ? "repeat(4, 1fr)" : "repeat(7, minmax(0, 1fr))"}
+            sx={{
+              width: '100%',
+              marginBottom: '1rem',
+            }}
+      >
       <Typography
         variant="h6"
         sx={{

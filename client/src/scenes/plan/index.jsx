@@ -3,7 +3,7 @@ import Popup from 'reactjs-popup';
 import 'reactjs-popup/dist/index.css';
 import axios from 'axios';
 import './plan.css';
-import { Box, IconButton, Button, Typography, Chip, Avatar, Select, MenuItem  } from "@mui/material";
+import { Box, IconButton, Button, Typography, Chip, Avatar, Select, MenuItem, InputLabel  } from "@mui/material";
 import Header from "../../components/Header";
 import { ChevronLeft, ChevronRight, Close } from '@mui/icons-material';
 import { ThreeDots } from "react-loader-spinner"; 
@@ -24,6 +24,7 @@ const GanttChart = () => {
   const { t, i18n } = useTranslation();
   const [selectedStartWeek, setSelectedStartWeek] = useState();
   const [selectedEndWeek, setSelectedEndWeek] = useState();
+  const [mondayDate, setMondayDate] = useState();
   const BUTTON_STYLE = {
     borderColor: "white",
     "&.MuiButtonOutlined": {
@@ -450,6 +451,37 @@ const handleEndWeekChange = (event) => {
   setSelectedEndWeek(event.target.value);
 };
 
+const calculateWeekDetails = () => {
+  const today = new Date();
+
+  // Calculating the date of the Monday of the current week
+  const dayOfWeek = today.getDay();
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1)); // Adjusting to the previous Monday
+
+  return { monday };
+};
+
+const formatMonday = (date) => {
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // JavaScript months are 0-indexed
+  const year = date.getFullYear();
+  return `${day}.${month}.${year}`;
+};
+
+useEffect(() => {
+  const { weekNumber, monday } = calculateWeekDetails();
+  setCurrentWeekNum(weekNumber);
+  setMondayDate(monday.toISOString().split('T')[0]); // Set the Monday date in 'YYYY-MM-DD' format
+}, []);
+
+const newDate = (dateString, days) => {
+  const date = new Date(dateString);
+  date.setDate(date.getDate() + days);
+  return formatMonday(date); // Reuse the formatDate function
+};
+
+
 //export excel
 const handleExportToExcel = async () => {
   try {
@@ -505,50 +537,59 @@ const handleExportToExcel = async () => {
           <Popup open={open} closeOnDocumentClick={false} onClose={closeModal}>
           <div className="modal">
             {/* Popup content */}
-            <Button onClick={closeModal} style={{ float: 'right' }}> 
+            <Button onClick={closeModal} style={{ float: 'right', backgroundColor: 'red', color: 'white' }}> 
               <Close /> {/* Close button with icon */}
             </Button>
             <div className="content">
-              <Typography variant="h5" fontWeight="600">
-                Export Zeitraum
+              <Typography variant="h5" fontWeight="600" style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+              {t('shiftplan.export_timerange')}
               </Typography>
-              <Select
-                labelId="simple-select-label"
-                id="simple-select"
-                label="Start Woche"
-                value={selectedStartWeek}
-                onChange={handleStartWeekChange}
-                style={{ width: '120px' }}  // Assuming you want the dropdown text to be white
-                size="small"
-            >
-                <MenuItem value={1}>{t('dashboard.calendar_week')} {currentWeekNum}</MenuItem>
-                <MenuItem value={2}>{t('dashboard.calendar_week')} {currentWeekNum+1}</MenuItem>
-                <MenuItem value={3}>{t('dashboard.calendar_week')} {currentWeekNum+2}</MenuItem>
-                <MenuItem value={4}>{t('dashboard.calendar_week')} {currentWeekNum+3}</MenuItem>
-              </Select>
-              <Select
-                labelId="simple-select-label"
-                id="simple-select"
-                label="Ende Woche"
-                value={selectedEndWeek}
-                onChange={handleEndWeekChange}
-                style={{ width: '120px' }}  // Assuming you want the dropdown text to be white
-                size="small"
-            >
-                <MenuItem value={1}>{t('dashboard.calendar_week')} {currentWeekNum}</MenuItem>
-                <MenuItem value={2}>{t('dashboard.calendar_week')} {currentWeekNum+1}</MenuItem>
-                <MenuItem value={3}>{t('dashboard.calendar_week')} {currentWeekNum+2}</MenuItem>
-                <MenuItem value={4}>{t('dashboard.calendar_week')} {currentWeekNum+3}</MenuItem>
-                <MenuItem value={4}>{t('dashboard.calendar_week')} {currentWeekNum+4}</MenuItem>
-              </Select>
+              <div style={{ display: 'flex', gap: '5px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <InputLabel id="start-week-label" style={{ marginBottom: '5px' }}>{t('shiftplan.start_week')}</InputLabel> {/* Label for the first select */}
+              </div>
+                  <Select
+                    labelId="start-week-label"
+                    id="start-week-select"
+                    label="Start Woche"
+                    value={selectedStartWeek}
+                    onChange={handleStartWeekChange}
+                    style={{ width: '120px' }}
+                    size="small"
+                  >
+                    <MenuItem value={1}>{t('dashboard.calendar_week')} {currentWeekNum} - Mo {newDate(mondayDate, 0)}</MenuItem>
+                    <MenuItem value={2}>{t('dashboard.calendar_week')} {currentWeekNum+1} - Mo {newDate(mondayDate, 7)}</MenuItem>
+                    <MenuItem value={3}>{t('dashboard.calendar_week')} {currentWeekNum+2} - Mo {newDate(mondayDate, 14)}</MenuItem>
+                    <MenuItem value={4}>{t('dashboard.calendar_week')} {currentWeekNum+3} - Mo {newDate(mondayDate, 21)}</MenuItem>
+                  </Select>
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <InputLabel id="start-week-label" style={{ marginLeft: '20px', marginBottom: '5px' }}>{t('shiftplan.end_week')}</InputLabel> {/* Label for the first select */}
+                </div>
+                  <Select
+                    labelId="simple-select-label"
+                    id="simple-select"
+                    label="Ende Woche"
+                    value={selectedEndWeek}
+                    onChange={handleEndWeekChange}
+                    style={{ width: '120px' }}  // Assuming you want the dropdown text to be white
+                    size="small"
+                >
+                    <MenuItem value={1}>{t('dashboard.calendar_week')} {currentWeekNum} - Mo {newDate(mondayDate, 0)}</MenuItem>
+                    <MenuItem value={2}>{t('dashboard.calendar_week')} {currentWeekNum+1} - Mo {newDate(mondayDate, 7)}</MenuItem>
+                    <MenuItem value={3}>{t('dashboard.calendar_week')} {currentWeekNum+2} - Mo {newDate(mondayDate, 14)}</MenuItem>
+                    <MenuItem value={4}>{t('dashboard.calendar_week')} {currentWeekNum+3} - Mo {newDate(mondayDate, 21)}</MenuItem>
+                    <MenuItem value={5}>{t('dashboard.calendar_week')} {currentWeekNum+4} - Mo {newDate(mondayDate, 28)}</MenuItem>
+                  </Select>
+                </div>
             </div>
             <div className="actions">
               <Button
                 variant="contained"
                 color="primary"
                 onClick={handleExportToExcel}
+                style={{ display: 'flex', gap: '10px', marginTop: '20px' }}
               >
-                Confirm & Download
+                {t('button.confirm_export')}
               </Button>
             </div>
           </div>
