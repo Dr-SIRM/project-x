@@ -39,6 +39,7 @@ const Dashboard = () => {
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const isMobile = useMediaQuery(theme.breakpoints.down('sm')); // Check for mobile view
+  const [mondayDate, setMondayDate] = useState();
   
   
   useEffect(() => {
@@ -88,6 +89,41 @@ const Dashboard = () => {
       setShowErrorNotification(true);
     }
   };
+
+  const calculateWeekDetails = () => {
+    const today = new Date();
+    const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
+    const pastDaysOfYear = (today - firstDayOfYear) / 86400000; // milliseconds in a day
+    const weekNumber = Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+
+    // Calculating the date of the Monday of the current week
+    const dayOfWeek = today.getDay();
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1)); // Adjusting to the previous Monday
+
+    return { weekNumber, monday };
+};
+
+  const formatDate = (date) => {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // JavaScript months are 0-indexed
+    const year = date.getFullYear();
+    return `${day}.${month}.${year}`;
+  };
+
+  useEffect(() => {
+      const { weekNumber, monday } = calculateWeekDetails();
+      setCurrentWeekNum(weekNumber);
+      setMondayDate(monday.toISOString().split('T')[0]); // Set the Monday date in 'YYYY-MM-DD' format
+  }, []);
+
+  const newDate = (dateString, days) => {
+      const date = new Date(dateString);
+      date.setDate(date.getDate() + days);
+      return formatDate(date); // Reuse the formatDate function
+  };
+
+
 
   return (
     <Box m="20px">
@@ -314,10 +350,10 @@ const Dashboard = () => {
               style={{ color: colors.grey[100], width: '120px' }}  // Assuming you want the dropdown text to be white
               size="small"
           >
-              <MenuItem value={1}>{t('dashboard.calendar_week')} {currentWeekNum}</MenuItem>
-              <MenuItem value={2}>{t('dashboard.calendar_week')} {currentWeekNum+1}</MenuItem>
-              <MenuItem value={3}>{t('dashboard.calendar_week')} {currentWeekNum+2}</MenuItem>
-              <MenuItem value={4}>{t('dashboard.calendar_week')} {currentWeekNum+3}</MenuItem>
+              <MenuItem value={1}>{t('dashboard.calendar_week')} {currentWeekNum} - Mo {newDate(mondayDate, 0)}</MenuItem>
+              <MenuItem value={2}>{t('dashboard.calendar_week')} {currentWeekNum+1} - Mo {newDate(mondayDate, 7)}</MenuItem>
+              <MenuItem value={3}>{t('dashboard.calendar_week')} {currentWeekNum+2} - Mo {newDate(mondayDate, 14)}</MenuItem>
+              <MenuItem value={4}>{t('dashboard.calendar_week')} {currentWeekNum+3} - Mo {newDate(mondayDate, 21)}</MenuItem>
             </Select>
             <IconButton 
                     color="inherit" 
@@ -378,10 +414,10 @@ const Dashboard = () => {
               style={{ color: colors.grey[100], width: '120px' }}  // Assuming you want the dropdown text to be white
               size="small"
           >
-              <MenuItem value={1}>{t('dashboard.calendar_week')} {currentWeekNum}</MenuItem>
-              <MenuItem value={2}>{t('dashboard.calendar_week')} {currentWeekNum+1}</MenuItem>
-              <MenuItem value={3}>{t('dashboard.calendar_week')} {currentWeekNum+2}</MenuItem>
-              <MenuItem value={4}>{t('dashboard.calendar_week')} {currentWeekNum+3}</MenuItem>
+              <MenuItem value={1}>{t('dashboard.calendar_week')} {currentWeekNum} - Mo {newDate(mondayDate, 0)}</MenuItem>
+              <MenuItem value={2}>{t('dashboard.calendar_week')} {currentWeekNum+1} - Mo {newDate(mondayDate, 7)}</MenuItem>
+              <MenuItem value={3}>{t('dashboard.calendar_week')} {currentWeekNum+2} - Mo {newDate(mondayDate, 14)}</MenuItem>
+              <MenuItem value={4}>{t('dashboard.calendar_week')} {currentWeekNum+3} - Mo {newDate(mondayDate, 21)}</MenuItem>
           </Select>
           <IconButton 
             color="inherit" 
