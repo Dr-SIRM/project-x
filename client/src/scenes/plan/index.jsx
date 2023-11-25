@@ -24,6 +24,7 @@ const GanttChart = () => {
   const { t, i18n } = useTranslation();
   const [selectedStartWeek, setSelectedStartWeek] = useState();
   const [selectedEndWeek, setSelectedEndWeek] = useState();
+  const [mondayDate, setMondayDate] = useState();
   const BUTTON_STYLE = {
     borderColor: "white",
     "&.MuiButtonOutlined": {
@@ -450,6 +451,37 @@ const handleEndWeekChange = (event) => {
   setSelectedEndWeek(event.target.value);
 };
 
+const calculateWeekDetails = () => {
+  const today = new Date();
+
+  // Calculating the date of the Monday of the current week
+  const dayOfWeek = today.getDay();
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1)); // Adjusting to the previous Monday
+
+  return { monday };
+};
+
+const formatMonday = (date) => {
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // JavaScript months are 0-indexed
+  const year = date.getFullYear();
+  return `${day}.${month}.${year}`;
+};
+
+useEffect(() => {
+  const { weekNumber, monday } = calculateWeekDetails();
+  setCurrentWeekNum(weekNumber);
+  setMondayDate(monday.toISOString().split('T')[0]); // Set the Monday date in 'YYYY-MM-DD' format
+}, []);
+
+const newDate = (dateString, days) => {
+  const date = new Date(dateString);
+  date.setDate(date.getDate() + days);
+  return formatMonday(date); // Reuse the formatDate function
+};
+
+
 //export excel
 const handleExportToExcel = async () => {
   try {
@@ -525,10 +557,10 @@ const handleExportToExcel = async () => {
                     style={{ width: '120px' }}
                     size="small"
                   >
-                    <MenuItem value={1}>{t('dashboard.calendar_week')} {currentWeekNum}</MenuItem>
-                    <MenuItem value={2}>{t('dashboard.calendar_week')} {currentWeekNum+1}</MenuItem>
-                    <MenuItem value={3}>{t('dashboard.calendar_week')} {currentWeekNum+2}</MenuItem>
-                    <MenuItem value={4}>{t('dashboard.calendar_week')} {currentWeekNum+3}</MenuItem>
+                    <MenuItem value={1}>{t('dashboard.calendar_week')} {currentWeekNum} - Mo {newDate(mondayDate, 0)}</MenuItem>
+                    <MenuItem value={2}>{t('dashboard.calendar_week')} {currentWeekNum+1} - Mo {newDate(mondayDate, 7)}</MenuItem>
+                    <MenuItem value={3}>{t('dashboard.calendar_week')} {currentWeekNum+2} - Mo {newDate(mondayDate, 14)}</MenuItem>
+                    <MenuItem value={4}>{t('dashboard.calendar_week')} {currentWeekNum+3} - Mo {newDate(mondayDate, 21)}</MenuItem>
                   </Select>
                 <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                   <InputLabel id="start-week-label" style={{ marginLeft: '20px', marginBottom: '5px' }}>{t('shiftplan.end_week')}</InputLabel> {/* Label for the first select */}
@@ -542,11 +574,11 @@ const handleExportToExcel = async () => {
                     style={{ width: '120px' }}  // Assuming you want the dropdown text to be white
                     size="small"
                 >
-                    <MenuItem value={1}>{t('dashboard.calendar_week')} {currentWeekNum}</MenuItem>
-                    <MenuItem value={2}>{t('dashboard.calendar_week')} {currentWeekNum+1}</MenuItem>
-                    <MenuItem value={3}>{t('dashboard.calendar_week')} {currentWeekNum+2}</MenuItem>
-                    <MenuItem value={4}>{t('dashboard.calendar_week')} {currentWeekNum+3}</MenuItem>
-                    <MenuItem value={4}>{t('dashboard.calendar_week')} {currentWeekNum+4}</MenuItem>
+                    <MenuItem value={1}>{t('dashboard.calendar_week')} {currentWeekNum} - So {newDate(mondayDate, 6)}</MenuItem>
+                    <MenuItem value={2}>{t('dashboard.calendar_week')} {currentWeekNum+1} - So {newDate(mondayDate, 13)}</MenuItem>
+                    <MenuItem value={3}>{t('dashboard.calendar_week')} {currentWeekNum+2} - So {newDate(mondayDate, 20)}</MenuItem>
+                    <MenuItem value={4}>{t('dashboard.calendar_week')} {currentWeekNum+3} - So {newDate(mondayDate, 27)}</MenuItem>
+                    <MenuItem value={5}>{t('dashboard.calendar_week')} {currentWeekNum+4} - So {newDate(mondayDate, 34)}</MenuItem>
                   </Select>
                 </div>
             </div>

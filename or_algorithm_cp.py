@@ -754,8 +754,8 @@ class ORAlgorithm_cp:
                         full_hours_availability = sum_availability_perm / self.hour_divider
                         full_hours_needed = sum_needed_hours / self.hour_divider
 
-                        error_messages.append(f"Vollzeit Mitarbeiter mit der Email {self.mitarbeiter[i]} hat im Berechnungszeitraum nur {full_hours_availability}h eingeplant. \
-                                      In diesem Zeitraum sollte er allerdings {full_hours_needed}h eintragen.")
+                        error_messages.append(f"Der/die Vollzeitmitarbeiter*in mit der E-Mail-Adresse '{self.mitarbeiter[i]}' hat im Berechnungszeitraum nur {full_hours_availability} Stunden eingeplant. \
+                                      In diesem Zeitraum sollte er/sie allerdings {full_hours_needed} Stunden eintragen.")
                     
             # Überprüfen, ob Fehlermeldungen vorhanden sind
             if error_messages:
