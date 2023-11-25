@@ -11,12 +11,12 @@ from routes_react import get_session
 from flask_jwt_extended import get_jwt
 
 class DataProcessing:
-    def __init__(self, current_user_email):
+    def __init__(self, current_user_email, start_date):
         # Attribute
         self.current_user_email = current_user_email
         self.week_timeframe = None
         self.hour_divider = None
-        self.start_date = None
+        self.start_date = start_date
         self.end_date = None
         self.opening_hours = None
         self.laden_oeffnet = None
@@ -77,29 +77,13 @@ class DataProcessing:
         self.week_timeframe = solver_req.week_timeframe
         self.hour_divider = solver_req.hour_divider
 
-        # Holen Sie sich das heutige Datum
-        today = datetime.today()
 
-        # Finden Sie den nächsten Montag
-        # next_monday = today + timedelta(days=(0-today.weekday() + 7) % 7)
-        next_monday = today + timedelta(days=-today.weekday(), weeks=1)
+        # Enddatum basierend auf week_timeframe finden
+        self.end_date = self.start_date + relativedelta(weeks=self.week_timeframe) - timedelta(days=1)
 
-        # Berechnen Sie das Enddatum basierend auf week_timeframe
-        if self.week_timeframe == 1:
-            self.end_date = next_monday + relativedelta(weeks=1) - timedelta(days=1)
-        elif self.week_timeframe == 2:
-            self.end_date = next_monday + relativedelta(weeks=2) - timedelta(days=1)
-        elif self.week_timeframe == 4:
-            self.end_date = next_monday + relativedelta(weeks=4) - timedelta(days=1)
-        else:
-            raise ValueError("Invalid value for week_timeframe.")
-        
-        self.start_date = next_monday.strftime("%Y-%m-%d")
+        # Formatieren der Datumsangaben als Strings
+        self.start_date = self.start_date.strftime("%Y-%m-%d")
         self.end_date = self.end_date.strftime("%Y-%m-%d")
-
-        # Zeitraum selbst manipulieren
-        # self.start_date = "2023-11-13"
-        # self.end_date = "2023-11-26"
 
         print("start_date: ", self.start_date)
         print("end_time: ", self.end_date)

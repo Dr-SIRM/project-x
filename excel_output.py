@@ -12,7 +12,7 @@ from models import User, Availability, TimeReq, Company, OpeningHours, Timetable
     SolverRequirement, SolverAnalysis
 from flask_jwt_extended import get_jwt
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, not_
 
 
 def get_session(uri):
@@ -146,6 +146,7 @@ def create_excel_output(current_user_email, start, end):
     company_users = session.query(User).filter_by(company_name=company_name).with_entities(
         User.id, User.first_name, User.last_name, User.employment, 
         User.email, User.employment_level
+        ).filter(not_(User.access_level == "Super_Admin")
     ).all()
 
     # ----------------------------------------------------------------------------------

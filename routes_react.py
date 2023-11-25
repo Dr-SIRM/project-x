@@ -1202,17 +1202,22 @@ def run_solver():
     user = session.query(User).filter_by(email=react_user).first()
 
     solver_data = request.get_json()
-
     session.close()
 
+    start_week = solver_data['startWeek']
+
+    # Calculate the start date
+    today = datetime.datetime.today()
+    start_date_delta = datetime.timedelta(weeks=start_week)
+    start_date = (today.date() - datetime.timedelta(days=today.weekday())) + start_date_delta
+
     if 'solverButtonClicked' in solver_data and solver_data['solverButtonClicked']:
-        dp = DataProcessing(user.email)
+        dp = DataProcessing(user.email, start_date)
         dp.run()
         or_algo_cp = ORAlgorithm_cp(dp)
 
         or_algo_cp.run()
     
-        
         errors = []  # Eine Liste um alle Fehler zu speichern
         
         for i in range(1, 6):  # Assuming you have 6 pre-checks
