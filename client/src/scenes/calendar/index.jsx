@@ -142,7 +142,7 @@ const Calendar = () => {
   borderRadius="4px"
   style={{ maxHeight: 'calc(8 * 60px + 10px)', overflowY: 'auto', display: isMobile ? 'none' : 'block' }}
 >
-  <Typography variant="h5" color={"white"}>Events</Typography>
+  <Typography variant="h5" color={"white"}>Arbeitseinsätze</Typography>
   <List>
     {currentEvents.map((event) => (
       <ListItem
