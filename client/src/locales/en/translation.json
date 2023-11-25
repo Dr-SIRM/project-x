@@ -282,7 +282,9 @@
     "precheck3": "3. Vorüberprüfung: Haben alle Mitarbeiter zusammen genug Stunden eingeplant, um ihre Planung zu erfüllen?",
     "precheck4": "4. Vorüberprüfung: Stehen zu jeder Zeit mindestens die Anzahl Mitarbeiter mit dem entsprechenden Skill zur Verfügung, die Sie eingeplant haben? ",
     "precheck5": "5. Vorüberprüfung: Sind ausreichend Mannstunden von den Mitarbeitern, die Arbeitsstunden eingeplant haben, für den zu lösenden Zeitraum verfügbar? ",
-    "precheck6": " "
+    "precheck6": " ",
+    "success_message": "Congratulation is plan is created",
+    "error_message": "Creation is failed. Please check logs."
 
   }
 
