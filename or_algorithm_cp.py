@@ -66,17 +66,17 @@ To-Do Liste:
  - (erl) Wenn man gar keine time_req eingegeben hat, hällt dann Vorüberprüfung 1 stand?
  - (erl) Solvingzeit mit der Zeit automaitsch abbrechen
  - (erl) Vorüberprüfung 1 anpassen (Wenn der Betrieb an einem Tag geschlossen ist dann sollen diese Tage ignoriert werden)
+ - (erl) Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden
+ - (erl) Die gerechte Verteilung kann ins - gehen, wenn mehr stunden zur Verfügung stehen als benötigt
+ - (erl) self.max_time_week darf niemals grösser als self.weekly hours gewählt werden!
+ - (erl) self.daily_deployment soll nur 1 oder 2 werden können
+ - (erl) self.skills_per_day soll nur 1 oder 0 werden können
+ - (erl) Solvingzeitraum selbst anwählen können
  
 
  To-Do's 
  -------------------------------
- - Die gerechte Verteilung geht über die max Stunden hinaus wenn zuviele MA benötigt werden und zu wenige Stunden eingegeben wurden??
 
- - self.max_time_week darf niemals grösser als self.weekly hours gewählt werden!
- - self.daily_deployment soll nur 1 oder 2 werden können
- - self.skills_per_day soll nur 1 oder 0 werden können
-
-  - Solvingzeitraum selbst anwählen können
 
 
 
@@ -435,6 +435,8 @@ class ORAlgorithm_cp:
 
         # Die übrigen Stunden unter den den Teilzeit Mitarbeitern aufteilen
         remaining_hours = self.verteilbare_stunden - total_hours_assigned
+        if remaining_hours < 0:
+            remaining_hours = 0
         print("remaining_hours: ", remaining_hours)
         for i in temp_employees:
             temp_hours = remaining_hours * (self.employment_lvl_exact[i] / sum(self.employment_lvl_exact[j] for j in temp_employees))
@@ -447,13 +449,19 @@ class ORAlgorithm_cp:
             # Sortieren der Temp-Mitarbeiter nach zugeteilten Stunden in absteigender Reihenfolge
             temp_employees.sort(key=lambda i: self.gerechte_verteilung[i], reverse=True)
             print("Temporäre Mitarbeiter: ", temp_employees)
+
             # Überschüssigen Stunden von den Temp-Mitarbeitern abziehen, beginnend mit demjenigen mit den meisten Stunden
             for i in temp_employees:
                 if total_hours_assigned == self.verteilbare_stunden:
                     break
-                self.gerechte_verteilung[i] -= 1
-                total_hours_assigned -= 1
-        print("4. self.gerechte_verteilung: ", self.gerechte_verteilung)   
+
+                # Überprüfen, ob der Mitarbeiter mehr als 0 Stunden hat, bevor abgezogen wird
+                if self.gerechte_verteilung[i] > 0:
+                    self.gerechte_verteilung[i] -= 1
+                    total_hours_assigned -= 1
+
+        print("4. self.gerechte_verteilung: ", self.gerechte_verteilung)
+
 
         # Neue Prüfung und Anpassung auf Basis von self.gesamtstunden_verfügbarkeit
         # Wenn gerechte Verteilung grösser als Gesamtstundenverfügbarkeit ist, dann den Wert überschreiben
