@@ -1363,7 +1363,7 @@ def solver_req():
                                 desired_max_time_week = solver_req_data['desired_max_time_week'],
                                 max_time_week = solver_req_data['max_time_week'],
                                 hour_divider = solver_req_data['hour_divider'],
-                                fair_distribution = solver_req_data['fair_distribution'],
+                                fair_distribution = None,
                                 week_timeframe = solver_req_data['week_timeframe'],
                                 subsequent_workingdays = solver_req_data['subsequent_workingdays'],
                                 daily_deployment = solver_req_data['daily_deployment'],

@@ -117,7 +117,9 @@
     "nb17": "Constraint 17",
     "nb18": "Constraint 18",
     "nb19": "Constraint 19",
-    "nb20": "Constraint 20"
+    "nb20": "Constraint 20",
+    "yup_max_week_1": "Max time per week cannot be less than",
+    "yup_max_week_2": "hours"
   },
 
   "availabilty" : {

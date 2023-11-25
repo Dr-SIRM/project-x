@@ -24,6 +24,7 @@ const SolverReq = ({ solverreq }) => {
   const { t, i18n } = useTranslation();
   const [isChecked, setIsChecked] = useState(false);
   const [inputText, setInputText] = useState('');
+  const [selectedOption, setSelectedOption] = useState(t('solverreq.Mindestanforderungen'));
 
   useEffect(() => {
     const fetchSolver = async () => {
@@ -34,6 +35,7 @@ const SolverReq = ({ solverreq }) => {
               }
           });
           setsolverData(response.data);
+          console.log("Daily Deployment Data: ", solverData.daily_deployment);
         } catch (error) {
           console.error('Error fetching Solver details:', error);
         }
@@ -59,6 +61,15 @@ const SolverReq = ({ solverreq }) => {
     }
   };
 
+  const validationSchema = yup.object({
+  
+    max_time_week: yup.number()
+    .min(
+      solverData.weekly_hours, 
+      `${t('solverreq.yup_max_week_1')} ${solverData.weekly_hours} ${t('solverreq.yup_max_week_2')}`
+    )
+    .required(t('solverreq.yup_required')), // Using translation for 'Required'
+});
 
   return (
     <Box m="20px">
@@ -66,6 +77,27 @@ const SolverReq = ({ solverreq }) => {
         title={t('solverreq.title')}
         subtitle={t('solverreq.subtitle')}
       />
+      <Box display="flex" justifyContent="center" mb="20px">
+        <Button
+          onClick={() => setSelectedOption(t('solverreq.Mindestanforderungen'))}
+          sx={{
+            color: selectedOption === t('solverreq.Mindestanforderungen') ? 'white' : colors.primary[100],
+            backgroundColor: selectedOption === t('solverreq.Mindestanforderungen') ? colors.primary[100] : 'transparent',
+            marginRight: '10px',
+          }}
+        >
+          {t('solverreq.Mindestanforderungen')}
+        </Button>
+        <Button
+          onClick={() => setSelectedOption(t('solverreq.title2'))}
+          sx={{
+            color: selectedOption === t('solverreq.title2') ? 'white' : colors.primary[100],
+            backgroundColor: selectedOption === t('solverreq.title2') ? colors.primary[100] : 'transparent',
+          }}
+        >
+          {t('solverreq.title2')}
+        </Button>
+      </Box>
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -85,7 +117,7 @@ const SolverReq = ({ solverreq }) => {
           week_timeframe: String(solverData.week_timeframe),
           subsequent_workingdays: solverData.subsequent_workingdays,
           subsequent_workingdays_max: solverData.subsequent_workingdays_max,
-          daily_deployment: solverData.daily_deployment,
+          daily_deployment: String(solverData.daily_deployment),
           time_per_deployment: solverData.time_per_deployment,
           new_fte_per_slot: solverData.new_fte_per_slot,
           subsequent_workingdays_max: solverData.subsequent_workingdays_max,
@@ -111,6 +143,7 @@ const SolverReq = ({ solverreq }) => {
           nb19: String(solverData.nb19),
           nb20: String(solverData.nb20)
         }}
+        validationSchema={validationSchema}
       >
         {({
           values,
@@ -121,7 +154,8 @@ const SolverReq = ({ solverreq }) => {
           handleSubmit,
         }) => (
           <form onSubmit={handleSubmit}>   
-          <br></br>
+          {selectedOption === t('solverreq.Mindestanforderungen') ? (
+          <div>
           <Typography variant="h4">{t('solverreq.Mindestanforderungen')}</Typography>        
             <br></br>
             <br></br>
@@ -133,11 +167,13 @@ const SolverReq = ({ solverreq }) => {
                 "& > div": { gridColumn: isNonMobile ? undefined : "span 10" },
               }}
             >
+              {/* New Line */}
+
                <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 5",
+                  gridColumn: "span 3",
                   display: "flex",
                   alignItems: "left",
                   justifyContent: "left",
@@ -171,20 +207,10 @@ const SolverReq = ({ solverreq }) => {
                 }}
                 />
                 <Typography
-                  color={colors.primary[100]}
-                  variant=""
-                  sx={{
-                    gridColumn: "span 3",
-                    display: "grid",
-                    alignItems: "center",
-                    height: "100%",
-                  }}
-                ></Typography>
-                <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 5",
+                  gridColumn: "span 3",
                   display: "flex",
                   alignItems: "left",
                   justifyContent: "left",
@@ -217,21 +243,14 @@ const SolverReq = ({ solverreq }) => {
                   },
                 }}
                 />
-                <Typography
-                  color={colors.primary[100]}
-                  variant=""
-                  sx={{
-                    gridColumn: "span 3",
-                    display: "grid",
-                    alignItems: "center",
-                    height: "100%",
-                  }}
-                ></Typography>
+
+                {/* New Line */}
+
                 <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 5",
+                  gridColumn: "span 3",
                   display: "flex",
                   alignItems: "left",
                   justifyContent: "left",
@@ -265,20 +284,10 @@ const SolverReq = ({ solverreq }) => {
                 }}
                 />
                 <Typography
-                  color={colors.primary[100]}
-                  variant=""
-                  sx={{
-                    gridColumn: "span 3",
-                    display: "grid",
-                    alignItems: "center",
-                    height: "100%",
-                  }}
-                ></Typography>
-                <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 5",
+                  gridColumn: "span 3",
                   display: "flex",
                   alignItems: "left",
                   justifyContent: "left",
@@ -312,21 +321,92 @@ const SolverReq = ({ solverreq }) => {
                   },
                 }}
                 />
-                <Typography
-                  color={colors.primary[100]}
-                  variant=""
-                  sx={{
-                    gridColumn: "span 3",
-                    display: "grid",
-                    alignItems: "center",
-                    height: "100%",
-                  }}
-                ></Typography>
+
+                {/* New Line */}
+
                 <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 5",
+                  gridColumn: "span 3",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  {t('solverreq.subsequent_workingdays')}
+                </Typography>
+                <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label=''
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.subsequent_workingdays}
+                name="subsequent_workingdays"
+                error={!!touched.subsequent_workingdays && !!errors.subsequent_workingdays}
+                helperText={touched.subsequent_workingdays && errors.subsequent_workingdays}
+                sx={{
+                  gridColumn: "span 1",
+                  maxWidth: '150px',
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '0px',
+                    paddingBottom: '2px',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                }}
+                />
+
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 3",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  {t('solverreq.subsequent_workingdays_max')}
+                </Typography>
+                <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label=''
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.subsequent_workingdays_max}
+                name="subsequent_workingdays_max"
+                error={!!touched.subsequent_workingdays_max && !!errors.subsequent_workingdays_max}
+                helperText={touched.subsequent_workingdays_max && errors.subsequent_workingdays_max}
+                sx={{
+                  gridColumn: "span 1",
+                  maxWidth: '150px',
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '0px',
+                    paddingBottom: '2px',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                }}
+                />
+
+                {/* New Line */}
+
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 3",
                   display: "flex",
                   alignItems: "left",
                   justifyContent: "left",
@@ -363,289 +443,19 @@ const SolverReq = ({ solverreq }) => {
                   color={colors.primary[100]}
                   variant=""
                   sx={{
-                    gridColumn: "span 3",
+                    gridColumn: "span 6",
                     display: "grid",
                     alignItems: "center",
                     height: "100%",
                   }}
                 ></Typography>
-                <Typography
-                color={colors.primary[100]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 5",
-                  display: "flex",
-                  alignItems: "left",
-                  justifyContent: "left",
-                  height: "100%",
-                  backgroundColor: "#f0f0f0", 
-                }}
-                >
-                 {t('solverreq.differencetodistribution')}
-                </Typography>
-                <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label=''
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.fair_distribution}
-                name="fair_distribution"
-                error={!!touched.fair_distribution && !!errors.fair_distribution}
-                helperText={touched.fair_distribution && errors.fair_distribution}
-                sx={{
-                  gridColumn: "span 1",
-                  maxWidth: '150px',
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '0px',
-                    paddingBottom: '2px',
-                    justifyContent: "center",
-                    alignItems: "center",
-                    textAlign: "center",
-                  },
-                }}
-                />
-                <Typography
-                  color={colors.primary[100]}
-                  variant=""
-                  sx={{
-                    gridColumn: "span 3",
-                    display: "grid",
-                    alignItems: "center",
-                    height: "100%",
-                  }}
-                ></Typography>
+                {/* New Line */}
+
                 <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
                   gridColumn: "span 3",
-                  display: "flex",
-                  alignItems: "left",
-                  justifyContent: "left",
-                  height: "100%",
-                  backgroundColor: "#f0f0f0", 
-                }}
-                >
-                  {t('solverreq.hourunit')}
-                </Typography>
-                <Select
-                  labelId="hour_divider-label"
-                  id="hour_divider"
-                  name="hour_divider"
-                  value={values.hour_divider}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={!!touched.hour_divider && !!errors.hour_divider}
-                helperText={touched.hour_divider && errors.hour_divider}
-                  sx={{
-                    gridColumn: "span 1",
-                    '& .MuiFilledInput-input': {
-                      paddingTop: '0px',
-                      paddingBottom: '0px',
-                    },
-                    
-                  }}
-                >
-                  <MenuItem value="1">1</MenuItem>
-                  <MenuItem value="2">2</MenuItem>
-                  <MenuItem value="4">4</MenuItem>
-                </Select>
-                <Typography
-                  color={colors.primary[100]}
-                  variant=""
-                  sx={{
-                    gridColumn: "span 1",
-                    display: "grid",
-                    alignItems: "center",
-                    height: "100%",
-                  }}
-                ></Typography>
-                <Typography
-                color={colors.primary[100]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 3",
-                  display: "flex",
-                  alignItems: "left",
-                  justifyContent: "left",
-                  height: "100%",
-                  backgroundColor: "#f0f0f0", 
-                }}
-                >
-                  {t('solverreq.calculationtimeframe')}
-                </Typography>
-                <Select
-                  labelId="week_timeframe-label"
-                  id="week_timeframe"
-                  value={values.week_timeframe}
-                  name="week_timeframe"
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  error={!!touched.week_timeframe && !!errors.week_timeframe}
-                  helperText={touched.week_timeframe && errors.week_timeframe}
-                  sx={{
-                    gridColumn: "span 1",
-                    '& .MuiFilledInput-input': {
-                      paddingTop: '10px',
-                      paddingBottom: '10px',
-                    },
-                    '& .MuiSelect-icon': { 
-                      color: 'black', 
-                    },
-                  }}
-                >
-                  <MenuItem value="1">1</MenuItem>
-                  <MenuItem value="2">2</MenuItem>
-                  <MenuItem value="4">4</MenuItem>
-                </Select>
-                <Typography
-                  color={colors.primary[100]}
-                  variant=""
-                  sx={{
-                    gridColumn: "span 0",
-                    display: "grid",
-                    alignItems: "center",
-                    height: "100%",
-                  }}
-                ></Typography>
-                <Typography
-                color={colors.primary[100]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 5",
-                  display: "flex",
-                  alignItems: "left",
-                  justifyContent: "left",
-                  height: "100%",
-                  backgroundColor: "#f0f0f0", 
-                }}
-                >
-                  {t('solverreq.subsequent_workingdays')}
-                </Typography>
-                <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label=''
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.subsequent_workingdays}
-                name="subsequent_workingdays"
-                error={!!touched.subsequent_workingdays && !!errors.subsequent_workingdays}
-                helperText={touched.subsequent_workingdays && errors.subsequent_workingdays}
-                sx={{
-                  gridColumn: "span 1",
-                  maxWidth: '150px',
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '0px',
-                    paddingBottom: '2px',
-                    justifyContent: "center",
-                    alignItems: "center",
-                    textAlign: "center",
-                  },
-                }}
-                />
-                <Typography
-                color={colors.primary[100]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 5",
-                  display: "flex",
-                  alignItems: "left",
-                  justifyContent: "left",
-                  height: "100%",
-                  backgroundColor: "#f0f0f0", 
-                }}
-                >
-                  {t('solverreq.subsequent_workingdays_max')}
-                </Typography>
-                <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label=''
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.subsequent_workingdays_max}
-                name="subsequent_workingdays_max"
-                error={!!touched.subsequent_workingdays_max && !!errors.subsequent_workingdays_max}
-                helperText={touched.subsequent_workingdays_max && errors.subsequent_workingdays_max}
-                sx={{
-                  gridColumn: "span 1",
-                  maxWidth: '150px',
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '0px',
-                    paddingBottom: '2px',
-                    justifyContent: "center",
-                    alignItems: "center",
-                    textAlign: "center",
-                  },
-                }}
-                />
-                <Typography
-                  color={colors.primary[100]}
-                  variant=""
-                  sx={{
-                    gridColumn: "span 2",
-                    display: "grid",
-                    alignItems: "center",
-                    height: "100%",
-                  }}
-                ></Typography>
-                <Typography
-                color={colors.primary[100]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 5",
-                  display: "flex",
-                  alignItems: "left",
-                  justifyContent: "left",
-                  height: "100%",
-                  backgroundColor: "#f0f0f0", 
-                }}
-                >
-                  {t('solverreq.countofshiftsperday')}
-                </Typography>
-                <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label=''
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.daily_deployment}
-                name="daily_deployment"
-                error={!!touched.daily_deployment && !!errors.daily_deployment}
-                helperText={touched.daily_deployment && errors.daily_deployment}
-                sx={{
-                  gridColumn: "span 1",
-                  maxWidth: '150px',
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '0px',
-                    paddingBottom: '2px',
-                    justifyContent: "center",
-                    alignItems: "center",
-                    textAlign: "center",
-                  },
-                }}
-                />
-                <Typography
-                  color={colors.primary[100]}
-                  variant=""
-                  sx={{
-                    gridColumn: "span 3",
-                    display: "grid",
-                    alignItems: "center",
-                    height: "100%",
-                  }}
-                ></Typography>
-                <Typography
-                color={colors.primary[100]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 5",
                   display: "flex",
                   alignItems: "left",
                   justifyContent: "left",
@@ -682,17 +492,20 @@ const SolverReq = ({ solverreq }) => {
                   color={colors.primary[100]}
                   variant=""
                   sx={{
-                    gridColumn: "span 3",
+                    gridColumn: "span 6",
                     display: "grid",
                     alignItems: "center",
                     height: "100%",
                   }}
                 ></Typography>
+
+                {/* New Line */}
+
                 <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 5",
+                  gridColumn: "span 3",
                   display: "flex",
                   alignItems: "left",
                   justifyContent: "left",
@@ -726,10 +539,163 @@ const SolverReq = ({ solverreq }) => {
                 }}
                 />
                 <Typography
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 6",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+
+                {/* New Line */}
+
+                <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 5",
+                  gridColumn: "span 3",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  {t('solverreq.hourunit')}
+                </Typography>
+                <Select
+                  labelId="hour_divider-label"
+                  id="hour_divider"
+                  name="hour_divider"
+                  value={values.hour_divider}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.hour_divider && !!errors.hour_divider}
+                  helperText={touched.hour_divider && errors.hour_divider}
+                  sx={{
+                    gridColumn: "span 1",
+                    '& .MuiSelect-select': {
+                      textAlign: 'center', // Center align the selected value
+                    },
+                  }}
+                  >
+                  <MenuItem value="1">1</MenuItem>
+                  <MenuItem value="2">2</MenuItem>
+                  <MenuItem value="4">4</MenuItem>
+                </Select>
+                <Typography
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 6",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+
+                {/* New Line */}
+
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 3",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  {t('solverreq.calculationtimeframe')}
+                </Typography>
+                <Select
+                  labelId="week_timeframe-label"
+                  id="week_timeframe"
+                  value={values.week_timeframe}
+                  name="week_timeframe"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.week_timeframe && !!errors.week_timeframe}
+                  helperText={touched.week_timeframe && errors.week_timeframe}
+                  sx={{
+                    gridColumn: "span 1",
+                    '& .MuiSelect-select': {
+                      textAlign: 'center', // Center align the selected value
+                    },
+                  }}
+                >
+                  <MenuItem value="1">1</MenuItem>
+                  <MenuItem value="2">2</MenuItem>
+                  <MenuItem value="4">4</MenuItem>
+                </Select>
+                <Typography
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 6",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+
+                {/* New Line */}
+
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 3",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  {t('solverreq.countofshiftsperday')}
+                </Typography>
+                <Select
+                  labelId="daily_deployment-label"
+                  id="daily_deployment"
+                  value={values.daily_deployment}
+                  name="daily_deployment"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.daily_deployment && !!errors.daily_deployment}
+                helperText={touched.daily_deployment && errors.daily_deployment}
+                  sx={{
+                    gridColumn: "span 1",
+                    '& .MuiSelect-select': {
+                      textAlign: 'center', // Center align the selected value
+                    },
+                  }}
+                >
+                  <MenuItem value="1">1</MenuItem>
+                  <MenuItem value="2">2</MenuItem>
+                </Select>
+                <Typography
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 6",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+
+                {/* New Line */}
+
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 3",
                   display: "flex",
                   alignItems: "left",
                   justifyContent: "left",
@@ -739,34 +705,40 @@ const SolverReq = ({ solverreq }) => {
                 >
                   {t('solverreq.skills_per_day')}
                 </Typography>
-                <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label=''
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.skills_per_day}
-                name="skills_per_day"
-                error={!!touched.skills_per_day && !!errors.skills_per_day}
-                helperText={touched.skills_per_day && errors.skills_per_day}
-                sx={{
-                  gridColumn: "span 1",
-                  maxWidth: '150px',
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '0px',
-                    paddingBottom: '2px',
-                    justifyContent: "center",
+                <Select
+                  labelId="skills_per_day-label"
+                  id="skills_per_day"
+                  name="skills_per_day"
+                  value={values.skills_per_day}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={!!touched.skills_per_day && !!errors.skills_per_day}
+                  helperText={touched.skills_per_day && errors.skills_per_day}
+                  sx={{
+                    gridColumn: "span 1",
+                    '& .MuiSelect-select': {
+                      textAlign: 'center', // Center align the selected value
+                    },
+                  }}
+                  >
+                  <MenuItem value="0">0</MenuItem>
+                  <MenuItem value="1">1</MenuItem>
+                </Select>
+                <Typography
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 6",
+                    display: "grid",
                     alignItems: "center",
-                    textAlign: "center",
-                  },
-                }}
-                />
+                    height: "100%",
+                  }}
+                ></Typography>
                 
             </Box>
-            <br></br>
-            <br></br>
-            <br></br>
+            </div>
+            ) : (
+            <div>
             <Typography variant="h4">{t('solverreq.title2')}</Typography> 
               <br></br>
               <Box
@@ -781,7 +753,7 @@ const SolverReq = ({ solverreq }) => {
                   color={colors.primary[100]}
                   variant=""
                   sx={{
-                    gridColumn: "span 10",
+                    gridColumn: "span 9",
                     display: "grid",
                     alignItems: "center",
                     height: "100%",
@@ -824,17 +796,6 @@ const SolverReq = ({ solverreq }) => {
                 }}
               ></Typography>
               {/* New Line */}
-              <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={(e) => setIsChecked(e.target.checked)}
-                sx={{
-                  display: "flex",
-                  gridColumn: "span 1",
-                  alignItems: "left",
-                  height: "100%",
-                }}
-              />
               <Typography
                 color={colors.primary[100]}
                 variant="h6"
@@ -896,17 +857,6 @@ const SolverReq = ({ solverreq }) => {
                   }}
                 ></Typography>
                 {/* New Line */}
-                <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={(e) => setIsChecked(e.target.checked)}
-                sx={{
-                  display: "flex",
-                  gridColumn: "span 1",
-                  alignItems: "left",
-                  height: "100%",
-                }}
-              />
               <Typography
                 color={colors.primary[100]}
                 variant="h6"
@@ -968,17 +918,6 @@ const SolverReq = ({ solverreq }) => {
                   }}
                 ></Typography>
                 {/* New Line */}
-                <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={(e) => setIsChecked(e.target.checked)}
-                sx={{
-                  display: "flex",
-                  gridColumn: "span 1",
-                  alignItems: "left",
-                  height: "100%",
-                }}
-              />
               <Typography
                 color={colors.primary[100]}
                 variant="h6"
@@ -1040,16 +979,6 @@ const SolverReq = ({ solverreq }) => {
                   }}
                 ></Typography>
                 {/* New Line */}
-                <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={(e) => setIsChecked(e.target.checked)}
-                sx={{
-                  display: "flex",
-                  alignItems: "left",
-                  height: "100%",
-                }}
-              />
               <Typography
                 color={colors.primary[100]}
                 variant="h6"
@@ -1111,16 +1040,6 @@ const SolverReq = ({ solverreq }) => {
                   }}
                 ></Typography>
                 {/* New Line */}
-                <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={(e) => setIsChecked(e.target.checked)}
-                sx={{
-                  display: "flex",
-                  alignItems: "left",
-                  height: "100%",
-                }}
-              />
               <Typography
                 color={colors.primary[100]}
                 variant="h6"
@@ -1182,16 +1101,6 @@ const SolverReq = ({ solverreq }) => {
                   }}
                 ></Typography>
                 {/* New Line */}
-                <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={(e) => setIsChecked(e.target.checked)}
-                sx={{
-                  display: "flex",
-                  alignItems: "left",
-                  height: "100%",
-                }}
-              />
               <Typography
                 color={colors.primary[100]}
                 variant="h6"
@@ -1253,16 +1162,6 @@ const SolverReq = ({ solverreq }) => {
                   }}
                 ></Typography>
                 {/* New Line */}
-                <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={(e) => setIsChecked(e.target.checked)}
-                sx={{
-                  display: "flex",
-                  alignItems: "left",
-                  height: "100%",
-                }}
-              />
               <Typography
                 color={colors.primary[100]}
                 variant="h6"
@@ -1324,16 +1223,6 @@ const SolverReq = ({ solverreq }) => {
                   }}
                 ></Typography>
                 {/* New Line */}
-                <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={(e) => setIsChecked(e.target.checked)}
-                sx={{
-                  display: "flex",
-                  alignItems: "left",
-                  height: "100%",
-                }}
-              />
               <Typography
                 color={colors.primary[100]}
                 variant="h6"
@@ -1395,16 +1284,6 @@ const SolverReq = ({ solverreq }) => {
                   }}
                 ></Typography>
                 {/* New Line */}
-                <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={(e) => setIsChecked(e.target.checked)}
-                sx={{
-                  display: "flex",
-                  alignItems: "left",
-                  height: "100%",
-                }}
-              />
               <Typography
                 color={colors.primary[100]}
                 variant="h6"
@@ -1466,16 +1345,6 @@ const SolverReq = ({ solverreq }) => {
                   }}
                 ></Typography>
                 {/* New Line */}
-                <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={(e) => setIsChecked(e.target.checked)}
-                sx={{
-                  display: "flex",
-                  alignItems: "left",
-                  height: "100%",
-                }}
-              />
               <Typography
                 color={colors.primary[100]}
                 variant="h6"
@@ -1537,16 +1406,6 @@ const SolverReq = ({ solverreq }) => {
                   }}
                 ></Typography>
                 {/* New Line */}
-                <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={(e) => setIsChecked(e.target.checked)}
-                sx={{
-                  display: "flex",
-                  alignItems: "left",
-                  height: "100%",
-                }}
-              />
               <Typography
                 color={colors.primary[100]}
                 variant="h6"
@@ -1608,16 +1467,6 @@ const SolverReq = ({ solverreq }) => {
                   }}
                 ></Typography>
                 {/* New Line */}
-                <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={(e) => setIsChecked(e.target.checked)}
-                sx={{
-                  display: "flex",
-                  alignItems: "left",
-                  height: "100%",
-                }}
-              />
               <Typography
                 color={colors.primary[100]}
                 variant="h6"
@@ -1679,6 +1528,8 @@ const SolverReq = ({ solverreq }) => {
                   }}
                 ></Typography>
             </Box>
+            </div>
+            )}
             <Box display="flex" justifyContent="end" mt="20px">
             <Button 
                 type="submit" 
