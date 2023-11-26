@@ -505,7 +505,7 @@ useEffect(() => {
       {Array.from({ length: availabilityData.day_num }).map((_, rowIndex) => (
         <Box
           display="grid"
-          gridTemplateColumns="repeat(7, minmax(0, 1fr))"
+          gridTemplateColumns={isMobile ? "repeat(5, 1fr)" : "repeat(7, minmax(0, 1fr))"}
           gap="10px"  
           sx={{ gridColumn: "span 7" }}
         >
