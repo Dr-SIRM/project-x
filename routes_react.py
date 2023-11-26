@@ -1346,6 +1346,8 @@ def solver_req():
         nb19 = solver_requirement.nb19
         nb20 =solver_requirement.nb20
 
+    print("Daily Deployment:", solver_requirement.daily_deployment)
+
     #Submit Solver Requirements
     if request.method =='POST':
         solver_req_data = request.get_json()
