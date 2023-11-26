@@ -14,6 +14,7 @@ from sqlalchemy import func, extract, not_, and_, or_, asc, desc, text, create_e
 from sqlalchemy.orm import scoped_session, sessionmaker
 import stripe
 import math
+from contextlib import contextmanager
 
 
 #Import of Database
@@ -1271,197 +1272,195 @@ if __name__ == '__main__':
 def solver_req():
     react_user = get_jwt_identity()
     jwt_data = get_jwt()
-    session = get_session(get_database_uri('', user.company_name.lower().replace(' ', '_')))
-    user = session.query(User).filter_by(email=react_user).first()
-    company = session.query(Company).filter_by(company_name=user.company_name).first()
-    solver_requirement = session.query(SolverRequirement).filter_by(company_name=user.company_name).first()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    uri = get_database_uri('', session_company)
 
-    if solver_requirement is None:
-        company_name = ""
-        weekly_hours = ""
-        shifts = ""
-        desired_min_time_day = ""
-        desired_max_time_day = ""
-        min_time_day = ""
-        max_time_day = ""
-        desired_max_time_week = ""
-        max_time_week = ""
-        hour_divider = ""
-        fair_distribution = ""
-        week_timeframe = ""
-        subsequent_workingdays = ""
-        daily_deployment = ""
-        time_per_deployment = ""
-        new_fte_per_slot = "" 
-        subsequent_workingdays_max = ""
-        skills_per_day = ""
-        nb1 = ""
-        nb2 = ""
-        nb3 = ""
-        nb4 = ""
-        nb5 = ""
-        nb6 = ""
-        nb7 = ""
-        nb8 = ""
-        nb9 = ""
-        nb10 = ""
-        nb11 = ""
-        nb12 = ""
-        nb13 = ""
-        nb14 = ""
-        nb15 = ""
-        nb16 = ""
-        nb17 = ""
-        nb18 = ""
-        nb19 = ""
-        nb20 = ""
-    else:
-        company_name = company.company_name
-        weekly_hours = company.weekly_hours
-        shifts = company.shifts
-        desired_min_time_day = solver_requirement.desired_min_time_day
-        desired_max_time_day = solver_requirement.desired_max_time_day
-        min_time_day = solver_requirement.min_time_day
-        max_time_day = solver_requirement.max_time_day
-        desired_max_time_week = company.weekly_hours
-        max_time_week = solver_requirement.max_time_week
-        hour_divider = solver_requirement.hour_divider
-        fair_distribution = solver_requirement.fair_distribution
-        week_timeframe = solver_requirement.week_timeframe
-        subsequent_workingdays = solver_requirement.subsequent_workingdays
-        daily_deployment = solver_requirement.daily_deployment
-        time_per_deployment = solver_requirement.time_per_deployment
-        new_fte_per_slot = solver_requirement.new_fte_per_slot 
-        subsequent_workingdays_max = solver_requirement.subsequent_workingdays_max
-        skills_per_day = solver_requirement.skills_per_day
-        nb1 = solver_requirement.nb1
-        nb2 = solver_requirement.nb2
-        nb3 = solver_requirement.nb3
-        nb4 = solver_requirement.nb4
-        nb5 = solver_requirement.nb5
-        nb6 = solver_requirement.nb6
-        nb7 = solver_requirement.nb7
-        nb8 = solver_requirement.nb8
-        nb9 = solver_requirement.nb9
-        nb10 = solver_requirement.nb10
-        nb11 = solver_requirement.nb11
-        nb12 = solver_requirement.nb12
-        nb13 = solver_requirement.nb13
-        nb14 = solver_requirement.nb14
-        nb15 = solver_requirement.nb15
-        nb16 = solver_requirement.nb16
-        nb17 = solver_requirement.nb17
-        nb18 = solver_requirement.nb18
-        nb19 = solver_requirement.nb19
-        nb20 =solver_requirement.nb20
+    with get_session(uri) as session:
+        user = session.query(User).filter_by(email=react_user).first()
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
 
-    #Submit Solver Requirements
-    if request.method =='POST':
-        solver_req_data = request.get_json()
-        session = get_session(get_database_uri('', user.company_name.lower().replace(' ', '_')))
-        data_deletion = session.query(SolverRequirement).filter_by(company_name=user.company_name)
-        if solver_requirement:
-            data_deletion.delete()
-            session.commit()
+        company = session.query(Company).filter_by(company_name=user.company_name).first()
+        solver_requirement = session.query(SolverRequirement).filter_by(company_name=user.company_name).first()
+
+        if solver_requirement is None:
+            company_name = ""
+            weekly_hours = ""
+            shifts = ""
+            desired_min_time_day = ""
+            desired_max_time_day = ""
+            min_time_day = ""
+            max_time_day = ""
+            desired_max_time_week = ""
+            max_time_week = ""
+            hour_divider = ""
+            fair_distribution = ""
+            week_timeframe = ""
+            subsequent_workingdays = ""
+            daily_deployment = ""
+            time_per_deployment = ""
+            new_fte_per_slot = "" 
+            subsequent_workingdays_max = ""
+            skills_per_day = ""
+            nb1 = ""
+            nb2 = ""
+            nb3 = ""
+            nb4 = ""
+            nb5 = ""
+            nb6 = ""
+            nb7 = ""
+            nb8 = ""
+            nb9 = ""
+            nb10 = ""
+            nb11 = ""
+            nb12 = ""
+            nb13 = ""
+            nb14 = ""
+            nb15 = ""
+            nb16 = ""
+            nb17 = ""
+            nb18 = ""
+            nb19 = ""
+            nb20 = ""
         else:
-            pass
+            company_name = company.company_name
+            weekly_hours = company.weekly_hours
+            shifts = company.shifts
+            desired_min_time_day = solver_requirement.desired_min_time_day
+            desired_max_time_day = solver_requirement.desired_max_time_day
+            min_time_day = solver_requirement.min_time_day
+            max_time_day = solver_requirement.max_time_day
+            desired_max_time_week = company.weekly_hours
+            max_time_week = solver_requirement.max_time_week
+            hour_divider = solver_requirement.hour_divider
+            fair_distribution = solver_requirement.fair_distribution
+            week_timeframe = solver_requirement.week_timeframe
+            subsequent_workingdays = solver_requirement.subsequent_workingdays
+            daily_deployment = solver_requirement.daily_deployment
+            time_per_deployment = solver_requirement.time_per_deployment
+            new_fte_per_slot = solver_requirement.new_fte_per_slot 
+            subsequent_workingdays_max = solver_requirement.subsequent_workingdays_max
+            skills_per_day = solver_requirement.skills_per_day
+            nb1 = solver_requirement.nb1
+            nb2 = solver_requirement.nb2
+            nb3 = solver_requirement.nb3
+            nb4 = solver_requirement.nb4
+            nb5 = solver_requirement.nb5
+            nb6 = solver_requirement.nb6
+            nb7 = solver_requirement.nb7
+            nb8 = solver_requirement.nb8
+            nb9 = solver_requirement.nb9
+            nb10 = solver_requirement.nb10
+            nb11 = solver_requirement.nb11
+            nb12 = solver_requirement.nb12
+            nb13 = solver_requirement.nb13
+            nb14 = solver_requirement.nb14
+            nb15 = solver_requirement.nb15
+            nb16 = solver_requirement.nb16
+            nb17 = solver_requirement.nb17
+            nb18 = solver_requirement.nb18
+            nb19 = solver_requirement.nb19
+            nb20 =solver_requirement.nb20
 
-        data = SolverRequirement(       
-                                company_name = user.company_name,
-                                weekly_hours = company.weekly_hours,
-                                shifts = company.shifts,
-                                desired_min_time_day = solver_req_data['desired_min_time_day'],
-                                desired_max_time_day = solver_req_data['desired_max_time_day'],
-                                min_time_day = solver_req_data['min_time_day'],
-                                max_time_day = solver_req_data['max_time_day'],
-                                desired_max_time_week = solver_req_data['desired_max_time_week'],
-                                max_time_week = solver_req_data['max_time_week'],
-                                hour_divider = solver_req_data['hour_divider'],
-                                fair_distribution = None,
-                                week_timeframe = solver_req_data['week_timeframe'],
-                                subsequent_workingdays = solver_req_data['subsequent_workingdays'],
-                                daily_deployment = solver_req_data['daily_deployment'],
-                                time_per_deployment = solver_req_data['time_per_deployment'],
-                                new_fte_per_slot = solver_req_data['new_fte_per_slot'],
-                                subsequent_workingdays_max = solver_req_data['subsequent_workingdays_max'],
-                                skills_per_day = solver_req_data['skills_per_day'],
-                                nb1 = solver_req_data['nb1'],
-                                nb2 = solver_req_data['nb2'],
-                                nb3 = solver_req_data['nb3'],
-                                nb4 = solver_req_data['nb4'],
-                                nb5 = solver_req_data['nb5'],
-                                nb6 = solver_req_data['nb6'],
-                                nb7 = solver_req_data['nb7'],
-                                nb8 = solver_req_data['nb8'],
-                                nb9 = solver_req_data['nb9'],
-                                nb10 = solver_req_data['nb10'],
-                                nb11 = solver_req_data['nb11'],
-                                nb12 = solver_req_data['nb12'],
-                                nb13 = 0,
-                                nb14 = 0,
-                                nb15 = 0,
-                                nb16 = 0,
-                                nb17 = 0,
-                                nb18 = 0,
-                                nb19 = 0,
-                                nb20 = 0,
-                                created_by = user.company_id,
-                                changed_by = user.company_id,
-                                creation_timestamp = datetime.datetime.now(),
-                                update_timestamp = datetime.datetime.now()
-                                )
-        try:
+        #Submit Solver Requirements
+        if request.method =='POST':
+            solver_req_data = request.get_json()
+            session = get_session(get_database_uri('', user.company_name.lower().replace(' ', '_')))
+            data_deletion = session.query(SolverRequirement).filter_by(company_name=user.company_name)
+            if solver_requirement:
+                data_deletion.delete()
+                session.commit()
+            else:
+                pass
+
+            data = SolverRequirement(       
+                                    company_name = user.company_name,
+                                    weekly_hours = company.weekly_hours,
+                                    shifts = company.shifts,
+                                    desired_min_time_day = solver_req_data['desired_min_time_day'],
+                                    desired_max_time_day = solver_req_data['desired_max_time_day'],
+                                    min_time_day = solver_req_data['min_time_day'],
+                                    max_time_day = solver_req_data['max_time_day'],
+                                    desired_max_time_week = solver_req_data['desired_max_time_week'],
+                                    max_time_week = solver_req_data['max_time_week'],
+                                    hour_divider = solver_req_data['hour_divider'],
+                                    fair_distribution = None,
+                                    week_timeframe = solver_req_data['week_timeframe'],
+                                    subsequent_workingdays = solver_req_data['subsequent_workingdays'],
+                                    daily_deployment = solver_req_data['daily_deployment'],
+                                    time_per_deployment = solver_req_data['time_per_deployment'],
+                                    new_fte_per_slot = solver_req_data['new_fte_per_slot'],
+                                    subsequent_workingdays_max = solver_req_data['subsequent_workingdays_max'],
+                                    skills_per_day = solver_req_data['skills_per_day'],
+                                    nb1 = solver_req_data['nb1'],
+                                    nb2 = solver_req_data['nb2'],
+                                    nb3 = solver_req_data['nb3'],
+                                    nb4 = solver_req_data['nb4'],
+                                    nb5 = solver_req_data['nb5'],
+                                    nb6 = solver_req_data['nb6'],
+                                    nb7 = solver_req_data['nb7'],
+                                    nb8 = solver_req_data['nb8'],
+                                    nb9 = solver_req_data['nb9'],
+                                    nb10 = solver_req_data['nb10'],
+                                    nb11 = solver_req_data['nb11'],
+                                    nb12 = solver_req_data['nb12'],
+                                    nb13 = 0,
+                                    nb14 = 0,
+                                    nb15 = 0,
+                                    nb16 = 0,
+                                    nb17 = 0,
+                                    nb18 = 0,
+                                    nb19 = 0,
+                                    nb20 = 0,
+                                    created_by = user.company_id,
+                                    changed_by = user.company_id,
+                                    creation_timestamp = datetime.datetime.now(),
+                                    update_timestamp = datetime.datetime.now()
+                                    )
             session.add(data)
-            session.commit()
-        except Exception as e:
-            session.rollback()
-            # Log the exception or handle it as needed
-        finally:
-            session.close()
 
 
-    solver_req_dict = {
-    "company_name": company_name,
-    "weekly_hours": weekly_hours,
-    "shifts": shifts,
-    "desired_min_time_day": desired_min_time_day,
-    "desired_max_time_day": desired_max_time_day,
-    "min_time_day": min_time_day,
-    "max_time_day": max_time_day,
-    "desired_max_time_week": desired_max_time_week,
-    "max_time_week": max_time_week,
-    "hour_divider": hour_divider,
-    "fair_distribution": fair_distribution,
-    "week_timeframe": week_timeframe,
-    "subsequent_workingdays": subsequent_workingdays,
-    "daily_deployment": daily_deployment,
-    "time_per_deployment": time_per_deployment,
-    "new_fte_per_slot": new_fte_per_slot, 
-    "subsequent_workingdays_max": subsequent_workingdays_max,
-    "skills_per_day": skills_per_day,
-    "nb1": nb1,
-    "nb2": nb2,
-    "nb3": nb3,
-    "nb4": nb4,
-    "nb5": nb5,
-    "nb6": nb6,
-    "nb7": nb7,
-    "nb8": nb8,
-    "nb9": nb9,
-    "nb10": nb10,
-    "nb11": nb11,
-    "nb12": nb12,
-    "nb13": nb13,
-    "nb14": nb14,
-    "nb15": nb15,
-    "nb16": nb16,
-    "nb17": nb17,
-    "nb18": nb18,
-    "nb19": nb19,
-    "nb20": nb20
-    }
-
-    session.close()
+        solver_req_dict = {
+        "company_name": company_name,
+        "weekly_hours": weekly_hours,
+        "shifts": shifts,
+        "desired_min_time_day": desired_min_time_day,
+        "desired_max_time_day": desired_max_time_day,
+        "min_time_day": min_time_day,
+        "max_time_day": max_time_day,
+        "desired_max_time_week": desired_max_time_week,
+        "max_time_week": max_time_week,
+        "hour_divider": hour_divider,
+        "fair_distribution": fair_distribution,
+        "week_timeframe": week_timeframe,
+        "subsequent_workingdays": subsequent_workingdays,
+        "daily_deployment": daily_deployment,
+        "time_per_deployment": time_per_deployment,
+        "new_fte_per_slot": new_fte_per_slot, 
+        "subsequent_workingdays_max": subsequent_workingdays_max,
+        "skills_per_day": skills_per_day,
+        "nb1": nb1,
+        "nb2": nb2,
+        "nb3": nb3,
+        "nb4": nb4,
+        "nb5": nb5,
+        "nb6": nb6,
+        "nb7": nb7,
+        "nb8": nb8,
+        "nb9": nb9,
+        "nb10": nb10,
+        "nb11": nb11,
+        "nb12": nb12,
+        "nb13": nb13,
+        "nb14": nb14,
+        "nb15": nb15,
+        "nb16": nb16,
+        "nb17": nb17,
+        "nb18": nb18,
+        "nb19": nb19,
+        "nb20": nb20
+        }
     
     return jsonify(solver_req_dict)
 
@@ -1657,6 +1656,8 @@ def get_admin_registration():
                     except Exception as e:
                         print(str(e))
                         return jsonify({'message': 'Failed to create schema'}), 500
+                    finally:
+                        connection.close()
 
                     # Clone entire schema
                     original_schema = 'schema_timetab'
@@ -2061,7 +2062,7 @@ def get_required_workforce():
                 TimeReq.company_name == user.company_name,
                 TimeReq.department == workforce_data['department'] if 'department' in workforce_data else None,
                 TimeReq.date.in_(new_dates)
-            ).delete(synchronize_session='fetch')
+            ).delete()
             session.commit()
 
             # Create new TimeReq entries
@@ -2429,49 +2430,56 @@ import locale
 @app.route('/api/dashboard', methods=['POST', 'GET'])
 @jwt_required()
 def get_dashboard_data():
-    session, current_user = get_current_user_session()
-    users = session.query(User).filter_by(company_name=current_user.company_name).filter(not_(User.access_level == "Super_Admin")).all()
-    today = datetime.datetime.now().date()
-    current_week_num = int(today.isocalendar()[1])
-    if not current_user:
-        return jsonify({'error': 'User not found'}), 404
-    
-    missing_users = get_missing_user_list(session, current_user)
-    unavailable_times_list = unavailable_times(session, current_user)
+    current_user_id = get_jwt_identity()
+    jwt_data = get_jwt()
+    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
+    uri = get_database_uri('', session_company)
+
+    with get_session(uri) as session:
+        current_user = get_current_user(session, current_user_id)
+
+        if not current_user:
+            return jsonify({'error': 'User not found'}), 404
         
-    # Extract email addresses from the missing users list
-    recipients_missing_user = [user['email'] for user in missing_users]
-    recipients_all = [user.email for user in users]
-    print(recipients_missing_user)
-    print(recipients_all)
+        users = session.query(User).filter_by(company_name=current_user.company_name).filter(not_(User.access_level == "Super_Admin")).all()
+        today = datetime.datetime.now().date()
+        current_week_num = int(today.isocalendar()[1])
+    
+        missing_users = get_missing_user_list(session, current_user)
+        unavailable_times_list = unavailable_times(session, current_user)
+            
+        # Extract email addresses from the missing users list
+        recipients_missing_user = [user['email'] for user in missing_users]
+        recipients_all = [user.email for user in users]
+        print(recipients_missing_user)
+        print(recipients_all)
 
-    if request.method == 'POST':
-        button = request.json.get("button", None)
-        if button == "Msg_Missing_Availability":
-            msg = Message('Fehlende Verfuegbarkeit', recipients=recipients_missing_user)
-            msg.body = f"Hoi Team,\n \n" \
-            f"Bisher hast du noch keine Verfügbarkeit für die kommenden Wochen eingetragen. \n \n" \
-            F"Bitte trage deine Verfügbarkeit schnellstmöglich. Anderenfalls können wir dich leider nicht mit einplanen. \n \n" \
-            f"Liebe Grüsse \n \n" \
-            f"Team {current_user.company_name}"
-            #mail.send(msg)
-            print(msg.body)
-        if button == "Msg_Insufficient_Planning":
-            table_header = "Datum\t\tUnbesetzte Zeiten\n"
-            table_rows = "\n".join([f"{time_dict['date']}\t\t{time_dict['time']}" for time_dict in unavailable_times_list])
-            time_table = table_header + table_rows
-            msg = Message('Unbesetzte Stunden', recipients=recipients_all)
-            msg.body = f"Hoi Team,\n \n" \
-            f"Wir haben leider noch einige Stunden, die wir noch nicht besetzen können. Solltest du zu einer der untenstehen Stunden Zeit haben, trag dich doch bitte ein. \n \n" \
-            f"{time_table}\n\n" \
-            f"Bitte trage deine Unterstützung in deiner Verfügbarkeit schnellstmöglich ein. \n \n" \
-            f"Liebe Grüsse \n \n" \
-            f"Team {current_user.company_name}"
-            #mail.send(msg)
-            print(msg.body)
+        if request.method == 'POST':
+            button = request.json.get("button", None)
+            if button == "Msg_Missing_Availability":
+                msg = Message('Fehlende Verfuegbarkeit', recipients=recipients_missing_user)
+                msg.body = f"Hoi Team,\n \n" \
+                f"Bisher hast du noch keine Verfügbarkeit für die kommenden Wochen eingetragen. \n \n" \
+                F"Bitte trage deine Verfügbarkeit schnellstmöglich. Anderenfalls können wir dich leider nicht mit einplanen. \n \n" \
+                f"Liebe Grüsse \n \n" \
+                f"Team {current_user.company_name}"
+                #mail.send(msg)
+                print(msg.body)
+            if button == "Msg_Insufficient_Planning":
+                table_header = "Datum\t\tUnbesetzte Zeiten\n"
+                table_rows = "\n".join([f"{time_dict['date']}\t\t{time_dict['time']}" for time_dict in unavailable_times_list])
+                time_table = table_header + table_rows
+                msg = Message('Unbesetzte Stunden', recipients=recipients_all)
+                msg.body = f"Hoi Team,\n \n" \
+                f"Wir haben leider noch einige Stunden, die wir noch nicht besetzen können. Solltest du zu einer der untenstehen Stunden Zeit haben, trag dich doch bitte ein. \n \n" \
+                f"{time_table}\n\n" \
+                f"Bitte trage deine Unterstützung in deiner Verfügbarkeit schnellstmöglich ein. \n \n" \
+                f"Liebe Grüsse \n \n" \
+                f"Team {current_user.company_name}"
+                #mail.send(msg)
+                print(msg.body)
     
 
-    try:
         return jsonify({
             'worker_count': get_worker_count(session, current_user),
             'start_time_count': get_start_time_count(session, current_user),
@@ -2484,17 +2492,9 @@ def get_dashboard_data():
             'current_week_num': current_week_num,
             'unavailable_times': unavailable_times(session, current_user)
         })
-    finally:
-        session.close()
 
-def get_current_user_session():
-    current_user_id = get_jwt_identity()
-    jwt_data = get_jwt()
-    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
-    session = get_session(get_database_uri('', session_company))
-    current_user = session.query(User).filter_by(email=current_user_id).first()
-    session.close()
-    return session, current_user
+def get_current_user(session, user_id):
+    return session.query(User).filter_by(email=user_id).first()
 
 def get_worker_count(session, current_user):
     return session.query(User).filter_by(company_name=current_user.company_name).filter(not_(User.access_level == "Super_Admin")).count()
