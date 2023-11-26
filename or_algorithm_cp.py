@@ -79,8 +79,10 @@ To-Do Liste:
  - Vorüberprüfung die prüft, ob alle Mitarbeiter in self.mitarbeiter_s in self.mitarbeiter sind. Wenn nein, 
    heisst das das der Mitarbeiter der in self.mitarebeiter ist aber in self.mitarbeiter_s nicht vorhanden ist, 
    das dieser keine Fähigkeit zugewiesen bekommen hat
-
-
+   
+ - Vorüberprüfung die prüft, ob die Mitarbeiter mit ihren Max Arbeitszeiten die self.verteilbaren_stunden überhaupt erreichen können.
+   Achtung! Wenn ein MA z.b. den Skill Koch hat und Koch nur 20h benötigt wird der Mitarbeiter aber in self.gerechte_verteilung 45h hat,
+   dann müssen 20h genommen werden und nicht 45h, da der MA gar nie 45h erreichen kann. (Teilzeit 100%)
 
 
 
@@ -684,12 +686,6 @@ class ORAlgorithm_cp:
                            wieviele Mitarbeiter benötigt werden?
         ---------------------------------------------------------------------------------------------------------------
         """
-
-
-        # Anpassen, wenn der Betrieb an einem Tag geschlossen hat kommt ein Fehler!
-
-
-
         # Funktion um Zeitwerte umzurechnen ---------------------------------------------------------------------------
         def time_to_int(t):
             # Divisor basierend auf self.hour_divider erzeugen

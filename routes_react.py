@@ -1271,8 +1271,8 @@ if __name__ == '__main__':
 def solver_req():
     react_user = get_jwt_identity()
     jwt_data = get_jwt()
-    session = get_session(get_database_uri('', user.company_name.lower().replace(' ', '_')))
     user = session.query(User).filter_by(email=react_user).first()
+    session = get_session(get_database_uri('', user.company_name.lower().replace(' ', '_')))
     company = session.query(Company).filter_by(company_name=user.company_name).first()
     solver_requirement = session.query(SolverRequirement).filter_by(company_name=user.company_name).first()
 
