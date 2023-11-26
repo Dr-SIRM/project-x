@@ -546,18 +546,20 @@ const QuickStartPopup = ({ open, onClose }) => {
             title={t('solverreq.Mindestanforderungen')}
             />
             <Box
-                display="grid"
-                gap="30px"
-                gridTemplateColumns="repeat(6, minmax(0, 1fr))"
-                sx={{
-                    "& > div": { gridColumn: isNonMobile ? undefined : "span 6" },
-                }}
-                >
-                <Typography
+              display="grid"
+              gap="30px"
+              gridTemplateColumns="repeat(10, minmax(0, 1fr))"
+              sx={{
+                "& > div": { gridColumn: isNonMobile ? undefined : "span 10" },
+              }}
+            >
+              {/* New Line */}
+
+               <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 5",
+                  gridColumn: "span 3",
                   display: "flex",
                   alignItems: "left",
                   justifyContent: "left",
@@ -572,10 +574,9 @@ const QuickStartPopup = ({ open, onClose }) => {
                 variant="filled"
                 type="text"
                 label=''
-                name="desired_min_time_day"
-                value={formData.desired_min_time_day}
                 onChange={handleInputChange}
-
+                value={formData.desired_min_time_day}
+                name="desired_min_time_day"
                 sx={{
                   gridColumn: "span 1",
                   maxWidth: '150px',
@@ -589,20 +590,10 @@ const QuickStartPopup = ({ open, onClose }) => {
                 }}
                 />
                 <Typography
-                  color={colors.primary[100]}
-                  variant=""
-                  sx={{
-                    gridColumn: "span 3",
-                    display: "grid",
-                    alignItems: "center",
-                    height: "100%",
-                  }}
-                ></Typography>
-                <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 5",
+                  gridColumn: "span 3",
                   display: "flex",
                   alignItems: "left",
                   justifyContent: "left",
@@ -617,10 +608,9 @@ const QuickStartPopup = ({ open, onClose }) => {
                 variant="filled"
                 type="text"
                 label=''
-                name="min_time_day"
-                value={formData.min_time_day}
                 onChange={handleInputChange}
-
+                value={formData.min_time_day}
+                name="min_time_day"
                 sx={{
                   gridColumn: "span 1",
                   maxWidth: '150px',
@@ -633,21 +623,14 @@ const QuickStartPopup = ({ open, onClose }) => {
                   },
                 }}
                 />
-                <Typography
-                  color={colors.primary[100]}
-                  variant=""
-                  sx={{
-                    gridColumn: "span 3",
-                    display: "grid",
-                    alignItems: "center",
-                    height: "100%",
-                  }}
-                ></Typography>
+
+                {/* New Line */}
+
                 <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 5",
+                  gridColumn: "span 3",
                   display: "flex",
                   alignItems: "left",
                   justifyContent: "left",
@@ -662,10 +645,9 @@ const QuickStartPopup = ({ open, onClose }) => {
                 variant="filled"
                 type="text"
                 label=''
-                name="desired_max_time_day"
-                value={formData.desired_max_time_day}
                 onChange={handleInputChange}
-
+                value={formData.desired_max_time_day}
+                name="desired_max_time_day"
                 sx={{
                   gridColumn: "span 1",
                   maxWidth: '150px',
@@ -679,20 +661,10 @@ const QuickStartPopup = ({ open, onClose }) => {
                 }}
                 />
                 <Typography
-                  color={colors.primary[100]}
-                  variant=""
-                  sx={{
-                    gridColumn: "span 3",
-                    display: "grid",
-                    alignItems: "center",
-                    height: "100%",
-                  }}
-                ></Typography>
-                <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 5",
+                  gridColumn: "span 3",
                   display: "flex",
                   alignItems: "left",
                   justifyContent: "left",
@@ -707,10 +679,9 @@ const QuickStartPopup = ({ open, onClose }) => {
                 variant="filled"
                 type="text"
                 label=''
-                name="max_time_day"
+                onChange={handleInputChange}
                 value={formData.max_time_day}
-                onChange={handleInputChange}
-
+                name="max_time_day"
                 sx={{
                   gridColumn: "span 1",
                   maxWidth: '150px',
@@ -723,171 +694,14 @@ const QuickStartPopup = ({ open, onClose }) => {
                   },
                 }}
                 />
-                <Typography
-                  color={colors.primary[100]}
-                  variant=""
-                  sx={{
-                    gridColumn: "span 3",
-                    display: "grid",
-                    alignItems: "center",
-                    height: "100%",
-                  }}
-                ></Typography>
-                <Typography
-                color={colors.primary[100]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 5",
-                  display: "flex",
-                  alignItems: "left",
-                  justifyContent: "left",
-                  height: "100%",
-                  backgroundColor: "#f0f0f0", 
-                }}
-                >
-                  {t('solverreq.maxtimeperweek')}
-                </Typography>
-                <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label=''
-                name="max_time_week"
-                value={formData.max_time_week}
-                onChange={handleInputChange}
 
-                sx={{
-                  gridColumn: "span 1",
-                  maxWidth: '150px',
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '0px',
-                    paddingBottom: '2px',
-                    justifyContent: "center",
-                    alignItems: "center",
-                    textAlign: "center",
-                  },
-                }}
-                />
-                <Typography
-                  color={colors.primary[100]}
-                  variant=""
-                  sx={{
-                    gridColumn: "span 3",
-                    display: "grid",
-                    alignItems: "center",
-                    height: "100%",
-                  }}
-                ></Typography>
-                <Typography
-                color={colors.primary[100]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 5",
-                  display: "flex",
-                  alignItems: "left",
-                  justifyContent: "left",
-                  height: "100%",
-                  backgroundColor: "#f0f0f0", 
-                }}
-                >
-                 {t('solverreq.differencetodistribution')}
-                </Typography>
-                <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label=''
-                name="fair_distribution"
-                value={formData.fair_distribution}
-                onChange={handleInputChange}
+                {/* New Line */}
 
-                sx={{
-                  gridColumn: "span 1",
-                  maxWidth: '150px',
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '0px',
-                    paddingBottom: '2px',
-                    justifyContent: "center",
-                    alignItems: "center",
-                    textAlign: "center",
-                  },
-                }}
-                />
                 <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 5",
-                  display: "flex",
-                  alignItems: "left",
-                  justifyContent: "left",
-                  height: "100%",
-                  backgroundColor: "#f0f0f0", 
-                }}
-                >
-                  {t('solverreq.hourunit')}
-                </Typography>
-                <Select
-                  labelId="hour_divider-label"
-                  id="hour_divider"
-                  name="hour_divider"
-                  value={formData.hour_divider}
-                  onChange={handleInputChange}
-
-                  sx={{
-                    gridColumn: "span 1",
-                    '& .MuiFilledInput-input': {
-                      paddingTop: '0px',
-                      paddingBottom: '0px',
-                    },
-                    
-                  }}
-                >
-                  <MenuItem value="1">1</MenuItem>
-                  <MenuItem value="2">2</MenuItem>
-                  <MenuItem value="4">4</MenuItem>
-                </Select>
-                <Typography
-                color={colors.primary[100]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 5",
-                  display: "flex",
-                  alignItems: "left",
-                  justifyContent: "left",
-                  height: "100%",
-                  backgroundColor: "#f0f0f0", 
-                }}
-                >
-                  {t('solverreq.calculationtimeframe')}
-                </Typography>
-                <Select
-                  labelId="week_timeframe-label"
-                  id="week_timeframe"
-                  name="week_timeframe"
-                  value={formData.week_timeframe}
-                  onChange={handleInputChange}
-
-                  sx={{
-                    gridColumn: "span 1",
-                    '& .MuiFilledInput-input': {
-                      paddingTop: '10px',
-                      paddingBottom: '10px',
-                    },
-                    '& .MuiSelect-icon': { 
-                      color: 'black', 
-                    },
-                  }}
-                >
-                  <MenuItem value="1">1</MenuItem>
-                  <MenuItem value="2">2</MenuItem>
-                  <MenuItem value="4">4</MenuItem>
-                </Select>
-                <Typography
-                color={colors.primary[100]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 5",
+                  gridColumn: "span 3",
                   display: "flex",
                   alignItems: "left",
                   justifyContent: "left",
@@ -902,10 +716,9 @@ const QuickStartPopup = ({ open, onClose }) => {
                 variant="filled"
                 type="text"
                 label=''
-                name="subsequent_workingdays"
-                value={formData.subsequent_workingdays}
                 onChange={handleInputChange}
-
+                value={formData.subsequent_workingdays}
+                name="subsequent_workingdays"
                 sx={{
                   gridColumn: "span 1",
                   maxWidth: '150px',
@@ -918,11 +731,12 @@ const QuickStartPopup = ({ open, onClose }) => {
                   },
                 }}
                 />
+
                 <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 5",
+                  gridColumn: "span 3",
                   display: "flex",
                   alignItems: "left",
                   justifyContent: "left",
@@ -937,10 +751,9 @@ const QuickStartPopup = ({ open, onClose }) => {
                 variant="filled"
                 type="text"
                 label=''
-                name="subsequent_workingdays_max"
-                value={formData.subsequent_workingdays_max}
                 onChange={handleInputChange}
-
+                value={formData.subsequent_workingdays_max}
+                name="subsequent_workingdays_max"
                 sx={{
                   gridColumn: "span 1",
                   maxWidth: '150px',
@@ -953,21 +766,14 @@ const QuickStartPopup = ({ open, onClose }) => {
                   },
                 }}
                 />
-                <Typography
-                  color={colors.primary[100]}
-                  variant=""
-                  sx={{
-                    gridColumn: "span 2",
-                    display: "grid",
-                    alignItems: "center",
-                    height: "100%",
-                  }}
-                ></Typography>
+
+                {/* New Line */}
+
                 <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 5",
+                  gridColumn: "span 3",
                   display: "flex",
                   alignItems: "left",
                   justifyContent: "left",
@@ -975,17 +781,16 @@ const QuickStartPopup = ({ open, onClose }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
                 >
-                  {t('solverreq.countofshiftsperday')}
+                  {t('solverreq.maxtimeperweek')}
                 </Typography>
                 <TextField
                 fullWidth
                 variant="filled"
                 type="text"
                 label=''
-                name="daily_deployment"
-                value={formData.daily_deployment}
                 onChange={handleInputChange}
-
+                value={formData.max_time_week}
+                name="max_time_week"
                 sx={{
                   gridColumn: "span 1",
                   maxWidth: '150px',
@@ -1002,17 +807,19 @@ const QuickStartPopup = ({ open, onClose }) => {
                   color={colors.primary[100]}
                   variant=""
                   sx={{
-                    gridColumn: "span 3",
+                    gridColumn: "span 6",
                     display: "grid",
                     alignItems: "center",
                     height: "100%",
                   }}
                 ></Typography>
+                {/* New Line */}
+
                 <Typography
                 color={colors.primary[100]}
                 variant="h6"
                 sx={{
-                  gridColumn: "span 5",
+                  gridColumn: "span 3",
                   display: "flex",
                   alignItems: "left",
                   justifyContent: "left",
@@ -1027,80 +834,9 @@ const QuickStartPopup = ({ open, onClose }) => {
                 variant="filled"
                 type="text"
                 label=''
-                name="time_per_deployment"
+                onChange={handleInputChange}
                 value={formData.time_per_deployment}
-                onChange={handleInputChange}
-
-                sx={{
-                  gridColumn: "span 1",
-                  maxWidth: '150px',
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '0px',
-                    paddingBottom: '2px',
-                    justifyContent: "center",
-                    alignItems: "center",
-                    textAlign: "center",
-                  },
-                }}
-                />
-                <Typography
-                color={colors.primary[100]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 5",
-                  display: "flex",
-                  alignItems: "left",
-                  justifyContent: "left",
-                  height: "100%",
-                  backgroundColor: "#f0f0f0", 
-                }}
-                >
-                  {t('solverreq.new_fte_per_slot')}
-                </Typography>
-                <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label=''
-                name="new_fte_per_slot"
-                value={formData.new_fte_per_slot}
-                onChange={handleInputChange}
-
-                sx={{
-                  gridColumn: "span 1",
-                  maxWidth: '150px',
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '0px',
-                    paddingBottom: '2px',
-                    justifyContent: "center",
-                    alignItems: "center",
-                    textAlign: "center",
-                  },
-                }}
-                />
-                <Typography
-                color={colors.primary[100]}
-                variant="h6"
-                sx={{
-                  gridColumn: "span 5",
-                  display: "flex",
-                  alignItems: "left",
-                  justifyContent: "left",
-                  height: "100%",
-                  backgroundColor: "#f0f0f0", 
-                }}
-                >
-                  {t('solverreq.skills_per_day')}
-                </Typography>
-                <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label=''
-                name="skills_per_day"
-                value={formData.skills_per_day}
-                onChange={handleInputChange}
-
+                name="time_per_deployment"
                 sx={{
                   gridColumn: "span 1",
                   maxWidth: '150px',
@@ -1117,16 +853,252 @@ const QuickStartPopup = ({ open, onClose }) => {
                   color={colors.primary[100]}
                   variant=""
                   sx={{
-                    gridColumn: "span 3",
+                    gridColumn: "span 6",
                     display: "grid",
                     alignItems: "center",
                     height: "100%",
                   }}
                 ></Typography>
-            </Box>   
+                
+            </Box>  
             </>
         )}  
         {currentStep === 4 && (
+            <>
+            <Header
+            title={t('solverreq.Mindestanforderungen')}
+            />
+            <Box
+              display="grid"
+              gap="30px"
+              gridTemplateColumns="repeat(10, minmax(0, 1fr))"
+              sx={{
+                "& > div": { gridColumn: isNonMobile ? undefined : "span 10" },
+              }}
+            >
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 3",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  {t('solverreq.new_fte_per_slot')}
+                </Typography>
+                <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label=''
+                onChange={handleInputChange}
+                value={formData.new_fte_per_slot}
+                name="new_fte_per_slot"
+                sx={{
+                  gridColumn: "span 1",
+                  maxWidth: '150px',
+                  '& .MuiFilledInput-input': {
+                    paddingTop: '0px',
+                    paddingBottom: '2px',
+                    justifyContent: "center",
+                    alignItems: "center",
+                    textAlign: "center",
+                  },
+                }}
+                />
+                <Typography
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 6",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+
+                {/* New Line */}
+
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 3",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  {t('solverreq.hourunit')}
+                </Typography>
+                <Select
+                  labelId="hour_divider-label"
+                  id="hour_divider"
+                  name="hour_divider"
+                  value={formData.hour_divider}
+                  onChange={handleInputChange}
+                  sx={{
+                    gridColumn: "span 1",
+                    '& .MuiSelect-select': {
+                      textAlign: 'center', // Center align the selected value
+                    },
+                  }}
+                  >
+                  <MenuItem value="1">1</MenuItem>
+                  <MenuItem value="2">2</MenuItem>
+                  <MenuItem value="4">4</MenuItem>
+                </Select>
+                <Typography
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 6",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+
+                {/* New Line */}
+
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 3",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  {t('solverreq.calculationtimeframe')}
+                </Typography>
+                <Select
+                  labelId="week_timeframe-label"
+                  id="week_timeframe"
+                  value={formData.week_timeframe}
+                  name="week_timeframe"
+                  onChange={handleInputChange}
+                  sx={{
+                    gridColumn: "span 1",
+                    '& .MuiSelect-select': {
+                      textAlign: 'center', // Center align the selected value
+                    },
+                  }}
+                >
+                  <MenuItem value="1">1</MenuItem>
+                  <MenuItem value="2">2</MenuItem>
+                  <MenuItem value="4">4</MenuItem>
+                </Select>
+                <Typography
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 6",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+
+                {/* New Line */}
+
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 3",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  {t('solverreq.countofshiftsperday')}
+                </Typography>
+                <Select
+                  labelId="daily_deployment-label"
+                  id="daily_deployment"
+                  value={formData.daily_deployment}
+                  name="daily_deployment"
+                  onChange={handleInputChange}
+                  sx={{
+                    gridColumn: "span 1",
+                    '& .MuiSelect-select': {
+                      textAlign: 'center', // Center align the selected value
+                    },
+                  }}
+                >
+                  <MenuItem value="1">1</MenuItem>
+                  <MenuItem value="2">2</MenuItem>
+                </Select>
+                <Typography
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 6",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+
+                {/* New Line */}
+
+                <Typography
+                color={colors.primary[100]}
+                variant="h6"
+                sx={{
+                  gridColumn: "span 3",
+                  display: "flex",
+                  alignItems: "left",
+                  justifyContent: "left",
+                  height: "100%",
+                  backgroundColor: "#f0f0f0", 
+                }}
+                >
+                  {t('solverreq.skills_per_day')}
+                </Typography>
+                <Select
+                  labelId="skills_per_day-label"
+                  id="skills_per_day"
+                  name="skills_per_day"
+                  value={formData.skills_per_day}
+                  onChange={handleInputChange}
+                  sx={{
+                    gridColumn: "span 1",
+                    '& .MuiSelect-select': {
+                      textAlign: 'center', // Center align the selected value
+                    },
+                  }}
+                  >
+                  <MenuItem value="0">0</MenuItem>
+                  <MenuItem value="1">1</MenuItem>
+                </Select>
+                <Typography
+                  color={colors.primary[100]}
+                  variant=""
+                  sx={{
+                    gridColumn: "span 6",
+                    display: "grid",
+                    alignItems: "center",
+                    height: "100%",
+                  }}
+                ></Typography>
+                
+            </Box>  
+            </>
+        )}  
+        {currentStep === 5 && (
             <>
                 <Header
                 title={t('company.title')}
@@ -1486,7 +1458,7 @@ const QuickStartPopup = ({ open, onClose }) => {
                 </Box>
             </>
         )}
-        {currentStep === 5 && (
+        {currentStep === 6 && (
             <>
                 <Header
                 title={t('company.title')}
@@ -1857,12 +1829,12 @@ const QuickStartPopup = ({ open, onClose }) => {
                     {t('button.back')}
                 </Button>
             )}
-            {currentStep < 5 && (
+            {currentStep < 6 && (
                 <Button variant="contained" color="primary" onClick={handleNext}>
                     {t('button.next')}
                 </Button>
             )}
-            {currentStep === 5 && (
+            {currentStep === 6 && (
                 <Button variant="contained" color="secondary" onClick={handleSubmit}>
                     {t('button.submit')}
                 </Button>

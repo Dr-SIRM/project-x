@@ -550,6 +550,8 @@ def new_user():
                     except Exception as e:
                         print(str(e))
                         return jsonify({'message': 'Failed to clone schema'}), 500
+                    finally:
+                        session.close()
                 
    
     
@@ -619,17 +621,21 @@ def get_change_password():
     if request.method == 'POST':
         password_data = request.get_json()
         session = get_session(get_database_uri('', user.company_name.lower().replace(' ', '_')))
-
-        if user:
-            if password_data['password'] != password_data['password2']:
-                return jsonify({'message': 'Password are not matching'}), 200
-            else:
-                hashed_password = generate_password_hash(password_data['password'])
-                user.password = hashed_password
-                user.changed_by = user.id
-                user.update_timestamp = datetime.datetime.now()
-                session.commit()
-                session.close()
+        try:
+            if user:
+                if password_data['password'] != password_data['password2']:
+                    return jsonify({'message': 'Password are not matching'}), 200
+                else:
+                    hashed_password = generate_password_hash(password_data['password'])
+                    user.password = hashed_password
+                    user.changed_by = user.id
+                    user.update_timestamp = datetime.datetime.now()
+                    session.commit()
+        except Exception as e:
+            session.rollback()
+            # Log the exception or handle it as needed
+        finally:
+            session.close()
 
     session.close()
 
@@ -1080,18 +1086,23 @@ def get_forget_password():
     if request.method == 'POST':
         forget_password_data = request.get_json()
         session = get_session(get_database_uri('', "timetab"))
+        try:
         
-        existing_user = OverviewUser.query.filter_by(email=forget_password_data['email']).first()
-        if existing_user is None:
-            return jsonify({"message": "No User exists under your email"}), 400
-        else:
-            random_token = random.randint(100000,999999)
-            reset_url = url_for('reset_password', token=random_token, _external=True)
+            existing_user = OverviewUser.query.filter_by(email=forget_password_data['email']).first()
+            if existing_user is None:
+                return jsonify({"message": "No User exists under your email"}), 400
+            else:
+                random_token = random.randint(100000,999999)
+                reset_url = url_for('reset_password', token=random_token, _external=True)
 
-            data = PasswordReset(email=forget_password_data['email'], token=random_token)
+                data = PasswordReset(email=forget_password_data['email'], token=random_token)
 
-            session.add(data)
-            session.commit()
+                session.add(data)
+                session.commit()
+        except Exception as e:
+            session.rollback()
+            # Log the exception or handle it as needed
+        finally:
             session.close()
 
             msg = Message('Reset Password', recipients=['timetab@gmx.ch'])
@@ -1260,10 +1271,8 @@ if __name__ == '__main__':
 def solver_req():
     react_user = get_jwt_identity()
     jwt_data = get_jwt()
-    session_company = jwt_data.get("company_name").lower().replace(' ', '_')
-    session = get_session(get_database_uri('', session_company))
-    user = session.query(User).filter_by(email=react_user).first()
     session = get_session(get_database_uri('', user.company_name.lower().replace(' ', '_')))
+    user = session.query(User).filter_by(email=react_user).first()
     company = session.query(Company).filter_by(company_name=user.company_name).first()
     solver_requirement = session.query(SolverRequirement).filter_by(company_name=user.company_name).first()
 
@@ -1404,11 +1413,11 @@ def solver_req():
         try:
             session.add(data)
             session.commit()
-            session.close()
-            return jsonify({'message': 'Succesful Registration'}), 200
-        except:
+        except Exception as e:
             session.rollback()
-            return jsonify({'message': 'Registration went wrong!'}), 200
+            # Log the exception or handle it as needed
+        finally:
+            session.close()
 
 
     solver_req_dict = {
@@ -2131,39 +2140,44 @@ def get_required_workforce():
         if button == "Save Template":
             workforce_data = request.get_json()
             session = get_session(get_database_uri('', user.company_name.lower().replace(' ', '_')))
-            data_deletion = session.query(TemplateTimeRequirement).filter_by(company_name=user.company_name, template_name=workforce_data['template_name'])
-            if data_deletion:
-                data_deletion.delete()
-                session.commit()
-            for i in range(day_num):
-                for quarter in range(int(daily_slots)): # There are 96 quarters in a day
-                    if quarter >= full_day +1:
-                        quarter -= full_day + 1
-                        quarter_hour = quarter / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
-                        quarter_minute = (quarter % hour_divider) * minutes  # Remainder gives the quarter in the hour
-                        formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
-                    else:
-                        quarter_hour = quarter / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
-                        quarter_minute = (quarter % hour_divider) * minutes  # Remainder gives the quarter in the hour
-                        formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
-                    capacity = workforce_data.get(f'worker_{i}_{formatted_time}')
-                    if capacity:
-                        time = f'{formatted_time}:00'
-                        new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
+            try:
+                data_deletion = session.query(TemplateTimeRequirement).filter_by(company_name=user.company_name, template_name=workforce_data['template_name'])
+                if data_deletion:
+                    data_deletion.delete()
+                    session.commit()
+                for i in range(day_num):
+                    for quarter in range(int(daily_slots)): # There are 96 quarters in a day
+                        if quarter >= full_day +1:
+                            quarter -= full_day + 1
+                            quarter_hour = quarter / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
+                            quarter_minute = (quarter % hour_divider) * minutes  # Remainder gives the quarter in the hour
+                            formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+                        else:
+                            quarter_hour = quarter / hour_divider  # Each quarter represents 15 minutes, so divided by 4 gives hour
+                            quarter_minute = (quarter % hour_divider) * minutes  # Remainder gives the quarter in the hour
+                            formatted_time = f'{int(quarter_hour):02d}:{int(quarter_minute):02d}'
+                        capacity = workforce_data.get(f'worker_{i}_{formatted_time}')
+                        if capacity:
+                            time = f'{formatted_time}:00'
+                            new_time = datetime.datetime.strptime(time, '%H:%M:%S').time()
 
-                        temp_req = TemplateTimeRequirement(
-                            company_name = user.company_name,
-                            template_name = workforce_data['template_name'],
-                            weekday = {i},
-                            start_time = new_time,
-                            worker = capacity,
-                            created_by = user.company_id,
-                            changed_by = user.company_id,
-                            creation_timestamp = creation_date
-                            )
-                        session.add(temp_req)
-                        session.commit()
-                        session.close()
+                            temp_req = TemplateTimeRequirement(
+                                company_name = user.company_name,
+                                template_name = workforce_data['template_name'],
+                                weekday = {i},
+                                start_time = new_time,
+                                worker = capacity,
+                                created_by = user.company_id,
+                                changed_by = user.company_id,
+                                creation_timestamp = creation_date
+                                )
+                            session.add(temp_req)
+                session.commit()
+            except Exception as e:
+                session.rollback()
+                # Log the exception or handle it as needed
+            finally:
+                session.close()
         
     calendar_dict={
         'weekdays': weekdays,
@@ -2479,6 +2493,7 @@ def get_current_user_session():
     session_company = jwt_data.get("company_name").lower().replace(' ', '_')
     session = get_session(get_database_uri('', session_company))
     current_user = session.query(User).filter_by(email=current_user_id).first()
+    session.close()
     return session, current_user
 
 def get_worker_count(session, current_user):
@@ -2767,6 +2782,9 @@ def user_management():
             'email': user.email,
         }
         to_dict.append(user_dict)  # Append each user_dict to to_dict list
+    
+    session.close()
+
     return jsonify(users=to_dict)  # Return all user data as a JSON response
 
 
@@ -2867,6 +2885,7 @@ def is_initial_setup_needed():
     is_opening_hours_empty = session.query(OpeningHours).first() is None
     is_solverreq_empty = session.query(SolverRequirement).first() is None
     # Add a similar check for SolverReq table
+    session.close()
     return is_company_empty or is_opening_hours_empty or is_solverreq_empty
 
 @app.route('/api/check_initial_setup', methods=['POST', 'GET'])
@@ -2993,6 +3012,8 @@ def check_initial_setup():
         session.add(new_solverreq_data)
         session.commit()
         session.close()   
+
+    session.close()
 
     return jsonify({'initialSetupNeeded': is_initial_setup_needed()})
 
