@@ -1,18 +1,5 @@
-@media (max-width: 768px) {
-    .pro-sidebar {
-      width: 100%;
-      height: 60px;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 100;
-    }
-  
-    .pro-menu-item {
-      display: inline-block;
-      /* Other styles for alignment and spacing */
-    }
-  
-    /* Additional styling for mobile view */
+@media (max-width: 600px) {
+  .sidebar {
+    display: none;
   }
-  
+}

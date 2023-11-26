@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import { AppBar, Box, IconButton, Typography, useTheme } from "@mui/material";
 import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
@@ -18,23 +18,22 @@ import GroupsIcon from '@mui/icons-material/Groups';
 import CalendarViewMonthIcon from '@mui/icons-material/CalendarViewMonth';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import SettingsIcon from '@mui/icons-material/Settings';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import axios from 'axios';
 import { API_BASE_URL } from "../../config";
 import { useTranslation } from 'react-i18next';
-import '../../i18n';  
-import './side.css';
+import '../../i18n';
+import './side.css'
+import MenuIcon from "@mui/icons-material/Menu";
 
-const isMobile = () => window.innerWidth < 768;
+const drawerWidth = 240;
+const navItems = ['Dashboard', 'Solver', 'User Management', /* ... other items ... */];
+
 const Sidebar = () => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const colors = tokens(theme.palette.mode);
-  const [isCollapsed, setIsCollapsed] = useState(isMobile());
-  const [isDropdownVisible, setIsDropdownVisible] = useState(true);
-  const toggleDropdown = () => {
-    setIsDropdownVisible(!isDropdownVisible);
-  };
-  
-
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
   const token = localStorage.getItem('session_token'); 
   const { t, i18n } = useTranslation();
@@ -45,9 +44,9 @@ const Sidebar = () => {
     email: '',
     accessLevel: ''
   });
-
-  useEffect(() => {
-    axios.get(`${API_BASE_URL}/api/current_react_user`, {
+  
+    useEffect(() => {
+      axios.get(`${API_BASE_URL}/api/current_react_user`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -67,29 +66,24 @@ const Sidebar = () => {
       .catch((error) => {
         console.error('Error fetching data: ', error);
       });
-      const handleResize = () => {
-        setIsCollapsed(isMobile());
-      };
-    
-      // Add event listener
-      window.addEventListener('resize', handleResize);
-    
-      // Call the handler right away so state gets updated with initial window size
-      handleResize();
-  }, []);
+    }, []);
+
+    if (isMobile) {
+      return null;
+    }
 
     const Item = ({ title, to, icon, selected, setSelected, requiredAccessLevel, accessLevel }) => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
-  
+
     // Don't render the item if the user's access level is not included in the required access levels for the item
     if (Array.isArray(requiredAccessLevel) && !requiredAccessLevel.includes(accessLevel)) {
       return null;
     } else if (typeof requiredAccessLevel === 'string' && requiredAccessLevel !== accessLevel) {
       return null;
     }
-    
-    
+
+
     return (
       <MenuItem
         active={selected === title}
@@ -134,7 +128,6 @@ const Sidebar = () => {
       }}
       className="sidebar"
     >
-      {isDropdownVisible && (
       <ProSidebar collapsed={isCollapsed}>
         <Menu iconShape="square">
           {/* LOGO AND MENU ICON */}
@@ -299,13 +292,13 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-{/*             <Item
+            <Item
               title={t('sidebar.Schichtplan')}
               to="/plan2"
               icon={<CalendarViewMonthIcon />}
               selected={selected}
               setSelected={setSelected}
-            /> */}
+            />
             <Item
               title={t('sidebar.Kalender')}
               to="/calendar"
@@ -367,7 +360,6 @@ const Sidebar = () => {
            )}
         </Menu>
       </ProSidebar>
-      )}
     </Box>
   );
 };
