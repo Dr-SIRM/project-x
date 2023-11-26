@@ -32,7 +32,6 @@ const Token_Registration = ({ token_registration }) => {
       // Send the updated form values to the server for database update
       await axios.post(`${API_BASE_URL}/api/token_registration`, values, {
     headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
         }
     });
