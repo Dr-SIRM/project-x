@@ -76,7 +76,9 @@ To-Do Liste:
 
  To-Do's 
  -------------------------------
-
+ - Vorüberprüfung die prüft, ob alle Mitarbeiter in self.mitarbeiter_s in self.mitarbeiter sind. Wenn nein, 
+   heisst das das der Mitarbeiter der in self.mitarebeiter ist aber in self.mitarbeiter_s nicht vorhanden ist, 
+   das dieser keine Fähigkeit zugewiesen bekommen hat
 
 
 
