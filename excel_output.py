@@ -65,7 +65,7 @@ def create_excel_output(current_user_email, start, end):
     # Die entsprechende Company-Instanz abfragen
     company = session.query(Company).filter_by(company_name=company_name).first()
 
-    # Liste für die Abteilungen
+    # Liste für die Fähigkeiten
     departments = []
 
     # Zugriff auf das erste Department
@@ -79,7 +79,7 @@ def create_excel_output(current_user_email, start, end):
         if department_value:
             departments.append(department_value)
 
-    # Zuweisen von Farben zu Abteilungen
+    # Zuweisen von Farben zu Fähigkeiten
     department_colors = {}
     for i, department in enumerate(departments):
         department_initials = department[:2].upper()  # Nehmen Sie die ersten zwei Buchstaben in Großbuchstaben
@@ -314,11 +314,11 @@ def create_excel_output(current_user_email, start, end):
                         start_col = col_index - len(hours) + (datetime.combine(datetime.today(), start_time) - datetime.combine(datetime.today(), (datetime.min + start_time_obj).time())).seconds // (60 * 60 // hour_divider)
                         end_col = start_col + (datetime.combine(datetime.today(), end_time) - datetime.combine(datetime.today(), start_time)).seconds // (60 * 60 // hour_divider) - 1
 
-                        # Färben der Zellen, Einfügen der Abteilungsinitialen und Formatierung
+                        # Färben der Zellen, Einfügen der Fähigkeitsinitialen und Formatierung
                         for col in range(start_col, end_col + 1):
                             cell = ws.cell(row=user_row, column=col)
-                            department_initials = department[:2].upper()  # Erste zwei Buchstaben der Abteilung
-                            cell.value = department_initials  # Setze die Abteilungsinitialen in die Zelle
+                            department_initials = department[:2].upper()  # Erste zwei Buchstaben der Fähigkeit
+                            cell.value = department_initials  # Setze die Fähigkeitsinitialen in die Zelle
                             cell.alignment = Alignment(horizontal='center', vertical='center')  # Zentriere den Text
                             cell.font = Font(size=8, bold=True)  # Setze die Schriftgröße und Schriftart
 
@@ -334,11 +334,11 @@ def create_excel_output(current_user_email, start, end):
                             start_col2 = col_index - len(hours) + (datetime.combine(datetime.today(), start_time2) - datetime.combine(datetime.today(), (datetime.min + start_time_obj).time())).seconds // (60 * 60 // hour_divider)
                             end_col2 = start_col2 + (datetime.combine(datetime.today(), end_time2) - datetime.combine(datetime.today(), start_time2)).seconds // (60 * 60 // hour_divider) - 1
 
-                            # Färben der Zellen, Einfügen der Abteilungsinitialen und Formatierung für die zweite Schicht
+                            # Färben der Zellen, Einfügen der Fähigkeitsinitialen und Formatierung für die zweite Schicht
                             for col in range(start_col2, end_col2 + 1):
                                 cell = ws.cell(row=user_row, column=col)
-                                department_initials = department[:2].upper()  # Erste zwei Buchstaben der Abteilung
-                                cell.value = department_initials  # Setze die Abteilungsinitialen in die Zelle
+                                department_initials = department[:2].upper()  # Erste zwei Buchstaben der Fähigkeit
+                                cell.value = department_initials  # Setze die Fähigkeitsinitialen in die Zelle
                                 cell.alignment = Alignment(horizontal='center', vertical='center')  # Zentriere den Text
                                 cell.font = Font(size=8, bold=True)  # Setze die Schriftgröße und Schriftart
 
@@ -356,22 +356,22 @@ def create_excel_output(current_user_email, start, end):
 
 
 
-    # Legende für die Abteilungen hinzufügen
+    # Legende für die Fähigkeiten hinzufügen
     legend_row = last_data_row + 2  # Beginne zwei Zeilen unter der letzten Datenzeile
-    ws.cell(row=legend_row, column=2, value="Legende Abteilungen:").font = Font(size=11, bold=True)
+    ws.cell(row=legend_row, column=2, value="Legende Fähigkeiten:").font = Font(size=11, bold=True)
 
     for i, department in enumerate(departments):
-        legend_row += 1  # Für jede Abteilung eine neue Zeile
+        legend_row += 1  # Für jede Fähigkeit eine neue Zeile
         department_initials = department[:2].upper()
 
-        # Füge die Abteilungsinitialen und die zugehörige Farbe in die Zelle ein
+        # Füge die Fähigkeitsinitialen und die zugehörige Farbe in die Zelle ein
         initial_cell = ws.cell(row=legend_row, column=2, value=department_initials)
         initial_cell.font = Font(size=8, bold=True)
         initial_cell.alignment = Alignment(horizontal='center')
         cell_color = department_colors.get(department_initials, "00FF00")  # Standardfarbe ist Grün
         initial_cell.fill = PatternFill(start_color=cell_color, end_color=cell_color, fill_type="solid")
 
-        # Füge den vollständigen Namen der Abteilung in die nächste Zelle rechts ein
+        # Füge den vollständigen Namen der Fähigkeit in die nächste Zelle rechts ein
         ws.cell(row=legend_row, column=3, value=department).font = Font(size=10)
 
 

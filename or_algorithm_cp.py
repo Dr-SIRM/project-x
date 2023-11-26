@@ -673,7 +673,7 @@ class ORAlgorithm_cp:
     def pre_check_1(self):
         """
         ---------------------------------------------------------------------------------------------------------------
-        1. Vorüberprüfung: Haben Sie für mindestens eine Fähigkeit/Abteilung im Berechnungszeitraum unter Planung eigetragen, 
+        1. Vorüberprüfung: Haben Sie für mindestens eine Fähigkeit/Fähigkeit im Berechnungszeitraum unter Planung eigetragen, 
                            wieviele Mitarbeiter benötigt werden?
         ---------------------------------------------------------------------------------------------------------------
         """
@@ -721,12 +721,12 @@ class ORAlgorithm_cp:
 
                 time_req_dict = self.time_req.get(current_date, {})
                     
-                # Prüft, ob für den Tag Stunden in mindestens einer Abteilung geplant sind
+                # Prüft, ob für den Tag Stunden in mindestens einer Fähigkeit geplant sind
                 if all(not dept_hours for dept_hours in time_req_dict.values()):
                     fehlende_stunden.append(current_date)
 
             if fehlende_stunden:
-                error_message_lines = ["An folgenden Tagen wurden keine Stunden für irgendeine Abteilung geplant:"]
+                error_message_lines = ["An folgenden Tagen wurden keine Stunden für irgendeine Fähigkeit geplant:"]
                 for date in fehlende_stunden:
                     error_message_lines.append(f"Datum: {date}")
                 raise ValueError("\n".join(error_message_lines))
@@ -2394,7 +2394,7 @@ class ORAlgorithm_cp:
                 continue
 
             for department, days in departments.items():
-                print(f"Verarbeite Abteilung: {department}")
+                print(f"Verarbeite Fähigkeit: {department}")
 
                 for day_index, day in enumerate(days):
                     # Wir gehen davon aus, dass der erste Tag im 'self.user_availability' das Startdatum ist
