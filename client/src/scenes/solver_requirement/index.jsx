@@ -35,7 +35,6 @@ const SolverReq = ({ solverreq }) => {
               }
           });
           setsolverData(response.data);
-          console.log("Daily Deployment Data: ", solverData.daily_deployment);
         } catch (error) {
           console.error('Error fetching Solver details:', error);
         }
@@ -121,7 +120,7 @@ const SolverReq = ({ solverreq }) => {
           time_per_deployment: solverData.time_per_deployment,
           new_fte_per_slot: solverData.new_fte_per_slot,
           subsequent_workingdays_max: solverData.subsequent_workingdays_max,
-          skills_per_day: solverData.skills_per_day,
+          skills_per_day: String(solverData.skills_per_day),
           nb1: String(solverData.nb1),
           nb2: String(solverData.nb2),
           nb3: String(solverData.nb3),
