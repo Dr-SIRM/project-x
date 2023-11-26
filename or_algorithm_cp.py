@@ -82,9 +82,12 @@ To-Do Liste:
 
 
 
+
+
  --- PRIO 2 ---
  -------------------------------
  - (*) NB9 mit 3 Schichten fertigbauen
+ - Weiche NB11/12, NB erweitern damit die Differenz der gerechten Verteilungen zueinander auch bestraft wird
  -------------------------------
 
  
@@ -496,10 +499,12 @@ class ORAlgorithm_cp:
 
         # -- 15 ------------------------------------------------------------------------------------------------------------
         # Toleranz der gerechten Verteilung
+        """
         key = "fair_distribution"
         if key in self.solver_requirements:
             self.fair_distribution = self.solver_requirements[key]
         self.fair_distribution = self.fair_distribution / 100      # Prozentumrechnung
+        """
 
         # -- 16 ------------------------------------------------------------------------------------------------------------
         # Maximale Arbeitstage in Folge (Weiche NB)
@@ -609,7 +614,7 @@ class ORAlgorithm_cp:
         print("13. self.min_anwesend: ", self.min_anwesend)
         print("13.5 self.total_holidays_per_user: ", self.total_holidays_per_user)
         print("14. self.gerechte_verteilung: ", self.gerechte_verteilung)
-        print("15. self.fair_distribution: ", self.fair_distribution)
+        # print("15. self.fair_distribution: ", self.fair_distribution)
         print("16. self.subsequent_workingdays: ", self.subsequent_workingdays)
         print("16.5. self.subsequent_workingdays_max: ", self.subsequent_workingdays_max)
         print("17. self.daily_deployment: ", self.daily_deployment)
@@ -892,7 +897,7 @@ class ORAlgorithm_cp:
         try:
             mannstunden = 0
             for i, lvl in enumerate(self.employment_lvl_exact):
-                mannstunden_per_user = lvl * self.weekly_hours
+                mannstunden_per_user = lvl * self.weekly_hours * self.week_timeframe
 
                 if self.gesamtstunden_verfügbarkeit[i] < mannstunden_per_user:
                     mannstunden += self.gesamtstunden_verfügbarkeit[i]
@@ -2525,7 +2530,7 @@ class ORAlgorithm_cp:
             self_gesamtstunden_verfügbarkeit = str(self.gesamtstunden_verfügbarkeit),
             self_min_anwesend = str(self.min_anwesend),
             self_gerechte_verteilung = str(self.gerechte_verteilung),
-            self_fair_distribution = self.fair_distribution,
+            self_fair_distribution = None,
             solving_time = self.solving_time_seconds,
             lp_iteration = None,
             violation_nb1 = self.violation_nb1,
