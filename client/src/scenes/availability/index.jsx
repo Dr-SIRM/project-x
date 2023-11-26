@@ -502,13 +502,19 @@ useEffect(() => {
         </>
       )}
       
-      {Array.from({ length: availabilityData.day_num }).map((_, rowIndex) => (
-        <Box
-          display="grid"
-          gridTemplateColumns={isMobile ? "repeat(5, 1fr)" : "repeat(7, minmax(0, 1fr))"}
-          gap="10px"  
-          sx={{ gridColumn: "span 7" }}
-        >
+      {Array.from({ length: availabilityData.day_num }).map((_, rowIndex) => {
+        // Determine the grid layout based on the value of `additionalTimes`
+        const gridTemplate = isMobile 
+          ? `repeat(${5 + additionalTimes}, 1fr)` 
+          : "repeat(7, minmax(0, 1fr))";
+
+        return (
+          <Box
+            display="grid"
+            gridTemplateColumns={gridTemplate}
+            gap="10px"  
+            sx={{ gridColumn: "span 7" }}
+          >
           <Typography
             key={`number-${rowIndex}`}
             color={colors.primary[100]}
@@ -569,7 +575,7 @@ useEffect(() => {
             />
           ))}
         </Box>
-      ))}
+      )})}
     </Box>
             <Box display="flex" justifyContent="end" mt="20px">
             <Button onClick={handleAddTime} color="primary" variant="contained" sx={{ marginRight: '10px' }}>
