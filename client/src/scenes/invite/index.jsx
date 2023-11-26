@@ -191,7 +191,7 @@ const Invite = ({ invite }) => {
                   backgroundColor: "#f0f0f0", 
                 }}
               >
-                {t('registration.skills1')}
+                {t('registration.skill1')}
               </Typography>
               <Select
                 fullWidth
