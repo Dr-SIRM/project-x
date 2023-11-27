@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
-import { AppBar, Box, IconButton, Typography, useTheme } from "@mui/material";
+import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
@@ -25,6 +25,20 @@ import { useTranslation } from 'react-i18next';
 import '../../i18n';
 import './side.css'
 import MenuIcon from "@mui/icons-material/Menu";
+import {
+  AppBar,
+  CssBaseline,
+  Divider,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Toolbar,
+  ListItemIcon
+  
+} from "@mui/material";
+import { Dashboard } from "@mui/icons-material";
 
 const drawerWidth = 240;
 const navItems = ['Dashboard', 'Solver', 'User Management', /* ... other items ... */];
@@ -32,6 +46,7 @@ const navItems = ['Dashboard', 'Solver', 'User Management', /* ... other items .
 const Sidebar = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [mobileOpen, setMobileOpen] = useState(false);
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
@@ -68,9 +83,6 @@ const Sidebar = () => {
       });
     }, []);
 
-    if (isMobile) {
-      return null;
-    }
 
     const Item = ({ title, to, icon, selected, setSelected, requiredAccessLevel, accessLevel }) => {
     const theme = useTheme();
@@ -82,6 +94,7 @@ const Sidebar = () => {
     } else if (typeof requiredAccessLevel === 'string' && requiredAccessLevel !== accessLevel) {
       return null;
     }
+    
 
 
     return (
@@ -105,6 +118,158 @@ const Sidebar = () => {
     }
     return <Typography {...props}>{children}</Typography>;
   };
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
+  const drawer = (
+    <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center', color: "black" }}>
+      <Typography variant="h6" sx={{ my: 2, color: 'white' }}>
+        {user.companyName || "Your Company Name"}
+      </Typography>
+      <Divider />
+      <List>
+        {/* Dashboard */}
+        <ListItem button component={Link} to="/dashboard" selected={selected === 'Dashboard'} onClick={() => setSelected('Dashboard')}>
+          <ListItemIcon><HomeOutlinedIcon /></ListItemIcon>
+          <ListItemText primary={t('sidebar.Dashboard')} sx={{ color: 'white' }} />
+        </ListItem>
+
+        {/* Solver */}
+        {["Super_Admin", "Admin"].includes(user.accessLevel) && (
+          <ListItem button component={Link} to="/solver" selected={selected === 'Solver'} onClick={() => setSelected('Solver')}>
+            <ListItemIcon><CalculateIcon /></ListItemIcon>
+            <ListItemText primary={t('sidebar.Solver')} sx={{ color: 'white' }} />
+          </ListItem>
+        )}
+        {/* Solver Requirement */}
+        {["Super_Admin", "Admin"].includes(user.accessLevel) && (
+          <ListItem button component={Link} to="/solver/requirement" selected={selected === 'SolverReq'} onClick={() => setSelected('SolverReq')}>
+            <ListItemIcon><TuneIcon /></ListItemIcon>
+            <ListItemText primary={t('sidebar.Solver Req')} sx={{ color: 'white' }} />
+          </ListItem>
+        )}
+        {/* Manage Team */}
+        {["Super_Admin", "Admin"].includes(user.accessLevel) && (
+          <ListItem button component={Link} to="/team" selected={selected === 'ManageTeam'} onClick={() => setSelected('ManageTeam')}>
+            <ListItemIcon><GroupsIcon /></ListItemIcon>
+            <ListItemText primary={t('sidebar.Manage Team')} sx={{ color: 'white' }} />
+          </ListItem>
+        )}
+  
+        {/* User Management */}
+        {["Super_Admin", "Admin"].includes(user.accessLevel) && (
+          <ListItem button component={Link} to="/user_management" selected={selected === 'UserManagement'} onClick={() => setSelected('UserManagement')}>
+            <ListItemIcon><PersonOutlinedIcon /></ListItemIcon>
+            <ListItemText primary={t('sidebar.User Management')} sx={{ color: 'white' }} />
+          </ListItem>
+        )}
+        {/* Availability */}
+        {["Super_Admin", "Admin"].includes(user.accessLevel) && (
+          <ListItem button component={Link} to="/availability" selected={selected === 'Availability'} onClick={() => setSelected('Availability')}>
+            <ListItemIcon><EventAvailableIcon /></ListItemIcon>
+            <ListItemText primary={t('sidebar.Verfügbarkeit')} sx={{ color: 'white' }} />
+          </ListItem>
+        )}
+  
+        {/* Calendar */}
+        <ListItem button component={Link} to="/calendar" selected={selected === 'Calendar'} onClick={() => setSelected('Calendar')}>
+          <ListItemIcon><CalendarTodayOutlinedIcon /></ListItemIcon>
+          <ListItemText primary={t('sidebar.Kalender')} sx={{ color: 'white' }} />
+        </ListItem>
+  
+        {/* Company */}
+        {["Super_Admin", "Admin"].includes(user.accessLevel) && (
+          <ListItem button component={Link} to="/company" selected={selected === 'Company'} onClick={() => setSelected('Company')}>
+            <ListItemIcon><BusinessIcon /></ListItemIcon>
+            <ListItemText primary={t('sidebar.Company')} sx={{ color: 'white' }} />
+          </ListItem>
+        )}
+  
+        {/* Planning */}
+        {["Super_Admin", "Admin"].includes(user.accessLevel) && (
+          <ListItem button component={Link} to="/planning" selected={selected === 'Planning'} onClick={() => setSelected('Planning')}>
+            <ListItemIcon><EventNoteIcon /></ListItemIcon>
+            <ListItemText primary={t('sidebar.Planung')} sx={{ color: 'white' }} />
+          </ListItem>
+        )}
+  
+        {/* Shift Plan */}
+        <ListItem button component={Link} to="/plan" selected={selected === 'ShiftPlan'} onClick={() => setSelected('ShiftPlan')}>
+          <ListItemIcon><CalendarViewMonthIcon /></ListItemIcon>
+          <ListItemText primary={t('sidebar.Schichtplan')} sx={{ color: 'white' }} />
+        </ListItem>
+  
+        {/* Settings */}
+        <ListItem button component={Link} to="/update" selected={selected === 'Settings'} onClick={() => setSelected('Settings')}>
+          <ListItemIcon><SettingsIcon /></ListItemIcon>
+          <ListItemText primary={t('sidebar.Einstellungen')} sx={{ color: 'white' }} />
+        </ListItem>
+  
+        {/* FAQ */}
+        <ListItem button component={Link} to="/faq" selected={selected === 'FAQ'} onClick={() => setSelected('FAQ')}>
+          <ListItemIcon><HelpOutlineOutlinedIcon /></ListItemIcon>
+          <ListItemText primary={t('sidebar.FAQ')} sx={{ color: 'white' }} />
+        </ListItem>
+
+      </List>
+    </Box>
+  );
+  
+  
+
+  // Render mobile view
+  if (isMobile) {
+    return (
+      <Box sx={{ display: 'flex' }}>
+        <CssBaseline />
+        {isMobile && (
+          <>
+            <AppBar 
+                position="fixed" 
+                sx={{ 
+                  zIndex: (theme) => theme.zIndex.drawer + 1,
+                  backgroundColor: 'transparent', // Set background to transparent
+                  boxShadow: 'none', // Remove box shadow
+                  display: isMobile ? 'block' : 'none' // Ensure it's only for mobile view
+                }}
+              >
+
+            </AppBar>
+            <Drawer
+              variant="temporary"
+              open={mobileOpen}
+              onClose={handleDrawerToggle}
+              ModalProps={{ keepMounted: true }}
+              sx={{
+                display: { xs: 'block', sm: 'none' },
+                '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+              }}
+            >
+              {drawer}
+            </Drawer>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerToggle}
+              sx={{
+                position: 'fixed',
+                bottom: 16,
+                right: 16,
+                backgroundColor: 'primary.main',
+                color: 'white',
+                zIndex: theme => theme.zIndex.drawer + 2
+              }}
+            >
+              <MenuIcon />
+            </IconButton>
+          </>
+        )}
+      </Box>
+    );
+  
+  } else {
   
   
   return (
@@ -362,6 +527,7 @@ const Sidebar = () => {
       </ProSidebar>
     </Box>
   );
+};
 };
 
 export default Sidebar;
