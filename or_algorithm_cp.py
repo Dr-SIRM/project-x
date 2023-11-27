@@ -2370,123 +2370,119 @@ class ORAlgorithm_cp:
         # Eine neue Session kreieren
         jwt_data = get_jwt()
         session_company = jwt_data.get("company_name").lower().replace(' ', '_')
-        session = get_session(get_database_uri('', session_company))
+        uri = get_database_uri('', session_company)
+
+        with get_session(uri) as session:
         
-        # Bestimme den maximalen Datumsbereich aller Benutzer
-        all_start_dates = [self.user_availability[user_id][0][0] for user_id in self.mitarbeiter_arbeitszeiten]
-        all_end_dates = [start_date + datetime.timedelta(days=max(len(days) for days in departments.values()) - 1)
-                        for start_date, departments in zip(all_start_dates, self.mitarbeiter_arbeitszeiten.values())]
+            # Bestimme den maximalen Datumsbereich aller Benutzer
+            all_start_dates = [self.user_availability[user_id][0][0] for user_id in self.mitarbeiter_arbeitszeiten]
+            all_end_dates = [start_date + datetime.timedelta(days=max(len(days) for days in departments.values()) - 1)
+                            for start_date, departments in zip(all_start_dates, self.mitarbeiter_arbeitszeiten.values())]
 
-        # Früheste Startdatum und das späteste Enddatum für den gesamten Löschvorgang wählen
-        global_start_date = min(all_start_dates)
-        global_end_date = max(all_end_dates)
-        print(global_start_date)
-        print(global_end_date)
+            # Früheste Startdatum und das späteste Enddatum für den gesamten Löschvorgang wählen
+            global_start_date = min(all_start_dates)
+            global_end_date = max(all_end_dates)
+            print(global_start_date)
+            print(global_end_date)
 
-        # Lösche alle Einträge im globalen Datumsbereich
-        session.query(Timetable).filter(
-            Timetable.date >= global_start_date, 
-            Timetable.date <= global_end_date
-        ).delete()
-        session.commit()
+            # Lösche alle Einträge im globalen Datumsbereich
+            session.query(Timetable).filter(
+                Timetable.date >= global_start_date, 
+                Timetable.date <= global_end_date
+            ).delete()
 
-        for email, departments in self.mitarbeiter_arbeitszeiten.items(): # Durch mitarbeiter_arbeitszeiten durchitterieren
-            print(f"Verarbeite Benutzer-Email: {email}")
+            for email, departments in self.mitarbeiter_arbeitszeiten.items(): # Durch mitarbeiter_arbeitszeiten durchitterieren
+                print(f"Verarbeite Benutzer-Email: {email}")
 
-            # Benutzer aus der Datenbank abrufen
-            user = session.query(User).filter_by(email=email).first()
-            print(user)
-            if not user:
-                print(f"Kein Benutzer gefunden mit Email: {email}")
-                continue
+                # Benutzer aus der Datenbank abrufen
+                user = session.query(User).filter_by(email=email).first()
+                print(user)
+                if not user:
+                    print(f"Kein Benutzer gefunden mit Email: {email}")
+                    continue
 
-            for department, days in departments.items():
-                print(f"Verarbeite Fähigkeit: {department}")
+                for department, days in departments.items():
+                    print(f"Verarbeite Fähigkeit: {department}")
 
-                for day_index, day in enumerate(days):
-                    # Wir gehen davon aus, dass der erste Tag im 'self.user_availability' das Startdatum ist
-                    date = self.user_availability[email][0][0] + datetime.timedelta(days=day_index)
-                    weekday = date.strftime('%A') # Den aktuellen Wochentag finden
+                    for day_index, day in enumerate(days):
+                        # Wir gehen davon aus, dass der erste Tag im 'self.user_availability' das Startdatum ist
+                        date = self.user_availability[email][0][0] + datetime.timedelta(days=day_index)
+                        weekday = date.strftime('%A') # Den aktuellen Wochentag finden
 
-                    # Hier unterteilen wir den Tag in Schichten, basierend auf den Zeiten, zu denen der Mitarbeiter arbeitet
-                    shifts = []
-                    start_time_index = None
+                        # Hier unterteilen wir den Tag in Schichten, basierend auf den Zeiten, zu denen der Mitarbeiter arbeitet
+                        shifts = []
+                        start_time_index = None
 
-                    for time_index in range(len(day)):
-                        if day[time_index] == 1 and start_time_index is None:
-                            start_time_index = time_index
-                        elif day[time_index] == 0 and start_time_index is not None:
-                            shifts.append((start_time_index, time_index))
-                            start_time_index = None
+                        for time_index in range(len(day)):
+                            if day[time_index] == 1 and start_time_index is None:
+                                start_time_index = time_index
+                            elif day[time_index] == 0 and start_time_index is not None:
+                                shifts.append((start_time_index, time_index))
+                                start_time_index = None
 
-                    if start_time_index is not None:
-                        shifts.append((start_time_index, len(day)))
+                        if start_time_index is not None:
+                            shifts.append((start_time_index, len(day)))
 
-                    print(f"Berechnete Schichten für Benutzer-Email {email}, Tag-Index {day_index}: {shifts}")
+                        print(f"Berechnete Schichten für Benutzer-Email {email}, Tag-Index {day_index}: {shifts}")
 
-                    # Divisor bestimmen
-                    divisor = 3600 / self.hour_divider
+                        # Divisor bestimmen
+                        divisor = 3600 / self.hour_divider
 
-                    for shift_index, (start_time, end_time) in enumerate(shifts):
-                        opening_time_in_units = int(self.laden_oeffnet[day_index].total_seconds() * self.hour_divider / 3600)
-                        start_time += opening_time_in_units
-                        end_time += opening_time_in_units
+                        for shift_index, (start_time, end_time) in enumerate(shifts):
+                            opening_time_in_units = int(self.laden_oeffnet[day_index].total_seconds() * self.hour_divider / 3600)
+                            start_time += opening_time_in_units
+                            end_time += opening_time_in_units
 
-                        """
-                        print("start_time: ", start_time)
-                        print("end_time: ", end_time)
-                        print("shift_index: ", shift_index)
-                        """
+                            """
+                            print("start_time: ", start_time)
+                            print("end_time: ", end_time)
+                            print("shift_index: ", shift_index)
+                            """
 
-                        start_datetime = datetime.datetime.combine(date, datetime.datetime.min.time()) + timedelta(hours=start_time // self.hour_divider, minutes=(start_time % self.hour_divider) * 60 / self.hour_divider)
-                        end_datetime = datetime.datetime.combine(date, datetime.datetime.min.time()) + timedelta(hours=end_time // self.hour_divider, minutes=(end_time % self.hour_divider) * 60 / self.hour_divider)
+                            start_datetime = datetime.datetime.combine(date, datetime.datetime.min.time()) + timedelta(hours=start_time // self.hour_divider, minutes=(start_time % self.hour_divider) * 60 / self.hour_divider)
+                            end_datetime = datetime.datetime.combine(date, datetime.datetime.min.time()) + timedelta(hours=end_time // self.hour_divider, minutes=(end_time % self.hour_divider) * 60 / self.hour_divider)
 
-                        # Überprüfen Sie, ob das Enddatum auf den nächsten Tag überläuft
-                        if end_datetime.time() < start_datetime.time():
-                            end_datetime += timedelta(days=1)
+                            # Überprüfen Sie, ob das Enddatum auf den nächsten Tag überläuft
+                            if end_datetime.time() < start_datetime.time():
+                                end_datetime += timedelta(days=1)
 
-                        # Neues Timetable-Objekt
-                        if shift_index == 0:
-                            new_entry = Timetable(
-                                email=user.email,
-                                first_name=user.first_name,
-                                last_name=user.last_name,
-                                company_name=user.company_name,
-                                department=department,
-                                date=date,
-                                weekday = weekday,
-                                start_time=start_datetime,
-                                end_time=end_datetime,
-                                start_time2=None,
-                                end_time2=None,
-                                start_time3=None,
-                                end_time3=None,
-                                created_by=self.current_user_email,
-                                changed_by=self.current_user_email,
-                                creation_timestamp=datetime.datetime.now()
-                            )
+                            # Neues Timetable-Objekt
+                            if shift_index == 0:
+                                new_entry = Timetable(
+                                    email=user.email,
+                                    first_name=user.first_name,
+                                    last_name=user.last_name,
+                                    company_name=user.company_name,
+                                    department=department,
+                                    date=date,
+                                    weekday = weekday,
+                                    start_time=start_datetime,
+                                    end_time=end_datetime,
+                                    start_time2=None,
+                                    end_time2=None,
+                                    start_time3=None,
+                                    end_time3=None,
+                                    created_by=self.current_user_email,
+                                    changed_by=self.current_user_email,
+                                    creation_timestamp=datetime.datetime.now()
+                                )
+                                session.add(new_entry)
+
+                            elif shift_index == 1:
+                                start_time2 = datetime.datetime.combine(date, datetime.datetime.min.time()) + timedelta(hours=start_time // self.hour_divider, minutes=(start_time % self.hour_divider) * 60 / self.hour_divider)
+                                end_time2 = datetime.datetime.combine(date, datetime.datetime.min.time()) + timedelta(hours=end_time // self.hour_divider, minutes=(end_time % self.hour_divider) * 60 / self.hour_divider)
+
+                                # Überprüfen, ob das Enddatum auf den nächsten Tag überläuft
+                                if end_time2.time() < start_time2.time():
+                                    end_time2 += timedelta(days=1)
+
+                                new_entry.start_time2 = start_time2
+                                new_entry.end_time2 = end_time2
+
+
+                            # new_entry der Datenbank hinzufügen
                             session.add(new_entry)
 
-                        elif shift_index == 1:
-                            start_time2 = datetime.datetime.combine(date, datetime.datetime.min.time()) + timedelta(hours=start_time // self.hour_divider, minutes=(start_time % self.hour_divider) * 60 / self.hour_divider)
-                            end_time2 = datetime.datetime.combine(date, datetime.datetime.min.time()) + timedelta(hours=end_time // self.hour_divider, minutes=(end_time % self.hour_divider) * 60 / self.hour_divider)
-
-                            # Überprüfen, ob das Enddatum auf den nächsten Tag überläuft
-                            if end_time2.time() < start_time2.time():
-                                end_time2 += timedelta(days=1)
-
-                            new_entry.start_time2 = start_time2
-                            new_entry.end_time2 = end_time2
-
-
-                        # new_entry der Datenbank hinzufügen
-                        session.add(new_entry)
-
-            # Änderungen in der Datenbank speichern
-            session.commit()
-
-        # Session wieder beenden
-        session.close()
 
 
     def save_data_in_database_testing(self):
