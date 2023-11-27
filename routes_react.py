@@ -850,6 +850,16 @@ def get_availability():
         query_weekdays = [weekdays[i] for i in range(day_num)]
         dates = [week_start + datetime.timedelta(days=i) for i in range(day_num)]
 
+
+        # Fetch Opening Data
+        all_opening_hours = session.query(OpeningHours).filter(
+            OpeningHours.company_name == user.company_name,
+            OpeningHours.weekday.in_(list(weekdays.values()))
+        ).all()
+        
+        opening_hours_dict = {oh.weekday: oh for oh in all_opening_hours}
+
+
         # Create Drop Down Based Access Level
         if user.access_level == "User":
             user_list = [f"{user.first_name}, {user.last_name}, {user.email}"]
@@ -936,6 +946,9 @@ def get_availability():
                         print(i)
                     else:
                         planned_holiday = None
+
+                    weekday = weekdays.get(i)
+                    opening_details = opening_hours_dict.get(weekday)
                     
                     # Loop through entries
                     new_entry = {}
@@ -950,15 +963,15 @@ def get_availability():
                                 availability_minutes = new_entry['entry1'].minute
                                 total_availability_start = availability_hours * solverreq.hour_divider + availability_minutes
                                 print(i, j, total_availability_start)
-                                opening_hours = opening.start_time.hour
-                                opening_minutes = opening.start_time.minute
+                                opening_hours = opening_details.start_time.hour
+                                opening_minutes = opening_details.start_time.minute
                                 total_opening_start = opening_hours * solverreq.hour_divider + opening_minutes
-                                print(opening.start_time)
+                                print(opening_details.start_time)
                                 print(i, j , total_opening_start)
                                 if total_availability_start == 0:
                                     new_entry[f'entry{j + 1}'] = get_time_str(entry) if entry else None
                                 elif total_availability_start < total_opening_start:
-                                    new_entry['entry1'] = opening.start_time
+                                    new_entry['entry1'] = opening_details.start_time
                                 else:
                                     new_entry[f'entry{j + 1}'] = get_time_str(entry) if entry else None
 
