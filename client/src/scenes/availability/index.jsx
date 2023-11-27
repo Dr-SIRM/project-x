@@ -577,32 +577,56 @@ useEffect(() => {
         </Box>
       )})}
     </Box>
-            <Box display="flex" justifyContent="end" mt="20px">
-            <Button onClick={handleAddTime} color="primary" variant="contained" sx={{ marginRight: '10px' }}>
-            {t('availabilty.addtime')}
-            </Button>
-            <Button 
-            variant="outlined"
-            color="inherit"
-            onClick={() => handleFormSubmit(values, "Submit")}
-            sx={{
-              borderColor: 'white',
-              '&.MuiButtonOutlined': {
-                borderColor: 'white',
-              },
-              '&:hover': {
-                borderColor: 'white',
-              },
-              '&.MuiButtonText': {
-                borderColor: 'white',
-                color: 'white',
-                backgroundColor: '#2e7c67',
-              }
-            }}
-          >
-            {t('button.submit')}
-          </Button>
-            </Box>
+    <Box display="flex" flexDirection="column" justifyContent="center" mt="20px">
+      {/* "Add Time" Button */}
+      <Button 
+        onClick={handleAddTime} 
+        variant="outlined"  // Changed to outlined
+        color="inherit"
+        sx={{
+          marginBottom: '10px',
+          borderColor: 'white',  // White border
+          '&.MuiButtonOutlined': {
+            borderColor: 'white',
+          },
+          '&:hover': {
+            borderColor: 'white',
+          },
+          '&.MuiButtonText': {
+            borderColor: 'white',
+            color: 'white',
+            backgroundColor: '#2e7c67',
+          }
+        }}
+      >
+        {t('availabilty.addtime')}
+      </Button>
+
+      {/* "Submit" Button */}
+      <Button 
+        onClick={() => handleFormSubmit(values, "Submit")}
+        color="primary"  // Changed to primary color
+        variant="contained"  // Changed to contained
+        sx={{
+          borderColor: 'white',  // Optional as it's contained style
+          '&.MuiButtonOutlined': {
+            borderColor: 'white',  // Optional as it's contained style
+          },
+          '&:hover': {
+            borderColor: 'white',  // Optional as it's contained style
+          },
+          '&.MuiButtonText': {
+            borderColor: 'white',  // Optional as it's contained style
+            color: 'white',
+            backgroundColor: '#2e7c67',
+          }
+        }}
+      >
+        {t('button.submit')}
+      </Button>
+    </Box>
+
+
           </form>
         )}
       </Formik>
