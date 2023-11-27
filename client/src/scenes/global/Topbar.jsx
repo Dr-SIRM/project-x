@@ -1,4 +1,13 @@
-import { Box, IconButton, useTheme, Popover, Typography, Link, MenuItem, Menu } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  useTheme,
+  Popover,
+  Typography,
+  Link,
+  MenuItem,
+  Menu,
+} from "@mui/material";
 import { useContext, useState } from "react";
 import { ColorModeContext, tokens } from "../../theme";
 import InputBase from "@mui/material/InputBase";
@@ -7,10 +16,8 @@ import SearchIcon from "@mui/icons-material/Search";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { AuthContext } from "../../AuthContext";
 import { API_BASE_URL } from "../../config";
-import { useTranslation } from 'react-i18next';
-import LanguageIcon from '@mui/icons-material/Language';
-
-
+import { useTranslation } from "react-i18next";
+import LanguageIcon from "@mui/icons-material/Language";
 
 const Topbar = () => {
   const theme = useTheme();
@@ -24,7 +31,6 @@ const Topbar = () => {
   const [notificationsAnchor, setNotificationsAnchor] = useState(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [settingsAnchor, setSettingsAnchor] = useState(null);
-
 
   const handleLogoutMouseEnter = () => {
     setIsLogoutHovered(true);
@@ -56,10 +62,9 @@ const Topbar = () => {
 
   const handleLanguageChange = (lang) => {
     i18n.changeLanguage(lang);
-    console.log('Language changed to:', lang);
+    console.log("Language changed to:", lang);
     handleClose();
   };
-  
 
   return (
     <Box
@@ -75,7 +80,10 @@ const Topbar = () => {
         backgroundColor={colors.grey[200]}
         borderRadius="15px"
       >
-        <InputBase sx={{ ml: 2, flex: 1, color: "black" }} placeholder="Search" />
+        <InputBase
+          sx={{ ml: 2, flex: 1, color: "black" }}
+          placeholder="Search"
+        />
         <IconButton type="button" sx={{ p: 1, color: "black" }}>
           <SearchIcon />
         </IconButton>
@@ -83,11 +91,13 @@ const Topbar = () => {
 
       {/* ICONS */}
       <Box justifyContent="flex-end" sx={{ width: "960px", display: "flex" }}>
-        
-        <IconButton onClick={handleClick} color="inherit" style={{ color: 'black' }}>
+        <IconButton
+          onClick={handleClick}
+          color="inherit"
+          style={{ color: "black" }}
+        >
           <LanguageIcon />
         </IconButton>
-
 
         <Menu
           anchorEl={anchorEl}
@@ -95,36 +105,36 @@ const Topbar = () => {
           open={Boolean(anchorEl)}
           onClose={handleClose}
         >
-          <MenuItem onClick={() => handleLanguageChange('de')}>DE</MenuItem>
-          <MenuItem onClick={() => handleLanguageChange('en')}>EN</MenuItem>
+          <MenuItem onClick={() => handleLanguageChange("de")}>DE</MenuItem>
+          <MenuItem onClick={() => handleLanguageChange("en")}>EN</MenuItem>
         </Menu>
 
         <IconButton onClick={handleNotificationsClick} sx={{ color: "black" }}>
           <NotificationsOutlinedIcon />
         </IconButton>
-        
+
         <Popover
           open={isNotificationsOpen}
           anchorEl={notificationsAnchor}
           anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'center',
+            vertical: "bottom",
+            horizontal: "center",
           }}
           transformOrigin={{
-            vertical: 'top',
-            horizontal: 'center',
+            vertical: "top",
+            horizontal: "center",
           }}
           onClose={handlePopoverClose}
           disableRestoreFocus
           sx={{
-            '& .MuiPaper-root': {
-              minHeight: '400px',
-              maxWidth: '300px',
-              borderRadius: '8px',
+            "& .MuiPaper-root": {
+              minHeight: "400px",
+              maxWidth: "300px",
+              borderRadius: "8px",
             },
           }}
         >
-          <Box sx={{ padding: '10px' }}>
+          <Box sx={{ padding: "10px" }}>
             <Typography variant="body2">
               Recent changes and notifications will be displayed here.
             </Typography>
@@ -160,6 +170,6 @@ const Topbar = () => {
       </Box>
     </Box>
   );
- }
+};
 
 export default Topbar;

@@ -1,18 +1,23 @@
 import { useState, useEffect, useContext } from "react";
-import { useTheme, Box, Button, TextField, Snackbar, Typography } from "@mui/material";
+import {
+  useTheme,
+  Box,
+  Button,
+  TextField,
+  Snackbar,
+  Typography,
+} from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { Select, MenuItem } from "@mui/material";
 import Header from "../../components/Header";
 import { tokens } from "../../theme";
-import { ThreeDots } from "react-loader-spinner"; 
-import axios from 'axios';
+import { ThreeDots } from "react-loader-spinner";
+import axios from "axios";
 import { API_BASE_URL } from "../../config";
-import { useTranslation } from 'react-i18next';
-import '../../i18n';  
-
-
+import { useTranslation } from "react-i18next";
+import "../../i18n";
 
 const Invite = ({ invite }) => {
   const theme = useTheme();
@@ -23,50 +28,54 @@ const Invite = ({ invite }) => {
   const [department_list, setDepartmentList] = useState([]);
   const [inviteData, setinviteData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const token = localStorage.getItem('session_token'); // Get the session token from local storage
+  const token = localStorage.getItem("session_token"); // Get the session token from local storage
   const { t, i18n } = useTranslation();
-
 
   useEffect(() => {
     const fetchInvite = async () => {
       setIsLoading(true);
-        try {
-          const response = await axios.get(`${API_BASE_URL}/api/invite`, {
-              headers: {
-                  'Authorization': `Bearer ${token}`
-              }
-          });
-          setinviteData(response.data);
-          setDepartmentList(response.data.department_list);
-          setIsLoading(false);
-        } catch (error) {
-          console.error('Error fetching invite details:', error);
-          setIsLoading(false);
-        }
+      try {
+        const response = await axios.get(`${API_BASE_URL}/api/invite`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setinviteData(response.data);
+        setDepartmentList(response.data.department_list);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching invite details:", error);
+        setIsLoading(false);
+      }
     };
 
     fetchInvite();
   }, []);
 
-  
   const handleFormSubmit = async (values) => {
     try {
       // Send the updated form values to the server for database update
       await axios.post(`${API_BASE_URL}/api/invite`, values, {
-    headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        }
-    });
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
       setShowSuccessNotification(true);
     } catch (error) {
-      console.error('Error updating invite details:', error);
+      console.error("Error updating invite details:", error);
       setShowErrorNotification(true);
     }
   };
   if (isLoading) {
     return (
-      <Box m="20px" display="flex" justifyContent="center" alignItems="center" height="100vh">
+      <Box
+        m="20px"
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
         <ThreeDots type="ThreeDots" color="#70D8BD" height={80} width={80} />
       </Box>
     );
@@ -75,9 +84,9 @@ const Invite = ({ invite }) => {
   return (
     <Box m="20px">
       <Header
-        title={t('registration.invite_title')}
-        subtitle={t('registration.invite_subtitle')}
-      />  
+        title={t("registration.invite_title")}
+        subtitle={t("registration.invite_subtitle")}
+      />
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -111,25 +120,24 @@ const Invite = ({ invite }) => {
               }}
             >
               <Typography
-                
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center", 
+                  justifyContent: "center",
                   height: "100%",
-                  padding: "0 8px", 
-                  backgroundColor: "#f0f0f0", 
+                  padding: "0 8px",
+                  backgroundColor: "#f0f0f0",
                 }}
               >
-                {t('registration.email')}
+                {t("registration.email")}
               </Typography>
               <TextField
                 fullWidth
                 variant="filled"
                 type="text"
-                label= ""
+                label=""
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.email}
@@ -138,32 +146,31 @@ const Invite = ({ invite }) => {
                 helperText={touched.email && errors.email}
                 sx={{
                   gridColumn: "span 2",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
+                  "& .MuiFilledInput-input": {
+                    paddingTop: "10px",
+                    paddingBottom: "10px",
                   },
                 }}
               />
               <Typography
-                
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center", 
+                  justifyContent: "center",
                   height: "100%",
-                  padding: "0 8px", 
-                  backgroundColor: "#f0f0f0", 
+                  padding: "0 8px",
+                  backgroundColor: "#f0f0f0",
                 }}
               >
-                {t('registration.company_name')}
+                {t("registration.company_name")}
               </Typography>
               <TextField
                 fullWidth
                 variant="filled"
                 type="text"
-                label= ""
+                label=""
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.company_name}
@@ -172,32 +179,31 @@ const Invite = ({ invite }) => {
                 helperText={touched.company_name && errors.company_name}
                 sx={{
                   gridColumn: "span 2",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
+                  "& .MuiFilledInput-input": {
+                    paddingTop: "10px",
+                    paddingBottom: "10px",
                   },
                 }}
               />
               <Typography
-                
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center", 
+                  justifyContent: "center",
                   height: "100%",
-                  padding: "0 8px", 
-                  backgroundColor: "#f0f0f0", 
+                  padding: "0 8px",
+                  backgroundColor: "#f0f0f0",
                 }}
               >
-                {t('registration.skill1')}
+                {t("registration.skill1")}
               </Typography>
               <Select
                 fullWidth
                 variant="filled"
                 type="text"
-                label= ""
+                label=""
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.department}
@@ -206,13 +212,15 @@ const Invite = ({ invite }) => {
                 helperText={touched.department && errors.department}
                 sx={{
                   gridColumn: "span 2",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
+                  "& .MuiFilledInput-input": {
+                    paddingTop: "10px",
+                    paddingBottom: "10px",
                   },
                 }}
               >
-                <MenuItem value="">{t('registration.skill_selection')}</MenuItem>
+                <MenuItem value="">
+                  {t("registration.skill_selection")}
+                </MenuItem>
                 {department_list.map((department) => (
                   <MenuItem key={department} value={department}>
                     {department}
@@ -220,25 +228,24 @@ const Invite = ({ invite }) => {
                 ))}
               </Select>
               <Typography
-                
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center", 
+                  justifyContent: "center",
                   height: "100%",
-                  padding: "0 8px", 
-                  backgroundColor: "#f0f0f0", 
+                  padding: "0 8px",
+                  backgroundColor: "#f0f0f0",
                 }}
               >
-                {t('registration.skill2')}
+                {t("registration.skill2")}
               </Typography>
               <Select
                 fullWidth
                 variant="filled"
                 type="text"
-                label= ""
+                label=""
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.department2}
@@ -247,13 +254,15 @@ const Invite = ({ invite }) => {
                 helperText={touched.department2 && errors.department2}
                 sx={{
                   gridColumn: "span 2",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
+                  "& .MuiFilledInput-input": {
+                    paddingTop: "10px",
+                    paddingBottom: "10px",
                   },
                 }}
               >
-                <MenuItem value="">{t('registration.skill_selection')}</MenuItem>
+                <MenuItem value="">
+                  {t("registration.skill_selection")}
+                </MenuItem>
                 {department_list.map((department) => (
                   <MenuItem key={department} value={department}>
                     {department}
@@ -261,25 +270,24 @@ const Invite = ({ invite }) => {
                 ))}
               </Select>
               <Typography
-                
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center", 
+                  justifyContent: "center",
                   height: "100%",
-                  padding: "0 8px", 
-                  backgroundColor: "#f0f0f0", 
+                  padding: "0 8px",
+                  backgroundColor: "#f0f0f0",
                 }}
               >
-                {t('registration.skill3')}
+                {t("registration.skill3")}
               </Typography>
               <Select
                 fullWidth
                 variant="filled"
                 type="text"
-                label= ""
+                label=""
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.department3}
@@ -288,13 +296,15 @@ const Invite = ({ invite }) => {
                 helperText={touched.department3 && errors.department3}
                 sx={{
                   gridColumn: "span 2",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
+                  "& .MuiFilledInput-input": {
+                    paddingTop: "10px",
+                    paddingBottom: "10px",
                   },
                 }}
               >
-                <MenuItem value="">{t('registration.skill_selection')}</MenuItem>
+                <MenuItem value="">
+                  {t("registration.skill_selection")}
+                </MenuItem>
                 {department_list.map((department) => (
                   <MenuItem key={department} value={department}>
                     {department}
@@ -307,19 +317,19 @@ const Invite = ({ invite }) => {
                   gridColumn: "span 1",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center", 
+                  justifyContent: "center",
                   height: "100%",
-                  padding: "0 8px", 
-                  backgroundColor: "#f0f0f0", 
+                  padding: "0 8px",
+                  backgroundColor: "#f0f0f0",
                 }}
               >
-                {t('registration.in_training')} 
+                {t("registration.in_training")}
               </Typography>
               <Select
                 fullWidth
                 variant="filled"
                 type="text"
-                label= ""
+                label=""
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.in_training}
@@ -328,34 +338,33 @@ const Invite = ({ invite }) => {
                 helperText={touched.in_training && errors.in_training}
                 sx={{
                   gridColumn: "span 2",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
+                  "& .MuiFilledInput-input": {
+                    paddingTop: "10px",
+                    paddingBottom: "10px",
                   },
                 }}
               >
-                <MenuItem value={'X'}>X</MenuItem>
+                <MenuItem value={"X"}>X</MenuItem>
               </Select>
               <Typography
-                
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center", 
+                  justifyContent: "center",
                   height: "100%",
-                  padding: "0 8px", 
-                  backgroundColor: "#f0f0f0", 
+                  padding: "0 8px",
+                  backgroundColor: "#f0f0f0",
                 }}
               >
-                {t('registration.employment')}
+                {t("registration.employment")}
               </Typography>
               <Select
                 fullWidth
                 variant="filled"
                 type="text"
-                label= ""
+                label=""
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.employment}
@@ -364,35 +373,38 @@ const Invite = ({ invite }) => {
                 helperText={touched.employment && errors.employment}
                 sx={{
                   gridColumn: "span 2",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
+                  "& .MuiFilledInput-input": {
+                    paddingTop: "10px",
+                    paddingBottom: "10px",
                   },
                 }}
               >
-                <MenuItem value={'Perm'}>{t('registration.full_time')}</MenuItem>
-                <MenuItem value={'Temp'}>{t('registration.part_time')}</MenuItem>
+                <MenuItem value={"Perm"}>
+                  {t("registration.full_time")}
+                </MenuItem>
+                <MenuItem value={"Temp"}>
+                  {t("registration.part_time")}
+                </MenuItem>
               </Select>
               <Typography
-                
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center", 
+                  justifyContent: "center",
                   height: "100%",
-                  padding: "0 8px", 
-                  backgroundColor: "#f0f0f0", 
+                  padding: "0 8px",
+                  backgroundColor: "#f0f0f0",
                 }}
               >
-                {t('registration.employment_level')}
+                {t("registration.employment_level")}
               </Typography>
               <Select
                 fullWidth
                 variant="filled"
                 type="text"
-                label= ""
+                label=""
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.employment_level}
@@ -401,46 +413,45 @@ const Invite = ({ invite }) => {
                 helperText={touched.employment_level && errors.employment_level}
                 sx={{
                   gridColumn: "span 2",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
+                  "& .MuiFilledInput-input": {
+                    paddingTop: "10px",
+                    paddingBottom: "10px",
                   },
-                  '& .MuiSelect-icon': { 
-                    color: 'black', 
+                  "& .MuiSelect-icon": {
+                    color: "black",
                   },
                 }}
               >
-                <MenuItem value={'1'}>100%</MenuItem>
-                <MenuItem value={'0.9'}>90%</MenuItem>
-                <MenuItem value={'0.8'}>80%</MenuItem>
-                <MenuItem value={'0.7'}>70%</MenuItem>
-                <MenuItem value={'0.6'}>60%</MenuItem>
-                <MenuItem value={'0.5'}>50%</MenuItem>
-                <MenuItem value={'0.4'}>40%</MenuItem>
-                <MenuItem value={'0.3'}>30%</MenuItem>
-                <MenuItem value={'0.2'}>20%</MenuItem>
-                <MenuItem value={'0.1'}>10%</MenuItem>
+                <MenuItem value={"1"}>100%</MenuItem>
+                <MenuItem value={"0.9"}>90%</MenuItem>
+                <MenuItem value={"0.8"}>80%</MenuItem>
+                <MenuItem value={"0.7"}>70%</MenuItem>
+                <MenuItem value={"0.6"}>60%</MenuItem>
+                <MenuItem value={"0.5"}>50%</MenuItem>
+                <MenuItem value={"0.4"}>40%</MenuItem>
+                <MenuItem value={"0.3"}>30%</MenuItem>
+                <MenuItem value={"0.2"}>20%</MenuItem>
+                <MenuItem value={"0.1"}>10%</MenuItem>
               </Select>
               <Typography
-                
                 variant="h6"
                 sx={{
                   gridColumn: "span 1",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center", 
+                  justifyContent: "center",
                   height: "100%",
-                  padding: "0 8px", 
-                  backgroundColor: "#f0f0f0", 
+                  padding: "0 8px",
+                  backgroundColor: "#f0f0f0",
                 }}
               >
-                {t('registration.access_level')}
+                {t("registration.access_level")}
               </Typography>
               <Select
                 fullWidth
                 variant="filled"
                 type="text"
-                label= ""
+                label=""
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.access_level}
@@ -449,24 +460,24 @@ const Invite = ({ invite }) => {
                 helperText={touched.access_level && errors.access_level}
                 sx={{
                   gridColumn: "span 2",
-                  '& .MuiFilledInput-input': {
-                    paddingTop: '10px',
-                    paddingBottom: '10px',
+                  "& .MuiFilledInput-input": {
+                    paddingTop: "10px",
+                    paddingBottom: "10px",
                   },
-                  '& .MuiSelect-icon': { 
-                    color: 'black', 
+                  "& .MuiSelect-icon": {
+                    color: "black",
                   },
                 }}
               >
-                <MenuItem value={'User'}>User</MenuItem>
-                <MenuItem value={'Admin'}>Admin</MenuItem>
+                <MenuItem value={"User"}>User</MenuItem>
+                <MenuItem value={"Admin"}>Admin</MenuItem>
               </Select>
             </Box>
             <></>
-            
+
             <Box display="flex" justifyContent="end" mt="20px">
               <Button type="submit" color="primary" variant="contained">
-              {t('button.update')}
+                {t("button.update")}
               </Button>
             </Box>
           </form>
@@ -475,7 +486,7 @@ const Invite = ({ invite }) => {
       <Snackbar
         open={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
-        message={t('registration.success_invite')}
+        message={t("registration.success_invite")}
         autoHideDuration={3000}
         sx={{
           backgroundColor: "green !important",
@@ -490,7 +501,7 @@ const Invite = ({ invite }) => {
       <Snackbar
         open={showErrorNotification}
         onClose={() => setShowErrorNotification(false)}
-        message={t('registration.no_success_invite')}
+        message={t("registration.no_success_invite")}
         autoHideDuration={3000}
         sx={{
           backgroundColor: "red !important",
@@ -513,11 +524,10 @@ const checkoutSchema = yup.object().shape({
   employment: yup.string().required("required"),
   employment_level: yup
     .number()
-    .min(0, 'Company level must be greater than or equal to 0%')
-    .max(100, 'Company level must be less than or equal to 100%')
+    .min(0, "Company level must be greater than or equal to 0%")
+    .max(100, "Company level must be less than or equal to 100%")
     .required("required"),
   access_level: yup.string().required("required"),
 });
-
 
 export default Invite;
