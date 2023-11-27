@@ -1,16 +1,23 @@
 import { useState, useEffect } from "react";
-import { Box, Button, TextField, InputAdornment, Typography, useTheme, Snackbar  } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  InputAdornment,
+  Typography,
+  useTheme,
+  Snackbar,
+} from "@mui/material";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
-import { ThreeDots } from "react-loader-spinner"; 
-import axios from 'axios';
+import { ThreeDots } from "react-loader-spinner";
+import axios from "axios";
 import { API_BASE_URL } from "../../config";
 import { tokens } from "../../theme";
-import { useTranslation } from 'react-i18next';
-import '../../i18n'; 
-
+import { useTranslation } from "react-i18next";
+import "../../i18n";
 
 const Update = () => {
   const theme = useTheme();
@@ -20,47 +27,52 @@ const Update = () => {
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [userData, setUserData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const token = localStorage.getItem('session_token'); // Get the session token from local storage
+  const token = localStorage.getItem("session_token"); // Get the session token from local storage
   const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const fetchUser = async () => {
       setIsLoading(true);
-        try {
-          const response = await axios.get(`${API_BASE_URL}/api/update`, {
-              headers: {
-                  'Authorization': `Bearer ${token}`
-              }
-          });
-          setUserData(response.data);
-          setIsLoading(false);
-        } catch (error) {
-          console.error('Error fetching update details:', error);
-          setIsLoading(false);
-        }
+      try {
+        const response = await axios.get(`${API_BASE_URL}/api/update`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setUserData(response.data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching update details:", error);
+        setIsLoading(false);
+      }
     };
 
     fetchUser();
   }, []);
 
-  
   const handleFormSubmit = async (values) => {
     try {
       // Send the updated form values to the server for database update
       await axios.post(`${API_BASE_URL}/api/update`, values, {
-    headers: {
-        'Authorization': `Bearer ${token}`
-        }
-    });
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setShowSuccessNotification(true);
     } catch (error) {
-      console.error('Error updating update details:', error);
+      console.error("Error updating update details:", error);
       setShowErrorNotification(true);
     }
   };
   if (isLoading) {
     return (
-      <Box m="20px" display="flex" justifyContent="center" alignItems="center" height="100vh">
+      <Box
+        m="20px"
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100vh"
+      >
         <ThreeDots type="ThreeDots" color="#70D8BD" height={80} width={80} />
       </Box>
     );
@@ -68,7 +80,7 @@ const Update = () => {
 
   return (
     <Box m="20px">
-      <Header title={t('registration.update_title')} subtitle="" />
+      <Header title={t("registration.update_title")} subtitle="" />
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -103,7 +115,7 @@ const Update = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label={t('registration.first_name')}
+                label={t("registration.first_name")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.first_name}
@@ -116,7 +128,7 @@ const Update = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label={t('registration.last_name')}
+                label={t("registration.last_name")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.last_name}
@@ -129,7 +141,7 @@ const Update = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label={t('registration.email')}
+                label={t("registration.email")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.email}
@@ -141,10 +153,10 @@ const Update = () => {
               <TextField
                 fullWidth
                 variant="filled"
-                label= {t('registration.phone_number')}
+                label={t("registration.phone_number")}
                 onBlur={handleBlur}
                 onChange={handleChange}
-                defaultCountry={'us'}
+                defaultCountry={"us"}
                 value={values.phone_number}
                 name="phone_number"
                 error={!!touched.phone_number && !!errors.phone_number}
@@ -155,7 +167,7 @@ const Update = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label= {t('registration.password')}
+                label={t("registration.password")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.password}
@@ -168,7 +180,7 @@ const Update = () => {
                 fullWidth
                 variant="filled"
                 type="text"
-                label= {t('registration.password2')}
+                label={t("registration.password2")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.password2}
@@ -177,11 +189,10 @@ const Update = () => {
                 helperText={touched.password2 && errors.password2}
                 sx={{ gridColumn: "span 2" }}
               />
-             
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
               <Button type="submit" color="primary" variant="contained">
-              {t('button.update')}
+                {t("button.update")}
               </Button>
             </Box>
           </form>
@@ -190,11 +201,11 @@ const Update = () => {
       <Snackbar
         open={showSuccessNotification}
         onClose={() => setShowSuccessNotification(false)}
-        message={t('notification.success_update')}
+        message={t("notification.success_update")}
         autoHideDuration={3000}
         sx={{
-          backgroundColor: "green !important", 
-          color: "white", 
+          backgroundColor: "green !important",
+          color: "white",
           "& .MuiSnackbarContent-root": {
             borderRadius: "4px",
             padding: "15px",
@@ -205,11 +216,11 @@ const Update = () => {
       <Snackbar
         open={showErrorNotification}
         onClose={() => setShowErrorNotification(false)}
-        message={t('notification.no_success_update')}
+        message={t("notification.no_success_update")}
         autoHideDuration={3000}
         sx={{
-          backgroundColor: "red !important", 
-          color: "white", 
+          backgroundColor: "red !important",
+          color: "white",
           "& .MuiSnackbarContent-root": {
             borderRadius: "4px",
             padding: "15px",
@@ -217,21 +228,19 @@ const Update = () => {
           },
         }}
       />
-
     </Box>
   );
 };
 
-
 const checkoutSchema = yup.object().shape({
-  first_name: yup.string().required('First name is required'),
-  last_name: yup.string().required('Last name is required'),
-  email: yup.string().email('Invalid email').required('Email is required'),
+  first_name: yup.string().required("First name is required"),
+  last_name: yup.string().required("Last name is required"),
+  email: yup.string().email("Invalid email").required("Email is required"),
   password: yup.string().required("required"),
   password2: yup
-  .string()
-  .oneOf([yup.ref("password"), null], "Passwords must match")
-  .required("required"),
+    .string()
+    .oneOf([yup.ref("password"), null], "Passwords must match")
+    .required("required"),
 });
 
 export default Update;

@@ -1,10 +1,19 @@
 import React, { useState } from "react";
-import { Box, Typography, TextField, Button, Alert, useTheme, Link, CircularProgress } from '@mui/material';
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Alert,
+  useTheme,
+  Link,
+  CircularProgress,
+} from "@mui/material";
 import Header from "../../components/Header";
 import axios from "axios";
 import { API_BASE_URL } from "../../config";
-import { useTranslation } from 'react-i18next';
-import '../../i18n';  
+import { useTranslation } from "react-i18next";
+import "../../i18n";
 
 function ForgetPassword() {
   const [email, setEmail] = useState("");
@@ -16,7 +25,9 @@ function ForgetPassword() {
     e.preventDefault();
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/forget_password`, { email });
+      const response = await axios.post(`${API_BASE_URL}/api/forget_password`, {
+        email,
+      });
 
       if (response.data) {
         setMessage(response.data.message);
@@ -33,41 +44,54 @@ function ForgetPassword() {
       display="flex"
       flexDirection="column"
       justifyContent="center"
-      alignItems="center" 
+      alignItems="center"
       minHeight="100vh"
     >
-    <Header title={t('forget_password.title')} subtitle="" />
-    <Box width="300px" p={2}>
-      <form onSubmit={handleSubmit}>
-        <Box mb={2}>
-          <TextField
-            type="email"
-            label={t('forget_password.email')}
+      <Header title={t("forget_password.title")} subtitle="" />
+      <Box width="300px" p={2}>
+        <form onSubmit={handleSubmit}>
+          <Box mb={2}>
+            <TextField
+              type="email"
+              label={t("forget_password.email")}
+              fullWidth
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </Box>
+          <Button
+            type="submit"
+            variant="contained"
             fullWidth
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </Box>
-        <Button type="submit" variant="contained" fullWidth disabled={loading}>
+            disabled={loading}
+          >
             {loading ? (
-              <CircularProgress size={24} color="inherit" /> 
+              <CircularProgress size={24} color="inherit" />
             ) : (
-              'Zurücksetzen'
+              "Zurücksetzen"
             )}
-            {t('forget_password.reset')}
+            {t("forget_password.reset")}
           </Button>
           <Box mb={2}>
-            <Button variant="contained" href="/login" fullWidth style={{ textDecoration: 'none', color: 'inherit', marginTop: '20px' }}>
-            {t('forget_password.back')}
+            <Button
+              variant="contained"
+              href="/login"
+              fullWidth
+              style={{
+                textDecoration: "none",
+                color: "inherit",
+                marginTop: "20px",
+              }}
+            >
+              {t("forget_password.back")}
             </Button>
           </Box>
-      </form>
-      {message && <p>{message}</p>}
-    
+        </form>
+        {message && <p>{message}</p>}
+      </Box>
     </Box>
-  </Box>
-)}
-
+  );
+}
 
 export default ForgetPassword;

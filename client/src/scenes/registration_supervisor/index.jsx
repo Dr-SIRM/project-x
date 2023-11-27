@@ -2,14 +2,26 @@ import { useState, useEffect, useContext } from "react";
 import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useTheme, Box, Button, TextField, Snackbar, InputLabel, FormControl, Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
+import {
+  useTheme,
+  Box,
+  Button,
+  TextField,
+  Snackbar,
+  InputLabel,
+  FormControl,
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+} from "@mui/material";
 import Header from "../../components/Header";
 import { Select, MenuItem } from "@mui/material";
 import { tokens } from "../../theme";
-import axios from 'axios';
+import axios from "axios";
 import { API_BASE_URL } from "../../config";
-
-
 
 const Registration = ({ registration }) => {
   const theme = useTheme();
@@ -18,14 +30,12 @@ const Registration = ({ registration }) => {
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [registrationData, setregistrationData] = useState({});
-  const token = localStorage.getItem('session_token'); // Get the session token from local storage
+  const token = localStorage.getItem("session_token"); // Get the session token from local storage
 
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState("");
   const [open, setOpen] = useState(true); // Starts open to show the dialog immediately
   const correctPassword = "Ass&Titties"; // replace this with your password
 
-
- 
   const handleClose = () => {
     if (password === correctPassword) {
       console.log("Password is correct");
@@ -39,22 +49,21 @@ const Registration = ({ registration }) => {
   const handlePasswordChange = (event) => {
     setPassword(event.target.value);
   };
-  
+
   const handleFormSubmit = async (values) => {
     try {
       // Send the updated form values to the server for database update
       await axios.post(`${API_BASE_URL}/api/registration/admin`, values, {
-    headers: {
-        'Content-Type': 'application/json',
-        }
-    });
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       setShowSuccessNotification(true);
     } catch (error) {
-      console.error('Error updating registration details:', error);
+      console.error("Error updating registration details:", error);
       setShowErrorNotification(true);
     }
   };
-
 
   return (
     <Box m="20px">
@@ -76,9 +85,7 @@ const Registration = ({ registration }) => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>
-            Enter
-          </Button>
+          <Button onClick={handleClose}>Enter</Button>
         </DialogActions>
       </Dialog>
       <Header title="Register Now" subtitle="Erstelle einen neuen User" />
@@ -140,8 +147,7 @@ const Registration = ({ registration }) => {
                   alignItems: "center",
                   height: "100%",
                 }}
-              >
-              </Typography>
+              ></Typography>
               <TextField
                 fullWidth
                 variant="filled"
@@ -158,10 +164,10 @@ const Registration = ({ registration }) => {
               <TextField
                 fullWidth
                 variant="filled"
-                label= "Telefonnummer"
+                label="Telefonnummer"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                defaultCountry={'us'}
+                defaultCountry={"us"}
                 value={values.phone_number}
                 name="phone_number"
                 error={!!touched.phone_number && !!errors.phone_number}
@@ -176,8 +182,7 @@ const Registration = ({ registration }) => {
                   alignItems: "center",
                   height: "100%",
                 }}
-              >
-              </Typography>
+              ></Typography>
               <TextField
                 fullWidth
                 variant="filled"
@@ -191,7 +196,11 @@ const Registration = ({ registration }) => {
                 helpertext={touched.company_name && errors.company_name}
                 sx={{ gridColumn: "span 2" }}
               />
-              <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 2" }}>
+              <FormControl
+                fullWidth
+                variant="filled"
+                sx={{ gridColumn: "span 2" }}
+              >
                 <InputLabel id="employment-label">Anstellung</InputLabel>
                 <Select
                   labelId="employment-label"
@@ -204,12 +213,12 @@ const Registration = ({ registration }) => {
                   helpertext={touched.employment && errors.employment}
                   sx={{
                     gridColumn: "span 2",
-                    '& .MuiFilledInput-input': {
-                      paddingTop: '10px',
-                      paddingBottom: '10px',
+                    "& .MuiFilledInput-input": {
+                      paddingTop: "10px",
+                      paddingBottom: "10px",
                     },
-                    '& .MuiSelect-icon': { 
-                      color: 'black', 
+                    "& .MuiSelect-icon": {
+                      color: "black",
                     },
                   }}
                 >
@@ -225,9 +234,12 @@ const Registration = ({ registration }) => {
                   alignItems: "center",
                   height: "100%",
                 }}
+              ></Typography>
+              <FormControl
+                fullWidth
+                variant="filled"
+                sx={{ gridColumn: "span 2" }}
               >
-              </Typography>
-              <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 2" }}>
                 <InputLabel id="employment-level-label">Pensum</InputLabel>
                 <Select
                   labelId="employment-level-label"
@@ -238,23 +250,27 @@ const Registration = ({ registration }) => {
                     const decimalValue = selectedValue / 100;
                     handleChange({
                       target: {
-                        name: 'employment_level',
+                        name: "employment_level",
                         value: decimalValue,
                       },
                     });
                   }}
-                  value={values.employment_level ? values.employment_level * 100 : ''}
+                  value={
+                    values.employment_level ? values.employment_level * 100 : ""
+                  }
                   name="employment_level"
-                  error={!!touched.employment_level && !!errors.employment_level}
+                  error={
+                    !!touched.employment_level && !!errors.employment_level
+                  }
                   renderValue={(selected) => `${selected}%`}
                   sx={{
                     gridColumn: "span 2",
-                    '& .MuiFilledInput-input': {
-                      paddingTop: '10px',
-                      paddingBottom: '10px',
+                    "& .MuiFilledInput-input": {
+                      paddingTop: "10px",
+                      paddingBottom: "10px",
                     },
-                    '& .MuiSelect-icon': { 
-                      color: 'black', 
+                    "& .MuiSelect-icon": {
+                      color: "black",
                     },
                   }}
                 >
@@ -268,7 +284,11 @@ const Registration = ({ registration }) => {
                   })}
                 </Select>
               </FormControl>
-              <FormControl fullWidth variant="filled" sx={{ gridColumn: "span 2" }}>
+              <FormControl
+                fullWidth
+                variant="filled"
+                sx={{ gridColumn: "span 2" }}
+              >
                 <InputLabel id="access_level-label">Access Level</InputLabel>
                 <Select
                   labelId="access_level-label"
@@ -281,12 +301,12 @@ const Registration = ({ registration }) => {
                   helpertext={touched.access_level && errors.access_level}
                   sx={{
                     gridColumn: "span 2",
-                    '& .MuiFilledInput-input': {
-                      paddingTop: '10px',
-                      paddingBottom: '10px',
+                    "& .MuiFilledInput-input": {
+                      paddingTop: "10px",
+                      paddingBottom: "10px",
                     },
-                    '& .MuiSelect-icon': { 
-                      color: 'black', 
+                    "& .MuiSelect-icon": {
+                      color: "black",
                     },
                   }}
                 >
@@ -303,8 +323,7 @@ const Registration = ({ registration }) => {
                   alignItems: "center",
                   height: "100%",
                 }}
-              >
-              </Typography>
+              ></Typography>
               <TextField
                 fullWidth
                 variant="filled"
@@ -331,10 +350,10 @@ const Registration = ({ registration }) => {
                 helperText={touched.password2 && errors.password2}
                 sx={{ gridColumn: "span 2" }}
               />
-              {values.password !== values.password2 && touched.password2 }
+              {values.password !== values.password2 && touched.password2}
             </Box>
             <></>
-            
+
             <Box display="center" justifyContent="end" mt="20px">
               <Button type="submit" color="secondary" variant="contained">
                 Update
@@ -383,18 +402,17 @@ const checkoutSchema = yup.object().shape({
   last_name: yup.string().required("required"),
   password: yup.string().required("required"),
   password2: yup
-  .string()
-  .oneOf([yup.ref("password"), null], "Passwords must match")
-  .required("required"),
+    .string()
+    .oneOf([yup.ref("password"), null], "Passwords must match")
+    .required("required"),
   company_name: yup.string().required("required"),
   employment: yup.string().required("required"),
   employment_level: yup
     .number()
-    .min(0, 'Company level must be greater than or equal to 0%')
-    .max(100, 'Company level must be less than or equal to 100%')
+    .min(0, "Company level must be greater than or equal to 0%")
+    .max(100, "Company level must be less than or equal to 100%")
     .required("required"),
   access_level: yup.string().required("required"),
 });
-
 
 export default Registration;

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Starting CP-SAT solver v9.8.3296Parameters: max_time_in_seconds: 700 log_search_progress: true log_to_stdout: trueSetting number of workers to 11Initial optimization model '': (model_fingerprint: 0xdf1e9e4d6c008236)
 #Variables: 1'760 (#bools: 962 #ints: 181 in objective)
   - 1'529 Booleans in [0,1]
@@ -193,3 +194,35 @@ usertime: 141.962
 deterministic_time: 1531.3
 gap_integral: 2460.58
 solution_fingerprint: 0x932055fa7d4d3ca0
+=======
+Starting CP-SAT solver v9.7.2996Parameters: max_time_in_seconds: 500 log_search_progress: true log_to_stdout: trueSetting number of workers to 8Initial optimization model '': (model_fingerprint: 0xe474fec82c8e2296)
+#Variables: 4'706 (#bools: 2'820 #ints: 370 in objective)
+  - 4'300 Booleans in [0,1]
+  - 70 in [0,2]
+  - 35 in [0,4]
+  - 275 in [0,5]
+  - 5 in [0,6]
+  - 10 in [0,84]
+  - 10 in [0,2688]
+  - 1 constants in {1} 
+#kBoolOr: 310 (#literals: 310)
+#kLinear1: 1'746
+#kLinear2: 380
+#kLinear3: 1'340
+#kLinearN: 766 (#terms: 15'496)Starting presolve at 0.01s[ExtractEncodingFromLinear] #potential_supersets=33 #potential_subsets=0 #at_most_one_encodings=0 #exactly_one_encodings=0 #unique_terms=0 #multiple_terms=0 #literals=0 time=2.56e-05s[Symmetry] Graph for symmetry has 8710 nodes and 20504 arcs.[Symmetry] Symmetry computation done. time: 0.0046535 dtime: 0.00976518[Symmetry] #generators: 3, average support size: 1040[Symmetry] The model contains 10 duplicate constraints ![Symmetry] 678 orbits with sizes: 6,6,6,6,6,6,6,6,6,6,...[Symmetry] Found orbitope of size 558 x 3[SAT presolve] num removable Booleans: 1737 / 4706[SAT presolve] num trivial clauses: 0[SAT presolve] [0s] clauses:1608 literals:6080 vars:2617 one_side_vars:1279 simple_definition:1338 singleton_clauses:0[SAT presolve] [0.0013358s] clauses:1598 literals:6017 vars:2617 one_side_vars:1279 simple_definition:1338 singleton_clauses:0[SAT presolve] [0.0021388s] clauses:1598 literals:6017 vars:2617 one_side_vars:1279 simple_definition:1338 singleton_clauses:0[Probing] implications and bool_or (work_done=133566).[DetectDuplicateConstraints] #duplicates=0 #without_enforcements=0 time=0.002216s[DetectDominatedLinearConstraints] #relevant_constraints=371 #work_done=44321 #num_inclusions=48 #num_redundant=0 time=0.0003346s[ProcessSetPPC] #relevant_constraints=1855 #num_inclusions=219 work=46312 time=0.0033308s[FindBigHorizontalLinearOverlap] #blocks=5 #saved_nz=4142 #linears=352 #work_done=19956/1e+09 time=0.0010362s[FindBigVerticalLinearOverlap] #blocks=0 #nz_reduction=0 #work_done=459685 time=0.000872s[MergeClauses] #num_collisions=0 #num_merges=0 #num_saved_literals=0 work=5553/100000000 time=0.0003556s[Symmetry] Graph for symmetry has 9679 nodes and 17947 arcs.[Symmetry] Symmetry computation done. time: 0.0067254 dtime: 0.0097349[Symmetry] #generators: 3, average support size: 1003.33[Symmetry] 652 orbits with sizes: 6,6,6,6,6,6,6,6,6,6,...[Symmetry] Found orbitope of size 533 x 3[SAT presolve] num removable Booleans: 1884 / 4711[SAT presolve] num trivial clauses: 0[SAT presolve] [0s] clauses:2643 literals:8027 vars:2470 one_side_vars:1170 simple_definition:164 singleton_clauses:0[SAT presolve] [0.0010517s] clauses:2643 literals:8027 vars:2470 one_side_vars:1170 simple_definition:164 singleton_clauses:0[SAT presolve] [0.001833s] clauses:2643 literals:8027 vars:2470 one_side_vars:1170 simple_definition:164 singleton_clauses:0[Probing] implications and bool_or (work_done=45530).INFEASIBLE: 'during probing'Presolve summary:  - 73 affine relations were detected.  - rule 'TODO dual: add implied bound' was applied 203 times.  - rule 'TODO dual: only one blocking constraint?' was applied 8989 times.  - rule 'TODO dual: only one blocking enforced constraint?' was applied 203 times.  - rule 'TODO dual: only one unspecified blocking constraint?' was applied 2534 times.  - rule 'TODO dual: tighten at most one' was applied 8196 times.  - rule 'TODO linear2: contains a Boolean.' was applied 206 times.  - rule 'TODO symmetry: add symmetry breaking inequalities?' was applied 2 times.  - rule 'affine: new relation' was applied 73 times.  - rule 'at_most_one: dominated singleton' was applied 28 times.  - rule 'at_most_one: removed literals' was applied 10 times.  - rule 'at_most_one: satisfied' was applied 36 times.  - rule 'at_most_one: singleton' was applied 4 times.  - rule 'at_most_one: size one' was applied 2 times.  - rule 'bool_and: non-reified.' was applied 6 times.  - rule 'bool_and: x => x' was applied 37 times.  - rule 'bool_or: always true' was applied 342 times.  - rule 'bool_or: fixed literals' was applied 12 times.  - rule 'bool_or: implications' was applied 241 times.  - rule 'dual: enforced equivalence' was applied 37 times.  - rule 'dual: fix variable' was applied 6 times.  - rule 'dual: reduced domain' was applied 289 times.  - rule 'enforcement: false literal' was applied 44 times.  - rule 'enforcement: true literal' was applied 6 times.  - rule 'linear matrix: common horizontal rectangle' was applied 5 times.  - rule 'linear2: contains a Boolean.' was applied 246 times.  - rule 'linear: all booleans and trivially true' was applied 6 times.  - rule 'linear: always true' was applied 34 times.  - rule 'linear: empty' was applied 34 times.  - rule 'linear: extracted enforcement literal' was applied 58 times.  - rule 'linear: fixed or dup variables' was applied 122 times.  - rule 'linear: negative clause' was applied 88 times.  - rule 'linear: negative reified and' was applied 29 times.  - rule 'linear: positive at most one' was applied 33 times.  - rule 'linear: positive clause' was applied 1601 times.  - rule 'linear: reduced variable domains' was applied 58 times.  - rule 'linear: remapped using affine relations' was applied 29 times.  - rule 'linear: simplified rhs' was applied 3046 times.  - rule 'linear: tightened into equality' was applied 7 times.  - rule 'objective: variable not used elsewhere' was applied 1506 times.  - rule 'presolve: iteration' was applied 2 times.  - rule 'variables: detect half reified value encoding' was applied 246 times.Problem closed by presolve.CpSolverResponse summary:
+status: INFEASIBLE
+objective: NA
+best_bound: NA
+integers: 0
+booleans: 0
+conflicts: 0
+branches: 0
+propagations: 0
+integer_propagations: 0
+restarts: 0
+lp_iterations: 0
+walltime: 0.168707
+usertime: 0.168707
+deterministic_time: 0.0109633
+gap_integral: 0
+>>>>>>> 7a232fe9f41c16aef1af15ac150b201c3f8b2a21
