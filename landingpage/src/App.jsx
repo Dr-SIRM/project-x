@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import styles from "./style";
-import { Billing, Business, CardDeal, Clients, CTA, Footer, Navbar, Stats, Testimonials, Hero, Conditions, Product } from "./components";
+import { Billing, Business, CardDeal, Clients, CTA, Footer, Navbar, Stats, Testimonials, Hero, Conditions, Product, USP } from "./components";
 
 const App = () => (
   <Router>
@@ -28,6 +28,7 @@ const App = () => (
               <div className={`${styles.boxWidth}`}>
                 <Stats />
                 <Business />
+                <USP />
                 {/* <Billing /> */}
                 {/* <CardDeal /> */}
                 <CTA />
