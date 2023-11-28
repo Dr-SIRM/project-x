@@ -1,6 +1,7 @@
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import styles from "./style";
 import { Billing, Business, CardDeal, Clients, CTA, Footer, Navbar, Stats, Testimonials, Hero, Conditions, Product } from "./components";
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 const App = () => (
   <Router>
@@ -12,6 +13,9 @@ const App = () => (
       </div>
 
       <Routes>
+        {/* Redirect from base URL to /home */}
+        <Route path="/" element={<Navigate replace to="/home" />} />
+
         <Route path="/home" element={
           <>
             <div className={`bg-primary ${styles.flexStart}`}>
@@ -27,7 +31,7 @@ const App = () => (
                 {/* <Billing /> */}
                 {/* <CardDeal /> */}
                 <CTA />
-                {/* Contact Formular */}
+                {/* Contact Form */}
                 {/* <Testimonials /> */}
                 <Footer />
               </div>
@@ -51,6 +55,7 @@ const App = () => (
           </div>
         } />
 
+        {/* Add more routes as needed */}
       </Routes>
     </div>
   </Router>
