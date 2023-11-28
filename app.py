@@ -24,6 +24,7 @@ CORS(app)
 #SET SQLALCHEMY
 
 db_uri_prefix = 'mysql+pymysql://admin:ProjectX2023.@projectx3.cj6fxzhtmztu.eu-central-1.rds.amazonaws.com/'
+#db_uri_prefix = 'postgresql://PhuNguyen:ProjectX2023.@localhost/'
 
 app.config["SECRET_KEY"] = "mysecret"
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:ProjectX2023.@projectx3.cj6fxzhtmztu.eu-central-1.rds.amazonaws.com/projectx3'
