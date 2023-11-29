@@ -9,21 +9,21 @@ const boxes = [
     features: [
       "TimeTab minimiert den manuellen Aufwand und automatisiert die Erstellung von Schichtplänen, sodass Sie wertvolle Zeit sparen.",
     ],
-    price: "CHF 30.00",
+    price: "",
   },
   {
     title: "tbd",
     features: [
       "Durch Berücksichtigung individueller Präferenzen und Verfügbarkeiten bei der automatisierten Schichtplanung trägt unser Tool dazu bei, die Zufriedenheit und Motivation Ihrer Mitarbeiter zu steigern.",
     ],
-    price: "CHF 40.00",
+    price: "",
   },
   {
     title: "Zuverlässigkeit",
     features: [
       "Mit intelligenten Algorithmen werden Fehler vermieden und eine verlässliche, bedarfsgerechte Personalzuordnung sichergestellt.",
     ],
-    price: "CHF 50.00",
+    price: "",
   },
 ];
 
