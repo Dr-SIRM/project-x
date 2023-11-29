@@ -17,8 +17,9 @@ const Navbar = () => {
         backgroundColor: "rgba(0, 0, 0, 0.4)",
       }}
     >
-
-      <img src={logo} alt="hoobank" className="w-[150px] h-[50]" />
+      <Link to="/home">
+        <img src={logo} alt="hoobank" className="w-[150px] h-[50]" />
+      </Link>
 
       <ul className="list-none sm:flex hidden justify-end items-center flex-1">
         {navLinks.map((nav, index) => (
