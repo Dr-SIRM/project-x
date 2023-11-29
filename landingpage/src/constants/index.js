@@ -17,9 +17,14 @@ export const navLinks = [
     path: "/conditions", // Internal link
   },
   {
-    id: "features",
+    id: "FAQ",
+    title: "FAQ",
+    path: "/FAQ", 
+  },
+  {
+    id: "aboutus",
     title: "Über uns",
-    path: "/features", // Internal link
+    path: "/aboutus", // Internal link
   },
   {
     id: "login",

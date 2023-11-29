@@ -10,7 +10,10 @@ import Testimonials from "./Testimonials";
 import Hero from "./Hero";
 import Conditions from "./Conditions";
 import Home from "./Home";
-import Product from "./Product"
+import Product from "./Product";
+import USP from "./usp";
+import FAQ from "./FAQ";
+import Aboutus from "./Aboutus"
 
 export {
   Navbar,
@@ -25,5 +28,8 @@ export {
   Hero,
   Conditions,
   Home,
-  Product
+  Product,
+  USP,
+  FAQ,
+  Aboutus
 };

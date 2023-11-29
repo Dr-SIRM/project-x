@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { close, logo, menu } from "../assets";
 import { navLinks } from "../constants";
-import { Link } from 'react-router-dom';
-
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [active, setActive] = useState("Home");
   const [toggle, setToggle] = useState(false);
 
   return (
-    <nav className="w-full flex items-center navbar fixed top-0 left-0 z-50 bg-black shadow-md" style={{ height: '60px', paddingRight: '1rem', paddingLeft: '1rem' }}>
+    <nav
+      className="w-full flex items-center navbar fixed top-0 left-0 z-50 bg-black shadow-md"
+      style={{ height: "60px", paddingRight: "1rem", paddingLeft: "1rem" }}
+    >
       <img src={logo} alt="hoobank" className="w-[150px] h-[50]" />
 
       <ul className="list-none sm:flex hidden justify-end items-center flex-1">
@@ -18,13 +20,15 @@ const Navbar = () => {
             key={nav.id}
             className={`font-poppins font-normal cursor-pointer text-[16px] ${
               active === nav.title ? "text-white" : "text-dimWhite"
-            } ${
-              nav.title === "Login" ? "login-link" : ""
-            } ${index === navLinks.length - 1 ? "mr-0" : "mr-10"}`}
+            } ${nav.title === "Login" ? "login-link" : ""} ${
+              index === navLinks.length - 1 ? "mr-0" : "mr-10"
+            }`}
             onClick={() => setActive(nav.title)}
           >
             {nav.href ? (
-              <a href={nav.href} target="_blank" rel="noopener noreferrer">{nav.title}</a>
+              <a href={nav.href} target="_blank" rel="noopener noreferrer">
+                {nav.title}
+              </a>
             ) : (
               <Link to={nav.path}>{nav.title}</Link>
             )}
@@ -55,7 +59,9 @@ const Navbar = () => {
                 onClick={() => setActive(nav.title)}
               >
                 {nav.href ? (
-                  <a href={nav.href} target="_blank" rel="noopener noreferrer">{nav.title}</a>
+                  <a href={nav.href} target="_blank" rel="noopener noreferrer">
+                    {nav.title}
+                  </a>
                 ) : (
                   <Link to={nav.path}>{nav.title}</Link>
                 )}

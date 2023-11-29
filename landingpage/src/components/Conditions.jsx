@@ -31,8 +31,6 @@ const Conditions = () => {
           ))}
         </div>
       </div>
-
-      <Footer />
     </div>
   );
 };

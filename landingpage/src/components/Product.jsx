@@ -37,8 +37,6 @@ const Product = () => {
           </div>
         ))}
       </div>
-
-      <Footer />
     </div>
   );
 };
