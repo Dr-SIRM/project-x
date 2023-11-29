@@ -1880,7 +1880,7 @@ def get_required_workforce():
                             
                 closing_times.append(slot)
 
-        daily_slots = max(closing_times) * hour_divider
+        daily_slots = int(max(closing_times) * hour_divider)
 
         # Calculation Min Working Day
         opening_times = []
@@ -2559,7 +2559,10 @@ def unavailable_times(session, current_user):
         Availability.date <= end_of_week_missing_team
     ).group_by(
         Availability.date, Availability.start_time
-    ).subquery()
+    ).all()
+
+    for record in available_workers_subquery:
+        print(record)
 
     # Query to find dates and start times with insufficient workers
     insufficient_worker_dates_and_times = session.query(
