@@ -11,7 +11,9 @@ import Hero from "./Hero";
 import Conditions from "./Conditions";
 import Home from "./Home";
 import Product from "./Product";
-import USP from "./usp"
+import USP from "./usp";
+import FAQ from "./FAQ";
+import Aboutus from "./Aboutus"
 
 export {
   Navbar,
@@ -27,5 +29,7 @@ export {
   Conditions,
   Home,
   Product,
-  USP
+  USP,
+  FAQ,
+  Aboutus
 };

@@ -1,7 +1,28 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
 import styles from "./style";
-import { Billing, Business, CardDeal, Clients, CTA, Footer, Navbar, Stats, Testimonials, Hero, Conditions, Product, USP } from "./components";
+import {
+  Billing,
+  Business,
+  CardDeal,
+  Clients,
+  CTA,
+  Footer,
+  Navbar,
+  Stats,
+  Testimonials,
+  Hero,
+  Conditions,
+  Product,
+  USP,
+  FAQ,
+  Aboutus,
+} from "./components";
 
 const App = () => (
   <Router>
@@ -16,47 +37,88 @@ const App = () => (
         {/* Redirect from base URL to /home */}
         <Route path="/" element={<Navigate replace to="/home" />} />
 
-        <Route path="/home" element={
-          <>
-            <div className={`bg-primary ${styles.flexStart}`}>
-              <div className={`${styles.boxWidth}`}>
-                <Hero />
+        <Route
+          path="/home"
+          element={
+            <>
+              <div className={`bg-primary ${styles.flexStart}`}>
+                <div className={`${styles.boxWidth}`}>
+                  <Hero />
+                </div>
               </div>
-            </div>
-            
-            <div className={`bg-primary ${styles.paddingX} ${styles.flexCenter}`}>
+
+              <div
+                className={`bg-primary ${styles.paddingX} ${styles.flexCenter}`}
+              >
+                <div className={`${styles.boxWidth}`}>
+                  <Stats />
+                  {/* <Business /> */}
+                  <USP />
+                  {/* <Billing /> */}
+                  {/* <CardDeal /> */}
+                  <CTA />
+                  {/* Contact Form */}
+                  {/* <Testimonials /> */}
+                  <Footer />
+                </div>
+              </div>
+            </>
+          }
+        />
+
+        <Route
+          path="/Conditions"
+          element={
+            <div
+              className={`bg-primary ${styles.paddingX} ${styles.flexCenter}`}
+            >
               <div className={`${styles.boxWidth}`}>
-                <Stats />
-                <Business />
-                <USP />
-                {/* <Billing /> */}
-                {/* <CardDeal /> */}
-                <CTA />
-                {/* Contact Form */}
-                {/* <Testimonials /> */}
+                <Conditions />
                 <Footer />
               </div>
             </div>
-          </>
-        } />
+          }
+        />
 
-        <Route path="/Conditions" element={
-          <div className={`bg-primary ${styles.paddingX} ${styles.flexCenter}`}>
-            <div className={`${styles.boxWidth}`}>
-              <Conditions />
+        <Route
+          path="/product"
+          element={
+            <div
+              className={`bg-primary ${styles.paddingX} ${styles.flexCenter}`}
+            >
+              <div className={`${styles.boxWidth}`}>
+                <Product />
+                <Footer />
+              </div>
             </div>
-          </div>
-        } />
-
-        <Route path="/product" element={
-          <div className={`bg-primary ${styles.paddingX} ${styles.flexCenter}`}>
-            <div className={`${styles.boxWidth}`}>
-              <Product />
+          }
+        />
+        <Route
+          path="/FAQ"
+          element={
+            <div
+              className={`bg-primary ${styles.paddingX} ${styles.flexCenter}`}
+            >
+              <div className={`${styles.boxWidth}`}>
+                <FAQ />
+                <Footer />
+              </div>
             </div>
-          </div>
-        } />
-
-        {/* Add more routes as needed */}
+          }
+        />
+        <Route
+          path="/aboutus"
+          element={
+            <div
+              className={`bg-primary ${styles.paddingX} ${styles.flexCenter}`}
+            >
+              <div className={`${styles.boxWidth}`}>
+                <Aboutus />
+                <Footer />
+              </div>
+            </div>
+          }
+        />
       </Routes>
     </div>
   </Router>
