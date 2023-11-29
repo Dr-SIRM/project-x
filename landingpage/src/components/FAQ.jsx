@@ -5,18 +5,25 @@ const Faq = () => {
   // An array of FAQs, each with a question and answer
   const faqs = [
     {
-      question: "What is [Product/Service]?",
+      question: "Was ist TimeTab?",
       answer: "This is a description of what the product or service is about."
     },
     {
-      question: "How do I get started?",
+      question: "Wie starte ich?",
       answer: "Here are the steps to get started with our product/service..."
     },
     {
-      question: "What are the pricing options?",
+      question: "Was sind die Abokosten?",
       answer: "We offer various pricing plans, which are..."
     },
-    // Add more FAQs as needed
+    {
+      question: "Was sind die Abokosten?",
+      answer: "We offer various pricing plans, which are..."
+    },
+    {
+      question: "Was sind die Abokosten?",
+      answer: "We offer various pricing plans, which are..."
+    },
   ];
 
   // State to track the currently active FAQ item
@@ -37,7 +44,7 @@ const Faq = () => {
             className={`w-full px-4 py-2 mb-2 border-b border-gray-300 cursor-pointer ${activeIndex === index ? 'bg-black-100' : ''}`}
             onClick={() => toggleFAQ(index)}
           >
-            <h2 className={`${styles.heading3} text-lg`}>{faq.question}</h2>
+            <h2 className={`${styles.heading4}`}>{faq.question}</h2> {/* Use heading4 for questions */}
             <p className={`pl-4 text-white ${activeIndex === index ? 'block' : 'hidden'}`}>{faq.answer}</p>
           </div>
         ))}
