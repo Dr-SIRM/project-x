@@ -13,7 +13,8 @@ import Home from "./Home";
 import Product from "./Product";
 import USP from "./usp";
 import FAQ from "./FAQ";
-import Aboutus from "./Aboutus"
+import Aboutus from "./Aboutus";
+import Form from "./Form"
 
 export {
   Navbar,
@@ -31,5 +32,6 @@ export {
   Product,
   USP,
   FAQ,
-  Aboutus
+  Aboutus,
+  Form
 };

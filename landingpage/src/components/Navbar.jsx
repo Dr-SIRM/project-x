@@ -9,9 +9,15 @@ const Navbar = () => {
 
   return (
     <nav
-      className="w-full flex items-center navbar fixed top-0 left-0 z-50 bg-black shadow-md"
-      style={{ height: "60px", paddingRight: "1rem", paddingLeft: "1rem" }}
+      className="w-full flex items-center navbar fixed top-0 left-0 z-50 shadow-md"
+      style={{
+        height: "60px",
+        paddingRight: "1rem",
+        paddingLeft: "1rem",
+        backgroundColor: "rgba(0, 0, 0, 0.4)",
+      }}
     >
+
       <img src={logo} alt="hoobank" className="w-[150px] h-[50]" />
 
       <ul className="list-none sm:flex hidden justify-end items-center flex-1">

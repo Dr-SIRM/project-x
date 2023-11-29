@@ -60,10 +60,7 @@ const Conditions = () => {
                   {feature}
                 </p>
               ))}
-              <p className={`${styles.paragraph} mb-2`}>Cost: {box.price}</p>
-              <div className="flex justify-center w-full mt-10">
-                <Button />
-              </div>
+              <p className={`${styles.paragraph} mb-2`}>{box.price}</p>
             </div>
           ))}
         </div>

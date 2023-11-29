@@ -22,6 +22,7 @@ import {
   USP,
   FAQ,
   Aboutus,
+  Form
 } from "./components";
 
 const App = () => (
@@ -51,7 +52,7 @@ const App = () => (
                 className={`bg-primary ${styles.paddingX} ${styles.flexCenter}`}
               >
                 <div className={`${styles.boxWidth}`}>
-                  <Stats />
+                  {/* <Stats /> */}
                   {/* <Business /> */}
                   <USP />
                   {/* <Billing /> */}
@@ -59,6 +60,7 @@ const App = () => (
                   <CTA />
                   {/* Contact Form */}
                   {/* <Testimonials /> */}
+                  <Form />
                   <Footer />
                 </div>
               </div>
