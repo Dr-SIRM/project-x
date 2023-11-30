@@ -10,10 +10,15 @@ const About = () => {
       <h1 className={`${styles.heading2} text-center mb-6`}>Über uns</h1>
       {/* Introductory text */}
       <p className="text-center mb-6">
-        Unser automatisiertes Schichtplanungstool minimiert manuellen
-        Planungsaufwand, optimiert die Einsatzplanung unter Berücksichtigung von
-        Mitarbeiterpräferenzen, sowie reduziert potenzielle Fehlerquellen durch
-        intelligente, datengetriebene Entscheidungsunterstützung.
+        Es war einmal
+        Problem bie einem erfolgreiches Fitness Unternehmen
+        
+        Tauche ein in die Welt hinter unserer Schichtplanungs-Zauberei! Wir sind
+        ein Team aus Datenmagiern und Planungsvirtuosen, die mit Technologie,
+        Menschlichkeit und Innovation die Arbeitswelt revolutionieren. Erfahre
+        mehr über unsere spannende Reise von kleinen Anfängen zu großen Ideen,
+        unsere leuchtenden Werte und wie wir mit Herz, Hirn und Humor die
+        Zukunft der Schichtplanung gestalten!
       </p>
       {/* Image section */}
       <div className="flex flex-col justify-center items-center my-4">
@@ -33,9 +38,8 @@ const About = () => {
       {/* Quote section with box, different background, and rounded border */}
       <div className="rounded-lg border-2 border-gray-300 bg-gray-800 p-4 mt-12 mx-auto max-w-2xl">
         <p className="italic text-lg">
-          "Wir sind davon überzeugt, dass die Vereinfachung des automatisierten
-          Schichtplanungsprozesses unsere oberste Priorität ist. Es ist an der
-          Zeit, dies mit unserer Schichtplanungssoftware umzusetzen."
+          "Simple und Sexy, deine Liebhaber für revolutioniertes schichplanen"
+"
         </p>
         <p className="mt-4">Gery, Phu und Robin</p>
       </div>

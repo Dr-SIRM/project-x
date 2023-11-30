@@ -12,7 +12,7 @@ const boxes = [
     price: "",
   },
   {
-    title: "tbd",
+    title: "Zufriedenheit",
     features: [
       "Durch Berücksichtigung individueller Präferenzen und Verfügbarkeiten bei der automatisierten Schichtplanung trägt unser Tool dazu bei, die Zufriedenheit und Motivation Ihrer Mitarbeiter zu steigern.",
     ],
