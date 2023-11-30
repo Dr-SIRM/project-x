@@ -2559,10 +2559,8 @@ def unavailable_times(session, current_user):
         Availability.date <= end_of_week_missing_team
     ).group_by(
         Availability.date, Availability.start_time
-    ).all()
+    ).subquery()
 
-    for record in available_workers_subquery:
-        print(record)
 
     # Query to find dates and start times with insufficient workers
     insufficient_worker_dates_and_times = session.query(
