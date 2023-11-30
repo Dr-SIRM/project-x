@@ -86,10 +86,8 @@ def login_react():
 @app.route('/api/token/refresh', methods=['POST'])
 @jwt_required(refresh=True) 
 def refresh():
-    print("Request data:", request.json)
     current_user = get_jwt_identity()
     new_token = create_access_token(identity=current_user)
-    print("New Token: ", new_token)
     return jsonify({'session_token': new_token})
 
 

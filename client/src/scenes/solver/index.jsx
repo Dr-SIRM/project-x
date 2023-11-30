@@ -181,22 +181,22 @@ const Solver = () => {
           size="small"
         >
           <MenuItem value={1}>
-            {t("solver.week")} {currentWeekNum} - Mo {newDate(mondayDate, 7)}
+            {t("solver.week")} {currentWeekNum + 1} - Mo {newDate(mondayDate, 7)}
           </MenuItem>
           <MenuItem value={2}>
-            {t("solver.week")} {currentWeekNum + 1} - Mo{" "}
+            {t("solver.week")} {currentWeekNum + 2} - Mo{" "}
             {newDate(mondayDate, 14)}
           </MenuItem>
           <MenuItem value={3}>
-            {t("solver.week")} {currentWeekNum + 2} - Mo{" "}
+            {t("solver.week")} {currentWeekNum + 3} - Mo{" "}
             {newDate(mondayDate, 21)}
           </MenuItem>
           <MenuItem value={4}>
-            {t("solver.week")} {currentWeekNum + 3} - Mo{" "}
+            {t("solver.week")} {currentWeekNum + 4} - Mo{" "}
             {newDate(mondayDate, 28)}
           </MenuItem>
           <MenuItem value={4}>
-            {t("solver.week")} {currentWeekNum + 4} - Mo{" "}
+            {t("solver.week")} {currentWeekNum + 5} - Mo{" "}
             {newDate(mondayDate, 35)}
           </MenuItem>
         </Select>
