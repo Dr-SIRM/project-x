@@ -10,36 +10,6 @@ const AuthProvider = ({ children }) => {
   const [error, setError] = useState('');
 
 
-  // const checkTokenExpiration = () => {
-  //   const lastActivity = localStorage.getItem('last_activity');
-  //   const sessionToken = localStorage.getItem('session_token');
-  
-  //   // Proceed only if both session token and last activity are present
-  //   if (sessionToken && lastActivity) {
-  //     const lastActivityDate = new Date(lastActivity);
-  //     const now = new Date();
-  //     const difference = now - lastActivityDate;
-  //     const differenceInMinutes = Math.floor(difference / 1000 / 60);
-  
-  //     if (differenceInMinutes >= 60) {
-  //       localStorage.removeItem('session_token');
-  //       localStorage.removeItem('last_activity');
-  //       localStorage.removeItem('user');
-  //       setUser(null);
-  //       navigate('/login');
-  //     }
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   checkTokenExpiration();
-
-  //   const storedUser = localStorage.getItem('user');
-  //   if (storedUser) {
-  //     setUser(JSON.parse(storedUser));
-  //   }
-  // }, []);
-
   useEffect(() => {
     if (user) {
       localStorage.setItem('last_activity', new Date().toString());
@@ -77,7 +47,7 @@ const AuthProvider = ({ children }) => {
 
   const refreshAccessToken = async () => {
     try {
-      const refreshToken = localStorage.getItem('session_token');
+      const refreshToken = localStorage.getItem('refresh_token');
       const response = await fetch(`${API_BASE_URL}/api/token/refresh`, {
         method: "POST",
         headers: {

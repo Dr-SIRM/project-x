@@ -86,10 +86,8 @@ def login_react():
 @app.route('/api/token/refresh', methods=['POST'])
 @jwt_required(refresh=True) 
 def refresh():
-    print("Request data:", request.json)
     current_user = get_jwt_identity()
     new_token = create_access_token(identity=current_user)
-    print("New Token: ", new_token)
     return jsonify({'session_token': new_token})
 
 
@@ -2559,10 +2557,8 @@ def unavailable_times(session, current_user):
         Availability.date <= end_of_week_missing_team
     ).group_by(
         Availability.date, Availability.start_time
-    ).all()
+    ).subquery()
 
-    for record in available_workers_subquery:
-        print(record)
 
     # Query to find dates and start times with insufficient workers
     insufficient_worker_dates_and_times = session.query(

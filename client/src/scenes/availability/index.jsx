@@ -111,6 +111,13 @@ const Availability = ({ availability }) => {
     }
   }, [availabilityData]);
 
+  useEffect(() => {
+    if (selectedUser) {
+      setAvailabilityData({});
+      setActiveTemplateData({});
+    }
+  }, [selectedUser]);
+
   const hourDivider = availabilityData.hourDivider;
   const step = 3600 / hourDivider;
 
