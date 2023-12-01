@@ -544,21 +544,26 @@ const TimeReq = ({ timereq }) => {
           {t("planning.template1")}
         </Button>
         <Tooltip
-          title={
-            <>
-              <span style={{ fontWeight: "bold" }}>
-                {t("info.title_template")}
-              </span>
-              <br />
-              <br />
-              {t("info.title_template_step1")}
-              <br />
-              {t("info.title_template_step2")}
-              <br />
-              {t("info.title_template_step3")}
-            </>
-          }
-        >
+                title={
+                  <div style={{ fontSize: "15px" }}>
+                    <span style={{ ontSize: "10px" }}>
+                      {t("info.title_template")}
+                    </span>
+                    <br />
+                    <br />
+                    {t("info.title_template_step1")}
+                    <br />
+                    {t("info.title_template_step2")}
+                    <br />
+                    {t("info.title_template_step3")}
+                  </div>
+                }
+                sx={{
+                  "& .MuiTooltip-tooltip": {
+                    padding: "10px",
+                  },
+                }}
+              >
           <InfoOutlinedIcon style={{ color: "black" }} />
         </Tooltip>
       </Box>

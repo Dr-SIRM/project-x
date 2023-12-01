@@ -78,7 +78,6 @@ def get_database_uri(company_name, schema_name=None):
         lower_name = schema_name.lower().replace(' ', "_")
         schema_name = f"schema_{lower_name}"
 
-    print(f"Get URI: {db_uri_prefix}{schema_name}")
     return f"{db_uri_prefix}{schema_name}"
 
 def jwt_required_optional(fn):
