@@ -934,7 +934,7 @@ class ORAlgorithm_cp:
         self.solver = cp_model.CpSolver()
 
         mitarbeiter_anzahl = len(self.mitarbeiter)
-        self.solver.parameters.max_time_in_seconds = 100 * mitarbeiter_anzahl       # Der Solver stoppt nach 100s * Mitarbeiteranzahl
+        self.solver.parameters.max_time_in_seconds = 12000   # 100 * mitarbeiter_anzahl       # Der Solver stoppt nach 100s * Mitarbeiteranzahl
         self.gap_to_stop = 1                                                        # Der Solver stoppt unter diesem GAP
         # self.solver.parameters.num_search_workers = 4 # Anzahl Kerne --> noch genau testen was das optimum ist (CPU-Auslastung beachten!)
 

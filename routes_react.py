@@ -2344,12 +2344,14 @@ def get_shift2():
 import locale
 
 @app.route('/api/dashboard', methods=['POST', 'GET'])
-@jwt_required()
+@jwt_required() # Die Route ist durch den Dekorator geschützt, ein gültiger JWT-Token muss vorhanden sein
 def get_dashboard_data():
-    current_user_id = get_jwt_identity()
-    jwt_data = get_jwt()
+    current_user_id = get_jwt_identity() # Benutzer ID aus dem Token holen
+    jwt_data = get_jwt() # Gesamter Token holen
+
+    # Extrahiert den Firmennamen aus dem JWT, wandelt ihn in Kleinbuchstaben um und ersetzt Leerzeichen durch Unterstriche.
     session_company = jwt_data.get("company_name").lower().replace(' ', '_')
-    uri = get_database_uri('', session_company)
+    uri = get_database_uri('', session_company) # uri für Datenbankverbindung erstellen
 
     with get_session(uri) as session:
         current_user = get_current_user(session, current_user_id)
