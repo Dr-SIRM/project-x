@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "../style";
-import { Footer } from '../components';
+import { Business, Footer } from '../components';
 import Button from "./Button";
 
 const Conditions = () => {
@@ -36,3 +36,21 @@ const Conditions = () => {
 };
 
 export default Conditions;
+
+
+/* Kleines Unternehmen
+-10 MA
+Kosten: CHF 39.95 inkl. MwSt.
+
+Mittleres Unternehmen
+11-30 MA
+Kosten: CHF 59.95 inkl. MwSt.
+
+Grosses Unternehmen
+31 - 50 MA
+Kosten: CHF 69.95 inkl. MwSt.
+
+Enterprise Geschäft
+50+ MA
+Kosten: auf Anfrage */
+
