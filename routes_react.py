@@ -1216,8 +1216,18 @@ def run_solver():
             if errors:
                 return jsonify({'message': errors}), 400
             
+            # Maximale Solvingzeit aufgrund Berechnungen
+            solve_time = or_algo_cp.solving_time()
+
             # If no errors occurred, the algorithm is further executed.
             or_algo_cp.run_2()
+
+            # 1 == Solver hat eine Lösung gefunden, 0 == Solver hat keine Lösung gefunden
+            solver_res = or_algo_cp.solver_result()
+
+            # If no errors occurred, the algorithm is further executed.
+            or_algo_cp.run_3()
+
 
             print("Solver successfully started")  # Log success
             return jsonify({'message': 'Solver successfully started'}), 200

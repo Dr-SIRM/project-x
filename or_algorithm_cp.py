@@ -150,12 +150,14 @@ class ORAlgorithm_cp:
         self.desired_min_time_day = None
         self.min_time_day = None
 
+        # Attribute der Funktion "solving_time"
+        self.solve_time = None   
 
         # Attribute der Methode "solver_selection"
         self.model = None
         self.solver = None
-        self.gap_to_stop = None              
-
+        self.gap_to_stop = None  
+         
         # Attribute der Methode "define_penalty_costs"
         self.penalty_cost_nb1 = None
         self.penalty_cost_nb2 = None
@@ -267,6 +269,8 @@ class ORAlgorithm_cp:
         self.constraints()
         self.solve_problem()
         self.calculate_costs()
+
+    def run_3(self):
         self.store_solved_data()
         # self.output_result_excel() # Diese Methode wird in Zukunft nicht mehr benötigt
         self.plot_costs_excel()
@@ -926,6 +930,15 @@ class ORAlgorithm_cp:
         return None
 
 
+    def solving_time(self):
+        """
+        Solvingzeit Berechnen
+        """
+        mitarbeiter_anzahl = len(self.mitarbeiter)
+        self.solve_time = 30 # 100 * mitarbeiter_anzahl
+        return self.solve_time
+    
+
     def solver_selection(self):
         """
         Auswahl des geeigneten Solvers für Constraint Programmierung.
@@ -934,10 +947,11 @@ class ORAlgorithm_cp:
         self.solver = cp_model.CpSolver()
 
         mitarbeiter_anzahl = len(self.mitarbeiter)
-        self.solver.parameters.max_time_in_seconds = 12000   # 100 * mitarbeiter_anzahl       # Der Solver stoppt nach 100s * Mitarbeiteranzahl
+        self.solver.parameters.max_time_in_seconds = self.solving_time()
         self.gap_to_stop = 1                                                        # Der Solver stoppt unter diesem GAP
         # self.solver.parameters.num_search_workers = 4 # Anzahl Kerne --> noch genau testen was das optimum ist (CPU-Auslastung beachten!)
 
+    
 
     def define_penalty_costs(self):
         """
@@ -2201,6 +2215,19 @@ class ORAlgorithm_cp:
         print('Kosten Weiche NB12 (Überschreitung der gerechten Verteilung der Stunden):', self.nb12_penalty_costs)
         print('Gesamtkosten:', self.solver.ObjectiveValue())
 
+
+    def solver_result(self):
+        """
+        Diese Funktion ist dazu da, dem Frontend den Status zu übermitteln
+        """
+        if self.status == cp_model.OPTIMAL:
+            return 1
+        elif self.status == cp_model.FEASIBLE:
+            return 1
+        elif self.status == cp_model.INFEASIBLE:
+            return 0
+        elif self.status == cp_model.NOT_SOLVED:
+            return 0
 
 
     def store_solved_data(self):
