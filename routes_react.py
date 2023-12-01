@@ -2434,13 +2434,24 @@ def format_shifts(shifts):
     locale.setlocale(locale.LC_TIME, "de_DE.UTF-8")
     formatted_shifts = []
     for shift in shifts:
-        shift_data = {
-            'name': f'{shift.first_name} {shift.last_name}',
-            'day': shift.date.strftime('%A'),
-            'shifts': [format_shift_time(shift, i) for i in range(1, 4)]
-        }
-        shift_data['shifts'] = [s for s in shift_data['shifts'] if s]
-        formatted_shifts.append(shift_data)
+        # First shift
+        first_shift_time = format_shift_time(shift, 1)
+        if first_shift_time:
+            formatted_shifts.append({
+                'name': f'{shift.first_name} {shift.last_name}',
+                'day': shift.date.strftime('%A'),
+                'shifts': [first_shift_time]
+            })
+
+        # Second shift (if exists)
+        second_shift_time = format_shift_time(shift, 2)
+        if second_shift_time:
+            formatted_shifts.append({
+                'name': f'{shift.first_name} {shift.last_name}',
+                'day': shift.date.strftime('%A'),
+                'shifts': [second_shift_time]
+            })
+
     return formatted_shifts
 
 def format_shift_time(shift, index):
@@ -2711,25 +2722,44 @@ def user_availability(email):
             Availability.email == email,
             Availability.date >= today,
             Availability.date <= four_weeks_later
-        ).all()
+        ).order_by(Availability.date).all()
 
         
         availability_data = []
         for availability in availabilities:
-            availability_dict = {
-                'date': availability.date.strftime('%Y-%m-%d'),
-                'weekday': availability.weekday,
-                'start_time': availability.start_time.strftime('%H:%M:%S') if availability.start_time else None,
-                'end_time': availability.end_time.strftime('%H:%M:%S') if availability.end_time else None,
-                # Including the additional times as you've mentioned
-                'start_time2': availability.start_time2.strftime('%H:%M:%S') if availability.start_time2 else None,
-                'end_time2': availability.end_time2.strftime('%H:%M:%S') if availability.end_time2 else None,
-                'start_time3': availability.start_time3.strftime('%H:%M:%S') if availability.start_time3 else None,
-                'end_time3': availability.end_time3.strftime('%H:%M:%S') if availability.end_time3 else None
-            }
-            availability_data.append(availability_dict)
-        
-    return jsonify(availability=availability_data)
+            # Check and add first time slot
+            if availability.start_time and availability.end_time:
+                availability_dict = {
+                    'date': availability.date.strftime('%Y-%m-%d'),
+                    'weekday': availability.weekday,
+                    'start_time': availability.start_time.strftime('%H:%M:%S'),
+                    'end_time': availability.end_time.strftime('%H:%M:%S')
+                }
+                availability_data.append(availability_dict)
+
+            # Entry for second time slot
+            if availability.start_time2 and availability.end_time2:
+                availability_dict = {
+                    'date': availability.date.strftime('%Y-%m-%d'),
+                    'weekday': availability.weekday,
+                    'start_time': availability.start_time2.strftime('%H:%M:%S'),
+                    'end_time': availability.end_time2.strftime('%H:%M:%S')
+                }
+                availability_data.append(availability_dict)
+
+            # Entry for third time slot
+            if availability.start_time3 and availability.end_time3:
+                availability_dict = {
+                    'date': availability.date.strftime('%Y-%m-%d'),
+                    'weekday': availability.weekday,
+                    'start_time': availability.start_time3.strftime('%H:%M:%S'),
+                    'end_time': availability.end_time3.strftime('%H:%M:%S')
+                }
+                availability_data.append(availability_dict)
+
+        print(availability_data)
+
+        return jsonify(availability=availability_data)
 
 
 @app.route('/api/user_scheduled_shifts/<string:email>', methods=['GET'])
