@@ -1,12 +1,12 @@
 from flask import request, url_for, session, jsonify, send_from_directory, make_response, send_file, redirect
 from flask_mail import Message
 import datetime
-from datetime import date
+from datetime import date, time
 from werkzeug.security import generate_password_hash, check_password_hash
 import random
 from models import db
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt, create_refresh_token
-from app import app, mail, get_database_uri
+from app import app, mail, timedelta, get_database_uri
 from openpyxl import Workbook
 import io
 from excel_output import create_excel_output
@@ -2373,7 +2373,10 @@ def get_dashboard_data():
         today = datetime.datetime.now().date()
         current_week_num = int(today.isocalendar()[1])
     
+        # Welche User haben ihre Verfügbarkeiten noch nicht eingegeben (erl) 
         missing_users = get_missing_user_list(session, current_user)
+
+        # An den Folgenden Zeiten sind noch zu wenig User 
         unavailable_times_list = unavailable_times(session, current_user)
             
         # Extract email addresses from the missing users list
@@ -2389,7 +2392,7 @@ def get_dashboard_data():
                 F"Bitte trage deine Verfügbarkeit schnellstmöglich. Anderenfalls können wir dich leider nicht mit einplanen. \n \n" \
                 f"Liebe Grüsse \n \n" \
                 f"Team {current_user.company_name}"
-                #mail.send(msg)
+                # mail.send(msg)
                 print(msg.body)
             if button == "Msg_Insufficient_Planning":
                 table_header = "Datum\t\tUnbesetzte Zeiten\n"
@@ -2402,7 +2405,7 @@ def get_dashboard_data():
                 f"Bitte trage deine Unterstützung in deiner Verfügbarkeit schnellstmöglich ein. \n \n" \
                 f"Liebe Grüsse \n \n" \
                 f"Team {current_user.company_name}"
-                #mail.send(msg)
+                # mail.send(msg)
                 print(msg.body)
     
 
@@ -2504,6 +2507,7 @@ def calculate_shift_hours(start_time, end_time):
         (func.minute(end_time) - func.minute(start_time))
     ) / 60
 
+
 def get_current_week_range():
     today = datetime.datetime.now().date()
     start_of_week = today - datetime.timedelta(days=today.weekday())
@@ -2511,13 +2515,23 @@ def get_current_week_range():
     return start_of_week, end_of_week
 
 
+# Bearbeitet von Gery 01.12.2023
 def get_current_week_range2(selectedMissingWeek):
-    selectedMissingWeek = int(request.args.get('selectedMissingWeek', None))
-    today = datetime.datetime.now().date()
+    # 1 = aktuelle Woche, 2 = nächste Woche
+    selectedMissingWeek = int(selectedMissingWeek)
 
-    start_of_week_missing_team = today - datetime.timedelta(days=today.weekday()) + datetime.timedelta(days=7*selectedMissingWeek)
-    end_of_week_missing_team = start_of_week_missing_team + datetime.timedelta(days=6) 
+    # aktuelles Datums
+    today = datetime.datetime.now().date()
+    # Startdatums der aktuellen Woche (Montag) berechnen
+    start_of_current_week = today - datetime.timedelta(days=today.weekday())
+
+    # Berechnung des Startdatums der gewünschten Woche 
+    start_of_week_missing_team = start_of_current_week + datetime.timedelta(days=7 * (selectedMissingWeek - 1))
+    # Berechnung des Enddatums der gewünschten Woche (Sonntag der selectedMissingWeek)
+    end_of_week_missing_team = start_of_week_missing_team + datetime.timedelta(days=6)
+
     return start_of_week_missing_team, end_of_week_missing_team
+
 
 
 def get_current_shifts(session, current_user):
@@ -2566,10 +2580,113 @@ def get_missing_user_list(session, current_user):
     return [{'name': f'{user.first_name} {user.last_name}', 'email': user.email} for user in missing_users]
 
 
+
+# ------------------------------------------------------------------------------------------------------------
+
+# Bearbeitet von Gery 01.12.2023
 def unavailable_times(session, current_user):
+    # Welche Woche habe ich gezogen (KW)
     selectedMissingWeek = int(request.args.get('selectedMissingWeek', None))
     start_of_week_missing_team, end_of_week_missing_team, *_ = get_current_week_range2(selectedMissingWeek)
+
+    # print("Zeitraum: ", start_of_week_missing_team, end_of_week_missing_team)
+
+    # hour_devider ------------------------------------------------------------------------------------------------------
+    hour_divider_record = session.query(SolverRequirement).first()
+    hour_divider = hour_divider_record.hour_divider
+    # print("hour_divider: ", hour_divider)
+
+    # Öffnungszeiten ----------------------------------------------------------------------------------------------------
+    def time_to_timedelta(t):
+        if t is None:
+            return timedelta(hours=0, minutes=0, seconds=0)
+        return timedelta(hours=t.hour, minutes=t.minute, seconds=t.second)
     
+    def time_to_int(t, hour_divider):
+        divisor = 3600 / hour_divider
+        return int(t.total_seconds() / divisor)
+
+    weekday_order = case(
+        *[(OpeningHours.weekday == "Montag", 1),
+        (OpeningHours.weekday == "Dienstag", 2),
+        (OpeningHours.weekday == "Mittwoch", 3),
+        (OpeningHours.weekday == "Donnerstag", 4),
+        (OpeningHours.weekday == "Freitag", 5),
+        (OpeningHours.weekday == "Samstag", 6),
+        (OpeningHours.weekday == "Sonntag", 7)]
+    )
+
+    opening = session.query(OpeningHours).order_by(weekday_order).all()
+    # Dictionary mit den Öffnungszeiten für einfachere Abfragen
+    opening_dict = {record.weekday: record for record in opening}
+    # Standardliste von Wochentagen
+    weekdays = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"]
+    # "times" für jeden Wochentag, Werte aus der Datenbank, wenn verfügbar, sonst timedelta(0)
+    times = []
+    for day in weekdays:
+        if day in opening_dict:
+            record = opening_dict[day]
+            start_time = time_to_timedelta(record.start_time)
+            end_time = time_to_timedelta(record.end_time)
+            end_time2 = time_to_timedelta(record.end_time2)
+
+            # Logik zur Bestimmung der Schließzeit hinzufügen
+            if end_time2.total_seconds() == 0: 
+                # Wenn end_time2 nicht gesetzt ist, verwende end_time
+                close_time = end_time
+            else:
+                # Wenn end_time2 gesetzt ist, wird es immer verwendet, unabhängig von der Uhrzeit
+                close_time = end_time2
+                
+            times.append((record.weekday, start_time, end_time, close_time))
+        else:
+            times.append((day, timedelta(0), timedelta(0), timedelta(0)))
+
+
+    # Initialisiere leere Listen für die Öffnungs- und Schließzeiten
+    laden_oeffnet = [None] * 7
+    laden_schliesst = [None] * 7
+
+    # Ordne jedem Wochentag einen Index zu, um die Listen korrekt zu befüllen
+    weekday_indices = {
+        'Montag': 0,
+        'Dienstag': 1,
+        'Mittwoch': 2,
+        'Donnerstag': 3,
+        'Freitag': 4,
+        'Samstag': 5,
+        'Sonntag': 6
+    }
+
+    for weekday, start_time, end_time, close_time in times:
+        index = weekday_indices[weekday]
+        laden_oeffnet[index] = start_time
+        laden_schliesst[index] = close_time
+
+    # Berechne die Öffnungszeiten für jeden Wochentag und speichere sie in einer Liste
+    opening_hours = []
+    for i in range(7):
+        # Wenn die Schließzeit vor der Öffnungszeit liegt, werden 24 Stunden (86400 Sekunden) zur Schließzeit dazuaddiert
+        if laden_schliesst[i] < laden_oeffnet[i]:
+            corrected_close_time = laden_schliesst[i] + timedelta(seconds=86400) 
+        else:
+            corrected_close_time = laden_schliesst[i]
+        # Berechne die Öffnungszeit als Differenz zwischen der korrigierten Schließzeit und der Öffnungszeit
+        opening_hours.append(time_to_int(corrected_close_time, hour_divider) - time_to_int(laden_oeffnet[i], hour_divider))
+
+    # print("opening_hours: ", opening_hours)
+    # print("laden_oeffnet: ", laden_oeffnet)
+    # print("laden_schliesst: ", laden_schliesst)
+
+    # Verfügbarkeit ----------------------------------------------------------------------------------------------------
+    
+    # Pausiert da wichtigere Arbeit, später weiter machen
+    # Es müssen noch folgende Infos gezogen werden: Availability, User, Time_req
+
+
+
+
+
     # Subquery to count available workers for each time slot
     available_workers_subquery = session.query(
         Availability.date.label('avail_date'),
