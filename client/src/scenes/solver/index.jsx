@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
+  useTheme,
   Box,
   Button,
   Typography,
@@ -17,12 +18,15 @@ import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { Formik } from "formik";
 import { io } from "socket.io-client";
 import { API_BASE_URL } from "../../config";
+import { tokens } from "../../theme";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 import "../../i18n";
 
 // Arrow Function in JawaScript
 const Solver = () => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [showErrorNotification, setShowErrorNotification] = useState(false);
   const [selectedWeek, setSelectedWeek] = useState();
@@ -33,6 +37,9 @@ const Solver = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [solvingCompleted, setSolvingCompleted] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [solveTime, setSolveTime] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [solutionCompletion, setSolutionCompletion] = useState();
 
   const [loadingSteps, setLoadingSteps] = useState([
     { label: t("solver.precheck1"), status: "loading" },
@@ -67,11 +74,12 @@ const Solver = () => {
         );
         const anyError = updatedSteps.some((step) => step.status === "error");
 
-        if (allCompleted) {
-          setSolvingCompleted(true);
-        }
-
-        if (anyError) {
+        if (allCompleted && !anyError) {
+          // Add a delay of 2 seconds after all pre-checks are completed
+          setTimeout(() => {
+            setSolvingCompleted(true);
+          }, 2000); // 2000 milliseconds delay
+        } else if (anyError) {
           setHasError(true);
         }
 
@@ -79,10 +87,67 @@ const Solver = () => {
       });
     });
 
+    socket.on("solve_time", (data) => {
+      setSolveTime(data.time);
+    });
+
+    socket.on("solution_completion", (data) => {
+      setSolutionCompletion(data.solution);
+      console.log("Complete: ", data.solution)
+    });
+
     return () => {
       socket.disconnect();
     };
   }, []);
+
+  useEffect(() => {
+    let interval = null;
+  
+    if (solveTime > 0) {
+      interval = setInterval(() => {
+        setProgress((oldProgress) => {
+          const progressIncrement = 100 / solveTime;
+          const newProgress = oldProgress + progressIncrement;
+          return newProgress >= 100 ? 100 : newProgress;
+        });
+      }, 1000); // Update every second
+    } else {
+      setProgress(0); // Reset progress if conditions are not met
+    }
+  
+    return () => {
+      clearInterval(interval);
+    };
+  }, [solveTime, solvingCompleted]);
+
+
+  useEffect(() => {
+    if (solutionCompletion === 1 || solutionCompletion === 0) {
+      // Calculate the remaining time to reach 100%
+      const remainingTimeToComplete = 3000; // 3 seconds in milliseconds
+  
+      const interval = setInterval(() => {
+        setProgress((oldProgress) => {
+          const progressIncrement = (100 - oldProgress) / (remainingTimeToComplete / 1000);
+          const newProgress = oldProgress + progressIncrement;
+          return newProgress >= 100 ? 100 : newProgress;
+        });
+      }, 100); // Update every 100ms for a smoother transition
+  
+      const timeout = setTimeout(() => {
+        clearInterval(interval); // Clear the interval after 3 seconds
+        setSolvingCompleted(true);
+      }, remainingTimeToComplete);
+  
+      return () => {
+        clearTimeout(timeout);
+        clearInterval(interval);
+      };
+    }
+  }, [solutionCompletion]);
+
+  
 
   const handleWeekChange = (event) => {
     setSelectedWeek(event.target.value);
@@ -215,9 +280,9 @@ const Solver = () => {
                 }}
               >
                 <div style={{ marginRight: "10px" }}>
-                  {step.status === "loading" && <CircularProgress size={20} />}
+                  {step.status === "loading" && <CircularProgress size={20} style={{ color: colors.greenAccent[400] }}/>}
                   {step.status === "completed" && (
-                    <CheckCircleIcon style={{ color: "green" }} />
+                    <CheckCircleIcon style={{ color: colors.greenAccent[600] }} />
                   )}
                   {step.status === "error" && (
                     <ErrorOutlineIcon style={{ color: "red" }} />
@@ -247,15 +312,41 @@ const Solver = () => {
                 {t("solver.error_message")}
               </Typography>
             </div>
+          ) : progress < 100 ? (
+            <div style={{ textAlign: "center" }}>
+              <CircularProgress 
+                variant="determinate" 
+                value={progress} 
+                size={50} 
+                style={{ color: colors.greenAccent[600] }} // Assuming colors.greenAccent[400] is a valid color
+              />
+              <Typography style={{ margin: '10px 0' }}>
+                Loading... {Math.round(progress)}%
+              </Typography>
+            </div>
           ) : (
             <div style={{ textAlign: "center" }}>
-              <CheckCircleIcon style={{ color: "green", fontSize: 60 }} />
-              <Typography
-                variant="h6"
-                style={{ color: "green", marginTop: "20px" }}
-              >
-                {t("solver.success_message")}
-              </Typography>
+              {solutionCompletion === 0 ? (
+                <>
+                  <ErrorOutlineIcon style={{ color: "red", fontSize: 60 }} />
+                  <Typography
+                    variant="h6"
+                    style={{ color: "red", marginTop: "20px" }}
+                  >
+                    {t("solver.error_message")}
+                  </Typography>
+                </>
+              ) : (
+                <>
+                  <CheckCircleIcon style={{ color: colors.greenAccent[600], fontSize: 60 }} />
+                  <Typography
+                    variant="h6"
+                    style={{ color: colors.greenAccent[600], marginTop: "20px" }}
+                  >
+                    {t("solver.success_message")}
+                  </Typography>
+                </>
+              )}
             </div>
           )}
         </DialogContent>
@@ -275,7 +366,7 @@ const Solver = () => {
                 <div style={{ marginRight: "10px" }}>
                   {step.status === "loading" && <CircularProgress size={20} />}
                   {step.status === "completed" && (
-                    <CheckCircleIcon style={{ color: "green" }} />
+                    <CheckCircleIcon style={{ color: colors.greenAccent[600] }} />
                   )}
                   {step.status === "error" && (
                     <ErrorOutlineIcon style={{ color: "red" }} />
@@ -323,36 +414,6 @@ const Solver = () => {
           )}
         </Formik>
       </div>
-      <Snackbar
-        open={showSuccessNotification}
-        onClose={() => setShowSuccessNotification(false)}
-        message={t("notification.success_solver")}
-        autoHideDuration={3000}
-        sx={{
-          backgroundColor: "green !important",
-          color: "white",
-          "& .MuiSnackbarContent-root": {
-            borderRadius: "4px",
-            padding: "15px",
-            fontSize: "16px",
-          },
-        }}
-      />
-      <Snackbar
-        open={showErrorNotification}
-        onClose={() => setShowErrorNotification(false)}
-        message={t("notification.no_success_solver")}
-        autoHideDuration={3000}
-        sx={{
-          backgroundColor: "red !important",
-          color: "white",
-          "& .MuiSnackbarContent-root": {
-            borderRadius: "4px",
-            padding: "15px",
-            fontSize: "16px",
-          },
-        }}
-      />
     </Box>
   );
 };

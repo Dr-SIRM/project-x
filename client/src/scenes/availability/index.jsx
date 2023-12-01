@@ -129,10 +129,12 @@ const Availability = ({ availability }) => {
 
   const goToNextWeek = () => {
     setWeekAdjustment(weekAdjustment + 7);
+    setActiveTemplateData({});
   };
 
   const goToPreviousWeek = () => {
     setWeekAdjustment(weekAdjustment - 7);
+    setActiveTemplateData({});
   };
 
   const isUserEmpty =
@@ -432,11 +434,11 @@ const Availability = ({ availability }) => {
                     </span>
                     <br />
                     <br />
-                    {t("info.availability_template_step1")}
+                    {t("info.title_template_step1")}
                     <br />
-                    {t("info.availability_template_step2")}
+                    {t("info.title_template_step2")}
                     <br />
-                    {t("info.availability_template_step3")}
+                    {t("info.title_template_step3")}
                   </div>
                 }
                 sx={{

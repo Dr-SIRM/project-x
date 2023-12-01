@@ -1219,11 +1219,15 @@ def run_solver():
             # Maximale Solvingzeit aufgrund Berechnungen
             solve_time = or_algo_cp.solving_time()
 
+            socketio.emit('solve_time', {'time': solve_time})
+
             # If no errors occurred, the algorithm is further executed.
             or_algo_cp.run_2()
 
             # 1 == Solver hat eine Lösung gefunden, 0 == Solver hat keine Lösung gefunden
             solver_res = or_algo_cp.solver_result()
+
+            socketio.emit('solution_completion', {'solution': solver_res})
 
             # If no errors occurred, the algorithm is further executed.
             or_algo_cp.run_3()
