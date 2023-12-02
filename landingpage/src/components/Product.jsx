@@ -3,9 +3,13 @@ import styles from "../style";
 import { Footer } from "../components";
 import Button from "./Button";
 import Dashboard from "../assets/Dashboard.png"; // adjust the path to where your image is stored
-import Gif1 from "../assets/Gif1.gif";
-import Gif2 from "../assets/Gif2.gif";
-import Gif3 from "../assets/Gif3.gif";
+import gif_verfuegbarkeit from "../assets/gif_verfuegbarkeit.gif";
+import gif_planung from "../assets/gif_planung.gif";
+import gif_anforderungen from "../assets/gif_anforderungen.gif";
+import gif_solver from "../assets/gif_solver.gif";
+import billImage from "../assets/bill.png";
+
+
 
 const Product = () => {
   return (
@@ -19,12 +23,12 @@ const Product = () => {
         – alles mit einem Hauch von Datenmagie. Mach dich bereit für ein
         effizientes und spaßiges Planungserlebnis!
       </p>
-      {/* Section 1 */}
+      {/* Verfügbarkeit */}
       <div className="flex flex-row items-center mb-6">
         <div className="w-1/2 pr-8 flex justify-center">
           <img
-            src={Gif2}
-            alt="GIF 1"
+            src={gif_verfuegbarkeit}
+            alt="Verfügbarkeit"
             style={{ Width: "400px", height: "300px" }}
             className="rounded-lg"
           />
@@ -34,7 +38,7 @@ const Product = () => {
             className={`p-8 rounded-[20px] hover:bg-blue-700 transition-all duration-300 ${styles.marginX} feedback-card`}
           >
             <div className="flex flex-col items-start">
-              <h2 className={`${styles.heading3} text-lg mb-2`}>
+              <h2 className={`${styles.heading2} text-lg mb-2`}>
                 Verfügbarkeit
               </h2>
               <p className={`${styles.paragraph}`}>
@@ -47,7 +51,7 @@ const Product = () => {
           </div>
         </div>
       </div>
-      {/* Section 2 */}
+      {/* Planung */}
       <div className="flex flex-row items-center mb-6">
         <div className="w-1/2">
           <div
@@ -66,19 +70,19 @@ const Product = () => {
         </div>
         <div className="w-1/2 pl-8 flex justify-center">
           <img
-            src={Gif1}
-            alt="GIF 1"
+            src={gif_planung}
+            alt="Planung"
             style={{ Width: "400px", height: "300px" }}
             className="rounded-lg"
           />
         </div>
       </div>
-      {/* Section 3 */}
+      {/* Anforderungen */}
       <div className="flex flex-row items-center mb-6">
         <div className="w-1/2 pr-8 flex justify-center">
           <img
-            src={Gif2}
-            alt="GIF 1"
+            src={gif_anforderungen}
+            alt="Anforderungen"
             style={{ Width: "400px", height: "300px" }}
             className="rounded-lg"
           />
@@ -102,7 +106,7 @@ const Product = () => {
           </div>
         </div>
       </div>
-      {/* Section 4 */}
+      {/* Solver */}
       <div className="flex flex-row items-center mb-6">
         <div className="w-1/2">
           <div
@@ -121,34 +125,29 @@ const Product = () => {
         </div>
         <div className="w-1/2 pl-8 flex justify-center">
           <img
-            src={Gif3}
-            alt="GIF 1"
+            src={gif_solver}
+            alt="Solver"
             style={{ Width: "400px", height: "300px" }}
             className="rounded-lg"
           />
         </div>
       </div>
-      {/* Section 5 */}
+      {/* Features */}
       <div className="flex flex-row items-center mb-6">
         <div className="w-1/2 pr-8 flex justify-center">
           <img
-            src={Gif2}
-            alt="GIF 1"
-            style={{ Width: "400px", height: "300px" }}
+            src={billImage}
+            alt="Features Bild"
+            style={{ width: "400px", height: "300px" }}
             className="rounded-lg"
           />
         </div>
         <div className="w-1/2">
-          <div
-            className={`p-8 rounded-[20px] hover:bg-blue-700 transition-all duration-300 ${styles.marginX} feedback-card`}
-          >
+          <div className={`p-8 rounded-[20px] hover:bg-blue-700 transition-all duration-300 ${styles.marginX} feedback-card`}>
             <div className="flex flex-col items-start">
               <h2 className={`${styles.heading2} text-lg mb-2`}>Features</h2>
               <p className={`${styles.paragraph}`}>
-                Reduziert Fehler durch datengetriebene Entscheidungen. Reduziert
-                Fehler durch datengetriebene Entscheidungen. Reduziert Fehler
-                durch datengetriebene Entscheidungen. Reduziert Fehler durch
-                datengetriebene Entscheidungen.
+                Reduziert Fehler durch datengetriebene Entscheidungen...
               </p>
             </div>
           </div>
