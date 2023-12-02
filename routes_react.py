@@ -1385,9 +1385,9 @@ def solver_req():
                                     nb10 = solver_req_data['nb10'],
                                     nb11 = solver_req_data['nb11'],
                                     nb12 = solver_req_data['nb12'],
-                                    nb13 = 0,
-                                    nb14 = 0,
-                                    nb15 = 0,
+                                    nb13 = solver_req_data['nb13'],
+                                    nb14 = solver_req_data['nb14'],
+                                    nb15 = solver_req_data['nb15'],
                                     nb16 = 0,
                                     nb17 = 0,
                                     nb18 = 0,
@@ -1395,8 +1395,8 @@ def solver_req():
                                     nb20 = 0,
                                     created_by = user.company_id,
                                     changed_by = user.company_id,
-                                    creation_timestamp = datetime.datetime.now(),
-                                    update_timestamp = datetime.datetime.now()
+                                    creation_timestamp = datetime.now(),
+                                    update_timestamp = datetime.now()
                                     )
             session.add(data)
 
