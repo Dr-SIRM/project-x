@@ -1127,9 +1127,9 @@ def get_invite():
                 email=invite_data['email'], 
                 token=random_token, 
                 company_name=invite_data['company_name'], 
-                department = invite_data['department'] if 'department' in invite_data else None, 
-                department2 = invite_data['department2'] if 'department2' in invite_data else None,
-                department3 = invite_data['department3'] if 'department3' in invite_data else None,
+                department = invite_data['department'], 
+                department2 = invite_data['department2'],
+                department3 = invite_data['department3'],
                 department4 = None,
                 department5 = None,
                 department6 = None,
@@ -1139,7 +1139,7 @@ def get_invite():
                 department10 = None,
                 employment=invite_data['employment'], 
                 employment_level=invite_data['employment_level'], 
-                in_training=invite_data['in_training'] if 'in_training' in invite_data else None, 
+                in_training=invite_data['in_training'], 
                 access_level=invite_data['access_level'], 
                 created_by=user.company_id)
 
@@ -1833,7 +1833,7 @@ def is_within_opening_hours(time, opening, closing):
     if closing >= opening:
         return opening <= time < closing
     else:
-        return opening <= time or time < closing
+        return time < closing
 
 
 
@@ -1855,7 +1855,7 @@ def get_required_workforce():
         today = datetime.date.today()
         solverreq = session.query(SolverRequirement).filter_by(company_name=user.company_name).first()
         hour_divider = solverreq.hour_divider
-        full_day = (24 * hour_divider) -1
+        full_day = (24 * hour_divider)
         minutes = 60 / hour_divider
         day_num = 7   
         company_id = user.company_id
@@ -1917,7 +1917,7 @@ def get_required_workforce():
 
         # Week with adjustments
         monday = today - datetime.timedelta(days=today.weekday())
-        week_adjustment = int(request.args.get('week_adjustment', 0)) +7
+        week_adjustment = int(request.args.get('week_adjustment', 0))
         week_start = monday + datetime.timedelta(days=week_adjustment)
 
         slot_dict = {}
@@ -2068,7 +2068,7 @@ def get_required_workforce():
                                         is_within_opening_hours(new_time, opening_details.start_time, opening_details.end_time2):
                                             pass
                                         else:
-                                            capacity = 0
+                                            pass
                                     else:
                                         # Only end_time is defined
                                         if is_within_opening_hours(new_time, opening_details.start_time, opening_details.end_time):
@@ -3063,9 +3063,9 @@ def check_initial_setup():
                 nb10 = initial_data['nb10'],
                 nb11 = initial_data['nb11'],
                 nb12 = initial_data['nb12'],
-                nb13 = 0,
-                nb14 = 0,
-                nb15 = 0,
+                nb13 = initial_data['nb13'],,
+                nb14 = initial_data['nb14'],,
+                nb15 = initial_data['nb15'],,
                 nb16 = 0,
                 nb17 = 0,
                 nb18 = 0,
