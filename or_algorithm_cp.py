@@ -1110,13 +1110,7 @@ class ORAlgorithm_cp:
             for week in range(1, self.week_timeframe + 1):
                 self.nb2_violation[ma][week] = self.model.NewIntVar(0, diff_1, f'nb2_violation[{ma}][{week}]')
 
-        # NB3 Mindestarbeitszeit Verletzungsvariable
-        diff_2 = self.desired_min_time_day - self.min_time_day
-        if diff_2 < 0:
-            diff_2 = 0
-        for i in self.mitarbeiter:
-            for j in range(self.calc_time):
-                self.nb3_min_violation[i, j] = self.model.NewIntVar(0, diff_2, f'nb3_min_violation[{i}, {j}]')
+        # NB3 könnte mit NB4 verknüpft werden -> muss noch gemacht werden
 
         # NB4 Höchstarbeitszeit Verletzungsvariable
         diff_3 = self.max_time_day - self.desired_max_time_day
@@ -1158,12 +1152,12 @@ class ORAlgorithm_cp:
         # NB11 Gerechte Verteilung der Stunden - Unterschreitung
         for i in self.mitarbeiter:
             # 96 * 7 * 4 = 2688
-            self.nb11_min_violation[i] = self.model.NewIntVar(0, 2688, f'nb11_min_violation[{i}]')
+            self.nb11_min_violation[i] = self.model.NewIntVar(0, 1, f'nb11_min_violation[{i}]')
 
         # NB12 Gerechte Verteilung der Stunden - Überschreitung
         for i in self.mitarbeiter:
             # 96 * 7 * 4 = 2688
-            self.nb12_max_violation[i] = self.model.NewIntVar(0, 2688, f'nb12_max_violation[{i}]')
+            self.nb12_max_violation[i] = self.model.NewIntVar(0, 1, f'nb12_max_violation[{i}]')
 
         # NB13 Bevorzugte Mitarbeiter möglichst miteinander einteilen - Verletzungsvariable (*-1)
         for j in range(self.calc_time):
@@ -2056,11 +2050,6 @@ class ORAlgorithm_cp:
         # ***** Weiche Nebenbedingung 13 *****
         # -------------------------------------------------------------------------------------------------------
         
-        # Wie genau soll man das lösen mit einem reward?
-        
-        """
-        self.prefered_ee = {"jasmin.pfulg@sportrock.ch":["user_20@sportrock.ch", "user_19@sportrock.ch"], "user_20@sportrock.ch":["jasmin.pfulg@sportrock.ch"], "user_19@sportrock.ch":["jasmin.pfulg@sportrock.ch"]}
-        
         for ma1, others in self.prefered_ee.items():
             for ma2 in others:
                 for j in range(self.calc_time):
@@ -2072,7 +2061,7 @@ class ORAlgorithm_cp:
                                     # Wenn beide Mitarbeiter zur gleichen Zeit mit ihren jeweiligen Skills arbeiten, erhöhen Sie die nb13_violation
                                     print(f"Info 1: x {ma1}{j}{k}{s1} + x{ma2}{j}{k}{s2} <= 1 + nb13_violation")
                                     self.model.Add(self.x[ma1, j, k, s1] + self.x[ma2, j, k, s2] <= 1 + self.nb13_violation[j, k])
-        """
+        
 
 
         # -------------------------------------------------------------------------------------------------------
@@ -2080,21 +2069,6 @@ class ORAlgorithm_cp:
         # NB 18 - Vermeidbare Mitarbeiter möglichst nicht miteinander einteilen
         # ***** Weiche Nebenbedingung 14 *****
         # -------------------------------------------------------------------------------------------------------
-        
-        self.avoidable_ee = {"jasmin.pfulg@sportrock.ch":["user_0@sportrock.ch", "user_19@sportrock.ch"], "user_0@sportrock.ch":["jasmin.pfulg@sportrock.ch"], "user_19@sportrock.ch":["jasmin.pfulg@sportrock.ch"]}
-        
-        for ma1, others in self.avoidable_ee.items():
-            for ma2 in others:
-                for j in range(self.calc_time):
-                    for k in range(len(self.verfügbarkeit[ma1][j])):
-                        for s1 in self.mitarbeiter_s[ma1]:
-                            for s2 in self.mitarbeiter_s[ma2]:
-                                # Überprüfen, ob beide Mitarbeiter zur gleichen Zeit verfügbar sind und ob beide den jeweiligen Skill haben
-                                if s1 in self.benoetigte_skills[j // 7] and s2 in self.benoetigte_skills[j // 7]:
-                                    # Wenn beide Mitarbeiter zur gleichen Zeit mit ihren jeweiligen Skills arbeiten, nb13_violation erhöhen
-                                    self.model.Add(self.x[ma1, j, k, s1] + self.x[ma2, j, k, s2] <= 1 + self.nb14_violation[j, k])
-
-
 
 
 
@@ -2106,7 +2080,7 @@ class ORAlgorithm_cp:
         self.last_best_value = None
         self.current_best_value = None
         self.last_read_time = 0
-        self.stop_thread = False
+        self.stop_thread = True
 
         # -----------------------------
         # Nach wievielen Sekunden soll jeweils der aktuelle Bestwert in der Liste aufgenommen werden:
@@ -2136,12 +2110,7 @@ class ORAlgorithm_cp:
                 # gap_now = round(((1 - (hiring_cost_min / self.current_best_value))*100), 2)
                 gap_now = round(abs(1 - (self.current_best_value / hiring_cost_min)) * 100, 2)
                 print("------------------ NEUER WERT HINZUGEFÜGT: ", self.current_best_value, "GAP:", gap_now, "%", "------------------------")
-
-                # Überprüfen, ob der Gap weniger als 1% beträgt, wenn ja, solver stoppen
-                if gap_now < self.gap_to_stop:
-                    print("Gap unter 1%, stoppe den Solver.")
-                    self.solver.StopSearch()
-                    self.stop_thread = True  # Thread in diesem Fall sofort stoppen.
+                # Gap rausgelöscht, braucht es nicht mehr
 
 
         self.solver.parameters.log_search_progress = True
