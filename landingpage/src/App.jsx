@@ -25,8 +25,9 @@ import {
   Form,
   AGB,
   Impressum,
-  Datasecurity
+  Datasecurity,
 } from "./components";
+import UpButton from "./components/UpButton";
 
 const App = () => (
   <Router>
@@ -164,7 +165,9 @@ const App = () => (
           }
         />
       </Routes>
+      <UpButton /> {/* Add the UpButton component here */}
     </div>
+    
   </Router>
 );
 

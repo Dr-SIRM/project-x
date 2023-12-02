@@ -18,6 +18,7 @@ import Form from "./Form"
 import AGB from "./AGB"
 import Datasecurity from "./Datasecurity"
 import Impressum from "./Impressum"
+import UpButton from "./UpButton";
 
 export {
   Navbar,
