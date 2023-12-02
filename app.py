@@ -20,7 +20,7 @@ CORS(app)
 #SET SQLALCHEMY
 
 db_uri_prefix = 'mysql+pymysql://admin:ProjectX2023.@projectx3.cj6fxzhtmztu.eu-central-1.rds.amazonaws.com/'
-#db_uri_prefix = 'postgresql://PhuNguyen:ProjectX2023.@localhost/'
+#db_uri_prefix = 'postgresql://PhuProgramming:ProjectX2023.@localhost/'
 
 app.config["SECRET_KEY"] = "mysecret"
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://admin:ProjectX2023.@projectx3.cj6fxzhtmztu.eu-central-1.rds.amazonaws.com/projectx3'
@@ -72,7 +72,7 @@ def get_database_uri(company_name, schema_name=None):
         schema_name = f"schema_{company_name}"
     else:
         lower_name = schema_name.lower().replace(' ', "_")
-        schema_name = f"schema_{lower_name}"
+        schema_name = f"schema_timetab"
 
     return f"{db_uri_prefix}{schema_name}"
 
