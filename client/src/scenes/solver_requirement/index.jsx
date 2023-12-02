@@ -50,7 +50,7 @@ const SolverReq = ({ solverreq }) => {
         );
         setsolverData(response.data);
       } catch (error) {
-        console.error("Error fetching Solver details:", error);
+        // console.error("Error fetching Solver details:", error);
       }
     };
 
@@ -72,7 +72,7 @@ const SolverReq = ({ solverreq }) => {
       );
       setShowSuccessNotification(true);
     } catch (error) {
-      console.error("Error updating solver details:", error);
+      // console.error("Error updating solver details:", error);
       setShowErrorNotification(true);
     }
   };

@@ -62,7 +62,7 @@ const Topbar = () => {
 
   const handleLanguageChange = (lang) => {
     i18n.changeLanguage(lang);
-    console.log("Language changed to:", lang);
+    // console.log("Language changed to:", lang);
     handleClose();
   };
 

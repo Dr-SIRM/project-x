@@ -24,7 +24,6 @@ import "../../i18n";
 const GanttChart = () => {
   const [view, setView] = useState("day");
   const [shifts, setShifts] = useState([]);
-  console.log("Shifts:", shifts);
   const token = localStorage.getItem("session_token");
   const [openingHours, setOpeningHours] = useState({});
   const [currentDay, setCurrentDay] = useState(new Date());
@@ -52,11 +51,6 @@ const GanttChart = () => {
 
   useEffect(() => {
     const fetchWorkers = async () => {
-      console.log("Making request with view:", view);
-      console.log(
-        "Making request with currentDate:",
-        currentDay.toISOString().split("T")[0]
-      );
       const dayString = currentDay.toISOString().split("T")[0];
 
       // Use the existing "currentDay" as per your request
@@ -79,7 +73,7 @@ const GanttChart = () => {
         });
         const responseData = response.data;
         setCurrentWeekNum(responseData.current_week_num);
-        console.log("API Response Data:", responseData);
+        // console.log("API Response Data:", responseData);
 
         if (responseData && responseData.shifts) {
           const workerMap = new Map();
@@ -105,10 +99,10 @@ const GanttChart = () => {
         if (responseData && responseData.opening_hours) {
           setOpeningHours(responseData.opening_hours);
         } else {
-          console.error("Invalid response format:", responseData);
+          // console.error("Invalid response format:", responseData);
         }
       } catch (error) {
-        console.error("Error fetching workers:", error);
+        // console.error("Error fetching workers:", error);
       }
     };
 
@@ -238,7 +232,7 @@ const GanttChart = () => {
         }
       });
     });
-    console.log(validShifts);
+    // console.log(validShifts);
 
     const currentTimePercentage = getCurrentTimePercentage();
     const currentTimeLineStyle = {
@@ -326,7 +320,7 @@ const GanttChart = () => {
       return previousDay;
     });
   };
-  console.log(currentDay);
+  // console.log(currentDay);
   const formatDateDisplay = (date) => {
     return date.toLocaleDateString("de-DE", {
       year: "numeric",
@@ -388,7 +382,7 @@ const GanttChart = () => {
 
   const getShiftsForDay = (day) => {
     if (typeof day.toISOString() !== "string") {
-      console.error("The ISO string is not of type string:", day.toISOString());
+      // console.error("The ISO string is not of type string:", day.toISOString());
       return [];
     }
 
@@ -398,11 +392,11 @@ const GanttChart = () => {
     shifts.forEach((worker) => {
       worker.shifts.forEach((shiftDetail) => {
         if (shiftDetail.date === formattedDate) {
-          console.log("Found worker with matching date:", worker);
+          // console.log("Found worker with matching date:", worker);
 
           shiftDetail.shifts.forEach((shift) => {
             if (shift.start_time || shift.end_time) {
-              console.log("Shift for matched worker:", shift);
+              // console.log("Shift for matched worker:", shift);
             }
           });
         }
@@ -423,12 +417,12 @@ const GanttChart = () => {
           }
         });
       } else {
-        console.log(
-          "Date not matching for worker",
-          worker.first_name,
-          ":",
-          worker.date
-        );
+        // console.log(
+        //   "Date not matching for worker",
+        //   worker.first_name,
+        //   ":",
+        //   worker.date
+        // );
       }
     });
 
@@ -540,7 +534,7 @@ const GanttChart = () => {
       document.body.appendChild(link);
       link.click();
     } catch (error) {
-      console.error("Failed to export data to Excel:", error);
+      // console.error("Failed to export data to Excel:", error);
     }
   };
 

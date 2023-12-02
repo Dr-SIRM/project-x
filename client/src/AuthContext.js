@@ -19,7 +19,7 @@ const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      console.log('Email:', email, 'Password:', password);
+      // console.log('Email:', email, 'Password:', password);
       const response = await fetch(`${API_BASE_URL}/api/login`, {
         method: "POST",
         headers: {
@@ -31,7 +31,7 @@ const AuthProvider = ({ children }) => {
           throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      console.log('Server response:', data);
+      // console.log('Server response:', data);
       if (data.session_token) {
         localStorage.setItem('session_token', data.session_token);
         localStorage.setItem('refresh_token', data.refresh_token);
@@ -56,7 +56,7 @@ const AuthProvider = ({ children }) => {
         },
       });
 
-      console.log('Refresh Token:', response);
+      // console.log('Refresh Token:', response);
   
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -69,7 +69,7 @@ const AuthProvider = ({ children }) => {
         throw new Error('Failed to refresh token');
       }
     } catch (error) {
-      console.error('Error refreshing token:', error);
+      // console.error('Error refreshing token:', error);
       // Handle token refresh failure (e.g., redirect to login)
       logout(); // Logout the user if token refresh fails
     }
@@ -80,7 +80,7 @@ const AuthProvider = ({ children }) => {
       try {
         await refreshAccessToken(); // Call the refresh token function
       } catch (error) {
-        console.error("Token refresh failed:", error);
+        // console.error("Token refresh failed:", error);
       }
     };
   
@@ -112,11 +112,11 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     if (user) {
-      console.log('User after login:', user);
-      console.log('Session token after login:', localStorage.getItem('session_token'));
+      // console.log('User after login:', user);
+      // console.log('Session token after login:', localStorage.getItem('session_token'));
       navigate('/welcome');
     } else {
-      console.log('Back to Login');
+      // console.log('Back to Login');
     }  
   }, [user]); // This useEffect hook logs the value of 'user' whenever it changes
 

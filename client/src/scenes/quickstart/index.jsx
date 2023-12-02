@@ -143,10 +143,10 @@ const QuickStartPopup = ({ open, onClose }) => {
         },
       });
       setShowSuccessNotification(true);
-      console.log("Sending this data to server:", formData);
+      // console.log("Sending this data to server:", formData);
       onClose();
     } catch (error) {
-      console.error("Error updating details:", error);
+      // console.error("Error updating details:", error);
       setShowErrorNotification(true);
     }
   };

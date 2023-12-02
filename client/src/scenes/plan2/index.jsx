@@ -34,7 +34,7 @@ const GanttChart = () => {
     const startOfDay = moment().startOf('day').hour(0).minute(0).second(0);
     const endOfDay = moment().startOf('day').hour(23).minute(59).second(59);
   
-    console.log('Day View - Start:', startOfDay.toString(), 'End:', endOfDay.toString());
+    // console.log('Day View - Start:', startOfDay.toString(), 'End:', endOfDay.toString());
     setCurrentView('day');
     setTimelineBounds({ start: startOfDay, end: endOfDay });
     setTimelineKey(prevKey => prevKey + 1); // Update key to force re-render
@@ -122,7 +122,7 @@ const GanttChart = () => {
         setGroups(timelineGroups);
         setTimelineBounds({ start: minStartTime, end: maxEndTime });
       } catch (error) {
-        console.error('Error fetching shift data:', error);
+        // console.error('Error fetching shift data:', error);
       } finally {
         setIsLoading(false);
       }

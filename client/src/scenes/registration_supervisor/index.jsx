@@ -38,10 +38,10 @@ const Registration = ({ registration }) => {
 
   const handleClose = () => {
     if (password === correctPassword) {
-      console.log("Password is correct");
+      // console.log("Password is correct");
       setOpen(false);
     } else {
-      console.log("Incorrect password");
+      // console.log("Incorrect password");
       alert("Incorrect password"); // This is a basic alert, you might want to replace this with a more user-friendly message
     }
   };
@@ -60,7 +60,7 @@ const Registration = ({ registration }) => {
       });
       setShowSuccessNotification(true);
     } catch (error) {
-      console.error("Error updating registration details:", error);
+      // console.error("Error updating registration details:", error);
       setShowErrorNotification(true);
     }
   };
