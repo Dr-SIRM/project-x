@@ -109,6 +109,7 @@ const Solver = () => {
         setProgress((oldProgress) => {
           const progressIncrement = 100 / solveTime;
           const newProgress = oldProgress + progressIncrement;
+          console.log("Calc Time: ", oldProgress, progressIncrement, solveTime, newProgress)
           return newProgress >= 100 ? 100 : newProgress;
         });
       }, 1000); // Update every second

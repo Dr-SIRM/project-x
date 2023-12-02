@@ -1,7 +1,7 @@
-from flask import request, url_for, session, jsonify, send_from_directory, make_response, send_file, redirect
+from flask import request, url_for, jsonify, send_from_directory, make_response, send_file
 from flask_mail import Message
 import datetime
-from datetime import date, time
+from datetime import date
 from werkzeug.security import generate_password_hash, check_password_hash
 import random
 from models import db
@@ -10,8 +10,8 @@ from app import app, mail, timedelta, get_database_uri
 from openpyxl import Workbook
 import io
 from excel_output import create_excel_output
-from sqlalchemy import func, extract, not_, and_, or_, asc, desc, text, create_engine, inspect, case, exists
-from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy import func, not_, and_, or_, asc, text, create_engine, case
+from sqlalchemy.orm import sessionmaker
 import stripe
 import math
 from contextlib import contextmanager
