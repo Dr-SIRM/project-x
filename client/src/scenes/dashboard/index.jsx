@@ -78,9 +78,9 @@ const Dashboard = () => {
         setCurrentWeekNum(response.data.current_week_num);
         setInsufficientPlanning(response.data.unavailable_times);
 
-        console.log(response.data.upcoming_shifts);
+        // console.log(response.data.upcoming_shifts);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        // console.error("Error fetching data:", error);
       }
     };
 
@@ -89,7 +89,7 @@ const Dashboard = () => {
 
   const handleFormSubmit = async (buttonName) => {
     const payload = { button: buttonName };
-    console.log("Final payload before sending to server:", payload);
+    // console.log("Final payload before sending to server:", payload);
 
     try {
       // Send the updated form values to the server for database update
@@ -106,7 +106,7 @@ const Dashboard = () => {
       );
       setShowSuccessNotification(true);
     } catch (error) {
-      console.error("Error Sending Mail:", error);
+      // console.error("Error Sending Mail:", error);
       setShowErrorNotification(true);
     }
   };
@@ -144,6 +144,12 @@ const Dashboard = () => {
     const date = new Date(dateString);
     date.setDate(date.getDate() + days);
     return formatDate(date); // Reuse the formatDate function
+  };
+
+  const calculateProgress = (currentWorkers, maxWorkers) => currentWorkers / maxWorkers;
+  const calculateIncrease = (currentWorkers, maxWorkers) => {
+    const increase = (currentWorkers / maxWorkers) * 100;
+    return "+" + increase.toFixed(0) + "%"; // To format it as a string with a percentage sign
   };
 
   return (
@@ -189,8 +195,8 @@ const Dashboard = () => {
           <StatBox
             title={fullTimeWorkers}
             subtitle={t("dashboard.fulltimeworkers")}
-            progress="0.75"
-            increase="+14%"
+            progress={calculateProgress(fullTimeWorkers, mitarbeiterCount)}
+            increase={calculateIncrease(fullTimeWorkers, mitarbeiterCount)}
             icon={
               <AccountCircleIcon
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
@@ -209,10 +215,10 @@ const Dashboard = () => {
           <StatBox
             title={parttimeData}
             subtitle={t("dashboard.partimeworkers")}
-            progress="0.50"
-            increase="+21%"
+            progress={calculateProgress(parttimeData, mitarbeiterCount)}
+            increase={calculateIncrease(parttimeData, mitarbeiterCount)}
             icon={
-              <ChangeCircleIcon
+              <AccountCircleIcon
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
               />
             }
@@ -231,16 +237,16 @@ const Dashboard = () => {
               mitarbeiterCount ? mitarbeiterCount.toString() : "Loading..."
             }
             subtitle={t("dashboard.mitarbeiter")}
-            progress="0.50"
-            increase="+5%"
+            progress={calculateProgress(mitarbeiterCount, mitarbeiterCount)}
+            increase={calculateIncrease(mitarbeiterCount, mitarbeiterCount)}
             icon={
-              <PersonAddIcon
+              <AccountCircleIcon
                 sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
               />
             }
           />
         </Box>
-        <Box
+        {/* <Box
           gridColumn={isMobile ? "span 12" : "span 3"}
           backgroundColor={colors.primary[800]}
           borderRadius="15px"
@@ -259,7 +265,7 @@ const Dashboard = () => {
               />
             }
           />
-        </Box>
+        </Box> */}
 
         {/* ROW 2 */}
         <Box
@@ -367,6 +373,7 @@ const Dashboard = () => {
             justifyContent="space-between"
             alignItems="center"
             borderBottom={`4px solid ${colors.primary[500]}`}
+            backgroundColor={colors.primary[800]}
             colors={colors.grey[100]}
             p="15px"
           >

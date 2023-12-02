@@ -50,7 +50,7 @@ const SolverReq = ({ solverreq }) => {
         );
         setsolverData(response.data);
       } catch (error) {
-        console.error("Error fetching Solver details:", error);
+        // console.error("Error fetching Solver details:", error);
       }
     };
 
@@ -72,7 +72,7 @@ const SolverReq = ({ solverreq }) => {
       );
       setShowSuccessNotification(true);
     } catch (error) {
-      console.error("Error updating solver details:", error);
+      // console.error("Error updating solver details:", error);
       setShowErrorNotification(true);
     }
   };
@@ -909,7 +909,7 @@ const SolverReq = ({ solverreq }) => {
                           borderStyle: "solid",
                           color: "black", // Ensuring text color is black
                           "&.Mui-selected": {
-                            backgroundColor: "lightblue",
+                            backgroundColor: colors.greenAccent[400],
                             color: "white", // Ensuring selected text color is white
                           },
                         }}
@@ -972,7 +972,7 @@ const SolverReq = ({ solverreq }) => {
                           borderStyle: "solid",
                           color: "black", // Ensuring text color is black
                           "&.Mui-selected": {
-                            backgroundColor: "lightblue",
+                            backgroundColor: colors.greenAccent[400],
                             color: "white", // Ensuring selected text color is white
                           },
                         }}
@@ -1035,7 +1035,7 @@ const SolverReq = ({ solverreq }) => {
                           borderStyle: "solid",
                           color: "black", // Ensuring text color is black
                           "&.Mui-selected": {
-                            backgroundColor: "lightblue",
+                            backgroundColor: colors.greenAccent[400],
                             color: "white", // Ensuring selected text color is white
                           },
                         }}
@@ -1098,7 +1098,7 @@ const SolverReq = ({ solverreq }) => {
                           borderStyle: "solid",
                           color: "black", // Ensuring text color is black
                           "&.Mui-selected": {
-                            backgroundColor: "lightblue",
+                            backgroundColor: colors.greenAccent[400],
                             color: "white", // Ensuring selected text color is white
                           },
                         }}
@@ -1161,7 +1161,7 @@ const SolverReq = ({ solverreq }) => {
                           borderStyle: "solid",
                           color: "black", // Ensuring text color is black
                           "&.Mui-selected": {
-                            backgroundColor: "lightblue",
+                            backgroundColor: colors.greenAccent[400],
                             color: "white", // Ensuring selected text color is white
                           },
                         }}
@@ -1224,7 +1224,7 @@ const SolverReq = ({ solverreq }) => {
                           borderStyle: "solid",
                           color: "black", // Ensuring text color is black
                           "&.Mui-selected": {
-                            backgroundColor: "lightblue",
+                            backgroundColor: colors.greenAccent[400],
                             color: "white", // Ensuring selected text color is white
                           },
                         }}
@@ -1287,7 +1287,7 @@ const SolverReq = ({ solverreq }) => {
                           borderStyle: "solid",
                           color: "black", // Ensuring text color is black
                           "&.Mui-selected": {
-                            backgroundColor: "lightblue",
+                            backgroundColor: colors.greenAccent[400],
                             color: "white", // Ensuring selected text color is white
                           },
                         }}
@@ -1350,7 +1350,7 @@ const SolverReq = ({ solverreq }) => {
                           borderStyle: "solid",
                           color: "black", // Ensuring text color is black
                           "&.Mui-selected": {
-                            backgroundColor: "lightblue",
+                            backgroundColor: colors.greenAccent[400],
                             color: "white", // Ensuring selected text color is white
                           },
                         }}
@@ -1413,7 +1413,7 @@ const SolverReq = ({ solverreq }) => {
                           borderStyle: "solid",
                           color: "black", // Ensuring text color is black
                           "&.Mui-selected": {
-                            backgroundColor: "lightblue",
+                            backgroundColor: colors.greenAccent[400],
                             color: "white", // Ensuring selected text color is white
                           },
                         }}
@@ -1476,7 +1476,7 @@ const SolverReq = ({ solverreq }) => {
                           borderStyle: "solid",
                           color: "black", // Ensuring text color is black
                           "&.Mui-selected": {
-                            backgroundColor: "lightblue",
+                            backgroundColor: colors.greenAccent[400],
                             color: "white", // Ensuring selected text color is white
                           },
                         }}
@@ -1539,7 +1539,7 @@ const SolverReq = ({ solverreq }) => {
                           borderStyle: "solid",
                           color: "black", // Ensuring text color is black
                           "&.Mui-selected": {
-                            backgroundColor: "lightblue",
+                            backgroundColor: colors.greenAccent[400],
                             color: "white", // Ensuring selected text color is white
                           },
                         }}
@@ -1602,7 +1602,7 @@ const SolverReq = ({ solverreq }) => {
                           borderStyle: "solid",
                           color: "black", // Ensuring text color is black
                           "&.Mui-selected": {
-                            backgroundColor: "lightblue",
+                            backgroundColor: colors.greenAccent[400],
                             color: "white", // Ensuring selected text color is white
                           },
                         }}

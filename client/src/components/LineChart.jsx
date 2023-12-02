@@ -17,7 +17,7 @@ const LineChart = ({ isCustomLineColors = false, isDashboard = false, hoursWorke
     },
   ];
 
-  console.log(formattedData)
+  // console.log(formattedData)
   return (
     <ResponsiveLine
       data={formattedData}

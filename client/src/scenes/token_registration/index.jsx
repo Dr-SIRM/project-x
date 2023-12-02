@@ -37,7 +37,7 @@ const Token_Registration = ({ token_registration }) => {
     });
       setShowSuccessNotification(true);
     } catch (error) {
-      console.error('Error updating registration details:', error);
+      // console.error('Error updating registration details:', error);
       setShowErrorNotification(true);
     }
   };

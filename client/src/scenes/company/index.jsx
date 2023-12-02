@@ -40,7 +40,7 @@ const Company = ({ company }) => {
           setcompanyData(response.data);
           setIsLoading(false);
         } catch (error) {
-          console.error('Error fetching company details:', error);
+          // console.error('Error fetching company details:', error);
           setIsLoading(false);
         }
     };
@@ -66,7 +66,7 @@ const Company = ({ company }) => {
     });
       setShowSuccessNotification(true);
     } catch (error) {
-      console.error('Error updating company details:', error);
+      // console.error('Error updating company details:', error);
       setShowErrorNotification(true);
     }
   };

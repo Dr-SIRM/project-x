@@ -44,7 +44,7 @@ const Invite = ({ invite }) => {
         setDepartmentList(response.data.department_list);
         setIsLoading(false);
       } catch (error) {
-        console.error("Error fetching invite details:", error);
+        // console.error("Error fetching invite details:", error);
         setIsLoading(false);
       }
     };
@@ -63,7 +63,7 @@ const Invite = ({ invite }) => {
       });
       setShowSuccessNotification(true);
     } catch (error) {
-      console.error("Error updating invite details:", error);
+      // console.error("Error updating invite details:", error);
       setShowErrorNotification(true);
     }
   };

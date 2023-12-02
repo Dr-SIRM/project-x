@@ -204,7 +204,7 @@ const TimeReq = ({ timereq }) => {
         setClosingHours(closingHours);
         setIsLoading(false);
       } catch (error) {
-        console.error("Error fetching Time Requirements:", error);
+        // console.error("Error fetching Time Requirements:", error);
         setIsLoading(false);
         if (error.response.status === 401 || error.response.status === 500) {
           navigate("/login");
@@ -333,7 +333,7 @@ const TimeReq = ({ timereq }) => {
       return; // Prevent the form from submitting
     }
     try {
-      console.log(slotEmployeeCounts);
+      // console.log(slotEmployeeCounts);
       const payload = {};
       Object.entries(slotEmployeeCounts).forEach(([key, count]) => {
         if (count !== undefined) {
@@ -349,7 +349,7 @@ const TimeReq = ({ timereq }) => {
       payload["template_name"] = selectedTemplate;
       payload["department"] = selectedDepartment;
       // Send the updated form values to the server for database update
-      console.log("Final payload before sending to server:", payload);
+      // console.log("Final payload before sending to server:", payload);
       await axios.post(
         `${API_BASE_URL}/api/requirement/workforce?week_adjustment=${weekAdjustment}&selectedDepartment=${encodeURIComponent(
           selectedDepartment
@@ -363,7 +363,7 @@ const TimeReq = ({ timereq }) => {
         }
       );
       setShowSuccessNotification(true);
-      console.log("Sending this data to server:", payload);
+      // console.log("Sending this data to server:", payload);
     } catch (error) {
       setShowErrorNotification(true);
     }
@@ -544,21 +544,26 @@ const TimeReq = ({ timereq }) => {
           {t("planning.template1")}
         </Button>
         <Tooltip
-          title={
-            <>
-              <span style={{ fontWeight: "bold" }}>
-                {t("info.title_template")}
-              </span>
-              <br />
-              <br />
-              {t("info.title_template_step1")}
-              <br />
-              {t("info.title_template_step2")}
-              <br />
-              {t("info.title_template_step3")}
-            </>
-          }
-        >
+                title={
+                  <div style={{ fontSize: "15px" }}>
+                    <span style={{ ontSize: "10px" }}>
+                      {t("info.title_template")}
+                    </span>
+                    <br />
+                    <br />
+                    {t("info.title_template_step1")}
+                    <br />
+                    {t("info.title_template_step2")}
+                    <br />
+                    {t("info.title_template_step3")}
+                  </div>
+                }
+                sx={{
+                  "& .MuiTooltip-tooltip": {
+                    padding: "10px",
+                  },
+                }}
+              >
           <InfoOutlinedIcon style={{ color: "black" }} />
         </Tooltip>
       </Box>

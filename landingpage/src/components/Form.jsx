@@ -16,7 +16,7 @@ const ContactForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Form submission logic goes here
-    console.log("Form Data Submitted:", formData);
+    // console.log("Form Data Submitted:", formData);
     setFormData({ name: "", email: "", message: "" }); // Reset form fields
   };
 

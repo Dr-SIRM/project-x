@@ -1,18 +1,14 @@
-from flask import Flask, render_template, current_app, request, redirect, flash, url_for, abort, session, jsonify, send_from_directory, make_response
-from flask_login import LoginManager, current_user, logout_user, login_required, login_user
-from flask_mail import Mail, Message
+from flask import Flask, request
+from flask_login import LoginManager
+from flask_mail import Mail
 from flask_cors import CORS
-import datetime
 from datetime import timedelta
+import datetime
 from flask_migrate import Migrate
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash
 from functools import wraps
-import random
 from models import db
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, get_jwt, verify_jwt_in_request
-from collections.abc import Mapping as ABCMapping
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
+from flask_jwt_extended import JWTManager, get_jwt_identity, verify_jwt_in_request
 
 #Config
 #----------------------------------------------------------------------------------
@@ -78,7 +74,6 @@ def get_database_uri(company_name, schema_name=None):
         lower_name = schema_name.lower().replace(' ', "_")
         schema_name = f"schema_{lower_name}"
 
-    print(f"Get URI: {db_uri_prefix}{schema_name}")
     return f"{db_uri_prefix}{schema_name}"
 
 def jwt_required_optional(fn):
