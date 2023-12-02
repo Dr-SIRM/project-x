@@ -22,7 +22,10 @@ import {
   USP,
   FAQ,
   Aboutus,
-  Form
+  Form,
+  AGB,
+  Impressum,
+  Datasecurity
 } from "./components";
 
 const App = () => (
@@ -116,6 +119,45 @@ const App = () => (
             >
               <div className={`${styles.boxWidth}`}>
                 <Aboutus />
+                <Footer />
+              </div>
+            </div>
+          }
+        />
+        <Route
+          path="/AGB"
+          element={
+            <div
+              className={`bg-primary ${styles.paddingX} ${styles.flexCenter}`}
+            >
+              <div className={`${styles.boxWidth}`}>
+                <AGB />
+                <Footer />
+              </div>
+            </div>
+          }
+        />
+        <Route
+          path="/Impressum"
+          element={
+            <div
+              className={`bg-primary ${styles.paddingX} ${styles.flexCenter}`}
+            >
+              <div className={`${styles.boxWidth}`}>
+                <Impressum />
+                <Footer />
+              </div>
+            </div>
+          }
+        />
+        <Route
+          path="/Datasecurity"
+          element={
+            <div
+              className={`bg-primary ${styles.paddingX} ${styles.flexCenter}`}
+            >
+              <div className={`${styles.boxWidth}`}>
+                <Datasecurity />
                 <Footer />
               </div>
             </div>

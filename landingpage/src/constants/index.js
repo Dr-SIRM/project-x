@@ -17,11 +17,6 @@ export const navLinks = [
     path: "/conditions", // Internal link
   },
   {
-    id: "FAQ",
-    title: "FAQ",
-    path: "/FAQ", 
-  },
-  {
     id: "aboutus",
     title: "Über uns",
     path: "/aboutus", // Internal link
@@ -118,15 +113,15 @@ export const footerLinks = [
       }, */
       {
         name: "AGB",
-        link: "https://www.hoobank.com/create/",
+        link: "/AGB",
       },
       {
         name: "Impressum",
-        link: "https://www.hoobank.com/explore/",
+        link: "/Impressum",
       },
       {
         name: "Datenschutzgesetz",
-        link: "https://www.hoobank.com/terms-and-services/",
+        link: "/Datasecurity",
       },
     ],
   },
@@ -134,12 +129,13 @@ export const footerLinks = [
     title: "Community",
     links: [
       {
-        name: "Help Center",
-        link: "https://www.hoobank.com/help-center/",
+        id: "FAQ",
+        name: "FAQ",
+        link: "/FAQ", 
       },
       {
         name: "Newsletters",
-        link: "https://www.hoobank.com/newsletters/",
+/*         link: "https://www.hoobank.com/newsletters/", */
       },
     ],
   },

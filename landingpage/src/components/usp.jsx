@@ -1,29 +1,39 @@
 import React from "react";
 import styles from "../style";
 import Button from "./Button";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faArrowTrendUp,
+  faFaceSmileBeam,
+  faHandshakeSimple,
+} from "@fortawesome/free-solid-svg-icons";
 
 // Define an array with the content for each box
 const boxes = [
   {
     title: "Effizienz",
-    features: [
-      "TimeTab minimiert den manuellen Aufwand und automatisiert die Erstellung von Schichtplänen, sodass Sie wertvolle Zeit sparen.",
-    ],
-    price: "",
+    features: ["TimeTab minimiert den manuellen Aufwand und automatisiert die Erstellung von Schichtplänen, sodass Sie wertvolle Zeit sparen."],
+    icon: faArrowTrendUp,
+    iconStyle: { color: "#22e3b6" },
+    iconClass: "text-8xl",
   },
   {
     title: "Zufriedenheit",
     features: [
       "Durch Berücksichtigung individueller Präferenzen und Verfügbarkeiten bei der automatisierten Schichtplanung trägt unser Tool dazu bei, die Zufriedenheit und Motivation Ihrer Mitarbeiter zu steigern.",
     ],
-    price: "",
+    icon: faFaceSmileBeam,
+    iconStyle: { color: "#22e3b6" },
+    iconClass: "text-8xl",
   },
   {
     title: "Zuverlässigkeit",
     features: [
       "Mit intelligenten Algorithmen werden Fehler vermieden und eine verlässliche, bedarfsgerechte Personalzuordnung sichergestellt.",
     ],
-    price: "",
+    icon: faHandshakeSimple,
+    iconStyle: { color: "#67e2b5" },
+    iconClass: "text-8xl",
   },
 ];
 
@@ -45,22 +55,25 @@ const Conditions = () => {
           {boxes.map((box, index) => (
             <div
               key={index}
-              className={`flex flex-col items-center px-5 py-12 rounded-[20px] w-[300px] bg-blue-800 hover:bg-blue-700 transition-all duration-300 ${styles.marginX} feedback-card`}
+              className={`flex flex-col justify-between h-full px-5 py-12 rounded-[20px] w-[300px] bg-blue-800 hover:bg-blue-700 transition-all duration-300 ${styles.marginX} feedback-card`}
             >
-              <div className="flex justify-center items-center w-full">
+              <div>
                 <h2 className={`${styles.heading3} text-xl mb-4 text-white`}>
                   {box.title}
                 </h2>
+                {box.features.map((feature, featureIndex) => (
+                  <p key={featureIndex} className={`${styles.paragraph} mb-2`}>
+                    {feature}
+                  </p>
+                ))}
               </div>
-              {/* <h2 className={`${styles.paragraph} mb-2 text-l mb-4 text-white`}>
-                Features
-              </h2> */}
-              {box.features.map((feature, featureIndex) => (
-                <p key={featureIndex} className={`${styles.paragraph} mb-2`}>
-                  {feature}
-                </p>
-              ))}
-              <p className={`${styles.paragraph} mb-2`}>{box.price}</p>
+              <div className="mt-auto flex justify-center pt-10">
+                <FontAwesomeIcon
+                  icon={box.icon}
+                  className={box.iconClass || "text-2xl"} // Apply the iconClass here
+                  style={box.iconStyle || { color: "white" }}
+                />
+              </div>
             </div>
           ))}
         </div>

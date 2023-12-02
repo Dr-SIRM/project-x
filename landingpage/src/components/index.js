@@ -15,6 +15,9 @@ import USP from "./usp";
 import FAQ from "./FAQ";
 import Aboutus from "./Aboutus";
 import Form from "./Form"
+import AGB from "./AGB"
+import Datasecurity from "./Datasecurity"
+import Impressum from "./Impressum"
 
 export {
   Navbar,
@@ -33,5 +36,8 @@ export {
   USP,
   FAQ,
   Aboutus,
-  Form
+  Form,
+  AGB,
+  Datasecurity,
+  Impressum
 };
