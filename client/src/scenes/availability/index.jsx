@@ -86,9 +86,9 @@ const Availability = ({ availability }) => {
         setAvailabilityData(response.data);
         setUserList(response.data.user_list);
         setIsLoading(false);
-        console.log(response);
+        // console.log(response);
       } catch (error) {
-        console.error("Error fetching availability details:", error);
+        // console.error("Error fetching availability details:", error);
         setIsLoading(false);
       }
     };
@@ -168,7 +168,7 @@ const Availability = ({ availability }) => {
       selectedUser,
       checkedBoxes,
     };
-    console.log("Final payload before sending to server:", payload);
+    // console.log("Final payload before sending to server:", payload);
 
     try {
       // Send the updated form values to the server for database update

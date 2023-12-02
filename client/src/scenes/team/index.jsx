@@ -51,7 +51,7 @@ const Team = () => {
         setDepartments(response.data.departments);
         setIsLoading(false);
       } catch (error) {
-        console.error("Error fetching update details:", error);
+        // console.error("Error fetching update details:", error);
         setIsLoading(false);
       }
     };
@@ -145,7 +145,7 @@ const Team = () => {
         )
       );
     } catch (error) {
-      console.error("Error updating user:", error);
+      // console.error("Error updating user:", error);
     }
   };
 
@@ -179,7 +179,7 @@ const Team = () => {
       });
       setUsers(response.data.users); // Update the users state with the fresh data from the server
     } catch (error) {
-      console.error("Error updating in_training status:", error);
+      // console.error("Error updating in_training status:", error);
     }
   };
 
@@ -195,11 +195,11 @@ const Team = () => {
 
     // Retrieve the new value from the DOM
     const inputElement = document.querySelector(`[data-id='${id}'] input`);
-    console.log("Input Element:", inputElement);
+    // console.log("Input Element:", inputElement);
     if (inputElement) {
       const newValue = inputElement.value;
 
-      console.log("New value:", newValue); // Log the new value to the console for debugging
+      // console.log("New value:", newValue); // Log the new value to the // console for debugging
 
       // Prepare the data to be sent to the server
       let sendData = { [field]: newValue };
@@ -223,13 +223,13 @@ const Team = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log("Server Response:", response);
+        // console.log("Server Response:", response);
         setUsers(response.data.users); // Update the users state with the fresh data from the server
       } catch (error) {
-        console.error("Error updating user:", error);
+        // console.error("Error updating user:", error);
       }
     } else {
-      console.error("Could not find input element for edited cell");
+      // console.error("Could not find input element for edited cell");
     }
   };
 
@@ -256,13 +256,13 @@ const Team = () => {
       });
       setUsers(response.data.users); // Update the users state with the fresh data from the server
     } catch (error) {
-      console.error("Error updating user:", error);
+      // console.error("Error updating user:", error);
     }
   };
 
   const handleEmploymentChange = async (event, id) => {
     const newValue = event.target.value === "Vollzeit" ? "Perm" : "Temp";
-    console.log(event.target.value, newValue);
+    // console.log(event.target.value, newValue);
 
     try {
       // Send the modified data to the server
@@ -284,7 +284,7 @@ const Team = () => {
       });
       setUsers(response.data.users); // Update the users state with the fresh data from the server
     } catch (error) {
-      console.error("Error updating user:", error);
+      // console.error("Error updating user:", error);
     }
   };
 
@@ -306,7 +306,7 @@ const Team = () => {
         )
       );
     } catch (error) {
-      console.error("Error updating user:", error);
+      // console.error("Error updating user:", error);
     }
   };
 
@@ -340,7 +340,7 @@ const Team = () => {
       // Filter out the user from the current state
       setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
     } catch (error) {
-      console.error("Error deleting user:", error);
+      // console.error("Error deleting user:", error);
     }
   };
 

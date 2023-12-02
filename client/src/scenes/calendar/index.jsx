@@ -36,9 +36,9 @@ const Calendar = () => {
           },
         });
         setCurrentEvents(response.data);
-        console.log(response.data);
+        // console.log(response.data);
       } catch (error) {
-        console.error("Error fetching calendar details:", error);
+        // console.error("Error fetching calendar details:", error);
       }
     };
 

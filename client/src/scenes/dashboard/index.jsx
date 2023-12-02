@@ -78,9 +78,9 @@ const Dashboard = () => {
         setCurrentWeekNum(response.data.current_week_num);
         setInsufficientPlanning(response.data.unavailable_times);
 
-        console.log(response.data.upcoming_shifts);
+        // console.log(response.data.upcoming_shifts);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        // console.error("Error fetching data:", error);
       }
     };
 
@@ -89,7 +89,7 @@ const Dashboard = () => {
 
   const handleFormSubmit = async (buttonName) => {
     const payload = { button: buttonName };
-    console.log("Final payload before sending to server:", payload);
+    // console.log("Final payload before sending to server:", payload);
 
     try {
       // Send the updated form values to the server for database update
@@ -106,7 +106,7 @@ const Dashboard = () => {
       );
       setShowSuccessNotification(true);
     } catch (error) {
-      console.error("Error Sending Mail:", error);
+      // console.error("Error Sending Mail:", error);
       setShowErrorNotification(true);
     }
   };

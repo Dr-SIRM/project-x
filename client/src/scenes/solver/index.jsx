@@ -93,7 +93,7 @@ const Solver = () => {
 
     socket.on("solution_completion", (data) => {
       setSolutionCompletion(data.solution);
-      console.log("Complete: ", data.solution)
+      // console.log("Complete: ", data.solution)
     });
 
     return () => {
@@ -209,7 +209,7 @@ const Solver = () => {
         setShowErrorNotification(true);
       }
     } catch (error) {
-      console.error("Error updating solver details:", error);
+      // console.error("Error updating solver details:", error);
       setShowErrorNotification(true);
     }
   };

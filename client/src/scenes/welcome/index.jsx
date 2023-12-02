@@ -34,9 +34,9 @@ const Welcome = () => {
                     }
                 });
                 setInitalSetup(response.data.initialSetupNeeded)
-                console.log(response.data)
+                // console.log(response.data)
             } catch (error) {
-                console.error('Error fetching user details:', error);
+                // console.error('Error fetching user details:', error);
                 setIsLoading(false);
               }
           };

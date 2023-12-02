@@ -37,7 +37,7 @@ const ChangePassword = () => {
         setUserData(response.data);
         setIsLoading(false);
       } catch (error) {
-        console.error("Error fetching update details:", error);
+        // console.error("Error fetching update details:", error);
         setIsLoading(false);
       }
     };
@@ -55,7 +55,7 @@ const ChangePassword = () => {
       });
       setShowSuccessNotification(true);
     } catch (error) {
-      console.error("Error updating update details:", error);
+      // console.error("Error updating update details:", error);
       setShowErrorNotification(true);
     }
   };

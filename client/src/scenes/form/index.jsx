@@ -41,7 +41,7 @@ const Form = () => {
         setDepartmentList(response.data.department_list);
         setIsLoading(false);
       } catch (error) {
-        console.error("Error fetching user details:", error);
+        // console.error("Error fetching user details:", error);
         setIsLoading(false);
       }
     };
@@ -60,7 +60,7 @@ const Form = () => {
       setShowSuccessNotification(true);
       resetForm();
     } catch (error) {
-      console.error(error);
+      // console.error(error);
       setShowErrorNotification(true);
     }
   };

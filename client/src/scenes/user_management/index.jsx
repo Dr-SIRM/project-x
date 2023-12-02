@@ -48,7 +48,7 @@ const UserManagement = () => {
         setUsers(response.data.users);
         setIsLoading(false);
       } catch (error) {
-        console.error("Error fetching update details:", error);
+        // console.error("Error fetching update details:", error);
         setIsLoading(false);
       }
     };
@@ -74,7 +74,7 @@ const UserManagement = () => {
       }));
       setAvailability(availabilityWithId);
     } catch (error) {
-      console.error("Error fetching availability:", error);
+      // console.error("Error fetching availability:", error);
     }
   };
 
@@ -91,7 +91,7 @@ const UserManagement = () => {
       );
       setScheduledShifts(response.data.scheduledShifts);
     } catch (error) {
-      console.error("Error fetching scheduled shifts:", error);
+      // console.error("Error fetching scheduled shifts:", error);
     }
   };
   
