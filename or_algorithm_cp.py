@@ -78,11 +78,10 @@ To-Do Liste:
  -------------------------------
  - Vorüberprüfung die prüft, ob alle Mitarbeiter in self.mitarbeiter_s in self.mitarbeiter sind. Wenn nein, 
    heisst das das der Mitarbeiter der in self.mitarebeiter ist aber in self.mitarbeiter_s nicht vorhanden ist, 
-   das dieser keine Fähigkeit zugewiesen bekommen hat
+   das dieser keine Fähigkeit zugewiesen bekommen hat -> evtl. im Frontend lösen?
+
+ - Wenn der Solver abbricht da es unlösbar ist, soll an routes react entsprechend eine 0 gesendet werden.
    
- - Vorüberprüfung die prüft, ob die Mitarbeiter mit ihren Max Arbeitszeiten die self.verteilbaren_stunden überhaupt erreichen können.
-   Achtung! Wenn ein MA z.b. den Skill Koch hat und Koch nur 20h benötigt wird der Mitarbeiter aber in self.gerechte_verteilung 45h hat,
-   dann müssen 20h genommen werden und nicht 45h, da der MA gar nie 45h erreichen kann. (Teilzeit 100%)
 
 
 
@@ -171,6 +170,8 @@ class ORAlgorithm_cp:
         self.penalty_cost_nb10 = None
         self.penalty_cost_nb11_min = None
         self.penalty_cost_nb12_max = None
+        self.penalty_cost_nb13 = None
+        self.penalty_cost_nb14 = None
 
         # Attribute der Methode "decision_variables"
         self.x = None
@@ -194,6 +195,8 @@ class ORAlgorithm_cp:
         self.nb10_violation = {}
         self.nb11_min_violation = {}
         self.nb12_max_violation = {}
+        self.nb13_violation = {}
+        self.nb14_violation = {}
 
         # Attribute der Methode "objective_function"
         self.cost_expressions = []
@@ -216,6 +219,8 @@ class ORAlgorithm_cp:
         self.violation_nb10 = None
         self.violation_nb11 = None
         self.violation_nb12 = None
+        self.violation_nb13 = None
+        self.violation_nb14 = None
 
         self.hiring_costs = None
         self.nb1_penalty_costs = None
@@ -230,6 +235,8 @@ class ORAlgorithm_cp:
         self.nb10_penalty_costs = None
         self.nb11_min_penalty_costs = None
         self.nb12_max_penalty_costs = None
+        self.nb13_penalty_costs = None
+        self.nb14_penalty_costs = None
 
         # Attribute der Methode "store_solved_data"
         self.mitarbeiter_arbeitszeiten = {}
@@ -935,7 +942,7 @@ class ORAlgorithm_cp:
         Solvingzeit Berechnen
         """
         mitarbeiter_anzahl = len(self.mitarbeiter)
-        self.solve_time = 120 # 100 * mitarbeiter_anzahl
+        self.solve_time = 180 # 100 * mitarbeiter_anzahl
         return self.solve_time
     
 
@@ -970,7 +977,9 @@ class ORAlgorithm_cp:
             "nb9": {0: 1, 1: 100, 2: 250, 3: 400 , 4: 600, 5: 10000},
             "nb10": {0: 1, 1: 100, 2: 250, 3: 400 , 4: 600, 5: 10000},
             "nb11": {0: 1, 1: 100, 2: 250, 3: 400 , 4: 600, 5: 10000},
-            "nb12": {0: 1, 1: 100, 2: 250, 3: 400 , 4: 600, 5: 10000}
+            "nb12": {0: 1, 1: 100, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb13": {0: 100, 1: 100, 2: 250, 3: 400 , 4: 600, 5: 10000},
+            "nb14": {0: 100, 1: 100, 2: 250, 3: 400 , 4: 600, 5: 10000}
         }
 
         # Mapping für die entsprechenden Namen der Klassenattribute
@@ -986,7 +995,9 @@ class ORAlgorithm_cp:
             "nb9": "penalty_cost_nb9",
             "nb10": "penalty_cost_nb10",
             "nb11": "penalty_cost_nb11_min",
-            "nb12": "penalty_cost_nb12_max"
+            "nb12": "penalty_cost_nb12_max",
+            "nb13": "penalty_cost_nb13",
+            "nb14": "penalty_cost_nb14"
         }
 
         # Setze die Strafkosten für jede NB basierend auf dem Dictionary
@@ -1154,6 +1165,16 @@ class ORAlgorithm_cp:
             # 96 * 7 * 4 = 2688
             self.nb12_max_violation[i] = self.model.NewIntVar(0, 2688, f'nb12_max_violation[{i}]')
 
+        # NB13 Bevorzugte Mitarbeiter möglichst miteinander einteilen - Verletzungsvariable (*-1)
+        for j in range(self.calc_time):
+            for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):
+                self.nb13_violation[j, k] = self.model.NewIntVar(0, (self.opening_hours[j]), f'nb13_violation[{j}, {k}]')
+
+        # N14 Vermeidbare Mitarbeiter möglicht nicht miteinander einteilen - Verletzungsvariable
+        for j in range(self.calc_time):
+            for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):
+                self.nb14_violation[j, k] = self.model.NewIntVar(0, (self.opening_hours[j]), f'nb14_violation[{j}, {k}]')
+
 
 
     def objective_function(self):
@@ -1229,7 +1250,23 @@ class ORAlgorithm_cp:
         # Kosten für Weiche NB12 "Gerechte Verteilung der Stunden - Überschreitung"
         for i in self.mitarbeiter:
             self.cost_expressions.append(self.nb12_max_violation[i] * self.penalty_cost_nb12_max)
-        
+
+
+
+
+        # Kosten für Weiche NB13 "Bevorzugte Mitarbeiter möglichst miteinander einteilen"
+        for j in range(self.calc_time):
+            for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):
+                self.cost_expressions.append(self.nb13_violation[j, k] * self.penalty_cost_nb13)
+
+
+
+        # Koste für Weiche N14 "Vermeidbare Mitarbeiter möglicht nicht miteinander einteilen"
+        for j in range(self.calc_time):
+            for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):
+                self.cost_expressions.append(self.nb14_violation[j, k] * self.penalty_cost_nb14)
+
+
                 
         # Alle Kosten-Ausdrücke summieren und dem Model befehlen, die Kosten zu minimieren
         total_cost = sum(self.cost_expressions)
@@ -2003,15 +2040,60 @@ class ORAlgorithm_cp:
         
         # Für jeden Tag zur jeder Stunde mit jedem benötigten Skill
         for j in range(self.calc_time):
-                for k in range(len(self.verfügbarkeit[i][j])):
-                    woche = j // 7
-                    if self.benoetigte_skills[woche]:
-                        for s in self.benoetigte_skills[woche]:
-                            if s in self.mitarbeiter_s[i]:  # Prüfen, ob der Mitarbeiter den Skill hat
+            for k in range(len(self.verfügbarkeit[next(iter(self.mitarbeiter_s))][j])):  # Wir nehmen an, dass alle Mitarbeiter die gleichen Öffnungszeiten haben
+                woche = j // 7
+                if self.benoetigte_skills[woche]:
+                    for s in self.benoetigte_skills[woche]:
+                        if s in self.mitarbeiter_s[i]:  # Prüfen, ob der Mitarbeiter den Skill hat
 
-                                # Die Summe der neuen Mitarbeiter pro Tag pro Stunde pro Skill darf nicht größer 1 sein
-                                self.model.Add(sum(self.x[i, j, k, s] for i in self.mitarbeiter if self.new_employees[i] == 1) <= self.new_fte_per_slot)
+                            # Die Summe der neuen Mitarbeiter pro Tag pro Stunde pro Skill darf nicht größer 1 sein
+                            self.model.Add(sum(self.x[i, j, k, s] for i in self.mitarbeiter if self.new_employees[i] == 1) <= self.new_fte_per_slot)
+    
+
+        # -------------------------------------------------------------------------------------------------------
+        # WEICHE NB (02.12.2023)
+        # NB 17 - Bevorzugte Mitarbeiter möglichst miteinander einteilen
+        # ***** Weiche Nebenbedingung 13 *****
+        # -------------------------------------------------------------------------------------------------------
         
+        # Wie genau soll man das lösen mit einem reward?
+        
+        """
+        self.prefered_ee = {"jasmin.pfulg@sportrock.ch":["user_20@sportrock.ch", "user_19@sportrock.ch"], "user_20@sportrock.ch":["jasmin.pfulg@sportrock.ch"], "user_19@sportrock.ch":["jasmin.pfulg@sportrock.ch"]}
+        
+        for ma1, others in self.prefered_ee.items():
+            for ma2 in others:
+                for j in range(self.calc_time):
+                    for k in range(len(self.verfügbarkeit[ma1][j])):
+                        for s1 in self.mitarbeiter_s[ma1]:
+                            for s2 in self.mitarbeiter_s[ma2]:
+                                # Überprüfen, ob beide Mitarbeiter zur gleichen Zeit verfügbar sind und ob beide den jeweiligen Skill haben
+                                if s1 in self.benoetigte_skills[j // 7] and s2 in self.benoetigte_skills[j // 7]:
+                                    # Wenn beide Mitarbeiter zur gleichen Zeit mit ihren jeweiligen Skills arbeiten, erhöhen Sie die nb13_violation
+                                    print(f"Info 1: x {ma1}{j}{k}{s1} + x{ma2}{j}{k}{s2} <= 1 + nb13_violation")
+                                    self.model.Add(self.x[ma1, j, k, s1] + self.x[ma2, j, k, s2] <= 1 + self.nb13_violation[j, k])
+        """
+
+
+        # -------------------------------------------------------------------------------------------------------
+        # WEICHE NB (02.12.2023)
+        # NB 18 - Vermeidbare Mitarbeiter möglichst nicht miteinander einteilen
+        # ***** Weiche Nebenbedingung 14 *****
+        # -------------------------------------------------------------------------------------------------------
+        
+        self.avoidable_ee = {"jasmin.pfulg@sportrock.ch":["user_0@sportrock.ch", "user_19@sportrock.ch"], "user_0@sportrock.ch":["jasmin.pfulg@sportrock.ch"], "user_19@sportrock.ch":["jasmin.pfulg@sportrock.ch"]}
+        
+        for ma1, others in self.avoidable_ee.items():
+            for ma2 in others:
+                for j in range(self.calc_time):
+                    for k in range(len(self.verfügbarkeit[ma1][j])):
+                        for s1 in self.mitarbeiter_s[ma1]:
+                            for s2 in self.mitarbeiter_s[ma2]:
+                                # Überprüfen, ob beide Mitarbeiter zur gleichen Zeit verfügbar sind und ob beide den jeweiligen Skill haben
+                                if s1 in self.benoetigte_skills[j // 7] and s2 in self.benoetigte_skills[j // 7]:
+                                    # Wenn beide Mitarbeiter zur gleichen Zeit mit ihren jeweiligen Skills arbeiten, nb13_violation erhöhen
+                                    self.model.Add(self.x[ma1, j, k, s1] + self.x[ma2, j, k, s2] <= 1 + self.nb14_violation[j, k])
+
 
 
 
@@ -2045,12 +2127,14 @@ class ORAlgorithm_cp:
 
         def add_best_value_to_list():
             hiring_cost_min = self.verteilbare_stunden / self.hour_divider * 100
+            print("Kleinster Wert: ", hiring_cost_min)
             while not self.stop_thread:
                 time.sleep(self.best_test_time)
                 if self.last_best_value is not None:
                     self.current_best_value = self.last_best_value
                 self.best_values.append(self.current_best_value)
-                gap_now = round(((1 - (hiring_cost_min / self.current_best_value))*100), 2)
+                # gap_now = round(((1 - (hiring_cost_min / self.current_best_value))*100), 2)
+                gap_now = round(abs(1 - (self.current_best_value / hiring_cost_min)) * 100, 2)
                 print("------------------ NEUER WERT HINZUGEFÜGT: ", self.current_best_value, "GAP:", gap_now, "%", "------------------------")
 
                 # Überprüfen, ob der Gap weniger als 1% beträgt, wenn ja, solver stoppen
@@ -2084,7 +2168,6 @@ class ORAlgorithm_cp:
             self.last_best_value = int(match.group(1))
 
 
-
     def calculate_costs(self):
         """
         In dieser Methode werden die Kosten der einzelnen Nebenbedingungen berechnet und ausgegeben
@@ -2113,6 +2196,13 @@ class ORAlgorithm_cp:
             for j in range(self.calc_time):
                 print(f"a_sum[{i}][{j}] =", self.solver.Value(self.a_sum[i, j]))
         """
+
+        # Die Werte von nb13_violation printen
+        for j in range(self.calc_time):
+            for k in range(len(self.verfügbarkeit[self.mitarbeiter[0]][j])):
+                # Drucken Sie den Wert von nb13_violation[j, k]
+                print(f"nb13_violation[{j}][{k}] =", self.solver.Value(self.nb14_violation[j, k]))
+
 
         # ----------------------------------------------------------------
 

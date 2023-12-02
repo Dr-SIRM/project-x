@@ -1227,6 +1227,8 @@ def run_solver():
             # 1 == Solver hat eine Lösung gefunden, 0 == Solver hat keine Lösung gefunden
             solver_res = or_algo_cp.solver_result()
 
+            print("OOOOOOOOOOOOOOOOOOOOOOOOO: ", solver_res)
+
             socketio.emit('solution_completion', {'solution': solver_res})
 
             # If no errors occurred, the algorithm is further executed.
