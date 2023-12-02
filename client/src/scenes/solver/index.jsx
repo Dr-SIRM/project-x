@@ -47,7 +47,7 @@ const Solver = () => {
     { label: t("solver.precheck3"), status: "loading" },
     { label: t("solver.precheck4"), status: "loading" },
     { label: t("solver.precheck5"), status: "loading" },
-    // { label: "6. Vorüberprüfung: ", status: 'loading' }
+    { label: "6. Vorüberprüfung: ", status: 'loading' }
   ]);
 
   // "Hook" in react, wir dazu genutzt, Nebeneffekte in funktionalen Komponenten zu verwalten
@@ -124,13 +124,13 @@ const Solver = () => {
 
 
   useEffect(() => {
-    if (solutionCompletion === 1 || solutionCompletion === 0) {
+    if (solutionCompletion === 1 ) {
       // Calculate the remaining time to reach 100%
-      const remainingTimeToComplete = 3000; // 3 seconds in milliseconds
+      const remainingTimeToComplete = 12000; // 3 seconds in milliseconds
   
       const interval = setInterval(() => {
         setProgress((oldProgress) => {
-          const progressIncrement = (100 - oldProgress) / (remainingTimeToComplete / 1000);
+          const progressIncrement = (100 + oldProgress) / (remainingTimeToComplete / 1000);
           const newProgress = oldProgress + progressIncrement;
           return newProgress >= 100 ? 100 : newProgress;
         });
