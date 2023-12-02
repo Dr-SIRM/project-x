@@ -935,7 +935,7 @@ class ORAlgorithm_cp:
         Solvingzeit Berechnen
         """
         mitarbeiter_anzahl = len(self.mitarbeiter)
-        self.solve_time = 1000 # 100 * mitarbeiter_anzahl
+        self.solve_time = 120 # 100 * mitarbeiter_anzahl
         return self.solve_time
     
 
